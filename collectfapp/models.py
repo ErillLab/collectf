@@ -52,6 +52,9 @@ class Curator(models.Model):
     user = models.OneToOneField(User) # extend Django's user model
     assigned_papers = models.ManyToManyField("Publication")
 
+    def __unicode__(self):
+        return u'%s' % self.user
+
 class Publication(models.Model):
     PUBLICATION_TYPE = (("pubmed", "Pubmed article"),
                         ("nonpubmed", "Non-pubmed article"),

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if form.errors %}
+<p>Sorry, that's not a valid username or password.</p>
+{% endif %}
+
+<form class="form" action="" method="post">{% csrf_token %}
+  {% for field in form %}
+  <div class="field">
+    <div class="field-label">{{ field.label_tag }}</div>
+    <div class="field-field">{{ field }}</div>
+    <div class="field-error">{{ field.errors }}</div>
+  </div>
+  {% endfor %}
+  <div class="navigation">
+    <input type="submit" value="login" />
+    <input type="hidden" name="next" value="{{ next|escape }}" />
+  </div>
+</form>
+
+<p><a href=/collectf/accounts/register>register</a></p>
+{% endblock %}

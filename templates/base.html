@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html lang="en">
+<head>
+    <title></title>
+    <link href="http://fonts.googleapis.com/css?family=Ubuntu"
+	  rel="stylesheet" type="text/css">
+    <style>
+    *{
+	font-family: 'Ubuntu', sans-serif;
+	font-size: 14px;
+    }
+    #user_greet{
+	float: right;
+    }
+    .form, #header {
+	margin: 10px auto;
+	width: 700px;
+	padding: 14px;
+	border: solid 2px #b7ddf2;
+	background: #ebf4fb;
+    }
+    .form .helptext {
+        font-size: 11px;
+    }
+    .form .form-description{
+	margin-bottom: 20px;
+	border-bottom: solid 1px #b7ddf2;
+	padding-bottom: 10px;
+    }
+    .form .field-label{
+	width: 300px;
+	float: left;
+	text-align: right;
+    }
+    .form .field-field{
+	display: inline-block;
+	margin: 0px 0px 0px 10px;
+    }
+    .form .field-error{
+	display: inline-block;
+	color: red;
+    }
+    .form .field ul li{
+	list-style-type: none;
+    }
+    .form-step{
+	text-align: center;
+    }
+    .navigation, #footer{
+	text-align: center;
+    }
+    </style>
+</head>
+
+<body>
+    <!-- header -->
+    <div id="header">
+    <a href="/">CollecTF</a>
+    <span id="user_greet">
+        {% if user.is_authenticated %}
+        Hello {{ user.username }}! <a href="/accounts/logout/">logout</a>
+        {% endif %}
+    </span>
+    </div>
+
+    {% block content %}
+    {% endblock %}
+    
+    <div id="footer">
+    If you find anything wrong, send an email to sefa1@umbc.edu
+    </div>
+
+</body>
+</html>
+    

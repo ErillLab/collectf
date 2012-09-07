@@ -1,4 +1,7 @@
 from django.conf.urls import patterns, include, url
+from collectfapp.signup import *
+from collectfapp.views import *
+from django.contrib.auth.decorators import login_required
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -14,4 +17,15 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
+    # registration
+    url(r'^accounts/register/$', register),
+    # login
+    url(r'^accounts/login/$', login, {'extra_context': {'next': '/'}}),
+    # logout
+    url(r'^accounts/logout/$', logout),
+    # main page
+    url(r'^$', login_required(home_view)),
+    
 )
+
+print login
