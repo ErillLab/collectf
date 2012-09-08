@@ -2,11 +2,6 @@
 {% block content %}
 
 <div class="form">
-{% if form.errors %}
-<p> Please correct the following errors</p>
-{{ form.errors }}
-{% endif %}
-
 <form action="" method="post">{% csrf_token %}
   {% include "formbase.html" %}
   <input type="hidden" name="{{ stage_field }}" value="1"/>

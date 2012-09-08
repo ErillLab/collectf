@@ -64,12 +64,14 @@ class Publication(models.Model):
     pmid = models.CharField(max_length=30, null=True, blank=True)
     # pmid can be null if not pubmed article
     citation = models.TextField() # contains authors, title and journal info
-    url = models.URLField(null=True, blank=True)
+    url = models.CharField(max_length=1000, null=True, blank=True)
     pdf = models.FileField(upload_to="papers/", null=True, blank=True)
     contains_promoter_data = models.BooleanField()
     contains_expression_data = models.BooleanField()
     submission_notes = models.TextField(null=True, blank=True)
     curation_complete = models.BooleanField(default=False) #paper curated?
+    def __unicode__(self):
+        return u'%s [PMID: %s]' % (self.publication_id, self.pmid)
 
 class Gene(models.Model):
     # choices

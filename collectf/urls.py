@@ -30,6 +30,8 @@ urlpatterns = patterns('',
     url(r'^$', login_required(views.home)),
     # pubmed publication submission
     url(r'^pubmed_submission/$', login_required(pubview.pubmed_submission)),
+    # nonpubmed publication submission
+    url(r'^non_pubmed_submission/$', login_required(pubview.non_pubmed_submission)),
 
 )
 
