@@ -1,7 +1,10 @@
 from django.conf.urls import patterns, include, url
-from collectfapp.signup import *
-from collectfapp.views import *
+from collectfapp.signupview import *
 from django.contrib.auth.decorators import login_required
+
+import collectfapp.views as views
+import collectfapp.signupview as signupview
+import collectfapp.pubview as pubview
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -18,14 +21,16 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
     # registration
-    url(r'^accounts/register/$', register),
+    url(r'^accounts/register/$', signupview.register),
     # login
-    url(r'^accounts/login/$', login, {'extra_context': {'next': '/'}}),
+    url(r'^accounts/login/$', signupview.login, {'extra_context': {'next': '/'}}),
     # logout
-    url(r'^accounts/logout/$', logout),
+    url(r'^accounts/logout/$', signupview.logout),
     # main page
-    url(r'^$', login_required(home_view)),
-    
+    url(r'^$', login_required(views.home)),
+    # pubmed publication submission
+    url(r'^pubmed_submission/$', login_required(pubview.pubmed_submission)),
+
 )
 
 print login

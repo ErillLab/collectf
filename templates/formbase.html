@@ -1,0 +1,8 @@
+{# Include the visible fields #}
+{% for field in form %}
+<div class="field">
+  <div class="field-label"> {{ field.label_tag }}</div>
+  <div class="field-field"> {{ field }}</div>
+  <div class="field-error"> {{ field.errors }}</div>
+</div>
+{% endfor %}

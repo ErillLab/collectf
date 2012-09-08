@@ -4,7 +4,8 @@ import models
 
 # Create your views here.
 
-def home_view(request):
+# home view
+def home(request):
     """Home view function to choose an action.
     The user can submit paper for curation, curate a paper or edit one of their
     own previous curations.
@@ -15,5 +16,4 @@ def home_view(request):
                      "curator": curator,
                      "curations": curations}
     return render_to_response("choose.html", template_vals)
-
 

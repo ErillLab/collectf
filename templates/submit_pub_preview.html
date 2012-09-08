@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<form action="" method="post">{% csrf_token %}
+  <table>
+    {% for field in form %}
+    <tr>
+      <th>{{ field.label }}:</th>
+      <td>{{ field.data }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <p>{{ pub.citation }}</p>
+
+  {% for field in form %}
+  {{ field.as_hidden }}
+  {% endfor %}
+  <input type="hidden" name="{{ stage_field }}" value="2" />
+  <input type="hidden" name="{{ hash_field }}" value="{{ hash_value }}" />
+  <input type="checkbox" name="assignment">I want to be curator for this paper.<br/>
+  <p><input type="submit" value="Submit" /></p>
+</form>
+
+<h1>Or edit it again</h1>
+
+<form action="" method="post">{% csrf_token %}
+  {% include "formbase.html" %}
+  <input type="hidden" name="{{ stage_field }}" value="1" />
+  <input type="submit" value="Preview">
+</form>
+
+{% endblock %}
