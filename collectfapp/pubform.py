@@ -12,8 +12,12 @@ class PubmedPublicationForm(forms.Form):
     def clean_pmid(self):
         cp = self.cleaned_data['pmid'] # cleaned pmid
         # check if in database
-        if Publication.objects.get(pmid=cp):
+        try:
+            Publication.objects.get(pmid=cp)
             raise forms.ValidationError("Publication is already in database")
+        except Publication.DoesNotExist:
+            pass
+        
         if not bioutils.get_pubmed(cp):
             raise forms.ValidationError("Invalid PMID")
         return cp
