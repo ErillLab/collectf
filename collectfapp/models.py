@@ -90,13 +90,19 @@ class Gene(models.Model):
     # KEGG id?
     # homology
 
+    def __unicode__(self):
+        return '%s (%s)' % (self.name, self.genome.strain.name)
+
 class Genome(models.Model):
     GENOME_TYPE = (("chromosome", "chromosome"), ("plasmid", "plasmid"))
     genome_accession = models.CharField(max_length=20, primary_key=True)
-    genome_type = models.CharField(max_length=20, choices=GENOME_TYPE)
+    #genome_type = models.CharField(max_length=20, choices=GENOME_TYPE)
     sequence = models.TextField()
     GC_content = models.FloatField()
     strain = models.ForeignKey("Strain")
+
+    def __unicode__(self):
+        return u'%s (%s)' % (self.genome_accession, self.strain.name)
 
 class Strain(models.Model):
     taxonomy_id = models.CharField(max_length=200, primary_key=True)
