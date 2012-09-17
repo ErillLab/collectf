@@ -53,7 +53,7 @@ def make_all_genes(genome_record):
         Gene(genome=genome, **g).save()
 
 def make_TF_instance(TF_rec):
-    tf = TFInstance(TF_accession=TF_rec.name,
+    tf = TFInstance(protein_accession=TF_rec.name,
                     name=TF_rec.name,
                     description=TF_rec.description)
     tf.save()

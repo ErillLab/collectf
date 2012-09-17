@@ -91,7 +91,7 @@ class Gene(models.Model):
     # homology
 
     def __unicode__(self):
-        return '%s (%s)' % (self.name, self.genome.strain.name)
+        return u'%s' % (self.name)
 
 class Genome(models.Model):
     GENOME_TYPE = (("chromosome", "chromosome"), ("plasmid", "plasmid"))
@@ -129,8 +129,12 @@ class TFInstance(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField()
 
+    def __unicode__(self):
+        return u'%s -- %s' % (self.protein_accession, self.description)
+
     class Meta:
         verbose_name = "TF instance"
+
 
 class SiteInstance(models.Model):
     site_id = models.AutoField(primary_key=True)
@@ -157,5 +161,7 @@ class ExperimentalTechnique(models.Model):
     technique_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     description = models.TextField()
-    
+
+    def __unicode__(self):
+        return u'%s' % self.name
 

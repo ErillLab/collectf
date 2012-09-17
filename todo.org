@@ -1,0 +1,5 @@
+- Sometimes, when script tries to fetch all gene records from NCBI, using Epost,
+  it fails. NCBI may have a limit to fetch record. Try to divide into batches.
+  http://permalink.gmane.org/gmane.comp.python.bio.general/6968
+
+

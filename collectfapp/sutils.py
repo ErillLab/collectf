@@ -9,3 +9,7 @@ def sput(session, key, val):
 def sget(session, key):
     # read from session data
     return session[key]
+
+def sdel(session, key):
+    # delete from session data
+    del session[key]

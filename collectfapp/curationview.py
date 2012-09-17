@@ -18,10 +18,11 @@ from django.contrib.formtools.wizard.views import SessionWizardView
 from curationform import *
 import models
 import sutils
+import sitesearch
 
 # curation get form functions
 # get_form constructs the form for a given step
-def publication_form(wiz, form):
+def publication_get_form(wiz, form):
     """Publication selection form"""
     user = wiz.request.user
     curator = models.Curator.objects.get(user=user)
@@ -30,16 +31,89 @@ def publication_form(wiz, form):
     # put them in form choices, populate form field
     choices = [(p.publication_id, p.citation) for p in assigned_pubs]
     form.fields["pub"].choices = choices
-
     return form
     
-def genome_form(wiz, form):
+def genome_get_form(wiz, form):
     """Genome, TF, TF_family, tf instance, .. selection form"""
     # populate TF field
     choices = [(None, 'None'),]
     for TF in models.TF.objects.all():
         choices.append((TF.TF_id, TF.name + " (family: %s)" % TF.family))
     form.fields['TF'].choices = choices
+    return form
+
+def techniques_get_form(wiz, form):
+    return form
+
+def site_report_get_form(wiz, form):
+    return form
+
+# helper function for site_exact_match_form and site_soft_match_forms
+def populate_match_choices(sid, matches):
+    # for a given site and its all matches, populate Django field choice
+    # exact_match: True if populating exact match results, if false, soft search
+    choices = []
+    for mid, match in matches.items():
+        choices.append((mid, sitesearch.print_match(match.match)))
+    last_choice_msg = "None of matches are good."
+    choices.append((None, last_choice_msg))
+    return choices
+    
+def site_exact_match_get_form(wiz, form):
+    """Show list of sites and their exact matches."""
+    # Each reported site and its exact match results are represented as field.
+    # Dynamically add fields to site search results step.
+    sites = sutils.sget(wiz.request.session, 'sites')
+    site_match_choices = sutils.sget(wiz.request.session, 'site_match_choices')
+    for sid, matches in site_match_choices.items(): # for all matches belong to a site
+        choices = populate_match_choices(sid, matches)
+        # make the form field
+        form.fields[sid] = forms.ChoiceField(label=sites[sid], choices=choices,
+                                             widget=forms.RadioSelect())
+    return form
+
+def site_soft_match_get_form(wiz, form):
+    """For sites that are not matched with equivalents in the previous form,
+    show soft search results."""
+    sites = sutils.sget(wiz.request.session, 'sites')
+    # soft site matches: {sid: {mid: SiteMatch}}
+    soft_site_match_choices = sutils.sget(wiz.request.session, 'soft_site_match_choices')
+    # exact site matches: {sid: SiteMatch} -- they're already matched in prev form
+    exact_site_matches = sutils.sget(wiz.request.session, 'exact_site_matches')
+    for sid, matches in soft_site_match_choices.items():
+        choices = populate_match_choices(sid, matches)
+        # make the form field
+        form.fields[sid] = forms.ChoiceField(label=sites[sid], choices=choices,
+                                             widget=forms.RadioSelect())
+    return form
+
+def site_regulation_get_form(wiz, form):
+    """For each site and its equivalent, show nearby genes for regulation input. For
+    each nearby gene for each site, curator manually checks if site regulates gene or
+    not (i.e. if there is any experimantal support for regulation)."""
+    pubid = sutils.sget(wiz.request.session, 'publication')
+    publication = models.Publication.objects.get(publication_id=pubid)  # get pub
+
+    # get exact and soft site matches
+    exact_site_matches = sutils.sget(wiz.request.session, 'exact_site_matches')
+    soft_site_matches = sutils.sget(wiz.request.session, 'soft_site_matches')
+
+    print exact_site_matches.items() + soft_site_matches.items()
+    for sid,match in exact_site_matches.items() + soft_site_matches.items():
+        choices = []  # list of genes to the site match
+        for g in match.nearby_genes:
+            choices.append((g.gene_id, g.__unicode__()))
+            form.fields[sid] = forms.MultipleChoiceField(label=match.match.seq,
+                                                     choices=choices, required=False,
+                                                     widget=forms.CheckboxSelectMultiple)
+        # disable checkbox if publication is marked as not having expression data
+        if not publication.contains_expression_data:
+            form.fields[sid].widget.attrs['disabled'] = 'disabled'
+
+    return form
+
+def curation_review_get_form(wiz, form):
+    """Get curation review form"""
     return form
 
 # curation process step functions
@@ -54,6 +128,133 @@ def genome_process(wiz, form):
     # it is inserted into db. So, at this point, it is guaranteed that
     # genome with id <genome_accession> should be in db.
     genome = models.Genome.objects.get(genome_accession=genome_accession)
+    # store genome in session data
+    sutils.sput(wiz.request.session, 'genome', genome)
+
+def techniques_process(wiz, form):
+    # no need to process any data from this form.
+    # all data will be processed at the end of last form
+    pass
+
+def site_report_process(wiz, form):
+    # read genome from session data
+    genome = sutils.sget(wiz.request.session, 'genome')
+    genes = models.Gene.objects.filter(genome=genome).order_by('start')
+    # get reported sites -- list of (sid, site)
+    sites = sitesearch.parse_site_input(form.cleaned_data['sites'])
+    # find exact matches
+    site_match_choices = sitesearch.match_all(genome, genes, sites, exact=True)
+    # put sites and site matches into session data
+    sutils.sput(wiz.request.session, 'site_match_choices', site_match_choices)
+    sutils.sput(wiz.request.session, 'sites', sites)
+    
+def site_exact_match_process(wiz, form):
+    """In the form, reported sites and their matches are displayed. For some
+    sites, curator may choose to perform a 'soft' search (if surrogate genome is
+    being used, sites may not be exactly found in the genome)."""
+    genome = sutils.sget(wiz.request.session, 'genome')      # genome
+    genes = models.Gene.objects.filter(genome=genome).order_by('start')
+    sites = sutils.sget(wiz.request.session, 'sites')        # all sites
+    # get all match choices for each reported site
+    site_match_choices = sutils.sget(wiz.request.session, 'site_match_choices')
+    exact_site_matches = {} # {sid: SiteMatch} to store which sites are exactly matched
+    for sid, mid in form.cleaned_data.items():  # siteid and matchid
+        if mid != 'None':
+            exact_site_matches[sid] = site_match_choices[sid][int(mid)]
+    # the rest is unmatched, perform soft search for them
+    soft_sites = {}
+    for sid, site in sites.items():
+        if sid not in exact_site_matches:
+            soft_sites[sid] = site
+    soft_site_match_choices = sitesearch.match_all(genome, genes, soft_sites, exact=False)
+
+    # - exact_site_matches {sid: SiteMatch}
+    # - soft_site_match_choices {sid: {mid: SiteMatch}} and get user selections for those
+    sutils.sput(wiz.request.session, 'exact_site_matches', exact_site_matches)
+    sutils.sput(wiz.request.session, 'soft_site_match_choices', soft_site_match_choices)
+
+def site_soft_match_process(wiz, form):
+    """In this form, soft search results are processed, user matched all of sites to
+    any equivalent. Some sites might be unmatched if there is not any good candidate
+    in search results."""
+    sites = sutils.sget(wiz.request.session, 'sites')
+    soft_site_match_choices = sutils.sget(wiz.request.session, 'soft_site_match_choices')
+    soft_site_matches = {} # {sid: SiteMatch} to store which sites are softly matched
+    not_matched_sites = [] # list of ids of sites that are not matched
+    for sid, mid in form.cleaned_data.items(): # siteid and matchid
+        if mid != 'None':
+            # reported site mapped to a soft search result site
+            soft_site_matches[sid] = soft_site_match_choices[sid][int(mid)]
+        else:
+            # site is not mapped as exact nor soft search, insert to DB as unmatched
+            not_matched_sites.append(sid)
+
+    # - soft_site_matches {sid: SiteMatch}
+    # - not_matched_sites [sid, ..]
+    sutils.sput(wiz.request.session, 'soft_site_matches', soft_site_matches)
+    sutils.sput(wiz.request.session, 'not_matched_sites', not_matched_sites)
+    
+
+def site_regulation_process(wiz, form):
+    pass
+
+def curation_review_process(wiz, form):
+    pass
+
+# CurationWizard done step functions
+
+# When the last step of the form is submitted, gather all data from each form
+# step and insert into database. Following _done_ functions are implemented for
+# each step and they are called by CurationWizard.done when user submit curation
+# form. Each _done_ function returns a dictionary of cleaned data from the
+# corresponding form.
+def publication_done(wiz, form, **kwargs):
+    pid = form.cleaned_data['pub']
+    publication = models.Publication.objects.get(publication_id=pid)
+    return {'publication': publication}
+
+def genome_done(wiz, form, **kwargs):
+    """Get genome and TF data from the genome form (2nd step)"""
+    cd = {}  # cleaned data to be returned
+    # genome
+    genome_accession = form.cleaned_data['genome_accession']
+    cd['genome'] = models.Genome.objects.get(genome_accession=genome_accession)
+    # TF instance
+    TF_accession = form.cleaned_data['TF_accession']
+    cd['TF_instance'] = models.TFInstance.objects.get(protein_accession=TF_accession)
+    # get all other cleaned data
+    cd['TF'] = form.cleaned_data['TF']
+    cd['TF_function'] = form.cleaned_data['TF_function']
+    cd['TF_type'] = form.cleaned_data['TF_type']
+    cd['TF_species'] = form.cleaned_data['TF_species']
+    cd['site_species'] = form.cleaned_data['site_species']
+    
+    return cd
+
+def techniques_done(wiz, form, **kwargs):
+    """Get techniques and experimental process data from form"""
+    cd = {}  # cleaned data to be returned
+    cd['techniques'] = form.cleaned_data['techniques']
+    cd['experimental_process'] = form.cleaned_data['experimental_process']
+    cd['forms_complex'] = form.cleaned_data['forms_complex']
+    cd['complex_notes'] = form.cleaned_data['complex_notes']
+    return cd
+
+def site_report_done(wiz, form, **kwargs):
+    pass
+
+def site_exact_match_done(wiz, form, **kwargs):
+    pass
+
+def site_soft_match_done(wiz, form, **kwargs):
+    pass
+
+def site_regulation_done(wiz, form, **kwargs):
+    pass
+
+def curation_review_done(wiz, form, **kwargs):
+    pass
+        
 
 class CurationWizard(SessionWizardView):
     """Form wizard to handle curation forms. For methods, see Django docs."""
@@ -70,8 +271,14 @@ class CurationWizard(SessionWizardView):
         if step == None:
             step = self.steps.current
 
-        handlers = {'0': publication_form, # functions
-                    '1': genome_form,
+        handlers = {'0': publication_get_form, # functions
+                    '1': genome_get_form,
+                    '2': techniques_get_form,
+                    '3': site_report_get_form,
+                    '4': site_exact_match_get_form,
+                    '5': site_soft_match_get_form,
+                    '6': site_regulation_get_form,
+                    '7': curation_review_get_form,
                    }
         
         return handlers[step](wiz=self, form=form)
@@ -80,10 +287,21 @@ class CurationWizard(SessionWizardView):
         """Process data after each step before it gets stored"""
         handlers = {'0': publication_process, # functions
                     '1': genome_process,
+                    '2': techniques_process,
+                    '3': site_report_process,
+                    '4': site_exact_match_process,
+                    '5': site_soft_match_process,
+                    '6': site_regulation_process,
+                    '7': curation_review_process,
                    }
         
         handlers[self.steps.current](wiz=self, form=form)
         return self.get_form_step_data(form)
+
+    def done(self, form_list, **kwargs):
+        """Last step in curation process, this method is called after all
+        forms. Insert all data into the database."""
+        return render_to_response('success.html')
         
 
 
@@ -91,4 +309,11 @@ class CurationWizard(SessionWizardView):
 # curation handler
 # for form definitions, go curationform.py
 curation = CurationWizard.as_view([PublicationForm,
-                                   GenomeForm,])
+                                   GenomeForm,
+                                   TechniquesForm,
+                                   SiteReportForm,
+                                   SiteExactMatchForm,
+                                   SiteSoftMatchForm,
+                                   SiteRegulationForm,
+                                   CurationReviewForm])
+                                   

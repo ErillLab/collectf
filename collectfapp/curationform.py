@@ -54,4 +54,70 @@ class GenomeForm(forms.Form):
                 msg = "Cannot fetch protein record from NCBI. Check accession number."
                 raise forms.ValidationError(msg)
             # create TFInstance object
+            make_TF_instance(TF_rec)
         return TF_accession
+
+    def clean(self):
+        # check if either site-species or site-species-same is filled
+        # check if either TF-species or TF-species-same is filled
+        cd = self.cleaned_data
+        print cd
+        if not (cd['TF_species'] or cd['TF_species_same']):
+            self._errors['TF_species'] = self.error_class([u"Invalid TF species"])
+        if not (cd['site_species'] or cd['site_species_same']):
+            self._errors['site_species'] = self.error_class([u"Invalid site species"])
+        return cd
+
+class TechniquesForm(forms.Form):
+    """Form to enter experimental techniques used to identify TFBS"""
+    # get available techniques from db
+    techniques = forms.ModelMultipleChoiceField(
+        queryset=ExperimentalTechnique.objects.all(),
+        widget=forms.CheckboxSelectMultiple())
+    experimental_process = forms.CharField(widget=forms.Textarea, required=False)
+    forms_complex = forms.BooleanField(required=False)
+    complex_notes = forms.CharField(widget=forms.Textarea, required=False)
+
+class SiteReportForm(forms.Form):
+    """Form to input the list of sites reported in the paper"""
+    sites = forms.CharField(widget=forms.Textarea)
+
+class SiteExactMatchForm(forms.Form):
+    """Form to select and match reported sites to their equivalents in the
+    genome. This form displays only exact matches (i.e. ones that is present in
+    genome exactly). If the site is not found in the genome 'exactly', it is
+    searched 'softly' and presented in the next form, SiteSoftMatchForm."""
+    # all form fields are created dynamically. No static field def here
+    pass
+
+class SiteSoftMatchForm(forms.Form):
+    """Form displaying results of 'soft' search. Match sites are not exactly
+    same with the query sequence, but similar."""
+    # No static def either here.
+    pass
+
+class SiteRegulationForm(forms.Form):
+    """This form is displayed after SiteSoftMatchForm. After the user selects
+    site equivalent for each reported site, in this form, surrounding genes to
+    the site are displayed. For each gene, it can be (un)checked whether site
+    regualates gene (or not).
+
+    Like the previous two forms, all fields in this form are created
+    dynamically, based on which genome positions are selected in the previous
+    two forms as site equivalents."""
+    pass
+
+class CurationReviewForm(forms.Form):
+    """Form to see all data entered so far. The last step to submit curation."""
+    choices = ((None, 'None'),) + Curation.REVISION_REASONS
+    revision_reasons = forms.ChoiceField(choices=choices)
+    confidence = forms.BooleanField(required=False)
+    label = "This curation is ready to submit to NCBI."
+    NCBI_submission_ready = forms.BooleanField(label=label, required=False)
+    label = "Curation for this paper is complete."
+    paper_complete = forms.BooleanField(label=label, required=False)
+    label = "I want to submit this curation"
+    confirm = forms.BooleanField(label=label, required=True)
+    
+    
+
