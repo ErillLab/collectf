@@ -61,12 +61,43 @@ class GenomeForm(forms.Form):
         # check if either site-species or site-species-same is filled
         # check if either TF-species or TF-species-same is filled
         cd = self.cleaned_data
-        print cd
         if not (cd['TF_species'] or cd['TF_species_same']):
             self._errors['TF_species'] = self.error_class([u"Invalid TF species"])
         if not (cd['site_species'] or cd['site_species_same']):
             self._errors['site_species'] = self.error_class([u"Invalid site species"])
         return cd
+
+    def clean_TF_species(self):
+        # clean TF_species field. If TF_species_same checkbox is selected, assign
+        # species data to cleaned data. In that case, it is important that
+        # clean_genome is called BEFORE clean_TF_species, because genome is
+        # needed to extract species information.
+        cd = self.cleaned_data
+        if cd['TF_species_same']:
+            tf_species = self.clean_species("TF_species")
+        else:
+            tf_species = cd['TF_species']
+        return tf_species
+
+    def clean_site_species(self):
+        # same with clean_TF_species function, but for site_species field
+        cd = self.cleaned_data
+        if cd['site_species_same']:
+            site_species = self.clean_species("site_species")
+        else:
+            site_species = cd['site_species']
+        return site_species
+
+    def clean_species(self, field):
+        # Helper function for clean_TF_species and clean_site_species
+        cd = self.cleaned_data
+        genome_accession = self.cleaned_data['genome_accession']
+        genome = Genome.objects.get(genome_accession=genome_accession)
+        if not genome:
+            msg = u"Invalid genome accession number"
+            self._errors[field] = self.error_class([msg])
+        return genome.strain.name
+
 
 class TechniquesForm(forms.Form):
     """Form to enter experimental techniques used to identify TFBS"""
@@ -109,13 +140,14 @@ class SiteRegulationForm(forms.Form):
 
 class CurationReviewForm(forms.Form):
     """Form to see all data entered so far. The last step to submit curation."""
-    choices = ((None, 'None'),) + Curation.REVISION_REASONS
+    choices = ((None, "None"),) + Curation.REVISION_REASONS
     revision_reasons = forms.ChoiceField(choices=choices)
     confidence = forms.BooleanField(required=False)
     label = "This curation is ready to submit to NCBI."
     NCBI_submission_ready = forms.BooleanField(label=label, required=False)
     label = "Curation for this paper is complete."
     paper_complete = forms.BooleanField(label=label, required=False)
+    notes = forms.CharField(widget=forms.Textarea, required=False)
     label = "I want to submit this curation"
     confirm = forms.BooleanField(label=label, required=True)
     

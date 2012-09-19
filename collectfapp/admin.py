@@ -6,8 +6,13 @@ from django.db.models import get_app
 # curator admin view
 class CuratorAdmin(admin.ModelAdmin):
     filter_horizontal = ("assigned_papers",)
-
 admin.site.register(Curator, CuratorAdmin) # register Curator
+
+# curation admin view
+class CurationAdmin(admin.ModelAdmin):
+    filter_horizontal = ("experimental_techniques",)
+admin.site.register(Curation, CurationAdmin) # register Curation
+
 # register rest of models
 app = get_app("collectfapp")
 for model in get_models(app):

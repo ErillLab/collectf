@@ -20,8 +20,8 @@ class Curation(models.Model):
                ("N/A", "not specified"))
     # fields
     curation_id = models.AutoField(primary_key=True)
-    TF_species = models.CharField(max_length=100)   # species of reported TF
-    site_species = models.CharField(max_length=100) # species of reported sites
+    TF_species = models.CharField(max_length=500)   # species of reported TF
+    site_species = models.CharField(max_length=500) # species of reported sites
     confidence = models.BooleanField()              # is curation confident?
     NCBI_submission_ready = models.BooleanField()   # is ready to submit to NCBI?
     requires_revision = models.CharField(max_length=20, choices=REVISION_REASONS,
@@ -30,14 +30,14 @@ class Curation(models.Model):
     forms_complex = models.BooleanField()           # does TF forms complex
     complex_notes = models.TextField(null=True, blank=True) # if forms complex,
     notes = models.TextField()
-    last_modified = models.DateTimeField()
+    last_modified = models.DateTimeField(auto_now_add=True)
 
     # Same TF can be both activator and repressor for different
     # situations. Similarly, same TF protein can bind DNA both as monomer and
     # dimer, etc. Therefore, instead of storing TF function and type in
     # TFInstance model, keep them here
-    TF_function = models.CharField(max_length=5, choices=TF_FUNCTION)
-    TF_type = models.CharField(max_length=5, choices=TF_TYPE)
+    TF_function = models.CharField(max_length=50, choices=TF_FUNCTION)
+    TF_type = models.CharField(max_length=50, choices=TF_TYPE)
 
     # relations
     curator = models.ForeignKey("Curator")
@@ -45,7 +45,10 @@ class Curation(models.Model):
     TF = models.ForeignKey("TF", null=True)
     TF_instance = models.ForeignKey("TFInstance")
     experimental_techniques = models.ManyToManyField("ExperimentalTechnique")
-    site_instances = models.ManyToManyField("SiteInstance")
+    site_instances = models.ManyToManyField("SiteInstance", through="Curation_SiteInstance")
+
+    def __unicode__(self):
+        return u'%s' % (self.curation_id)
     
 class Curator(models.Model):
     curator_id = models.AutoField(primary_key=True)
@@ -89,9 +92,8 @@ class Gene(models.Model):
     # COG id?
     # KEGG id?
     # homology
-
     def __unicode__(self):
-        return u'%s' % (self.name)
+        return '%s (%s)' % (self.gene_id, self.name)
 
 class Genome(models.Model):
     GENOME_TYPE = (("chromosome", "chromosome"), ("plasmid", "plasmid"))
@@ -107,6 +109,9 @@ class Genome(models.Model):
 class Strain(models.Model):
     taxonomy_id = models.CharField(max_length=200, primary_key=True)
     name = models.CharField(max_length=100)
+
+    def __unicode__(self):
+        return self.name
 
 class TF(models.Model):
     TF_id = models.AutoField(primary_key=True)
@@ -134,17 +139,27 @@ class TFInstance(models.Model):
 
     class Meta:
         verbose_name = "TF instance"
-
-
+        
 class SiteInstance(models.Model):
     site_id = models.AutoField(primary_key=True)
-    annotated_seq = models.TextField()
-    original_seq = models.TextField()
+    seq = models.TextField()
     genome = models.ForeignKey("Genome")
     start = models.IntegerField() # genome start position
     end = models.IntegerField()   # genome end position
     strand = models.IntegerField(choices=Gene.STRAND) # genome strand (1 or -1)
     regulates = models.ManyToManyField("Gene", through="Regulation")
+
+    def __unicode__(self):
+        return u'%s [%s]' % (self.site_id, self.seq)
+
+class Curation_SiteInstance(models.Model):
+    # through model between Curation and SiteInstance models
+    curation = models.ForeignKey("Curation")
+    site_instance = models.ForeignKey("SiteInstance")
+    annotated_seq = models.TextField()
+
+    def __unicode__(self):
+        return u"reported: %s, matched: %s" % (self.site_instance, self.annotated_seq)
 
 class Regulation(models.Model):
     EVIDENCE_TYPE = (("exp", "experimentally verified"), ("inferred", "inferred"))
@@ -156,6 +171,8 @@ class NotAnnotatedSiteInstance(models.Model):
     """If no matching sequence found in genome, use this class"""
     sequence = models.TextField()
     curation = models.ForeignKey("Curation")
+    def __unicode__(self):
+        return u'%s [%s]' % (self.id, self.sequence)  
     
 class ExperimentalTechnique(models.Model):
     technique_id = models.AutoField(primary_key=True)

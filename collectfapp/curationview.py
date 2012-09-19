@@ -15,6 +15,7 @@ email, or whatever the application needs to do.
 """
 
 from django.contrib.formtools.wizard.views import SessionWizardView
+from django.shortcuts import render_to_response
 from curationform import *
 import models
 import sutils
@@ -98,7 +99,6 @@ def site_regulation_get_form(wiz, form):
     exact_site_matches = sutils.sget(wiz.request.session, 'exact_site_matches')
     soft_site_matches = sutils.sget(wiz.request.session, 'soft_site_matches')
 
-    print exact_site_matches.items() + soft_site_matches.items()
     for sid,match in exact_site_matches.items() + soft_site_matches.items():
         choices = []  # list of genes to the site match
         for g in match.nearby_genes:
@@ -109,7 +109,6 @@ def site_regulation_get_form(wiz, form):
         # disable checkbox if publication is marked as not having expression data
         if not publication.contains_expression_data:
             form.fields[sid].widget.attrs['disabled'] = 'disabled'
-
     return form
 
 def curation_review_get_form(wiz, form):
@@ -206,12 +205,11 @@ def curation_review_process(wiz, form):
 # When the last step of the form is submitted, gather all data from each form
 # step and insert into database. Following _done_ functions are implemented for
 # each step and they are called by CurationWizard.done when user submit curation
-# form. Each _done_ function returns a dictionary of cleaned data from the
-# corresponding form.
+# form.
 def publication_done(wiz, form, **kwargs):
     pid = form.cleaned_data['pub']
     publication = models.Publication.objects.get(publication_id=pid)
-    return {'publication': publication}
+    return publication
 
 def genome_done(wiz, form, **kwargs):
     """Get genome and TF data from the genome form (2nd step)"""
@@ -223,12 +221,12 @@ def genome_done(wiz, form, **kwargs):
     TF_accession = form.cleaned_data['TF_accession']
     cd['TF_instance'] = models.TFInstance.objects.get(protein_accession=TF_accession)
     # get all other cleaned data
-    cd['TF'] = form.cleaned_data['TF']
+    cd['TF'] = form.cleaned_data['TF'] if form.cleaned_data['TF'] != 'None' else None
     cd['TF_function'] = form.cleaned_data['TF_function']
     cd['TF_type'] = form.cleaned_data['TF_type']
     cd['TF_species'] = form.cleaned_data['TF_species']
+    print 'xx', cd['TF_species']
     cd['site_species'] = form.cleaned_data['site_species']
-    
     return cd
 
 def techniques_done(wiz, form, **kwargs):
@@ -244,17 +242,69 @@ def site_report_done(wiz, form, **kwargs):
     pass
 
 def site_exact_match_done(wiz, form, **kwargs):
+    """Get data from exact site match form"""
     pass
 
 def site_soft_match_done(wiz, form, **kwargs):
+    """Get data from soft site match form"""
     pass
 
 def site_regulation_done(wiz, form, **kwargs):
-    pass
+    """Get regulation data"""
+    return form.cleaned_data
 
 def curation_review_done(wiz, form, **kwargs):
-    pass
+    """Get review form data and return it"""
+    cd = {}  # cleaned data to be returned
+    cd['requires_revision'] = form.cleaned_data['revision_reasons']
+    cd['confidence'] = form.cleaned_data['confidence']
+    cd['NCBI_submission_ready'] = form.cleaned_data['NCBI_submission_ready']
+    cd['paper_complete'] = form.cleaned_data['paper_complete']
+    cd['notes'] = form.cleaned_data['notes']
+    return cd
+
+# other done helper functions
+
+def regulation_done(wiz, site_instance, match, regulations):
+    """For site instance, add regulation information if available"""
+    for gene in match.nearby_genes:
+        if str(gene.gene_id) in regulations:
+            ev = 'exp'  # experimentally verified
+        else:
+            ev = 'inf'  # inferred
+        # add regulation object
+        r = models.Regulation(site_instance=site_instance, gene=gene, evidence_type=ev)
+        r.save()
         
+def site_match_done(wiz, curation, regulations):
+    """Get exact and soft site matches and create those objects in the database."""
+    sites = sutils.sget(wiz.request.session, 'sites')
+    exact_site_matches = sutils.sget(wiz.request.session, 'exact_site_matches')
+    soft_site_matches = sutils.sget(wiz.request.session, 'soft_site_matches')
+    genome = sutils.sget(wiz.request.session, 'genome')  # get genome
+    # combine exact and soft site matches
+    all_site_matches = dict(exact_site_matches.items() + soft_site_matches.items())
+    for sid, match in all_site_matches.items():
+        # create SiteInstance object
+        si = models.SiteInstance(genome=genome, start=match.match.start,
+                                 end=match.match.end, strand=match.match.strand,
+                                 seq=sites[sid])
+        si.save()
+        # create curation_siteinstance object (through relation)
+        t = models.Curation_SiteInstance(curation=curation, site_instance=si,
+                                         annotated_seq=match.match.seq)
+        t.save()
+        # for site instance, add regulation information
+        regulation_done(wiz, site_instance=si, match=match, regulations=regulations)
+
+        
+def not_matched_sites_done(wiz, curation):
+    """Create not matched site instances."""
+    sites = sutils.sget(wiz.request.session, 'sites')
+    not_matched_sites = sutils.sget(wiz.request.session, 'not_matched_sites')
+    for sid in not_matched_sites:
+        models.NotAnnotatedSiteInstance(sequence=sites[sid], curation=curation).save()
+  
 
 class CurationWizard(SessionWizardView):
     """Form wizard to handle curation forms. For methods, see Django docs."""
@@ -296,11 +346,48 @@ class CurationWizard(SessionWizardView):
                    }
         
         handlers[self.steps.current](wiz=self, form=form)
+
         return self.get_form_step_data(form)
 
     def done(self, form_list, **kwargs):
         """Last step in curation process, this method is called after all
         forms. Insert all data into the database."""
+        # get data from forms
+        publication = publication_done(self, form_list[0], **kwargs)
+        genome_cd = genome_done(self, form_list[1], **kwargs)
+        techniques_cd = techniques_done(self, form_list[2], **kwargs)
+        curation_review_cd = curation_review_done(self, form_list[7], **kwargs)
+
+        # find curator
+        curator = models.Curator.objects.get(user=self.request.user)
+        # create curation object
+        curation = models.Curation(publication=publication,
+                                   TF_species=genome_cd['TF_species'],
+                                   site_species=genome_cd['site_species'],
+                                   TF=genome_cd['TF'],
+                                   TF_function=genome_cd['TF_function'],
+                                   TF_type=genome_cd['TF_type'],
+                                   TF_instance=genome_cd['TF_instance'],
+                                   experimental_process=techniques_cd['experimental_process'],
+                                   forms_complex=techniques_cd['forms_complex'],
+                                   complex_notes=techniques_cd['complex_notes'],
+                                   requires_revision=curation_review_cd['requires_revision'],
+                                   notes=curation_review_cd['notes'],
+                                   confidence=curation_review_cd['confidence'],
+                                   NCBI_submission_ready=curation_review_cd['NCBI_submission_ready'],
+                                   curator=curator)
+        curation.save()
+
+        # add techniques
+        for t in techniques_cd['techniques']:
+            curation.experimental_techniques.add(t)
+
+        regulations = site_regulation_done(self, form_list[6], **kwargs)
+        # create matched site instances & regulations
+        site_match_done(self, curation, regulations)
+        # create not annotated sites objects
+        not_matched_sites_done(self, curation)  
+        
         return render_to_response('success.html')
         
 
