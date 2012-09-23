@@ -13,3 +13,6 @@ def sget(session, key):
 def sdel(session, key):
     # delete from session data
     del session[key]
+
+def sin(session, key):
+    return key in session

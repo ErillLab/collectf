@@ -150,6 +150,3 @@ class CurationReviewForm(forms.Form):
     notes = forms.CharField(widget=forms.Textarea, required=False)
     label = "I want to submit this curation"
     confirm = forms.BooleanField(label=label, required=True)
-    
-    
-

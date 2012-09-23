@@ -285,11 +285,10 @@ def site_match_done(wiz, curation, regulations):
     # combine exact and soft site matches
     all_site_matches = dict(exact_site_matches.items() + soft_site_matches.items())
     for sid, match in all_site_matches.items():
-        # create SiteInstance object
-        si = models.SiteInstance(genome=genome, start=match.match.start,
-                                 end=match.match.end, strand=match.match.strand,
-                                 seq=sites[sid])
-        si.save()
+        # create SiteInstance object (or get if available)
+        si, created  = models.SiteInstance.objects.get_or_create(
+            genome=genome, start=match.match.start, end=match.match.end,
+            strand=match.match.strand, seq=sites[sid])
         # create curation_siteinstance object (through relation)
         t = models.Curation_SiteInstance(curation=curation, site_instance=si,
                                          annotated_seq=match.match.seq)
@@ -386,7 +385,12 @@ class CurationWizard(SessionWizardView):
         # create matched site instances & regulations
         site_match_done(self, curation, regulations)
         # create not annotated sites objects
-        not_matched_sites_done(self, curation)  
+        not_matched_sites_done(self, curation)
+
+        # this curation is either new one or curator is editing an existing one
+        if sutils.sin(self.request.session, 'old_curation'):
+            # delete existing one
+            sutils.sget(self.request.session, 'old_curation').delete()
         
         return render_to_response('success.html')
         

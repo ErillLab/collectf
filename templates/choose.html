@@ -14,7 +14,7 @@
 
 <h2>Previously submitted curations of <u>{{ curator }}</u></h2>
 {% for c in curations %}
-<a href="/edit?cid={{ c.curation_id }}">{{ c }}</a> <br/>
+<a href="/edit_curation/{{ c.curation_id }}/">{{ c }}</a> <br/>
 {% endfor %}
 
 <hr/>

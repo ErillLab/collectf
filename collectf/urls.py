@@ -6,6 +6,7 @@ import collectfapp.views as views
 import collectfapp.signupview as signupview
 import collectfapp.pubview as pubview
 import collectfapp.curationview as curationview
+import collectfapp.editcurationview as editcurationview
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -35,7 +36,8 @@ urlpatterns = patterns('',
     url(r'^non_pubmed_submission/$', login_required(pubview.non_pubmed_submission)),
     # curation
     url(r'^curation/$', login_required(curationview.curation)),
-
+    # edit curation
+    url(r'^edit_curation/(?P<cid>\d+)/$', login_required(editcurationview.edit_curation)),
 )
 
 print login
