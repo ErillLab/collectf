@@ -387,7 +387,12 @@ class CurationWizard(SessionWizardView):
         # create not annotated sites objects
         not_matched_sites_done(self, curation)
 
-        # this curation is either new one or curator is editing an existing one
+        # mark paper as complete if so
+        if curation_review_cd['paper_complete']:
+            publication.curation_complete = True
+            publication.save()
+            
+        # if this curation finalizes the curation of the paper, mark paper as so.
         if sutils.sin(self.request.session, 'old_curation'):
             # delete existing one
             sutils.sget(self.request.session, 'old_curation').delete()
