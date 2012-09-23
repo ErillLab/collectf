@@ -1,5 +1,7 @@
 from Bio import SeqIO
 from Bio.Seq import Seq
+from Bio import Motif
+from Bio.Alphabet import IUPAC
 import StringIO
 from collections import namedtuple
 import regex
@@ -21,45 +23,66 @@ def parse_site_input(text):
         sites = [l for l in text.split() if l]
     return dict(enumerate(sites)) # list of (sid, site)
 
+def reverse_complement(seq):
+    return Seq(seq).reverse_complement().tostring()
+
 def locate_site_strand(genome_seq, site_seq, strand):
     """Site search on genome sequence"""
+    search_seq = site_seq if strand==1 else reverse_complement(site_seq)
     matches = []
-    i = genome_seq.find(site_seq)
+    i = genome_seq.find(search_seq)
     while i >= 0:
         m = Match(seq=site_seq, start=i, end=i+len(site_seq)-1, strand=strand)
         matches.append(m)
-        i = genome_seq.find(site_seq, i+1)
+        i = genome_seq.find(search_seq, i+1)
     return matches
 
 def locate_site(genome_seq, site_seq):
     # find exact matches of site on the genome sequence
     # search both strands
-    reverse_site_seq = Seq(site_seq).reverse_complement().tostring()
     matches = locate_site_strand(genome_seq, site_seq, strand=1) + \
-              locate_site_strand(genome_seq, reverse_site_seq, strand=-1)
+              locate_site_strand(genome_seq, site_seq, strand=-1)
     return matches
 
-def soft_locate_site_strand(genome_seq, site_seq, strand, pattern):
+def soft_locate_site_strand(genome_seq, strand, site_seq, mismatch_th):
     """Soft seatch on one strand only"""
     # first find all sequences on genome that are similar enough
+    search_seq = site_seq if strand==1 else reverse_complement(site_seq)
+    pattern = regex.compile('(%s){1<=s<=%d}' % (search_seq, mismatch_th))
     matches = []
+    # find all matches upto <mismatch_th> substitutions
     for m in regex.finditer(pattern, genome_seq, overlapped=True):
-        match = Match(seq=m.group(), start=m.span()[0], end=m.span()[1], strand=1)
+        matched_seq = m.group() if strand==1 else reverse_complement(m.group())
+        match = Match(seq=matched_seq, start=m.span()[0], end=m.span()[1], strand=strand)
         matches.append(match)
     return matches
 
-def soft_locate_site(genome_seq, site_seq, mismatch_th=2):
+def soft_locate_site(genome_seq, site_seq, mismatch_th=2, motif=None):
     """SOFT search for site in genome sequence.
     Since, PSSM search over whole genome is _very_ expensive,
     - find all sequences on the genome such that they are at most mismatch_th far.
     - run PSSM over those sequences and sort them by score.
     In future Pat's suffix array module may be used."""
-    reverse_site_seq = Seq(site_seq).reverse_complement().tostring()
-    # allow upto <mismatch_th> substitutions
-    p = regex.compile('(%s){1<=s<=%d}' % (site_seq, mismatch_th))
-    matches = soft_locate_site_strand(genome_seq, site_seq, strand=1, pattern=p) + \
-              soft_locate_site_strand(genome_seq, reverse_site_seq, strand=-1, pattern=p)
+    matches = soft_locate_site_strand(genome_seq, 1, site_seq, mismatch_th) + \
+              soft_locate_site_strand(genome_seq, -1, site_seq, mismatch_th)
+    # sort matches based on PWM
+    if not motif:
+        return matches
+
+    matches.sort(key=lambda x: score_match(motif, x.seq), reverse=True)
+    
     return matches
+
+def build_motif(seqs):
+    """Create motif from sequences"""
+    m = Motif.Motif(alphabet=IUPAC.unambiguous_dna)
+    for seq in seqs:
+        m.add_instance(Seq(seq, m.alphabet))
+    return m
+
+def score_match(motif, sequence):
+    """Given Biopython motif object and a sequence match, return PWM score of the match"""
+    return motif.score_hit(sequence, position=0)
     
 def dist(a, b):
     """Given two genes (or gene and Match), return distance"""
@@ -101,18 +124,30 @@ def locate_nearby_genes(genes, site_loc, dist_th=50):
         rhs_index += 1
     return nearby_genes    
 
-def match_all(genome, genes, sites, exact):
-    """For all sites in list, find exact/soft matches on the genome"""
+def match_all_exact(genome, genes, sites):
+    """For all sites in list, find exact matches on the genome"""
     # For each site, store a SiteMatch namedtuple object.
-    match_function = locate_site if exact else soft_locate_site
     site_matches = {} # dictionary of {sid: {mid: SiteMatch}}
     for sid, site in sites.items():
         site_matches[sid] = {} # initialize
-        matches = match_function(genome.sequence, site)
+        matches = locate_site(genome.sequence, site)
+        # for each match, find nearby genes
+        for mid, match in enumerate(matches):
+            nearby_genes = locate_nearby_genes(genes, match)
+            site_matches[sid][mid] = SiteMatch(match=match, nearby_genes=nearby_genes)        
+    return site_matches
+
+def match_all_soft(genome, genes, sites, exact_sites):
+    """For all sites in the list, find soft matches on the genome. Sort set of
+    matches of every site."""
+    # create motif from exact sites
+    motif = build_motif(exact_sites)
+    site_matches = {} # dictionary of {sid: {mid: SiteMatch}}
+    for sid, site in sites.items():
+        site_matches[sid] = {}  # init
+        matches = soft_locate_site(genome.sequence, site, mismatch_th=2, motif=motif)
         # for each match, find nearby genes
         for mid, match in enumerate(matches):
             nearby_genes = locate_nearby_genes(genes, match)
             site_matches[sid][mid] = SiteMatch(match=match, nearby_genes=nearby_genes)
     return site_matches
-            
-        

@@ -142,7 +142,7 @@ def site_report_process(wiz, form):
     # get reported sites -- list of (sid, site)
     sites = sitesearch.parse_site_input(form.cleaned_data['sites'])
     # find exact matches
-    site_match_choices = sitesearch.match_all(genome, genes, sites, exact=True)
+    site_match_choices = sitesearch.match_all_exact(genome, genes, sites)
     # put sites and site matches into session data
     sutils.sput(wiz.request.session, 'site_match_choices', site_match_choices)
     sutils.sput(wiz.request.session, 'sites', sites)
@@ -165,8 +165,11 @@ def site_exact_match_process(wiz, form):
     for sid, site in sites.items():
         if sid not in exact_site_matches:
             soft_sites[sid] = site
-    soft_site_match_choices = sitesearch.match_all(genome, genes, soft_sites, exact=False)
 
+    exact_sites = [m.match.seq for m in exact_site_matches.values()]
+    soft_site_match_choices = sitesearch.match_all_soft(genome, genes,
+                                                        soft_sites, exact_sites)
+    
     # - exact_site_matches {sid: SiteMatch}
     # - soft_site_match_choices {sid: {mid: SiteMatch}} and get user selections for those
     sutils.sput(wiz.request.session, 'exact_site_matches', exact_site_matches)
