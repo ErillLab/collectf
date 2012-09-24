@@ -53,7 +53,6 @@ class Curation(models.Model):
 class Curator(models.Model):
     curator_id = models.AutoField(primary_key=True)
     user = models.OneToOneField(User) # extend Django's user model
-    assigned_papers = models.ManyToManyField("Publication")
 
     def __unicode__(self):
         return u'%s' % self.user
@@ -73,6 +72,7 @@ class Publication(models.Model):
     contains_expression_data = models.BooleanField()
     submission_notes = models.TextField(null=True, blank=True)
     curation_complete = models.BooleanField(default=False) #paper curated?
+    assigned_to = models.ForeignKey("Curator")
     def __unicode__(self):
         return u'%s [PMID: %s]' % (self.publication_id, self.pmid)
 
