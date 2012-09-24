@@ -6,48 +6,20 @@
 	  rel="stylesheet" type="text/css">
     <style>
     *{
-        font-family: 'Lucida Grande',Arial,sans-serif;
-        /*font-family: 'Ubuntu', sans-serif;*/
-	font-size: 14px;
+        font-family: 'Ubuntu', sans-serif;
+	font-size: 16px;
     }
-    #user_greet{
-	float: right;
-    }
-    .form, #header {
+    #header, #body, #footer {
 	margin: 10px auto;
-	width: 800px;
+	width: 700px;
 	padding: 14px;
 	border: solid 2px #b7ddf2;
 	background: #ebf4fb;
     }
-    .form .helptext {
-        font-size: 11px;
+    #user-greet {
+	float: right;
     }
-    .form .form-description{
-	margin-bottom: 20px;
-	border-bottom: solid 1px #b7ddf2;
-	padding-bottom: 10px;
-    }
-    .form .field-label{
-	width: 300px;
-	float: left;
-	text-align: right;
-    }
-    .form .field-field{
-	display: inline-block;
-	margin: 0px 0px 0px 10px;
-    }
-    .form .field-error{
-	display: inline-block;
-	color: red;
-    }
-    .form .field ul li{
-	list-style-type: none;
-    }
-    .form-step{
-	text-align: center;
-    }
-    .navigation, #footer{
+    .form .form-wizard-navigation {
 	text-align: center;
     }
     </style>
@@ -57,15 +29,17 @@
     <!-- header -->
     <div id="header">
     <a href="/">CollecTF</a>
-    <span id="user_greet">
+    <span id="user-greet">
         {% if user.is_authenticated %}
         Hello {{ user.username }}! <a href="/accounts/logout/">logout</a>
         {% endif %}
     </span>
     </div>
 
+    <div id="body">
     {% block content %}
     {% endblock %}
+    </div>
     
     <div id="footer">
     If you find anything wrong, send an email to sefa1@umbc.edu
