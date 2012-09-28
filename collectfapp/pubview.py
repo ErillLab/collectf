@@ -42,7 +42,7 @@ class PubSubmissionFormPreview(FormPreview):
         if "assignment" in request.POST: # if assigned to the curator
             curator = models.Curator.objects.get(user=request.user)
             p.assigned_to = curator
-            p.save()
+        p.save()  # insert into database
         return HttpResponseRedirect("/success")
 
 # pubmed publication submission handler

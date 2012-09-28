@@ -15,4 +15,3 @@ for model in get_models(app):
         admin.site.register(model)
     except admin.sites.AlreadyRegistered:
         pass
-

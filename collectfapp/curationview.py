@@ -271,6 +271,7 @@ def curation_review_done(wiz, form, **kwargs):
 def regulation_done(wiz, site_instance, match, regulations):
     """For site instance, add regulation information if available"""
     for gene in match.nearby_genes:
+        ev = None
         if str(gene.gene_id) in regulations:
             ev = 'exp'  # experimentally verified
         else:
