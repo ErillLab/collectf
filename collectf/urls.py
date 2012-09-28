@@ -27,7 +27,7 @@ urlpatterns = patterns('',
     # registration
     url(r'^accounts/register/$', signupview.register),
     # login
-    url(r'^accounts/login/$', signupview.login, {'extra_context': {'next': '/'}}),
+    url(r'^accounts/login/$', signupview.login, {'extra_context': {'next': ''}}),
     # logout
     url(r'^accounts/logout/$', signupview.logout),
     # main page

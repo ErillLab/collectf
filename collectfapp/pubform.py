@@ -5,7 +5,8 @@ from models import Publication
                     
 class PubmedPublicationForm(forms.Form):
     pmid = forms.CharField()
-    TF_discussed = forms.CharField(label="TF that the paper is about")
+    TF_discussed = forms.CharField(label="TF that the paper is about",
+                                   required=False)
     contains_promoter_data = forms.BooleanField(required=False)
     contains_expression_data = forms.BooleanField(required=False)
     submission_notes = forms.CharField(widget=forms.Textarea, required=False)

@@ -1,12 +1,13 @@
 import django.contrib.auth.views
+from django.contrib import auth
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from signupform import *
 from django.template import RequestContext
-
+from models import Curator
 
 # registration handler
-def register(request, redirect='/'):
+def register(request, redirect=''):
     """View function for registering user. The user is linked with
     models.Curator object.
     """
@@ -17,11 +18,11 @@ def register(request, redirect='/'):
         form = CuratorRegistrationForm(request.POST)
         if form.is_valid():
             new_user = form.save()           
-            models.Curator(user=new_user).save() # create Curator object in db
+            Curator(user=new_user).save() # create Curator object in db
             new_user = auth.authenticate(username=request.POST.get("username"),
                                          password=request.POST.get("password1"))
             auth.login(request, new_user)
-            return HTTPResponseRedirect(redirect)
+            return HttpResponseRedirect(redirect)
 
     return render_to_response("registration/register.html", {"form": form},
                               context_instance=RequestContext(request))

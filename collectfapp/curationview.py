@@ -16,6 +16,7 @@ email, or whatever the application needs to do.
 
 from django.contrib.formtools.wizard.views import SessionWizardView
 from django.shortcuts import render_to_response
+from django.http import HttpResponseRedirect
 from curationform import *
 import models
 import sutils
@@ -401,7 +402,7 @@ class CurationWizard(SessionWizardView):
             # delete existing one
             sutils.sget(self.request.session, 'old_curation').delete()
         
-        return HttpResponseRedirect("/success")
+        return HttpResponseRedirect("success")
         
 
 

@@ -19,6 +19,9 @@
     #user-greet {
 	float: right;
     }
+    .form .field-error {
+        color: red;
+    }
     .form .form-wizard-navigation {
 	text-align: center;
     }
@@ -28,10 +31,10 @@
 <body>
     <!-- header -->
     <div id="header">
-    <a href="/">CollecTF</a>
+    <a href="">CollecTF</a>
     <span id="user-greet">
         {% if user.is_authenticated %}
-        Hello {{ user.username }}! <a href="/accounts/logout/">logout</a>
+        Hello {{ user.username }}! <a href="accounts/logout/">logout</a>
         {% endif %}
     </span>
     </div>

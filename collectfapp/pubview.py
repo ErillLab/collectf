@@ -43,7 +43,7 @@ class PubSubmissionFormPreview(FormPreview):
             curator = models.Curator.objects.get(user=request.user)
             p.assigned_to = curator
         p.save()  # insert into database
-        return HttpResponseRedirect("/success")
+        return HttpResponseRedirect("success")
 
 # pubmed publication submission handler
 pubmed_submission = PubSubmissionFormPreview(PubmedPublicationForm)
