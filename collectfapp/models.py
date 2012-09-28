@@ -72,9 +72,12 @@ class Publication(models.Model):
     contains_expression_data = models.BooleanField()
     submission_notes = models.TextField(null=True, blank=True)
     curation_complete = models.BooleanField(default=False) #paper curated?
-    assigned_to = models.ForeignKey("Curator")
+    assigned_to = models.ForeignKey("Curator", null=True, blank=True)
+    TF_discussed = models.CharField(max_length=100, null=True, blank=True)
+    
     def __unicode__(self):
-        return u'%s [PMID: %s]' % (self.publication_id, self.pmid)
+        return u'[%s] PMID: %s, TF: %s, assigned to: %s' % \
+               (self.publication_id, self.pmid, self.TF_discussed, self.assigned_to)
 
 class Gene(models.Model):
     # choices

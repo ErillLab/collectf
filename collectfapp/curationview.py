@@ -28,7 +28,7 @@ def publication_get_form(wiz, form):
     user = wiz.request.user
     curator = models.Curator.objects.get(user=user)
     # select papers which are not complete yet
-    assigned_pubs = curator.assigned_papers.filter(curation_complete=False)
+    assigned_pubs = models.Publication.objects.filter(assigned_to=curator)
     # put them in form choices, populate form field
     choices = [(p.publication_id, p.citation) for p in assigned_pubs]
     form.fields["pub"].choices = choices
@@ -400,7 +400,7 @@ class CurationWizard(SessionWizardView):
             # delete existing one
             sutils.sget(self.request.session, 'old_curation').delete()
         
-        return render_to_response('success.html')
+        return HttpResponseRedirect("/success")
         
 
 

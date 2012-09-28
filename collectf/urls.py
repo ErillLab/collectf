@@ -1,6 +1,8 @@
 from django.conf.urls import patterns, include, url
 from collectfapp.signupview import *
 from django.contrib.auth.decorators import login_required
+from django.views.generic.simple import direct_to_template
+
 
 import collectfapp.views as views
 import collectfapp.signupview as signupview
@@ -38,6 +40,8 @@ urlpatterns = patterns('',
     url(r'^curation/$', login_required(curationview.curation)),
     # edit curation
     url(r'^edit_curation/(?P<cid>\d+)/$', login_required(editcurationview.edit_curation)),
+    # success page
+    url(r'^success/$', direct_to_template, {'template': 'success.html'}),
 )
 
 print login

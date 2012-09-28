@@ -39,10 +39,10 @@ class PubSubmissionFormPreview(FormPreview):
 
     def done(self, request, cleaned_data):
         p = sutils.sget(request.session, "publication")
-        p.save() # add pub to db
         if "assignment" in request.POST: # if assigned to the curator
             curator = models.Curator.objects.get(user=request.user)
-            curator.assigned_papers.add(p)
+            p.assigned_to = curator
+            p.save()
         return HttpResponseRedirect("/success")
 
 # pubmed publication submission handler

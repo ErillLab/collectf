@@ -3,11 +3,6 @@ from django.contrib import admin
 from django.db.models import get_models
 from django.db.models import get_app
 
-# curator admin view
-class CuratorAdmin(admin.ModelAdmin):
-    filter_horizontal = ("assigned_papers",)
-admin.site.register(Curator, CuratorAdmin) # register Curator
-
 # curation admin view
 class CurationAdmin(admin.ModelAdmin):
     filter_horizontal = ("experimental_techniques",)

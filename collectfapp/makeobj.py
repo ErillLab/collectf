@@ -21,6 +21,7 @@ def make_pub(pubrec, cd):
                     citation=citation(pubrec),
                     url=url,
                     pdf=None,
+                    TF_discussed=cd["TF_discussed"],
                     contains_promoter_data=cd["contains_promoter_data"],
                     contains_expression_data=cd["contains_expression_data"],
                     submission_notes=cd["submission_notes"],
