@@ -14,6 +14,7 @@ validated, the wizard processes the data - saving it to the database, sending an
 email, or whatever the application needs to do.
 """
 
+from django.contrib.auth.decorators import login_required
 from django.contrib.formtools.wizard.views import SessionWizardView
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
@@ -409,7 +410,9 @@ class CurationWizard(SessionWizardView):
     
 # curation handler
 # for form definitions, go curationform.py
-curation = CurationWizard.as_view([PublicationForm,
+@login_required
+def curation(request):
+    view = CurationWizard.as_view([PublicationForm,
                                    GenomeForm,
                                    TechniquesForm,
                                    SiteReportForm,
@@ -417,4 +420,5 @@ curation = CurationWizard.as_view([PublicationForm,
                                    SiteSoftMatchForm,
                                    SiteRegulationForm,
                                    CurationReviewForm])
+    return view(request)
                                    

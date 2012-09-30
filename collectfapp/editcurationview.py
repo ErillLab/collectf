@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from collectfapp.curationview import CurationWizard
 from collectfapp.curationform import *
 import models
@@ -52,7 +53,9 @@ def init_curation_review_form(curation):
                 paper_complete = curation.publication.curation_complete,
                 NCBI_submission_ready = curation.NCBI_submission_ready,
                 notes = curation.notes)
-    
+
+
+@login_required
 def edit_curation(request, cid):
     """Handler function for curation editing.
     - Get curation being edited.

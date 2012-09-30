@@ -1,6 +1,5 @@
 from django.conf.urls import patterns, include, url
 from collectfapp.signupview import *
-from django.contrib.auth.decorators import login_required
 from django.views.generic.simple import direct_to_template
 
 
@@ -27,21 +26,21 @@ urlpatterns = patterns('',
     # registration
     url(r'^accounts/register/$', signupview.register),
     # login
-    url(r'^accounts/login/$', signupview.login, {'extra_context': {'next': ''}}),
+    url(r'^accounts/login/$', signupview.login),
     # logout
     url(r'^accounts/logout/$', signupview.logout),
     # main page
-    url(r'^$', login_required(views.home)),
+    url(r'^$', views.home),
     # pubmed publication submission
-    url(r'^pubmed_submission/$', login_required(pubview.pubmed_submission)),
+    url(r'^pubmed_submission/$', pubview.pubmed_submission),
     # nonpubmed publication submission
-    url(r'^non_pubmed_submission/$', login_required(pubview.non_pubmed_submission)),
+    url(r'^non_pubmed_submission/$', pubview.non_pubmed_submission),
     # curation
-    url(r'^curation/$', login_required(curationview.curation)),
+    url(r'^curation/$', curationview.curation),
     # edit curation
-    url(r'^edit_curation/(?P<cid>\d+)/$', login_required(editcurationview.edit_curation)),
+    url(r'^edit_curation/(?P<cid>\d+)/$', editcurationview.edit_curation),
     # success page
-    url(r'^success/$', direct_to_template, {'template': 'success.html'}),
+    url(r'^success/$', views.success),
 )
 
 print login

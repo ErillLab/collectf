@@ -2,6 +2,7 @@
 Publication submission views.
 """
 from django.http import HttpResponseRedirect
+from django.contrib.auth.decorators import login_required
 from django.contrib.formtools.preview import FormPreview
 from pubform import PubmedPublicationForm
 from pubform import NonPubmedPublicationForm
@@ -46,8 +47,13 @@ class PubSubmissionFormPreview(FormPreview):
         return HttpResponseRedirect("success")
 
 # pubmed publication submission handler
-pubmed_submission = PubSubmissionFormPreview(PubmedPublicationForm)
+@login_required
+def pubmed_submission(request):
+    view = PubSubmissionFormPreview(PubmedPublicationForm)
+    return view(request)
 
 # non-pubmed publication submission handler
-non_pubmed_submission = PubSubmissionFormPreview(NonPubmedPublicationForm)
-
+@login_required
+def non_pubmed_submission(request):
+    view = PubSubmissionFormPreview(NonPubmedPublicationForm)
+    return view(request)

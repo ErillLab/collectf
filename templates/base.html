@@ -31,10 +31,10 @@
 <body>
     <!-- header -->
     <div id="header">
-    <a href="">CollecTF</a>
+    <a href="{% url collectfapp.views.home %}">CollecTF</a>
     <span id="user-greet">
         {% if user.is_authenticated %}
-        Hello {{ user.username }}! <a href="accounts/logout/">logout</a>
+        Hello {{ user.username }}! <a href="{% url collectfapp.signupview.logout %}">logout</a>
         {% endif %}
     </span>
     </div>

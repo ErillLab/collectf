@@ -5,16 +5,16 @@
   <li>
     Publication submission
     <ul>
-      <li><a href="pubmed_submission/">pubmed publication submission</a></li>
-      <li><a href="non_pubmed_submission/">non-pubmed publication submission</a></li>
+      <li><a href="{% url collectfapp.pubview.pubmed_submission %}">pubmed submission</a></li>
+      <li><a href="{% url collectfapp.pubview.non_pubmed_submission%}">non-pubmed publication submission</a></li>
     </ul>
   </li>
-  <li><a href="curation/">Submit a new curation</a></li>
+  <li><a href="{% url collectfapp.curationview.curation %}">Submit a new curation</a></li>
 </ul>
 
 <h2>Previously submitted curations of <u>{{ curator }}</u></h2>
 {% for c in curations %}
-<a href="/edit_curation/{{ c.curation_id }}/">{{ c }}</a> <br/>
+<a href="{% url collectfapp.editcurationview.edit_curation cid=c.curation_id %}"> {{ c.curation_id }}</a> <br/>
 {% endfor %}
 
 <hr/>
