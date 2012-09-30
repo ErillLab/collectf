@@ -121,6 +121,10 @@ class TF(models.Model):
     name = models.CharField(max_length=50)
     family = models.ForeignKey("TFFamily")
     description = models.TextField()
+
+    def __unicode__(self):
+        return u'%s (family: %s)' % (self.name, self.family.name)
+    
     class Meta:
         verbose_name_plural = "TFs"
 
@@ -128,6 +132,10 @@ class TFFamily(models.Model):
     TF_family_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
     description = models.TextField()
+
+    def __unicode__(self):
+        return u'%s' % self.name
+    
     class Meta:
         verbose_name = "TF family"
         verbose_name_plural = "TF families"
@@ -150,7 +158,6 @@ class SiteInstance(models.Model):
     start = models.IntegerField() # genome start position
     end = models.IntegerField()   # genome end position
     strand = models.IntegerField(choices=Gene.STRAND) # genome strand (1 or -1)
-    regulates = models.ManyToManyField("Gene", through="Regulation")
 
     def __unicode__(self):
         return u'%s [%s]' % (self.site_id, self.seq)
@@ -160,15 +167,24 @@ class Curation_SiteInstance(models.Model):
     curation = models.ForeignKey("Curation")
     site_instance = models.ForeignKey("SiteInstance")
     annotated_seq = models.TextField()
-
+    # regulation
+    regulates = models.ManyToManyField("Gene", through="Regulation")
+    
     def __unicode__(self):
         return u"reported: %s, matched: %s" % (self.site_instance, self.annotated_seq)
 
 class Regulation(models.Model):
-    EVIDENCE_TYPE = (("exp", "experimentally verified"), ("inferred", "inferred"))
-    site_instance = models.ForeignKey("SiteInstance")
+    EVIDENCE_TYPE = (("exp_verified", "experimentally verified"),
+                     ("inferred", "inferred"))
+    curation_site_instance = models.ForeignKey("Curation_SiteInstance")
     gene = models.ForeignKey("Gene")
     evidence_type = models.CharField(max_length=20, choices=EVIDENCE_TYPE)
+
+    def __unicode__(self):
+        return 'curation_id: %s gene: %s, site_id: %s, type: %s' % \
+               (self.curation_site_instance.curation.curation_id,
+                self.gene.name, self.curation_site_instance.site_instance.site_id,
+                self.evidence_type)
 
 class NotAnnotatedSiteInstance(models.Model):
     """If no matching sequence found in genome, use this class"""

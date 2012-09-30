@@ -15,7 +15,7 @@ class GenomeForm(forms.Form):
     TF_accession = forms.CharField(label="TF accession")
     TF_function = forms.ChoiceField(Curation.TF_FUNCTION, label="TF function")
     TF_type = forms.ChoiceField(Curation.TF_TYPE, label="TF type")
-    TF = forms.ChoiceField(choices=(), label="TF")
+    TF = forms.ModelChoiceField(queryset=TF.objects.all())
     
     # form fields below are redundant.  When the form is displayed, the curator
     # can either input TF and site species manually, or he can select the option

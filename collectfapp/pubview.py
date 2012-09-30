@@ -3,6 +3,7 @@ Publication submission views.
 """
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
 from django.contrib.formtools.preview import FormPreview
 from pubform import PubmedPublicationForm
 from pubform import NonPubmedPublicationForm
@@ -11,6 +12,7 @@ import sutils
 import models
 from models import Publication
 import makeobj
+import views
 
 class PubSubmissionFormPreview(FormPreview):
     """Form preview view for publication submission"""
@@ -44,7 +46,7 @@ class PubSubmissionFormPreview(FormPreview):
             curator = models.Curator.objects.get(user=request.user)
             p.assigned_to = curator
         p.save()  # insert into database
-        return HttpResponseRedirect("success")
+        return HttpResponseRedirect(reverse(views.success))
 
 # pubmed publication submission handler
 @login_required

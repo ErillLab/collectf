@@ -15,6 +15,7 @@ email, or whatever the application needs to do.
 """
 
 from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
 from django.contrib.formtools.wizard.views import SessionWizardView
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
@@ -22,6 +23,7 @@ from curationform import *
 import models
 import sutils
 import sitesearch
+import views
 
 # curation get form functions
 # get_form constructs the form for a given step
@@ -39,10 +41,6 @@ def publication_get_form(wiz, form):
 def genome_get_form(wiz, form):
     """Genome, TF, TF_family, tf instance, .. selection form"""
     # populate TF field
-    choices = [(None, 'None'),]
-    for TF in models.TF.objects.all():
-        choices.append((TF.TF_id, TF.name + " (family: %s)" % TF.family))
-    form.fields['TF'].choices = choices
     return form
 
 def techniques_get_form(wiz, form):
@@ -226,11 +224,10 @@ def genome_done(wiz, form, **kwargs):
     TF_accession = form.cleaned_data['TF_accession']
     cd['TF_instance'] = models.TFInstance.objects.get(protein_accession=TF_accession)
     # get all other cleaned data
-    cd['TF'] = form.cleaned_data['TF'] if form.cleaned_data['TF'] != 'None' else None
+    cd['TF'] = form.cleaned_data['TF']
     cd['TF_function'] = form.cleaned_data['TF_function']
     cd['TF_type'] = form.cleaned_data['TF_type']
     cd['TF_species'] = form.cleaned_data['TF_species']
-    print 'xx', cd['TF_species']
     cd['site_species'] = form.cleaned_data['site_species']
     return cd
 
@@ -270,18 +267,19 @@ def curation_review_done(wiz, form, **kwargs):
 
 # other done helper functions
 
-def regulation_done(wiz, site_instance, match, regulations):
+def regulation_done(wiz, regulations, match, curation_site_instance):
     """For site instance, add regulation information if available"""
     for gene in match.nearby_genes:
         ev = None
         if str(gene.gene_id) in regulations:
-            ev = 'exp'  # experimentally verified
+            ev = 'exp_verified'  # experimentally verified
         else:
-            ev = 'inf'  # inferred
+            ev = 'inferred'  # inferred
         # add regulation object
-        r = models.Regulation(site_instance=site_instance, gene=gene, evidence_type=ev)
+        r = models.Regulation(curation_site_instance=curation_site_instance,
+                              gene=gene, evidence_type=ev)
         r.save()
-        
+
 def site_match_done(wiz, curation, regulations):
     """Get exact and soft site matches and create those objects in the database."""
     sites = sutils.sget(wiz.request.session, 'sites')
@@ -295,12 +293,16 @@ def site_match_done(wiz, curation, regulations):
         si, created  = models.SiteInstance.objects.get_or_create(
             genome=genome, start=match.match.start, end=match.match.end,
             strand=match.match.strand, seq=sites[sid])
+                
         # create curation_siteinstance object (through relation)
-        t = models.Curation_SiteInstance(curation=curation, site_instance=si,
-                                         annotated_seq=match.match.seq)
-        t.save()
+        cs = models.Curation_SiteInstance(curation=curation, site_instance=si,
+                                          annotated_seq=match.match.seq)
+        cs.save()
+
         # for site instance, add regulation information
-        regulation_done(wiz, site_instance=si, match=match, regulations=regulations)
+        regulation_done(wiz, regulations=regulations[sid], match=match,
+                        curation_site_instance=cs)
+
 
         
 def not_matched_sites_done(wiz, curation):
@@ -399,19 +401,27 @@ class CurationWizard(SessionWizardView):
             publication.save()
             
         # if this curation finalizes the curation of the paper, mark paper as so.
+        print self.request.session.keys()
         if sutils.sin(self.request.session, 'old_curation'):
             # delete existing one
             sutils.sget(self.request.session, 'old_curation').delete()
         
-        return HttpResponseRedirect("success")
-        
-
-
+        return HttpResponseRedirect(reverse(views.success))
+    
     
 # curation handler
+
 # for form definitions, go curationform.py
 @login_required
 def curation(request):
+    # clear session data from previous forms
+    
+    # If user selects the old curation and then go back, the session will have the
+    # old_curation key in table, and it will cause trouble.
+    if sutils.sin(request.session, 'old_curation'):
+        sutils.sdel(request.session, 'old_curation')
+    # TODO make custom session objects be form wizard based
+    
     view = CurationWizard.as_view([PublicationForm,
                                    GenomeForm,
                                    TechniquesForm,
