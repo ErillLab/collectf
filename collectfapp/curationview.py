@@ -34,7 +34,8 @@ def publication_get_form(wiz, form):
     # select papers which are not complete yet
     assigned_pubs = models.Publication.objects.filter(assigned_to=curator)
     # put them in form choices, populate form field
-    choices = [(p.publication_id, p.citation) for p in assigned_pubs]
+    choices = [(p.publication_id, "[%s] %s" % (p.publication_id ,p.citation))
+                for p in assigned_pubs]
     form.fields["pub"].choices = choices
     return form
     
