@@ -96,7 +96,7 @@ class Gene(models.Model):
     # KEGG id?
     # homology
     def __unicode__(self):
-        return '%s (%s)' % (self.gene_id, self.name)
+        return '%s (%s - %s)' % (self.gene_id, self.name, self.genome.strain.name)
 
 class Genome(models.Model):
     GENOME_TYPE = (("chromosome", "chromosome"), ("plasmid", "plasmid"))

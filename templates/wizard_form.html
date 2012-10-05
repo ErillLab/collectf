@@ -4,12 +4,22 @@
 
 <div class="form">
   <form action="" method="post">{% csrf_token %}
-    <p class="form-step">Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}</p>
-    
+
     {{ wizard.management_form }}
-    {% with form=wizard.form %}
-    {% include "formbase.html" %}
-    {% endwith %}
+
+    <p class="form-step">Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}</p>
+
+    <div class="form-title">{{ form_title }}</div>
+    <div class="form-description">{{ form_description|linebreaks }}</div>
+
+    {# Include the visible fields #}
+    {% for field in wizard.form %}
+    <div class="field">
+      <div class="field-label"> {{ field.label_tag }}</div>
+      <div class="field-field"> {{ field }}</div>
+      <div class="field-error"> {{ field.errors }}</div>
+    </div>
+    {% endfor %}
 
     <div class="form-wizard-navigation">
       {% if wizard.steps.prev %}

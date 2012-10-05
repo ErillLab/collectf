@@ -55,7 +55,7 @@ def populate_match_choices(sid, matches):
     # exact_match: True if populating exact match results, if false, soft search
     choices = []
     for mid, match in matches.items():
-        choices.append((mid, sitesearch.print_match(match.match)))
+        choices.append((mid, sitesearch.print_site_match(match)))
     last_choice_msg = "None of matches are good."
     choices.append((None, last_choice_msg))
     return choices
@@ -320,6 +320,48 @@ class CurationWizard(SessionWizardView):
         """Override default template name for each form, default is
         wizard_form.html"""
         return ['wizard_form.html']
+
+    def get_context_data(self, form, **kwargs):
+        """Return template context for a step."""
+        context = super(CurationWizard, self).get_context_data(form=form, **kwargs)
+        titles = {
+            '0': "Publication selection",
+            '1': "Genome and TF information",
+            '2': "Used experiments in the paper",
+            '3': "Reported sites",
+            '4': "Exact site matches",
+            '5': "Soft site matches",
+            '6': "Gene regulation (experiment support)",
+            '7': "Curation information"
+        }
+        descriptions = {
+            '0': "Please choose one of the publications to curate",
+            '1': "Please enter genome and TF accession numbers and " \
+                 "fill other required fields",
+            '2': "Select techniques used in the paper and describe the process.",
+            '3': """Enter the list of sites reported by the paper. Valid formats are
+                 (a) one site per line\n (b) FASTA format""",
+            '4': "For each reported sites in the previous form, all exact matches in " \
+                 "the genome are presented. For sites that are not matched to a " \
+                 "sequence in the genome, select the (only) option of performing " \
+                 "soft search.",
+            '5': "For each unmatched sites in the previous form, a soft search was " \
+                 "performed and possible matches are being displayed. If none of " \
+                 "possible matches are good enough, you can prefer not matching by " \
+                 "selecting the last option for a site.",
+            '6': "For each transcription factor binding site positioned in the genome, " \
+                 "nearby genes are being displayed. If the curated publication contains " \
+                 "any experimental support for any TF-gene regulation, mark those genes. " \
+                 "All other genes will be saved as 'inferred' regulation. " \
+                 "If the publication was marked as it doesn't contain expression " \
+                 "data, checkboxes should be disabled.",
+            '7': "This is the last form before submission of the curation. " \
+                 "Fill all required fields."
+        }
+
+        context["form_title"] = titles[self.steps.current]
+        context["form_description"] = descriptions[self.steps.current]
+        return context
 
     def get_form(self, step=None, data=None, files=None):
         """Construct the form for a given step. The method is overriden to

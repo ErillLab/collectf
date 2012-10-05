@@ -9,9 +9,13 @@ import regex
 # Some namedtuple declarations
 Match = namedtuple('Match', 'seq start end strand')
 SiteMatch = namedtuple('SiteMatch', 'match nearby_genes')
-def print_match(m):
-    strand = '+' if m.strand == 1 else '-'
-    return u'%s, %s[%d, %d]' % (m.seq, strand, m.start, m.end)
+
+def print_site_match(m):
+    strand = '+' if m.match.strand else '-'
+    nearby_genes = ', '.join(g.name for g in m.nearby_genes)
+    s = (u'%s, %s[%d, %d], nearby genes: %s' % 
+         (m.match.seq, strand, m.match.start, m.match.end, nearby_genes))
+    return s
 
 def parse_site_input(text):
     """Parse text of reported sites. It can be either in FASTA format, or plain
