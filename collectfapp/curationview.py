@@ -103,8 +103,8 @@ def site_regulation_get_form(wiz, form):
     for sid,match in exact_site_matches.items() + soft_site_matches.items():
         choices = []  # list of genes to the site match
         for g in match.nearby_genes:
-            choices.append((g.gene_id, g.__unicode__()))
-            form.fields[sid] = forms.MultipleChoiceField(label=match.match.seq,
+            choices.append((g.gene_id, '%s locus_tag: %s' % (g.name, g.locus_tag)))
+        form.fields[sid] = forms.MultipleChoiceField(label=match.match.seq,
                                                      choices=choices, required=False,
                                                      widget=forms.CheckboxSelectMultiple)
         # disable checkbox if publication is marked as not having expression data
@@ -196,6 +196,7 @@ def site_soft_match_process(wiz, form):
     # - not_matched_sites [sid, ..]
     sutils.sput(wiz.request.session, 'soft_site_matches', soft_site_matches)
     sutils.sput(wiz.request.session, 'not_matched_sites', not_matched_sites)
+
     
 
 def site_regulation_process(wiz, form):
