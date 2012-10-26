@@ -38,10 +38,10 @@ class PubSubmissionFormPreview(FormPreview):
 
         # put p to context to show as html on form preview
         context["pub"] = p
-        sutils.sput(request.session, "publication", p)
+        sutils.sput(request.session, "pub_sub_publication", p)
 
     def done(self, request, cleaned_data):
-        p = sutils.sget(request.session, "publication")
+        p = sutils.sget(request.session, "pub_sub_publication")
         if "assignment" in request.POST: # if assigned to the curator
             curator = models.Curator.objects.get(user=request.user)
             p.assigned_to = curator
