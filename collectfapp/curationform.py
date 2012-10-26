@@ -3,6 +3,7 @@ from django import forms
 from models import *
 import bioutils
 from makeobj import *
+import sitesearch
 
 
 class PublicationForm(forms.Form):
@@ -31,6 +32,9 @@ class GenomeForm(forms.Form):
 
     def clean_genome_accession(self):
         genome_accession = self.cleaned_data['genome_accession']
+        # remove version
+        genome_accession = genome_accession.split('.')[0]
+        print genome_accession
         try: # to retrieve genome from database (if exists)
             g = Genome.objects.get(genome_accession=genome_accession)
         except Genome.DoesNotExist: # try to retrieve from NCBI database
@@ -46,6 +50,8 @@ class GenomeForm(forms.Form):
 
     def clean_TF_accession(self):
         TF_accession = self.cleaned_data['TF_accession']
+        # remove version
+        TF_accession = TF_accession.split('.')[0]
         try:
             TF_instance = TFInstance.objects.get(protein_accession=TF_accession)
         except TFInstance.DoesNotExist:
@@ -112,6 +118,14 @@ class TechniquesForm(forms.Form):
 class SiteReportForm(forms.Form):
     """Form to input the list of sites reported in the paper"""
     sites = forms.CharField(widget=forms.Textarea)
+
+    def clean_sites(self):
+        sites_cd = self.cleaned_data['sites']
+        sites = sitesearch.parse_site_input(sites_cd)
+        if not sites:
+            raise forms.ValidationError("ambiguous DNA sequence")
+        return sites_cd
+        
 
 class SiteExactMatchForm(forms.Form):
     """Form to select and match reported sites to their equivalents in the

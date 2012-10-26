@@ -25,6 +25,10 @@ def parse_site_input(text):
         sites = [item.seq.tostring() for item in l]
     else: # plain '\n' separated list of sequences
         sites = [l for l in text.split() if l]
+
+    # if any site have ambiguous nucs, return None
+    if any(nuc not in "ACGTacgt" for site in sites for nuc in site):
+        return None
     return dict(enumerate(sites)) # list of (sid, site)
 
 def reverse_complement(seq):
