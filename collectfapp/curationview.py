@@ -31,11 +31,13 @@ def publication_get_form(wiz, form):
     """Publication selection form"""
     user = wiz.request.user
     curator = models.Curator.objects.get(user=user)
-    # select papers which are not complete yet
+    # select papers assigned to user
     assigned_pubs = models.Publication.objects.filter(assigned_to=curator)
+    # select papers which are not complete yet
+    not_completed_pubs = assigned_pubs.filter(curation_complete=False)
     # put them in form choices, populate form field
-    choices = [(p.publication_id, "[%s] %s" % (p.publication_id ,p.citation))
-                for p in assigned_pubs]
+    choices = [(p.publication_id, "[%s] %s" % (p.publication_id, p.citation))
+                for p in not_completed_pubs]
     form.fields["pub"].choices = choices
     return form
     
@@ -445,7 +447,6 @@ class CurationWizard(SessionWizardView):
             publication.save()
             
         # if this curation finalizes the curation of the paper, mark paper as so.
-        print self.request.session.keys()
         if sutils.sin(self.request.session, 'old_curation'):
             # delete existing one
             sutils.sget(self.request.session, 'old_curation').delete()
