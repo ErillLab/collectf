@@ -20,8 +20,8 @@ def print_site_match(m):
 def parse_site_input(text):
     """Parse text of reported sites. It can be either in FASTA format, or plain
     list of site sequences"""
-    if text.strip().startswith('#'): # FASTA format
-        l = bio.SeqIO.parse(StringIO(text), 'fasta')
+    if text.strip().startswith('>'): # FASTA format
+        l = SeqIO.parse(StringIO.StringIO(text), 'fasta')
         sites = [item.seq.tostring() for item in l]
     else: # plain '\n' separated list of sequences
         sites = [l for l in text.split() if l]
