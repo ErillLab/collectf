@@ -26,6 +26,8 @@ def parse_site_input(text):
     else: # plain '\n' separated list of sequences
         sites = [l for l in text.split() if l]
 
+    # make uppercase
+    sites = [site.upper() for site in sites]
     # if any site have ambiguous nucs, return None
     if any(nuc not in "ACGTacgt" for site in sites for nuc in site):
         return None

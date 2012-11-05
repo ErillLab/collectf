@@ -48,7 +48,7 @@ class Curation(models.Model):
     site_instances = models.ManyToManyField("SiteInstance", through="Curation_SiteInstance")
 
     def __unicode__(self):
-        return u'%s' % (self.curation_id)
+        return u'%s [TF: %s]' % (self.curation_id, self.TF.name)
     
 class Curator(models.Model):
     curator_id = models.AutoField(primary_key=True)
@@ -73,7 +73,8 @@ class Publication(models.Model):
     submission_notes = models.TextField(null=True, blank=True)
     curation_complete = models.BooleanField(default=False) #paper curated?
     assigned_to = models.ForeignKey("Curator", null=True, blank=True)
-    TF_discussed = models.CharField(max_length=100, null=True, blank=True)
+    reported_TF = models.CharField(max_length=100, null=True, blank=True)
+    reported_species = models.CharField(max_length=100, null=True, blank=True)
     
     def __unicode__(self):
         return u'[%s] PMID: %s, TF: %s, assigned to: %s' % \
