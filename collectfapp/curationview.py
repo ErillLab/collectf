@@ -47,6 +47,13 @@ def genome_get_form(wiz, form):
     return form
 
 def techniques_get_form(wiz, form):
+    # populate the following fields
+    # - contains expression data
+    # - contains promoter data
+    pid = sutils.sget(wiz.request.session, 'publication')
+    pub = models.Publication.objects.get(publication_id=pid)
+    form.fields["contains_promoter_data"].initial = pub.contains_promoter_data
+    form.fields["contains_expression_data"].initial = pub.contains_expression_data
     return form
 
 def site_report_get_form(wiz, form):
@@ -134,11 +141,18 @@ def genome_process(wiz, form):
     sutils.sput(wiz.request.session, 'genome', genome)
 
 def techniques_process(wiz, form):
-    # no need to process any data from this form.
-    # all data will be processed at the end of last form
-    pass
+    # set publication fields
+    # - contains_promoter_data
+    # - contains_expression_data
+    pubid = sutils.sget(wiz.request.session, 'publication')
+    p = models.Publication.objects.get(publication_id=pubid)
+    p.contains_promoter_data = form.cleaned_data["contains_promoter_data"]
+    p.contains_expression_data = form.cleaned_data["contains_expression_data"]
+    p.save()
+
 
 def site_report_process(wiz, form):
+
     # read genome from session data
     genome = sutils.sget(wiz.request.session, 'genome')
     genes = models.Gene.objects.filter(genome=genome).order_by('start')

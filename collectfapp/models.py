@@ -77,8 +77,9 @@ class Publication(models.Model):
     reported_species = models.CharField(max_length=100, null=True, blank=True)
     
     def __unicode__(self):
-        return u'[%s] PMID: %s, TF: %s, assigned to: %s' % \
-               (self.publication_id, self.pmid, self.TF_discussed, self.assigned_to)
+        return u'[%s] PMID: %s, TF: %s, species: %s,assigned to: %s' % \
+               (self.publication_id, self.pmid, self.reported_TF,
+                self.reported_species, self.assigned_to)
 
 class Gene(models.Model):
     # choices

@@ -107,11 +107,11 @@ class GenomeForm(forms.Form):
 
 class TechniquesForm(forms.Form):
     """Form to enter experimental techniques used to identify TFBS"""
+    contains_promoter_data = forms.BooleanField(required=False)
+    contains_expression_data = forms.BooleanField(required=False)
     # get available techniques from db
-    exp_techs_sorted = ExperimentalTechnique.objects.order_by('name')
     techniques = forms.ModelMultipleChoiceField(
-        queryset=exp_techs_sorted,
-#        queryset=ExperimentalTechnique.objects.all(),
+        queryset=ExperimentalTechnique.objects.order_by('name'),
         widget=forms.CheckboxSelectMultiple())
     experimental_process = forms.CharField(widget=forms.Textarea, required=False)
     forms_complex = forms.BooleanField(required=False)
