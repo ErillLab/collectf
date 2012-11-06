@@ -6,12 +6,13 @@
 <form class="form-horizontal" action="" method="post">{% csrf_token %}
   {% for field in form %}
   <dl class="dl-horizontal">
-    <dt>{{ field.label }}</dt>
+    <dt style="white-space: normal;">{{ field.label }}</dt>
     <dd>{{ field.data }}</dd>
   </dl>
   {% endfor %}
   
 
+  <h2>Publication information</h2>
   <p>{{ pub.citation }}</p>
 
   {% for field in form %}
@@ -19,8 +20,14 @@
   {% endfor %}
   <input type="hidden" name="{{ stage_field }}" value="2" />
   <input type="hidden" name="{{ hash_field }}" value="{{ hash_value }}" />
-  <input type="checkbox" name="assignment">I want to be curator for this paper.
-  <p><input class="btn" type="submit" value="Submit" /></p>
+  <div class="control-group">
+
+      <label class="checkbox">
+	<input type="checkbox" name="assignment">I want to be curator for this paper.
+      </label>
+      <button class="btn" type="submit" value="Submit">Submit</button>
+
+  </div>
 </form>
 
 <h1>Or edit it again</h1>

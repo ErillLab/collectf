@@ -18,6 +18,7 @@ class GenomeForm(forms.Form):
     TF_type = forms.ChoiceField(Curation.TF_TYPE, label="TF structure")
     TF_function = forms.ChoiceField(Curation.TF_FUNCTION, label="TF function")
     genome_accession = forms.CharField(label="Genome NCBI accession number")
+    TF_accession = forms.CharField(label="TF accession number") 
     # form fields
     # TF_species_same / TF_species and
     # site_species_same / site_species
@@ -27,7 +28,6 @@ class GenomeForm(forms.Form):
     # need to input whole species name
     TF_species_same = forms.BooleanField(label="TF-species is same with genome",
                                          required=False)
-    TF_accession = forms.CharField(label="TF accession number") 
 
     site_species_same = forms.BooleanField(label="site-species is same with genome",
                                            required=False)
