@@ -1,33 +1,65 @@
+
 {% extends "base.html" %}
 
 {% block content %}
 
-<div class="form">
-  <form action="" method="post">{% csrf_token %}
+{% load bootstrap_tags %}
 
-    {{ wizard.management_form }}
+<div class="progress progress-info progress-striped">
+  <div class="bar" style="width:{% widthratio wizard.steps.step1 wizard.steps.count 100%}%">
+    Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}
+  </div>
+</div>
+<form method="post" action="" class="form-horizontal">  {% csrf_token %}
 
-    <p class="form-step">Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}</p>
+  {{ wizard.management_form }}
 
-    <div class="form-title">{{ form_title }}</div>
-    <div class="form-description">{{ form_description|linebreaks }}</div>
+  <h2>{{ form_title }} </h2>
+  <p>{{ form_description }}</p>
+  <legend></legend>
 
-    {# Include the visible fields #}
-    {% for field in wizard.form %}
+  {{ wizard.form|as_bootstrap }}
+
+  <div class="control-group">
+    <div class="controls">
+    {% if wizard.steps.prev %}
+    <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">prev step</button>
+    {% endif %}
+    <input type="submit" value="next step"/>
+    </div>
+  </div>
+</form>
+    
+<!--
+<form class="form" action="" method="post">{% csrf_token %}
+
+  {{ wizard.management_form }}
+
+  <p class="form-step">Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}</p>
+
+  <div class="form-title">{{ form_title }}</div>
+  <div class="form-description">{{ form_description|linebreaks }}</div>
+
+  {# Include the visible fields #}
+  {% for field in wizard.form %}
+  {% if field.is_hidden %}
+    {{ field }}
+  {% else %}
     <div class="field">
       <div class="field-label"> {{ field.label_tag }}</div>
       <div class="field-field"> {{ field }}</div>
       <div class="field-error"> {{ field.errors }}</div>
     </div>
-    {% endfor %}
-
-    <div class="form-wizard-navigation">
-      {% if wizard.steps.prev %}
-      <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">prev step</button>
-      {% endif %}
-      <input type="submit" value="next step"/>
-    </div>
-  </form>
-</div>
+  {% endif %}
+  {% endfor %}
+    
+  <div class="form-wizard-navigation">
+    {% if wizard.steps.prev %}
+    <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">prev step</button>
+    {% endif %}
+    <input type="submit" value="next step"/>
+  </div>
+</form>
+-->
 {% endblock %}
 

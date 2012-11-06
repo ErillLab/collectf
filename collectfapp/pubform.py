@@ -4,13 +4,16 @@ import sutils
 from models import Publication
                     
 class PubmedPublicationForm(forms.Form):
-    pmid = forms.CharField()
-    reported_TF = forms.CharField(label="TF that the paper is about",
-                                  required=False)
+    pmid = forms.CharField(label="PMID", required=True)
+    reported_TF = forms.CharField(label="Reported TF(s)", required=False)
     reported_species = forms.CharField(label="Reported species", required=False)
-    contains_promoter_data = forms.BooleanField(required=False)
-    contains_expression_data = forms.BooleanField(required=False)
-    submission_notes = forms.CharField(widget=forms.Textarea, required=False)
+
+    contains_promoter_data = forms.BooleanField(required=False,
+                                                label="The manuscript contains promoter information")
+    contains_expression_data = forms.BooleanField(required=False,
+                                                  label="The manuscript contains expression information")
+    submission_notes = forms.CharField(widget=forms.Textarea, required=False,
+                                       label="Submission notes")
 
     def clean_pmid(self):
         cp = self.cleaned_data['pmid'] # cleaned pmid
@@ -27,16 +30,19 @@ class PubmedPublicationForm(forms.Form):
 
 class NonPubmedPublicationForm(forms.Form):
     # form for non-pubmed publications or unpublished data
-    title = forms.CharField()
-    authors = forms.CharField()
-    journal = forms.CharField()
-    URL = forms.URLField(verify_exists=False, required=False)
+    authors = forms.CharField(label="Authors (Name Initials,)")
+    title = forms.CharField(label="Title")
+    journal = forms.CharField(label="Journal")
+    URL = forms.URLField(verify_exists=False, required=False, label="URL")
     # pdf?
-    reported_TF = forms.CharField(label="TF that the paper is about",
-                                   required=False)
+    reported_TF = forms.CharField(label="Reported TF(s)", required=False)
     reported_species = forms.CharField(label="Reported species",
                                        required=False)
-    contains_promoter_data = forms.BooleanField(required=False)
-    contains_expression_data = forms.BooleanField(required=False)
-    submission_notes = forms.CharField(widget=forms.Textarea, required=False)
+
+    contains_promoter_data = forms.BooleanField(required=False,
+                                                label="The manuscript contains promoter information")
+    contains_expression_data = forms.BooleanField(required=False,
+                                                  label="The manuscript contains expression information")
+    submission_notes = forms.CharField(widget=forms.Textarea, required=False,
+                                       label="Submission notes")
             

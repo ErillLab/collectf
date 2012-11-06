@@ -1,64 +1,60 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <title></title>
-    <link href="http://fonts.googleapis.com/css?family=Ubuntu"
-	  rel="stylesheet" type="text/css">
-    <style>
-    *{
-        font-family: 'Ubuntu', sans-serif;
-	font-size: 15px;
+  <!-- Bootstrap -->
+  <link href="/static/css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <style>
+    * {
+    font-family: Ubuntu;
     }
-    #header, #body, #footer {
-	margin: 10px auto;
-	width: 700px;
-	padding: 14px;
-	border: solid 2px #b7ddf2;
-	background: #ebf4fb;
+    body {
+    padding-top: 60px;
+    padding-bottom: 40px;
     }
-    #user-greet {
-	float: right;
-    }
-    .form .form-title {
-	font-size: larger;
-	font-weight: bold;
-	margin-bottom: 8px;	
-    }
-    .form .form-description {
-	color: #666666;
-	margin-bottom: 20px;
-	border-bottom: solid 1px #b7ddf2;
-	padding-bottom: 10px;
-    }
-    .form .field-error {
-        color: red;
-    }
-    .form .form-wizard-navigation {
-	text-align: center;
-    }
-    </style>
+
+
+  </style>
 </head>
 
 <body>
-    <!-- header -->
-    <div id="header">
-    <a href="{% url collectfapp.views.home %}">CollecTF</a>
-    <span id="user-greet">
-        {% if user.is_authenticated %}
-        Hello {{ user.username }}! <a href="{% url collectfapp.signupview.logout %}">logout</a>
-        {% endif %}
-    </span>
+  <script src="http://code.jquery.com/jquery-latest.js"></script>
+  <script src="/static/js/bootstrap.min.js"></script>
+  <!-- header -->
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+	<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </a>
+        <a class="brand" href="{% url collectfapp.views.home %}">collecTF</a>
+	<div class="nav-collapse collapse">
+          <p class="navbar-text pull-right">
+	    {% if user.is_authenticated %}
+            Logged in as {{user.username}} | 
+	    <a href="{% url collectfapp.signupview.logout %}" class="navbar-link"> logout</a>
+	    {% else %}
+	    <a class="navbar-link" href="{% url collectfapp.signupview.login %}">login</a>
+	    {% endif %}
+          </p>
+        </div><!--/.nav-collapse -->
+      </div>
     </div>
+  </div>
 
-    <div id="body">
+  <div class="container">
     {% block content %}
     {% endblock %}
+  </div>
+  
+  <div id="footer">
+    <div class="container">
+      <legend></legend>
+      <p>If you find anything wrong, send an email to sefa1@umbc.edu</p>
     </div>
-    
-    <div id="footer">
-    If you find anything wrong, send an email to sefa1@umbc.edu
-    </div>
+  </div>
 
 </body>
 </html>
-    
+

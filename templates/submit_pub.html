@@ -1,17 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="form">
-<form action="" method="post">{% csrf_token %}
-  {% for field in form %}
-  {{ field.label_tag}}
-  {{ field }}
-  {{ field.errors}}<br/>
-  {% endfor %}
-  <input type="hidden" name="{{ stage_field }}" value="1"/>
-  <input type="submit" value="Preview" />
+{% load bootstrap_tags %}
+<form class="form-horizontal" action="" method="post">{% csrf_token %}
+
+  {{ form|as_bootstrap }}
+  <div class="control-group">
+    <div class="controls">
+      <input type="hidden" name="{{ stage_field }}" value="1"/>
+      <input type="submit" value="Preview" />
+    </div>
+  </div>
 </form>
-</div>
+
 
 {% endblock %}
  

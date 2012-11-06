@@ -66,7 +66,7 @@ def populate_match_choices(sid, matches):
     choices = []
     for mid, match in matches.items():
         choices.append((mid, sitesearch.print_site_match(match)))
-    last_choice_msg = "None of matches are good."
+    last_choice_msg = "No valid match"
     choices.append((None, last_choice_msg))
     return choices
     
@@ -152,7 +152,6 @@ def techniques_process(wiz, form):
 
 
 def site_report_process(wiz, form):
-
     # read genome from session data
     genome = sutils.sget(wiz.request.session, 'genome')
     genes = models.Gene.objects.filter(genome=genome).order_by('start')
@@ -345,34 +344,41 @@ class CurationWizard(SessionWizardView):
         titles = {
             '0': "Publication selection",
             '1': "Genome and TF information",
-            '2': "Used experiments in the paper",
+            '2': "Experimental methods used in this paper",
             '3': "Reported sites",
             '4': "Exact site matches",
-            '5': "Soft site matches",
-            '6': "Gene regulation (experiment support)",
+            '5': "Inexact site matches",
+            '6': "Gene regulation (experimental support)",
             '7': "Curation information"
         }
         descriptions = {
-            '0': "Please choose one of the publications to curate",
-            '1': "Please enter genome and TF accession numbers and " \
-                 "fill other required fields",
-            '2': "Select techniques used in the paper and describe the process.",
-            '3': """Enter the list of sites reported by the paper. Valid formats are
-                 (a) one site per line\n (b) FASTA format""",
-            '4': "For each reported sites in the previous form, all exact matches in " \
-                 "the genome are presented. For sites that are not matched to a " \
-                 "sequence in the genome, select the (only) option of performing " \
-                 "soft search.",
-            '5': "For each unmatched sites in the previous form, a soft search was " \
-                 "performed and possible matches are being displayed. If none of " \
-                 "possible matches are good enough, you can prefer not matching by " \
-                 "selecting the last option for a site.",
-            '6': "For each transcription factor binding site positioned in the genome, " \
-                 "nearby genes are being displayed. If the curated publication contains " \
-                 "any experimental support for any TF-gene regulation, mark those genes. " \
-                 "All other genes will be saved as 'inferred' regulation. " \
-                 "If the publication was marked as it doesn't contain expression " \
-                 "data, checkboxes should be disabled.",
+            '0': "Please choose a publication to curate.",
+            '1': """This step collects information on the transcription factor (TF), the specific
+strains reported in the manuscript and the NCBI GenBank sequences that reported
+sites and TF will be mapped onto.""",
+            '2': """Select the experimental techniques and the describe the basic experimental
+procedure used to verify binding/expression of the sites reported in this
+curation.""",
+            '3': """Enter the list of sites as reported in the paper. Supported formats are:\n(a)
+Raw sequence (one site per line)\n(b) FASTA format""",
+            '4': """For each reported site, all exact matches in the chosen genome are listed. If a
+reported site does not have any exact matches, or the matched position/genes do
+not coincide with reported positions/gene, select the \"No valid match\"
+option. This will initiate a non-exact search.""",
+            '5': """For each unmatched sites in the previous form, a soft search was performed and
+possible matches are being displayed.  If none of possible matches are good
+enough, you can prefer not matching by selecting the last option for a site.
+Inexact matches for sites without valid matches are listed here, sorted by
+affinity to the TF-binding motif.  If the matched position/genes do not coincide
+with reported positions/gene, select the \"No valid match\" option.""",
+            '6': """For each transcription factor binding site positioned in the genome, nearby
+genes are being displayed. If the curated publication contains any experimental
+support for any TF-gene regulation, mark those genes. All other genes will be
+saved as 'inferred' regulation. If the publication was marked as it doesn't
+contain expression data, checkboxes should be disabled. Nearby genes are
+displayed for identified sites. Check all genes for which TF-site mediated
+regulation is reported in the manuscript. Skip this step if manuscript does not
+report gene expression.""",
             '7': "This is the last form before submission of the curation. " \
                  "Fill all required fields."
         }

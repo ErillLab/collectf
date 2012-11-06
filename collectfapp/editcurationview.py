@@ -67,11 +67,11 @@ def edit_curation(request, cid):
     # get curation
     old_curation = models.Curation.objects.get(curation_id=cid)
     # get initial data for new curation form
-    initial = {'0': init_publication(old_curation),
-               '1': init_genome_form(old_curation),
-               '2': init_techniques_form(old_curation),
-               '3': init_site_report_form(old_curation),
-               '7': init_curation_review_form(old_curation),
+    initial = {#'0': init_publication(old_curation),
+               '0': init_genome_form(old_curation),
+               '1': init_techniques_form(old_curation),
+               '2': init_site_report_form(old_curation),
+               '6': init_curation_review_form(old_curation),
               }
     
     # since if paper complete, it will not be displayed in the first form as
@@ -83,8 +83,10 @@ def edit_curation(request, cid):
     # tell form wizard that this is an edit to an existing curation
     sutils.sput(request.session, 'old_curation', old_curation)
 
-    wiz = CurationWizard.as_view([PublicationForm,
-                                  GenomeForm,
+    # save which publication we are about to edit
+    sutils.spui
+
+    wiz = CurationWizard.as_view([GenomeForm,
                                   TechniquesForm,
                                   SiteReportForm,
                                   SiteExactMatchForm,

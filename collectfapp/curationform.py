@@ -8,28 +8,34 @@ import sitesearch
 
 class PublicationForm(forms.Form):
     """Publication selection form"""
-    pub = forms.ChoiceField(widget=forms.RadioSelect())
+    pub = forms.ChoiceField(widget=forms.RadioSelect(),
+                            label="Publications")
 
 class GenomeForm(forms.Form):
     """Form for submission of genome and TF accession numbers and others"""
-    genome_accession = forms.CharField(label="genome accession")
-    TF_accession = forms.CharField(label="TF accession")
+    TF = forms.ModelChoiceField(queryset=TF.objects.all(),
+                                label="TF")
+    TF_type = forms.ChoiceField(Curation.TF_TYPE, label="TF structure")
     TF_function = forms.ChoiceField(Curation.TF_FUNCTION, label="TF function")
-    TF_type = forms.ChoiceField(Curation.TF_TYPE, label="TF type")
-    TF = forms.ModelChoiceField(queryset=TF.objects.all())
-    
-    # form fields below are redundant.  When the form is displayed, the curator
-    # can either input TF and site species manually, or he can select the option
-    # that they are same species with genome. If they are same species with
-    # genome, he doesn't need to input whole species name
+    genome_accession = forms.CharField(label="Genome NCBI accession number")
+    # form fields
+    # TF_species_same / TF_species and
+    # site_species_same / site_species
+    # are redundant.  When the form is displayed, the curator can either input
+    # TF and site species manually, or he can select the option that they are
+    # same species with genome. If they are same species with genome, he doesn't
+    # need to input whole species name
     TF_species_same = forms.BooleanField(label="TF-species is same with genome",
                                          required=False)
-    TF_species = forms.CharField(label="TF species", required=False)
-    # neither is required, but one of them should be filled
+    TF_accession = forms.CharField(label="TF accession number") 
+
     site_species_same = forms.BooleanField(label="site-species is same with genome",
                                            required=False)
-    site_species = forms.CharField(label="site species", required=False)
 
+    TF_species = forms.CharField(label="Organism of origin for reported TF", required=False)
+    site_species = forms.CharField(label="Organism TF binding sites are reported in",
+                                   required=False)
+    
     def clean_genome_accession(self):
         genome_accession = self.cleaned_data['genome_accession']
         # remove version
@@ -107,19 +113,26 @@ class GenomeForm(forms.Form):
 
 class TechniquesForm(forms.Form):
     """Form to enter experimental techniques used to identify TFBS"""
-    contains_promoter_data = forms.BooleanField(required=False)
-    contains_expression_data = forms.BooleanField(required=False)
+    contains_promoter_data = forms.BooleanField(required=False,
+                                                label="The manuscript contains promoter information")
+    contains_expression_data = forms.BooleanField(required=False,
+                                                  label="The manuscript contains expression data")
     # get available techniques from db
     techniques = forms.ModelMultipleChoiceField(
         queryset=ExperimentalTechnique.objects.order_by('name'),
-        widget=forms.CheckboxSelectMultiple())
-    experimental_process = forms.CharField(widget=forms.Textarea, required=False)
-    forms_complex = forms.BooleanField(required=False)
-    complex_notes = forms.CharField(widget=forms.Textarea, required=False)
+        widget=forms.CheckboxSelectMultiple(),
+        label="Techniques")
+    experimental_process = forms.CharField(widget=forms.Textarea, required=False,
+                                           label="Experimental process")
+                                           
+    forms_complex = forms.BooleanField(required=False, label="TF complex")
+    complex_notes = forms.CharField(widget=forms.Textarea, required=False,
+                                    label="Notes")
 
 class SiteReportForm(forms.Form):
     """Form to input the list of sites reported in the paper"""
-    sites = forms.CharField(widget=forms.Textarea)
+    sites = forms.CharField(widget=forms.Textarea,
+                            label="")
 
     def clean_sites(self):
         sites_cd = self.cleaned_data['sites']
@@ -157,12 +170,15 @@ class SiteRegulationForm(forms.Form):
 class CurationReviewForm(forms.Form):
     """Form to see all data entered so far. The last step to submit curation."""
     choices = ((None, "None"),) + Curation.REVISION_REASONS
-    revision_reasons = forms.ChoiceField(choices=choices)
-    confidence = forms.BooleanField(required=False)
-    label = "This curation is ready to submit to NCBI."
-    NCBI_submission_ready = forms.BooleanField(label=label, required=False)
-    label = "Curation for this paper is complete."
-    paper_complete = forms.BooleanField(label=label, required=False)
-    notes = forms.CharField(widget=forms.Textarea, required=False)
-    label = "I want to submit this curation"
-    confirm = forms.BooleanField(label=label, required=True)
+    revision_reasons = forms.ChoiceField(choices=choices,
+                                         label="Revision required")
+    confidence = forms.BooleanField(required=False,
+                                    label="I am confident of the results reported in this manuscript.")
+    NCBI_submission_ready = forms.BooleanField(required=False,
+                                               label="Curation is ready to submit to NCBI.")
+                                               
+    paper_complete = forms.BooleanField(required=False,
+                                        label="Curation for this paper is complete.")
+    notes = forms.CharField(widget=forms.Textarea, required=False, label="Notes")
+    confirm = forms.BooleanField(required=True,
+                                 label="I want to submit this curation")
