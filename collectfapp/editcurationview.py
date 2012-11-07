@@ -67,32 +67,36 @@ def edit_curation(request, cid):
     # get curation
     old_curation = models.Curation.objects.get(curation_id=cid)
     # get initial data for new curation form
-    initial = {#'0': init_publication(old_curation),
-               '0': init_genome_form(old_curation),
-               '1': init_techniques_form(old_curation),
-               '2': init_site_report_form(old_curation),
-               '6': init_curation_review_form(old_curation),
+    initial = {'0': init_publication(old_curation),
+               '1': init_genome_form(old_curation),
+               '2': init_techniques_form(old_curation),
+               '3': init_site_report_form(old_curation),
+               '7': init_curation_review_form(old_curation),
               }
     
     # since if paper complete, it will not be displayed in the first form as
     # available. Since we are using CurationForm for edit curation too, change it to
     # false.
-    old_curation.publication.curation_complete = False
-    old_curation.publication.save()
+    #old_curation.publication.curation_complete = False
+    #old_curation.publication.save()
 
     # tell form wizard that this is an edit to an existing curation
     sutils.sput(request.session, 'old_curation', old_curation)
 
     # save which publication we are about to edit
-    sutils.spui
+    sutils.sput(request.session, 'publication', old_curation.publication.publication_id)
 
-    wiz = CurationWizard.as_view([GenomeForm,
+    wiz = CurationWizard.as_view([PublicationForm,
+                                  GenomeForm,
                                   TechniquesForm,
                                   SiteReportForm,
                                   SiteExactMatchForm,
                                   SiteSoftMatchForm,
                                   SiteRegulationForm,
-                                  CurationReviewForm], initial_dict=initial)
+                                  CurationReviewForm],
+                                 initial_dict=initial,
+                                 condition_dict={'0': False}) # Don't show publication form
+                                 
     return wiz(request)
     
 

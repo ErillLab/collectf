@@ -25,7 +25,8 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
     # registration
-    url(r'^accounts/register/$', signupview.register),
+    # registration is not allowed, admin creates new accounts.
+    # url(r'^accounts/register/$', signupview.register),
     # login
     url(r'^accounts/login/$', signupview.login),
     # logout

@@ -18,6 +18,3 @@
 - Reported species in publication submission step
 - Multiple shared curations (populate form fields)
 - Curation (show TF and paper info)
-- Sepearte form templates
-- twitter-bootstrap
-- footer

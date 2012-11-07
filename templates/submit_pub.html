@@ -2,7 +2,17 @@
 {% block content %}
 
 {% load bootstrap_tags %}
-<form class="form-horizontal" action="" method="post">{% csrf_token %}
+
+<h2>Publication submission </h2>
+<p>Use this form to submit a candidate publication for curation in
+CollecTF. Read briefly the publication abstract to validate that it contains
+relevant data before submitting.</p>
+<p >
+<legend></legend>
+
+
+
+<form class="form-horizontal well" action="" method="post">{% csrf_token %}
 
   {{ form|as_bootstrap }}
   <div class="control-group">

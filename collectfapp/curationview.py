@@ -226,8 +226,8 @@ def curation_review_process(wiz, form):
 # step and insert into database. Following _done_ functions are implemented for
 # each step and they are called by CurationWizard.done when user submit curation
 # form.
-def publication_done(wiz, form, **kwargs):
-    pid = form.cleaned_data['pub']
+def publication_done(wiz):
+    pid = sutils.sget(wiz.request.session, 'publication')
     publication = models.Publication.objects.get(publication_id=pid)
     return publication
 
@@ -365,22 +365,14 @@ Raw sequence (one site per line)\n(b) FASTA format""",
 reported site does not have any exact matches, or the matched position/genes do
 not coincide with reported positions/gene, select the \"No valid match\"
 option. This will initiate a non-exact search.""",
-            '5': """For each unmatched sites in the previous form, a soft search was performed and
-possible matches are being displayed.  If none of possible matches are good
-enough, you can prefer not matching by selecting the last option for a site.
-Inexact matches for sites without valid matches are listed here, sorted by
+            '5': """Inexact matches for sites without valid matches are listed here, sorted by
 affinity to the TF-binding motif.  If the matched position/genes do not coincide
 with reported positions/gene, select the \"No valid match\" option.""",
-            '6': """For each transcription factor binding site positioned in the genome, nearby
-genes are being displayed. If the curated publication contains any experimental
-support for any TF-gene regulation, mark those genes. All other genes will be
-saved as 'inferred' regulation. If the publication was marked as it doesn't
-contain expression data, checkboxes should be disabled. Nearby genes are
+            '6': """Nearby genes are
 displayed for identified sites. Check all genes for which TF-site mediated
 regulation is reported in the manuscript. Skip this step if manuscript does not
 report gene expression.""",
-            '7': "This is the last form before submission of the curation. " \
-                 "Fill all required fields."
+            '7': """This step finalizes the curation. Fill all required fields."""
         }
 
         context["form_title"] = titles[self.steps.current]
@@ -426,7 +418,18 @@ report gene expression.""",
         """Last step in curation process, this method is called after all
         forms. Insert all data into the database."""
         # get data from forms
-        publication = publication_done(self, form_list[0], **kwargs)
+        publication = publication_done(self)
+        
+        # quick and dirty
+        # If curation view is used for revising a curation, the first step
+        # (publication selection) is hidden in formwizard, and in form_list
+        # list. However, in that case, the first element (i.e. form_list[0]) is
+        # not about publication anymore. Therefore, the quick and dirty solution
+        # is to insert a "fake" element to the form_list list
+        if sutils.sin(self.request.session, 'old_curation'):
+             # this is a revision for an existing curation
+             form_list.insert(0, None)
+             
         genome_cd = genome_done(self, form_list[1], **kwargs)
         techniques_cd = techniques_done(self, form_list[2], **kwargs)
         curation_review_cd = curation_review_done(self, form_list[7], **kwargs)
@@ -485,6 +488,7 @@ def curation(request):
     # old_curation key in table, and it will cause trouble.
     if sutils.sin(request.session, 'old_curation'):
         sutils.sdel(request.session, 'old_curation')
+        
     # TODO make custom session objects be form wizard based
     
     view = CurationWizard.as_view([PublicationForm,

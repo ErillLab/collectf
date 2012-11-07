@@ -33,6 +33,9 @@ class NonPubmedPublicationForm(forms.Form):
     authors = forms.CharField(label="Authors (Name Initials,)")
     title = forms.CharField(label="Title")
     journal = forms.CharField(label="Journal")
+    year = forms.CharField(label="Year")
+    volume = forms.CharField(label="Volume")
+    pages = forms.CharField(label="Pages (xxx-yyy)")
     URL = forms.URLField(verify_exists=False, required=False, label="URL")
     # pdf?
     reported_TF = forms.CharField(label="Reported TF(s)", required=False)

@@ -4,10 +4,10 @@ from django.contrib.auth.models import User
 # Create your models here.
 class Curation(models.Model):
     # choices
-    REVISION_REASONS = (("not_available", "genome not available"),
-                        ("not_sequenced", "sequence not available"),
-                        ("in_progress", "in progress"), #genome is being sequenced
-                        ("other", "other"),)            #other reasons
+    REVISION_REASONS = (("genome_not_available", "No comparable genome in NCBI"),
+                        ("in_progress", "Matching genome still in progress"),
+                        ("TF_not_available", "No comparable TF protein sequence in NCBI"),
+                        ("other", "other reason (specify in notes)"),)    #other reasons
     
     TF_FUNCTION = (("ACT", "activator"),
                    ("REP", "repressor"),
@@ -65,7 +65,13 @@ class Publication(models.Model):
     publication_type = models.CharField(max_length=20, choices=PUBLICATION_TYPE)
     pmid = models.CharField(max_length=30, null=True, blank=True)
     # pmid can be null if not pubmed article
-    citation = models.TextField() # contains authors, title and journal info
+    authors = models.CharField(max_length=1000)
+    title = models.CharField(max_length=1000)
+    journal = models.CharField(max_length=1000)
+    year = models.CharField(max_length=50)
+    volume = models.CharField(max_length=50)
+    pages = models.CharField(max_length=50)
+    citation = models.TextField() # contains authors, title, year, volume and pages info
     url = models.CharField(max_length=1000, null=True, blank=True)
     pdf = models.FileField(upload_to="papers/", null=True, blank=True)
     contains_promoter_data = models.BooleanField()

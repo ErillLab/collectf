@@ -14,11 +14,28 @@ class PublicationForm(forms.Form):
 class GenomeForm(forms.Form):
     """Form for submission of genome and TF accession numbers and others"""
     TF = forms.ModelChoiceField(queryset=TF.objects.all(),
-                                label="TF")
-    TF_type = forms.ChoiceField(Curation.TF_TYPE, label="TF structure")
-    TF_function = forms.ChoiceField(Curation.TF_FUNCTION, label="TF function")
-    genome_accession = forms.CharField(label="Genome NCBI accession number")
-    TF_accession = forms.CharField(label="TF accession number") 
+                                label="TF",
+                                help_text="""Select the transcription factor you
+                                are curating on from list. If not in list,
+                                please contact the master curator.""")
+    TF_type = forms.ChoiceField(Curation.TF_TYPE, label="TF structure",
+                                help_text="""If specified in the manuscript,
+                                select the quaternary structure for the
+                                transcription factor when binding to the sites
+                                reported in this curation.""") 
+    TF_function = forms.ChoiceField(Curation.TF_FUNCTION, label="TF function",
+                                    help_text="""If specified in the manuscript,
+                                    select the mode of operation for the TF on
+                                    the sites reported in this curation.""")
+    genome_accession = forms.CharField(label="Genome NCBI accession number",
+                                       help_text="""Paste the NCBI GenBank
+                                       genome accession number for the species
+                                       closest to the reported
+                                       species/strain. """) 
+    TF_accession = forms.CharField(label="TF accession number",
+                                   help_text="""Paste the NCBI TF protein
+                                   accession number for the species closest to
+                                   the reported species/strain.""")  
     # form fields
     # TF_species_same / TF_species and
     # site_species_same / site_species
@@ -27,14 +44,27 @@ class GenomeForm(forms.Form):
     # same species with genome. If they are same species with genome, he doesn't
     # need to input whole species name
     TF_species_same = forms.BooleanField(label="TF-species is same with genome",
-                                         required=False)
+                                         required=False,
+                                         help_text="""This is the exact same
+                                         strain as reported in the manuscript""")
+    
 
-    site_species_same = forms.BooleanField(label="site-species is same with genome",
-                                           required=False)
+    site_species_same = forms.BooleanField(label="Site-species is same with genome",
+                                           required=False,
+                                           help_text="""This is the exact same
+                                           strain as reported in the
+                                           manuscript""") 
 
-    TF_species = forms.CharField(label="Organism of origin for reported TF", required=False)
+    TF_species = forms.CharField(label="Organism of origin for reported TF",
+                                 required=False,
+                                 help_text="""Type the full name of the
+                                 species/strain the TF belongs to as reported in
+                                 the manuscript.""")
     site_species = forms.CharField(label="Organism TF binding sites are reported in",
-                                   required=False)
+                                   required=False,
+                                   help_text="""Type the full name of the
+                                   species/strain in which the sites are reported
+                                   in the manuscript.""")
     
     def clean_genome_accession(self):
         genome_accession = self.cleaned_data['genome_accession']
@@ -114,20 +144,31 @@ class GenomeForm(forms.Form):
 class TechniquesForm(forms.Form):
     """Form to enter experimental techniques used to identify TFBS"""
     contains_promoter_data = forms.BooleanField(required=False,
-                                                label="The manuscript contains promoter information")
+        label="The manuscript contains promoter information",
+        help_text="The paper provides experimental data on the structure and sequence of TF-regulated promoter")
+    
     contains_expression_data = forms.BooleanField(required=False,
-                                                  label="The manuscript contains expression data")
+        label="The manuscript contains expression data",
+        help_text="The paper provides experimental support for TF-mediated regulation of genes")
     # get available techniques from db
     techniques = forms.ModelMultipleChoiceField(
         queryset=ExperimentalTechnique.objects.order_by('name'),
         widget=forms.CheckboxSelectMultiple(),
-        label="Techniques")
+        label="Techniques",
+        help_text="Select as many as apply to reported sites")
+    
     experimental_process = forms.CharField(widget=forms.Textarea, required=False,
-                                           label="Experimental process")
+                                           label="Experimental process",
+                                           help_text="""Write a concise, intuitive description of the
+                                           experimental process to ascertain binding/induced expression""")
                                            
-    forms_complex = forms.BooleanField(required=False, label="TF complex")
+    forms_complex = forms.BooleanField(required=False,
+                                       label="""The manuscript reports that TF forms complex
+                                       with other proteins for binding with reported sites""")
     complex_notes = forms.CharField(widget=forms.Textarea, required=False,
-                                    label="Notes")
+                                    label="Notes",
+                                    help_text="""Provide brief description of the proteins involved in
+                                    the complex and how it affects binding""")
 
 class SiteReportForm(forms.Form):
     """Form to input the list of sites reported in the paper"""
@@ -171,14 +212,34 @@ class CurationReviewForm(forms.Form):
     """Form to see all data entered so far. The last step to submit curation."""
     choices = ((None, "None"),) + Curation.REVISION_REASONS
     revision_reasons = forms.ChoiceField(choices=choices,
-                                         label="Revision required")
+                                         label="Revision required",
+                                         help_text="""
+Select, if needed, the reason why this curation requires revision.
+See detailed list of reasons in the curation guide.""")
+    
     confidence = forms.BooleanField(required=False,
-                                    label="I am confident of the results reported in this manuscript.")
+                                    label="I am confident of the results reported in this manuscript.",
+                                    help_text="""
+Check this if experimental techniques and results meet the standards specified in the curation guide""")
     NCBI_submission_ready = forms.BooleanField(required=False,
-                                               label="Curation is ready to submit to NCBI.")
+                                               label="Curation is ready to submit to NCBI.",
+                                               help_text="""
+A curation is ready for submission if: (a) the identified genome sequence
+matches the reported one or (b) identified and reported genomes match at the
+species level and at least 90% of reported sites are located as exact matches.""")
                                                
     paper_complete = forms.BooleanField(required=False,
-                                        label="Curation for this paper is complete.")
-    notes = forms.CharField(widget=forms.Textarea, required=False, label="Notes")
+                                        label="Curation for this paper is complete.",
+                                        help_text="""
+Check this box if there are no more curations pending for this paper (additional
+    sites, different techniques, other TF, etc.""")
+    notes = forms.CharField(widget=forms.Textarea, required=False, label="Notes",
+                            help_text="""
+Type in any additional notes on the curation process. For instance, if reported
+sites were left out for some reason, what prompted selection of a surrogate
+genome instead of another, general comments on the experimental process, etc.
+""")
+    
     confirm = forms.BooleanField(required=True,
-                                 label="I want to submit this curation")
+                                 label="I want to submit this curation",
+                                 help_text="Check to submit when you click \"next step\"")

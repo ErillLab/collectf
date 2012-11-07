@@ -11,20 +11,21 @@
       Learn more</a></p>
 </div>
 
+{% if user.is_authenticated %}
 <div class="row">
   <div class="span6">
     <h2>Publication submission</h2>
-    <p>description here</p>
-    <p><a class="btn" href="{% url collectfapp.pubview.pubmed_submission %}">Pubmed submission</a>
-       <a class="btn" href="{% url collectfapp.pubview.pubmed_submission %}">non-pubmed submission</a>
+
+    <p><a class="btn btn-large" href="{% url collectfapp.pubview.pubmed_submission %}">Pubmed submission</a>
+       <a class="btn btn-large" href="{% url collectfapp.pubview.non_pubmed_submission %}">Non-pubmed submission</a>
     </p>
   </div>
 
   <div class="span6">
     <h2>Curation submission</h2>
-    <p>description here</p>
-    <a class="btn" href="{% url collectfapp.curationview.curation %}">Submit a new curation</a>
-    <a class="btn" href="#myModal" role="button" class="btn" data-toggle="modal">Edit curation</a>
+
+    <a class="btn btn-large" href="{% url collectfapp.curationview.curation %}">Submit a new curation</a>
+    <a class="btn btn-large" href="#myModal" role="button" class="btn" data-toggle="modal">Edit curation</a>
   </div>
 </div>
 
@@ -45,5 +46,6 @@
     <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
   </div>
 </div>
+{% endif %}
 
 {% endblock %}

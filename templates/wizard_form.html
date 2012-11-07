@@ -10,7 +10,7 @@
     Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}
   </div>
 </div>
-<form method="post" action="" class="form-horizontal">  {% csrf_token %}
+<form method="post" action="" class="form-horizontal well">  {% csrf_token %}
 
   {{ wizard.management_form }}
 
@@ -23,9 +23,9 @@
   <div class="control-group">
     <div class="controls">
     {% if wizard.steps.prev %}
-    <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">prev step</button>
+    <button class="btn" name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">prev step</button>
     {% endif %}
-    <input type="submit" value="next step"/>
+    <input class="btn" type="submit" value="next step"/>
     </div>
   </div>
 </form>
