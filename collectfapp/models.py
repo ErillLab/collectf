@@ -75,7 +75,6 @@ class Publication(models.Model):
     volume = models.CharField(max_length=50)
     issue = models.CharField(max_length=50)
     pages = models.CharField(max_length=50)
-    citation = models.TextField() # contains authors, title, year, volume and pages info
     url = models.CharField(max_length=1000, null=True, blank=True)
     pdf = models.FileField(upload_to="papers/", null=True, blank=True)
     contains_promoter_data = models.BooleanField()

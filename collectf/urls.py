@@ -45,4 +45,5 @@ urlpatterns = patterns('',
     url(r'^success/$', views.success),
 )
 
-print login
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+urlpatterns += staticfiles_urlpatterns()

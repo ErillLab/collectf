@@ -25,7 +25,6 @@ def make_pub(pubrec, cd):
                     volume = pubrec.get("Volume"),
                     issue = pubrec.get("Issue"),
                     pages = pubrec.get("Pages"),
-                    citation=citation(pubrec),
                     url=url,
                     pdf=None,
                     reported_TF=cd["reported_TF"],
