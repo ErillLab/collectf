@@ -24,6 +24,8 @@ import models
 import sutils
 import sitesearch
 import views
+from templatetags import publication_tags
+from django.utils.safestring import mark_safe
 
 # curation get form functions
 # get_form constructs the form for a given step
@@ -36,7 +38,9 @@ def publication_get_form(wiz, form):
     # select papers which are not complete yet
     not_completed_pubs = assigned_pubs.filter(curation_complete=False)
     # put them in form choices, populate form field
-    choices = [(p.publication_id, "[%s] %s" % (p.publication_id, p.citation))
+    choices = [(p.publication_id,
+                mark_safe("[%s] %s" % (p.publication_id,
+                                       publication_tags.as_publication(p))))
                 for p in not_completed_pubs]
     form.fields["pub"].choices = choices
     return form
@@ -112,7 +116,7 @@ def site_regulation_get_form(wiz, form):
     for sid,match in exact_site_matches.items() + soft_site_matches.items():
         choices = []  # list of genes to the site match
         for g in match.nearby_genes:
-            choices.append((g.gene_id, '%s locus_tag: %s' % (g.name, g.locus_tag)))
+            choices.append((g.gene_id, '%s (%s)' % (g.locus_tag, g.name)))
         form.fields[sid] = forms.MultipleChoiceField(label=match.match.seq,
                                                      choices=choices, required=False,
                                                      widget=forms.CheckboxSelectMultiple)

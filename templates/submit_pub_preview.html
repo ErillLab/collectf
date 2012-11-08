@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 
+{% load publication_tags %}
+
 {% block content %}
 
 <h1>Submit publication</h1>
-<form class="form-horizontal" action="" method="post">{% csrf_token %}
+<form class="form-horizontal well" action="" method="post">{% csrf_token %}
   {% for field in form %}
   <dl class="dl-horizontal">
     <dt style="white-space: normal;">{{ field.label }}</dt>
@@ -13,7 +15,7 @@
   
 
   <h2>Publication information</h2>
-  <p>{{ pub.citation }}</p>
+  <p>{{ pub|as_publication }}</p>
 
   {% for field in form %}
   {{ field.as_hidden }}

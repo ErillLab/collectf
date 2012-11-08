@@ -33,7 +33,11 @@ class PubSubmissionFormPreview(FormPreview):
         else:  # non-pubmed publication
             pubrec = dict(Title=cd['title'],
                           AuthorList=cd['authors'].split(','),
-                          FullJournalName=cd['journal'])
+                          FullJournalName=cd['journal'],
+                          PubDate=cd['publication_date'],
+                          Volume=cd['volume'],
+                          Issue=cd['issue'],
+                          Pages=cd['pages'])
             p = makeobj.make_pub(pubrec, cd)
 
         # put p to context to show as html on form preview

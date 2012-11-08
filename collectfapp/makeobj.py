@@ -18,6 +18,13 @@ def make_pub(pubrec, cd):
     publication_type = "pubmed" if pmid else "nonpubmed"
     p = Publication(publication_type = publication_type,
                     pmid=pmid,
+                    authors = ', '.join(pubrec.get("AuthorList")), 
+                    journal = pubrec.get("FullJournalName"),
+                    title = pubrec.get("Title"),
+                    publication_date = pubrec.get("PubDate"),
+                    volume = pubrec.get("Volume"),
+                    issue = pubrec.get("Issue"),
+                    pages = pubrec.get("Pages"),
                     citation=citation(pubrec),
                     url=url,
                     pdf=None,

@@ -2,19 +2,8 @@
   it fails. NCBI may have a limit to fetch record. Try to divide into batches.
   http://permalink.gmane.org/gmane.comp.python.bio.general/6968
 
-- PUBMED ID (store year too)
-- Store fields independently (author, title, journal, year, etc.)
-
-
 - Prepopulate fields if publication is previously submitted.
-- Show locustag+(gene) in search results
-- Curation complete
-  - Not show in list of papers
-  - Automatically select paper when revising (not uncheck complete)
 - Gray out (on add) TF-species / site-species
-
-- CTGT...TATG
-  hyaB, hyaC, hybA, ..
-- Reported species in publication submission step
+  
 - Multiple shared curations (populate form fields)
-- Curation (show TF and paper info)
+

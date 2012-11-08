@@ -48,7 +48,10 @@ class Curation(models.Model):
     site_instances = models.ManyToManyField("SiteInstance", through="Curation_SiteInstance")
 
     def __unicode__(self):
-        return u'%s [TF: %s]' % (self.curation_id, self.TF.name)
+        return u'%s - %s - %s, %s, %s' % (self.curation_id, self.TF.name,
+                                                    self.publication.title,
+                                                      self.publication.authors,
+                                                      self.publication.publication_date)
     
 class Curator(models.Model):
     curator_id = models.AutoField(primary_key=True)
@@ -68,8 +71,9 @@ class Publication(models.Model):
     authors = models.CharField(max_length=1000)
     title = models.CharField(max_length=1000)
     journal = models.CharField(max_length=1000)
-    year = models.CharField(max_length=50)
+    publication_date = models.CharField(max_length=50)
     volume = models.CharField(max_length=50)
+    issue = models.CharField(max_length=50)
     pages = models.CharField(max_length=50)
     citation = models.TextField() # contains authors, title, year, volume and pages info
     url = models.CharField(max_length=1000, null=True, blank=True)
