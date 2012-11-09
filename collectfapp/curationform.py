@@ -73,7 +73,6 @@ class GenomeForm(forms.Form):
         genome_accession = self.cleaned_data['genome_accession']
         # remove version
         genome_accession = genome_accession.split('.')[0]
-        print genome_accession
         try: # to retrieve genome from database (if exists)
             g = Genome.objects.get(genome_accession=genome_accession)
         except Genome.DoesNotExist: # try to retrieve from NCBI database
@@ -136,6 +135,8 @@ class GenomeForm(forms.Form):
     def clean_species(self, field):
         # Helper function for clean_TF_species and clean_site_species
         cd = self.cleaned_data
+        if 'genome_accession' not in self.cleaned_data:
+            return
         genome_accession = self.cleaned_data['genome_accession']
         genome = Genome.objects.get(genome_accession=genome_accession)
         if not genome:
