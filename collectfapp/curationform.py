@@ -70,7 +70,7 @@ class GenomeForm(forms.Form):
                                    in the manuscript.""")
     
     def clean_genome_accession(self):
-        genome_accession = self.cleaned_data['genome_accession']
+        genome_accession = self.cleaned_data['genome_accession'].strip()
         # remove version
         genome_accession = genome_accession.split('.')[0]
         try: # to retrieve genome from database (if exists)
@@ -87,7 +87,7 @@ class GenomeForm(forms.Form):
         return genome_accession
 
     def clean_TF_accession(self):
-        TF_accession = self.cleaned_data['TF_accession']
+        TF_accession = self.cleaned_data['TF_accession'].strip()
         # remove version
         TF_accession = TF_accession.split('.')[0]
         try:

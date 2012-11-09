@@ -18,6 +18,7 @@ class Curation(models.Model):
                ("TETRAMER", "tetramer"),
                ("OTHER", "other"),
                ("N/A", "not specified"))
+    
     # fields
     curation_id = models.AutoField(primary_key=True)
     TF_species = models.CharField(max_length=500)   # species of reported TF

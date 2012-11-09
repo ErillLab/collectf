@@ -31,7 +31,7 @@ number of sites reported, whether high-throughput techniques are used or any
 other factor that might help prioritize curation.""")
 
     def clean_pmid(self):
-        cp = self.cleaned_data['pmid'] # cleaned pmid
+        cp = self.cleaned_data['pmid'].strip() # cleaned pmid
         # check if in database
         try:
             Publication.objects.get(pmid=cp)

@@ -483,7 +483,6 @@ report gene expression.""",
         messages.success(self.request, "Curation was successfully submitted.")
         return HttpResponseRedirect(reverse(views.home))
     
-    
 # curation handler
 
 # for form definitions, go curationform.py
