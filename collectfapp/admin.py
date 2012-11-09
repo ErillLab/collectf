@@ -15,3 +15,11 @@ for model in get_models(app):
         admin.site.register(model)
     except admin.sites.AlreadyRegistered:
         pass
+
+
+# unregister Regulation
+# don't show any field. Gene field in the Regulation model
+# ruins everything. As default behavior, Django tries to
+# generate a dropdown box with __ALL__ genes in the database,
+# which kills the server.
+admin.site.unregister(Regulation)

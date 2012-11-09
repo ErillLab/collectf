@@ -43,6 +43,7 @@ other factor that might help prioritize curation.""")
             raise forms.ValidationError("Invalid PMID")
         return cp
 
+
 class NonPubmedPublicationForm(forms.Form):
     # form for non-pubmed publications or unpublished data
     authors = forms.CharField(label="Authors (Name Initials,)")
