@@ -47,6 +47,14 @@
   </div>
 
   <div class="container-fluid">
+    <!-- any messages? -->
+    {% for message in messages %}
+    <div class="alert alert-block alert-success">
+      <button type="button" class="close" data-dismiss="alert">x</button>
+      {{ message }}
+    </div>
+    {% endfor %}
+    <!-- main stuff -->
     {% block content %}
     {% endblock %}
   </div>

@@ -2,6 +2,14 @@
 
 {% block content %}
 
+
+{% for message in messages %}
+<div class="alert alert-block alert-success">
+  <button type="button" class="close" data-dismiss="alert">x</button>
+  {{ message }}
+</div>
+{% endfor %}
+
 Thank you! Curation was successfully submitted.
 
 {% endblock %}

@@ -13,6 +13,7 @@ import models
 from models import Publication
 import makeobj
 import views
+from django.contrib import messages
 
 class PubSubmissionFormPreview(FormPreview):
     """Form preview view for publication submission"""
@@ -50,7 +51,9 @@ class PubSubmissionFormPreview(FormPreview):
             curator = models.Curator.objects.get(user=request.user)
             p.assigned_to = curator
         p.save()  # insert into database
-        return HttpResponseRedirect(reverse(views.success))
+        messages.success(request,
+                         "The paper was successfully submitted to be curated later.")
+        return HttpResponseRedirect(reverse(views.home))
 
 # pubmed publication submission handler
 @login_required

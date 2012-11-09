@@ -3,10 +3,5 @@
   http://permalink.gmane.org/gmane.comp.python.bio.general/6968
 
 - Prepopulate fields if publication is previously submitted.
-- Gray out (on add) TF-species / site-species
-  
+
 - Multiple shared curations (populate form fields)
-
-
-
-

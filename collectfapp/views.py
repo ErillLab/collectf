@@ -1,6 +1,7 @@
 from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
 import models
+from django.template import RequestContext
 
 
 # Create your views here.
@@ -20,10 +21,12 @@ def home(request):
         template_vals["curator"] = curator
         template_vals["curations"] = curations
         
-    return render_to_response("choose.html", template_vals)
+    return render_to_response("choose.html", template_vals,
+                              context_instance = RequestContext(request))
 
 @login_required
 def success(request):
     """Success view handler"""
     template_vals = {"user": request.user}
-    return render_to_response("success.html", template_vals)
+    return render_to_response("success.html", template_vals,
+                              context_instance = RequestContext(request))

@@ -26,6 +26,7 @@ import sitesearch
 import views
 from templatetags import publication_tags
 from django.utils.safestring import mark_safe
+from django.contrib import messages
 
 # curation get form functions
 # get_form constructs the form for a given step
@@ -477,8 +478,10 @@ report gene expression.""",
         if sutils.sin(self.request.session, 'old_curation'):
             # delete existing one
             sutils.sget(self.request.session, 'old_curation').delete()
-        
-        return HttpResponseRedirect(reverse(views.success))
+
+
+        messages.success(self.request, "Curation was successfully submitted.")
+        return HttpResponseRedirect(reverse(views.home))
     
     
 # curation handler
@@ -503,5 +506,6 @@ def curation(request):
                                    SiteSoftMatchForm,
                                    SiteRegulationForm,
                                    CurationReviewForm])
+
     return view(request)
                                    
