@@ -31,11 +31,23 @@ class GenomeForm(forms.Form):
                                        help_text="""Paste the NCBI GenBank
                                        genome accession number for the species
                                        closest to the reported
-                                       species/strain. """) 
+                                       species/strain. """)
+    TF_species_same = forms.BooleanField(required=False,
+                                         label="""This is the exact same
+                                         strain as reported in the manuscript for the TF.""")
+
+    site_species_same = forms.BooleanField(required=False,
+                                           label="""This is the exact same
+                                           strain as reported in the
+                                           manuscript for the sites.""") 
+
+
     TF_accession = forms.CharField(label="TF accession number",
                                    help_text="""Paste the NCBI TF protein
                                    accession number for the species closest to
-                                   the reported species/strain.""")  
+                                   the reported species/strain.""")
+
+
     # form fields
     # TF_species_same / TF_species and
     # site_species_same / site_species
@@ -43,17 +55,8 @@ class GenomeForm(forms.Form):
     # TF and site species manually, or he can select the option that they are
     # same species with genome. If they are same species with genome, he doesn't
     # need to input whole species name
-    TF_species_same = forms.BooleanField(label="TF-species is same with genome",
-                                         required=False,
-                                         help_text="""This is the exact same
-                                         strain as reported in the manuscript""")
     
 
-    site_species_same = forms.BooleanField(label="Site-species is same with genome",
-                                           required=False,
-                                           help_text="""This is the exact same
-                                           strain as reported in the
-                                           manuscript""") 
 
     TF_species = forms.CharField(label="Organism of origin for reported TF",
                                  required=False,
