@@ -57,7 +57,7 @@ class PubSubmissionFormPreview(FormPreview):
             note = " \nPaper has no TF-binding site data."
             p.submission_notes += note
             p.curation_complete = True
-            msg = """The paper was marked as complete, since it does not have data"""
+            msg = """The paper was marked as complete, since it does not have data."""
 
         p.save()  # insert into database
 
