@@ -32,6 +32,7 @@ from django.contrib import messages
 # get_form constructs the form for a given step
 def publication_get_form(wiz, form):
     """Publication selection form"""
+
     user = wiz.request.user
     curator = models.Curator.objects.get(user=user)
     # select papers assigned to user
@@ -44,11 +45,38 @@ def publication_get_form(wiz, form):
                                        publication_tags.as_publication(p))))
                 for p in not_completed_pubs]
     form.fields["pub"].choices = choices
+
     return form
     
 def genome_get_form(wiz, form):
     """Genome, TF, TF_family, tf instance, .. selection form"""
-    # populate TF field
+
+    c = sutils.sget(wiz.request.session, "previously_curated_paper")
+    # if selected publication is previously curated, the related curation should
+    # be in object c. Otherwise, c = None.
+    # If so, populate "Genome and TF information" form fields from the
+    # previously submitted curation to make things easier for curator.
+    if c:
+        form.initial["TF"] = c.TF
+        form.initial["TF_type"] = c.TF_type
+        form.initial["TF_function"] = c.TF_function
+        form.initial["genome_accession"] = c.site_instances.all()[0].genome.genome_accession
+        form.initial["TF_accession"] = c.TF_instance.protein_accession
+        
+        form.initial["TF_species"] = c.TF_species
+        form.initial["site_species"] = c.site_species
+
+        msg = """
+<h4>Warning!</h4> It seems that the paper you selected is previously
+curated. For convenience, fields in this form are automatically filled based on
+the previous curation of the paper. They may differ in this curation, so it is
+best to check that they are correct before proceeding to the next step."""
+        
+        messages.warning(wiz.request, mark_safe(msg))
+        
+        # delete session data, if user change any field and then come back,
+        # store users last entered data, instead of populated data.
+        sutils.sput(wiz.request.session, "previously_curated_paper", None)
     return form
 
 def techniques_get_form(wiz, form):
@@ -136,7 +164,6 @@ def publication_process(wiz, form):
     pubid = form.cleaned_data['pub']
     sutils.sput(wiz.request.session, 'publication', pubid)
 
-    print 'process', paper_contains_no_data(form.cleaned_data)
     if paper_contains_no_data(form.cleaned_data):
         # mark paper as having no data
         paper = models.Publication.objects.get(publication_id=pubid)
@@ -144,9 +171,21 @@ def publication_process(wiz, form):
         paper.submission_notes += note
         paper.curation_complete = True
         paper.save()
-
-        sutils.sput(wiz.request.session, "paper_contains_no_data", True)
         
+        sutils.sput(wiz.request.session, "paper_contains_no_data", True)
+        return
+
+
+    # if paper is previously curated, populate genome and TF information form
+    # search db if there is any curation object belonging to this publication
+    p = models.Publication.objects.get(publication_id=pubid)
+    try:
+        c = models.Curation.objects.get(publication=p)
+        sutils.sput(wiz.request.session, "previously_curated_paper", c)
+        print "this pub previously curated"
+    except models.Curation.DoesNotExist:
+        sutils.sput(wiz.request.session, "previously_curated_paper", None)
+        print "this pub is new (not curated previously)"        
 
 def genome_process(wiz, form):
     genome_accession = form.cleaned_data['genome_accession']
@@ -529,7 +568,7 @@ def paper_contains_no_data(cleaned_data):
     publication selection form."""
     # get step data for publication step
     return cleaned_data["no_data"]
-    
+
 # curation handler
 
 # for form definitions, go curationform.py
@@ -544,7 +583,7 @@ def curation(request):
         sutils.sdel(request.session, 'old_curation')
         
     # TODO make custom session objects be form wizard based
-    
+
     view = CurationWizard.as_view([PublicationForm,
                                    GenomeForm,
                                    TechniquesForm,
