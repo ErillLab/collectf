@@ -64,8 +64,6 @@ def edit_curation(request, cid):
     - When new form is submitted, insert new curation instance to DB and remove the
     old one.
     """
-    # clear previous cookies
-    sutils.clear(request.session)
     # get curation
     old_curation = models.Curation.objects.get(curation_id=cid)
     # get initial data for new curation form

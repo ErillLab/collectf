@@ -515,7 +515,9 @@ report gene expression.""",
             # delete existing one
             sutils.sget(self.request.session, 'old_curation').delete()
 
-
+        # clear session
+        sutils.clear(self.request.session)
+        
         messages.success(self.request, "Curation was successfully submitted.")
         return HttpResponseRedirect(reverse(views.home))
 
@@ -533,11 +535,11 @@ def paper_contains_no_data(cleaned_data):
 def curation(request):
     # clear session data from previous forms
 
-    sutils.clear(request.session)
+
     # If user selects the old curation and then go back, the session will have the
     # old_curation key in table, and it will cause trouble.
-    #    if sutils.sin(request.session, 'old_curation'):
-    #       sutils.sdel(request.session, 'old_curation')
+    if sutils.sin(request.session, 'old_curation'):
+        sutils.sdel(request.session, 'old_curation')
         
     # TODO make custom session objects be form wizard based
     
