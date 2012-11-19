@@ -6,7 +6,7 @@
 - Multiple shared curations (populate form fields)
 
 
-- checkbox when go back
-
 
 - whitespaces
+  
+- monospaced font on TF sites

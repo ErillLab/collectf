@@ -136,6 +136,18 @@ def publication_process(wiz, form):
     pubid = form.cleaned_data['pub']
     sutils.sput(wiz.request.session, 'publication', pubid)
 
+    print 'process', paper_contains_no_data(form.cleaned_data)
+    if paper_contains_no_data(form.cleaned_data):
+        # mark paper as having no data
+        paper = models.Publication.objects.get(publication_id=pubid)
+        note = " \nPaper has no TF-binding site data"
+        paper.submission_notes += note
+        paper.curation_complete = True
+        paper.save()
+
+        sutils.sput(wiz.request.session, "paper_contains_no_data", True)
+        
+
 def genome_process(wiz, form):
     genome_accession = form.cleaned_data['genome_accession']
     # in form validation genome is searched in db, and if not found,
@@ -419,6 +431,30 @@ report gene expression.""",
 
         return self.get_form_step_data(form)
 
+    def render(self, form=None, **kwargs):
+
+        
+        form = form or self.get_form()
+        context = self.get_context_data(form=form, **kwargs)
+
+        # the only reason to override this method is to check "no data" button
+        # in publication selection form step. If the curator selects a
+        # publication and checks the button "This paper contains no data.", the
+        # proper action is to terminate curation process as ther is no data to
+        # be curated. The problem is to process that information and redirect to
+        # the home page. This is achieved by overloading render method. Before
+        # this function is called, publication object is modified as having no
+        # data. Afterwards, this function is called and it redirects to the
+        # homepage with the message about the action that was performed.
+
+        if (sutils.sin(self.request.session, "paper_contains_no_data") and
+            sutils.sget(self.request.session, "paper_contains_no_data")):
+            msg = "The publication was marked as having no data."
+            messages.info(self.request, msg)
+            return HttpResponseRedirect(reverse(views.home))
+        
+        return self.render_to_response(context)
+
     def done(self, form_list, **kwargs):
         """Last step in curation process, this method is called after all
         forms. Insert all data into the database."""
@@ -482,6 +518,13 @@ report gene expression.""",
 
         messages.success(self.request, "Curation was successfully submitted.")
         return HttpResponseRedirect(reverse(views.home))
+
+
+def paper_contains_no_data(cleaned_data):
+    """Return true if user checks the box "Paper contains no data" button in the
+    publication selection form."""
+    # get step data for publication step
+    return cleaned_data["no_data"]
     
 # curation handler
 
@@ -489,11 +532,12 @@ report gene expression.""",
 @login_required
 def curation(request):
     # clear session data from previous forms
-    
+
+    sutils.clear(request.session)
     # If user selects the old curation and then go back, the session will have the
     # old_curation key in table, and it will cause trouble.
-    if sutils.sin(request.session, 'old_curation'):
-        sutils.sdel(request.session, 'old_curation')
+    #    if sutils.sin(request.session, 'old_curation'):
+    #       sutils.sdel(request.session, 'old_curation')
         
     # TODO make custom session objects be form wizard based
     

@@ -11,6 +11,14 @@ class PublicationForm(forms.Form):
     pub = forms.ChoiceField(widget=forms.RadioSelect(),
                             label="Publications")
 
+    no_data = forms.BooleanField(label="This paper contains no data.",
+                                 required=False,
+                                 help_text="""
+Check this button if, after examining the paper, you find that the paper does
+not have data on binding sites. Checking this button will mark the paper as
+having no binding site data and set it to the 'curation complete' status. Also,
+the curation process will be ended as the paper has no data to be curated.""")
+
 class GenomeForm(forms.Form):
     """Form for submission of genome and TF accession numbers and others"""
     TF = forms.ModelChoiceField(queryset=TF.objects.all(),

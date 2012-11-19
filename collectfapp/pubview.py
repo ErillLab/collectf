@@ -46,13 +46,23 @@ class PubSubmissionFormPreview(FormPreview):
         sutils.sput(request.session, "pub_sub_publication", p)
 
     def done(self, request, cleaned_data):
+        msg = "The paper was successfully submitted to be curated later."
+        
         p = sutils.sget(request.session, "pub_sub_publication")
         if "assignment" in request.POST: # if assigned to the curator
             curator = models.Curator.objects.get(user=request.user)
             p.assigned_to = curator
+
+        if "contains_no_data" in request.POST: # if the paper has no TFBS data
+            note = " \nPaper has no TF-binding site data"
+            p.submission_notes += note
+            p.curation_complete = True
+            msg = """The paper was marked as complete, since it does not have data"""
+
         p.save()  # insert into database
-        messages.success(request,
-                         "The paper was successfully submitted to be curated later.")
+
+        messages.success(request, msg)
+        
         return HttpResponseRedirect(reverse(views.home))
 
 # pubmed publication submission handler

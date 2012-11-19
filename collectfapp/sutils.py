@@ -18,3 +18,8 @@ def sin(session, key):
     return key in session
 
 
+def clear(session):
+    for key,val in session.items():
+        if not key.startswith('_'):
+            del session[key]
+
