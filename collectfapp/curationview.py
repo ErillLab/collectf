@@ -451,6 +451,8 @@ report gene expression.""",
             sutils.sget(self.request.session, "paper_contains_no_data")):
             msg = "The publication was marked as having no data."
             messages.info(self.request, msg)
+            # clear session data
+            sutils.clear(self.request.session)
             return HttpResponseRedirect(reverse(views.home))
         
         return self.render_to_response(context)
