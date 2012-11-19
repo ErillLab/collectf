@@ -140,7 +140,7 @@ def publication_process(wiz, form):
     if paper_contains_no_data(form.cleaned_data):
         # mark paper as having no data
         paper = models.Publication.objects.get(publication_id=pubid)
-        note = " \nPaper has no TF-binding site data"
+        note = " \nPaper has no TF-binding site data."
         paper.submission_notes += note
         paper.curation_complete = True
         paper.save()

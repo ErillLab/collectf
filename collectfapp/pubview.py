@@ -54,7 +54,7 @@ class PubSubmissionFormPreview(FormPreview):
             p.assigned_to = curator
 
         if "contains_no_data" in request.POST: # if the paper has no TFBS data
-            note = " \nPaper has no TF-binding site data"
+            note = " \nPaper has no TF-binding site data."
             p.submission_notes += note
             p.curation_complete = True
             msg = """The paper was marked as complete, since it does not have data"""
