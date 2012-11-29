@@ -179,11 +179,12 @@ def publication_process(wiz, form):
     # if paper is previously curated, populate genome and TF information form
     # search db if there is any curation object belonging to this publication
     p = models.Publication.objects.get(publication_id=pubid)
-    try:
-        c = models.Curation.objects.get(publication=p)
-        sutils.sput(wiz.request.session, "previously_curated_paper", c)
+    # check if the publication is previously curated
+    cs = models.Curation.objects.filter(publication=p)
+    if cs.count() >= 1:
+        sutils.sput(wiz.request.session, "previously_curated_paper", cs[0])
         print "this pub previously curated"
-    except models.Curation.DoesNotExist:
+    else:
         sutils.sput(wiz.request.session, "previously_curated_paper", None)
         print "this pub is new (not curated previously)"        
 
