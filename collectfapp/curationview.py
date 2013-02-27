@@ -52,10 +52,10 @@ def genome_get_form(wiz, form):
     """Genome, TF, TF_family, tf instance, .. selection form"""
 
     c = sutils.sget(wiz.request.session, "previously_curated_paper")
-    # if selected publication is previously curated, the related curation should
-    # be in object c. Otherwise, c = None.
-    # If so, populate "Genome and TF information" form fields from the
-    # previously submitted curation to make things easier for curator.
+    # if selected publication is the one most recently curated, the related curation
+    # should be in object c. Otherwise, c = None.  If so, populate "Genome and TF
+    # information" form fields from the previously submitted curation to make things
+    # easier for curator.
     if c:
         form.initial["TF"] = c.TF
         form.initial["TF_type"] = c.TF_type

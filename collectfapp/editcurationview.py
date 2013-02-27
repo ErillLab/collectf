@@ -86,6 +86,14 @@ def edit_curation(request, cid):
     # save which publication we are about to edit
     sutils.sput(request.session, 'publication', old_curation.publication.publication_id)
 
+    # When doing a new curation, the first form is publication step. To help the
+    # curator, if the publication is previously curated, some fields are
+    # pre-populated, such as TF-type, TF-function, TF-species, etc. (assuming they
+    # are same for all curations that belong to one publication). We shouldn't use
+    # this feature, for edit_curation feature as the fields are populated with
+    # curation data being edited.
+    sutils.sput(request.session, "previously_curated_paper", None)
+
     wiz = CurationWizard.as_view([PublicationForm,
                                   GenomeForm,
                                   TechniquesForm,
