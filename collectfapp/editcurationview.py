@@ -12,8 +12,15 @@ def get_genome(curation):
     # get genome
     site_instances = curation.site_instances.all()
     # make sure there is >1 site instance for curation. No other way to access genome
-    assert site_instances
-    return site_instances[0].genome.genome_accession
+    # Wed Feb 27 18:07:02 2013 => Actually, it is possible for a curation to not to
+    # have any site. In this case, there is no way to access the genome accession
+    # number reported in the original curation.
+    if site_instances:
+        genome_accession = site_instances[0].genome.genome_accession
+    else:
+        genome_accession = ""
+
+    return genome_accession
 
 def init_genome_form(curation):
     """Return genome form data from old curation for new one"""
