@@ -33,16 +33,19 @@ def curation_stats(csv_file="db_stats.csv"):
         TF_species = c.TF_species
         site_species = c.site_species
 
-        # all site instances should belong to the same genome!
         site_instances = c.site_instances.all()
-        assert len(site_instances) > 0, "no site instance"
-        assert all(x.genome.genome_accession ==
-                   site_instances[0].genome.genome_accession
-                   for x in site_instances)
+        annotated_sites = len(site_instances)
+                    
+        if site_instances:
+            print "warning: no site instance for curation %d"% c.curation_id
+            sites_genome_accession = "N/A"
+        else:
+            assert all(x.genome.genome_accession ==
+                       site_instances[0].genome.genome_accession
+                       for x in site_instances)
+            sites_genome_accession = c.site_instances.all()[0].genome.genome_accession
 
-        annotated_sites = len(c.site_instances.all())
-        sites_genome_accession = c.site_instances.all()[0].genome.genome_accession
-
+        
         # write to csv
         f.write(tab.join(map(str, (curation_id,
                                    publication_id,
