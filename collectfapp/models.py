@@ -26,11 +26,11 @@ class Curation(models.Model):
     confidence = models.BooleanField()              # is curation confident?
     NCBI_submission_ready = models.BooleanField()   # is ready to submit to NCBI?
     requires_revision = models.CharField(max_length=20, choices=REVISION_REASONS,
-                                         null=True)
+                                         null=True, blank=True)
     experimental_process = models.TextField(null=True, blank=True)
     forms_complex = models.BooleanField()           # does TF forms complex
     complex_notes = models.TextField(null=True, blank=True) # if forms complex,
-    notes = models.TextField()
+    notes = models.TextField(blank=True)
     last_modified = models.DateTimeField(auto_now_add=True)
 
     # Same TF can be both activator and repressor for different
