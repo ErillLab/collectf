@@ -19,12 +19,23 @@
     }
 
   </style>
+
+
 </head>
 
 <body>
   <script src="http://code.jquery.com/jquery-latest.js"></script>
   <script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
   <script src="{% static "bootstrap/js/auxiliary.js" %}"></script>
+  <script type="text/javascript">
+    // use twitter-bootstrap tooltip feature
+    $('body').tooltip({
+       selector: '[data-toggle="tooltip"]',
+       placement: 'right',
+    });
+
+  </script>
+
   <!-- header -->
   <div class="navbar navbar navbar-fixed-top">
     <div class="navbar-inner">
