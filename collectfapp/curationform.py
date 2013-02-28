@@ -4,6 +4,7 @@ from models import *
 import bioutils
 from makeobj import *
 import sitesearch
+from django.utils.safestring import mark_safe
 
 
 class PublicationForm(forms.Form):
@@ -162,12 +163,26 @@ class TechniquesForm(forms.Form):
     contains_expression_data = forms.BooleanField(required=False,
         label="The manuscript contains expression data",
         help_text="The paper provides experimental support for TF-mediated regulation of genes")
+    
+    # generate techniques field
     # get available techniques from db
+    choices = []
+    for t in ExperimentalTechnique.objects.order_by('name'):
+        choices.append((t.technique_id,
+                        mark_safe(u'<div title="%s">%s</div>' % (t.description, t.name))))
+    techniques = forms.MultipleChoiceField(choices = choices,
+                                           label = "Techniques",
+                                           help_text = """Select as many as apply to reported sites.
+                                           Hover over any technique to see the description.""",
+                                           widget = forms.CheckboxSelectMultiple())
+
+    '''
     techniques = forms.ModelMultipleChoiceField(
         queryset=ExperimentalTechnique.objects.order_by('name'),
         widget=forms.CheckboxSelectMultiple(),
         label="Techniques",
         help_text="Select as many as apply to reported sites")
+    '''
     
     experimental_process = forms.CharField(widget=forms.Textarea, required=False,
                                            label="Experimental process",
