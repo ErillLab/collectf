@@ -9,8 +9,13 @@
 {{pub.volume}}({{pub.issue}}):{{pub.pages}}</i>
 {% endwith %}
 
+<h3>TF species</h3>
+{{ curation.TF_species }}
+<h3>Site species</h3>
+{{ curation.site_species }}
+
 <h3>TF</h3>
-{{curation.TF}}
+{{ curation.TF_instance.name }} [{{ curation.TF }}]
 
 
 <h3>Experimental Techniques</h3>
