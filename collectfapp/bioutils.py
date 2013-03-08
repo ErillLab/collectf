@@ -2,6 +2,7 @@ from Bio import Entrez
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqUtils import GC
+import time
 
 Entrez.email = "sefakilic@gmail.com"
 
@@ -50,11 +51,18 @@ def get_genes(genome_rec):
     # get gene ids
     gene_features = [f for f in genome_rec.features if f.type == 'gene']
     gids = [get_gene_id(f) for f in gene_features]
-
-    req = Entrez.epost('gene', id=','.join(gids))
-    res = Entrez.read(req)
-    recs = Entrez.read(Entrez.esummary(db='gene', webenv=res['WebEnv'],
-                                       query_key=res['QueryKey']))
+    # Occasionally, when collecTF tries to retrieve all gene summaries, NCBI refuses
+    # to return all them. There should be some sort of limit for a query. Therefore,
+    # the gene list summary query is chunked into 1000 gene pieces.
+    recs = []
+    chunk_size = 10
+    for sliced_gids in [gids[i:i+chunk_size] for i in range(0, len(gids), chunk_size)]:
+        print 'getting slice'
+        req = Entrez.epost('gene', id=','.join(sliced_gids))
+        res = Entrez.read(req)
+        recs.extend(Entrez.read(Entrez.esummary(db='gene', webenv=res['WebEnv'],
+                                                query_key=res['QueryKey'])))
+        time.sleep(1)
 
     # two sources of gene data: Entrez epost and gene features from genome record
     for gid, feat, rec in zip(gids, gene_features, recs):

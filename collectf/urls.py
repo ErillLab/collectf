@@ -9,6 +9,7 @@ import collectfapp.signupview as signupview
 import collectfapp.pubview as pubview
 import collectfapp.curationview as curationview
 import collectfapp.editcurationview as editcurationview
+import collectfapp.viewcurationview as viewcurationview
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -41,6 +42,8 @@ urlpatterns = patterns('',
     url(r'^curation/$', curationview.curation),
     # edit curation
     url(r'^edit_curation/(?P<cid>\d+)/$', editcurationview.edit_curation),
+    # view curation
+    url(r'^view_curation/(?P<cid>\d+)/$', viewcurationview.view_curation),
     # success page
     url(r'^success/$', views.success),
 )

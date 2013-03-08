@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load publication_tags %}
+{% block content %}
+
+<h3>Publication</h3>
+{% with pub=curation.publication %}
+{{ pub.title }}; {{ pub.authors }};
+<i>{{ pub.journal }} {{pub.publication_date}};
+{{pub.volume}}({{pub.issue}}):{{pub.pages}}</i>
+{% endwith %}
+
+<h3>TF</h3>
+{{curation.TF}}
+
+
+<h3>Experimental Techniques</h3>
+<ul>
+{% for technique in curation.experimental_techniques.all %}
+<li>{{ technique.name }}</li>
+{% endfor %}
+</ul>
+
+
+<h3>Site Instances</h3>
+<pre>
+{% for site in curation.site_instances.all %}{{ site.seq }}
+{% endfor %}
+</pre>
+
+
+
+
+
+{% endblock %}
