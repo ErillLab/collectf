@@ -4,12 +4,13 @@ from collectfapp.signupview import *
 from django.views.generic.simple import direct_to_template
 
 
-import collectfapp.views as views
+import collectfapp.views
 import collectfapp.signupview as signupview
 import collectfapp.pubview as pubview
 import collectfapp.curationview as curationview
 import collectfapp.editcurationview as editcurationview
 import collectfapp.viewcurationview as viewcurationview
+import browseapp.views
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -33,7 +34,7 @@ urlpatterns = patterns('',
     # logout
     url(r'^accounts/logout/$', signupview.logout),
     # main page
-    url(r'^$', views.home),
+    url(r'^$', collectfapp.views.home),
     # pubmed publication submission
     url(r'^pubmed_submission/$', pubview.pubmed_submission),
     # nonpubmed publication submission
@@ -45,7 +46,9 @@ urlpatterns = patterns('',
     # view curation
     url(r'^view_curation/(?P<cid>\d+)/$', viewcurationview.view_curation),
     # success page
-    url(r'^success/$', views.success),
+    url(r'^success/$', collectfapp.views.success),
+    # view all curations
+    url(r'^view_all_curations/$', browseapp.views.view_all_curations),
 )
 
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns

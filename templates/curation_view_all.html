@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>List of curations</h2>
+
+<table class="table table-hover">
+<thead>
+<tr>
+  <th>Curation id</th>
+  <th>TF</th>
+  <th>Species</th>
+  <th>PMID</th>
+  <th>Curated by</th>
+</thead>
+
+<tbody data-provides="rowlink">
+{% for curation in curations %}
+<tr>
+  <td><a href="{% url collectfapp.viewcurationview.view_curation curation.curation_id %}" class="rowlink">{{ curation.curation_id }}</a></td>
+  <td>{{ curation.TF.name }}</td>
+  <td>{{ curation.site_species }}</td>
+  <td><span title="{% with pub=curation.publication %}{{ pub.title }}, {{ pub.authors }} {% endwith %}">
+      {{ curation.publication.pmid }}</span></td>
+  <td>{{ curation.curator.user.username }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+{% endblock %}

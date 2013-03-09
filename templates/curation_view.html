@@ -2,38 +2,48 @@
 {% load publication_tags %}
 {% block content %}
 
-<h3>Publication</h3>
-{% with pub=curation.publication %}
-{{ pub.title }}; {{ pub.authors }};
-<i>{{ pub.journal }} {{pub.publication_date}};
-{{pub.volume}}({{pub.issue}}):{{pub.pages}}</i>
-{% endwith %}
+<section id="publication">
+  <h1>Publication</h1>
+  
+  {% with pub=curation.publication %}
+  {{ pub.title }}; {{ pub.authors }};
+  <i>{{ pub.journal }} {{pub.publication_date}};
+    {{pub.volume}}({{pub.issue}}):{{pub.pages}}</i>
+  {% endwith %}
+  
+</section>
 
-<h3>TF species</h3>
-{{ curation.TF_species }}
-<h3>Site species</h3>
-{{ curation.site_species }}
+<section id="genome">
+  
+  <h1>Genome and TF information</h1>
+  
+  <h3>TF species</h3>
+  {{ curation.TF_species }}
+  <h3>Site species</h3>
+  {{ curation.site_species }}
 
-<h3>TF</h3>
-{{ curation.TF_instance.name }} [{{ curation.TF }}]
+  <h3>TF</h3>
+  {{ curation.TF_instance.name }} [{{ curation.TF }}]
+</section>
 
+<section id="exp_technique">
+  <h3>Experimental Techniques</h3>
+  <ul>
+    {% for technique in curation.experimental_techniques.all %}
+    <li>{{ technique.name }}</li>
+    {% endfor %}
+  </ul>
+</section>
 
-<h3>Experimental Techniques</h3>
-<ul>
-{% for technique in curation.experimental_techniques.all %}
-<li>{{ technique.name }}</li>
-{% endfor %}
-</ul>
-
-
-<h3>Site Instances</h3>
-<pre>
-{% for site in curation.site_instances.all %}{{ site.seq }}
-{% endfor %}
-</pre>
-
-
-
+<section id="sites">
+  <h3>Site Instances</h3>
+  <pre>
+    {% for site in curation.site_instances.all %}{{ site.seq }}
+    {% endfor %}
+  </pre>
+</section>
 
 
 {% endblock %}
+
+
