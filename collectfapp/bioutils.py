@@ -41,8 +41,39 @@ def get_gene_id(feature):
     i = 0
     while not feature.qualifiers['db_xref'][i].startswith('GeneID:'):
         i += 1
-    return feature.qualifiers['db_xref'][i][7:]
+    gene_id = feature.qualifiers['db_xref'][i][7:]
+    return gene_id
+
+def get_gene_annotation(id_list):
+    """Annotates Entrez Gene ids using Bio.Entrez, in particular epost (to submit the
+    data to NCBI) and esummary to retrieve the information. Returns a list gene
+    summary objects."""
+    epost_result = Entrez.read(Entrez.epost("gene", id=','.join(id_list)))
+    # Occasionally, when collecTF tries to retrieve all gene summaries, NCBI refuses
+    # to return all them. There should be some sort of limit for a query. Therefore,
+    # the gene list summary query is chunked into 1000 gene pieces.
     
+    # edit: After several different ways to fix it, the best way is breaking up the
+    # list into batches of size 1000 AND retry if any batch fails for some reason.
+    runtime_error = 0  # number of runtime errors during Entrez esummary
+    
+    while runtime_error < 10:  # if runtime error is consistent, there is no point trying again
+        try:
+            request = Entrez.esummary(db="gene", webenv=epost_result["WebEnv"],
+                                      query_key=epost_result["QueryKey"])
+            records = Entrez.read(request)
+        except RuntimeError as e:
+            print "Error occurred during epost+esummary:", e
+            print "Trying again."
+            runtime_error += 1
+        else:
+            runtime_error = 0
+            break
+
+    assert runtime_error == 0
+    return records
+
+
 def get_genes(genome_rec):
     """Get list of all genes"""
     genes = [] # return list of genes
@@ -51,19 +82,14 @@ def get_genes(genome_rec):
     # get gene ids
     gene_features = [f for f in genome_rec.features if f.type == 'gene']
     gids = [get_gene_id(f) for f in gene_features]
-    # Occasionally, when collecTF tries to retrieve all gene summaries, NCBI refuses
-    # to return all them. There should be some sort of limit for a query. Therefore,
-    # the gene list summary query is chunked into 1000 gene pieces.
+    
     recs = []
-    chunk_size = 10
-    for sliced_gids in [gids[i:i+chunk_size] for i in range(0, len(gids), chunk_size)]:
-        print 'getting slice'
-        req = Entrez.epost('gene', id=','.join(sliced_gids))
-        res = Entrez.read(req)
-        recs.extend(Entrez.read(Entrez.esummary(db='gene', webenv=res['WebEnv'],
-                                                query_key=res['QueryKey'])))
-        time.sleep(1)
-
+    chunk_size = 1000
+    for start in xrange(0, len(gids), chunk_size):
+        end = min(len(gids), start+chunk_size)
+        #print gids[start:end]
+        recs = recs + get_gene_annotation(gids[start:end])
+        
     # two sources of gene data: Entrez epost and gene features from genome record
     for gid, feat, rec in zip(gids, gene_features, recs):
         assert rec['Id'] == gid
