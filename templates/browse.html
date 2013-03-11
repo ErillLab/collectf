@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container-fluid">
+<div class="row-fluid">
+
+<div class="span3">
+<form method="POST" id="" action="">{% csrf_token %}
+
+<label>TF</label>
+<select>
+{% for TF in TFs %}
+<option>{{ TF }}</option>
+{% endfor %}
+</select>
+
+<label>Species</label>
+<select>
+{% for sp in species %}
+<option>{{ sp }}</option>
+{% endfor %}
+</select>
+
+<br/>
+
+<input type="submit" class="btn" value="submit"/>
+</form>
+
+<hr/>
+
+<div class="span9">
+asda
+
+<hr/>
+
+
+
+</div>
+
+
+</div>
+</div>
+
+{% endblock %}

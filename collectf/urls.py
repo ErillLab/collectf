@@ -49,6 +49,8 @@ urlpatterns = patterns('',
     url(r'^success/$', collectfapp.views.success),
     # view all curations
     url(r'^view_all_curations/$', browseapp.views.view_all_curations),
+    # browse
+    url(r'^browse/$', browseapp.views.browse),
 )
 
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
