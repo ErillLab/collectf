@@ -36,7 +36,7 @@
   </li>
   <!-- requires revision? -->
   <li>
-  {% if curation.requires_revision != None and curation.requires_revision != "none" %}
+  {% if curation.requires_revision != "None" and curation.requires_revision != "none" %}
   <i class="icon-remove"></i> The curation requires revision: {{ curation.get_requires_revision_display }}.
   {% else %}
   <i class="icon-ok"></i> The curation does not require revision.
@@ -44,6 +44,7 @@
   </li>
 </ul>
 
+<!-- curation notes -->
 {% if curation.notes %}
 <h5>Curation notes</h5>
 <blockquote><p>{{ curation.notes }}</p></blockquote>
@@ -52,6 +53,7 @@
 </section>
 <hr/>
 
+<!-- publication -->
 <section id="publication">
 <h4>Publication</h4>
 <i class="icon-file"></i>
@@ -62,20 +64,15 @@
 </section>
 <hr/>
 
+<!-- genome and TF information -->
 <section id="genome">
 <h4>Genome and TF information</h4>
-
-<dl class="dl-horizontal">
-  <dt>TF</dt>
-  <dd>{{ curation.TF.name }}</dd>
-  <dt>TF instance</dt>
-  <dd>{{ curation.TF_instance }}</dd>
-  <dt>TF structure</dt>
-  <dd>{{ curation.get_TF_type_display }}</dd>
-  <dt>TF function</dt>
-  <dd>{{ curation.get_TF_function_display }}</dd>
-</dl>
-
+<ul>
+  <li><strong>TF:</strong> {{ curation.TF.name }}</li>
+  <li><strong>TF instance:</strong> {{ curation.TF_instance.protein_accession }}; {{ curation.TF_instance.description }}</li>
+  <li><strong>TF structure:</strong> {{ curation.get_TF_type_display }}</li>
+  <li><strong>TF function:</strong> {{ curation.get_TF_function_display }}</li>
+</ul>
 </section>
 <hr/>
 
@@ -111,20 +108,24 @@
 </section>
 <hr/>
 
-
+<!-- gene regulation -->
 <section id="gene-regulation">
 <h4>Gene Regulation</h4>
-Regulated genes for each binding site are displayed below.
-{% with curation_site_instances=curation.curation_siteinstance_set.all %}
-<ul>
-  {% for cs in curation_site_instances %}
-  <li><span style="font-family: monospace">{{ cs.site_instance.seq }} </span>
-    {% for regulation in cs.regulation_set.all %}
-    <span title="{{ regulation.gene.description }}" {% if regulation.evidence_type == "exp_verified" %} style="color:red" {% endif %}
-	  data-toggle="tooltip">
-    {{ regulation.gene.name }},
-    {% endfor %}
 
+Regulated genes for each binding site are displayed below. Genes that are reported
+for TF-site mediated regulation are displayed in <span style="color:red">red</span>.
+
+{% with curation_site_instances=curation.curation_siteinstance_set.all %}
+<ul class="unstyled">
+  {% for cs in curation_site_instances %}
+  <li>
+    <i class="icon-wrench"></i>
+    <span style="font-family: monospace">{{ cs.site_instance.seq }} - </span>
+    {% for regulation in cs.regulation_set.all %}
+    <span title="{{ regulation.gene.description }}" {% if regulation.evidence_type == "exp_verified" %} style="color:red" {% endif %} data-toggle="tooltip">
+      {{ regulation.gene.name }}
+    </span>,
+    {% endfor %}
   </li>
   {% endfor %}
 </ul>
