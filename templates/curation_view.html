@@ -36,8 +36,8 @@
   </li>
   <!-- requires revision? -->
   <li>
-  {% if curation.requires_revision != None %}
-  <i class="icon-remove"></i> The curation requires revision, since {{ curation.requires_revision }}.
+  {% if curation.requires_revision != None and curation.requires_revision != "none" %}
+  <i class="icon-remove"></i> The curation requires revision: {{ curation.get_requires_revision_display }}.
   {% else %}
   <i class="icon-ok"></i> The curation does not require revision.
   {% endif %}
@@ -65,12 +65,16 @@
 <section id="genome">
 <h4>Genome and TF information</h4>
 
-<ul>
-  <li>TF: {{ curation.TF.name }}</li>
-  <li>TF instance: {{ curation.TF_instance }}</li>
-  <li>TF structure: {{ curation.TF_type }}</li>
-  <li>TF function: {{ curation.TF_function }}</li>
-</ul>  
+<dl class="dl-horizontal">
+  <dt>TF</dt>
+  <dd>{{ curation.TF.name }}</dd>
+  <dt>TF instance</dt>
+  <dd>{{ curation.TF_instance }}</dd>
+  <dt>TF structure</dt>
+  <dd>{{ curation.get_TF_type_display }}</dd>
+  <dt>TF function</dt>
+  <dd>{{ curation.get_TF_function_display }}</dd>
+</dl>
 
 </section>
 <hr/>
@@ -107,17 +111,27 @@
 </section>
 <hr/>
 
-<!--
+
 <section id="gene-regulation">
 <h4>Gene Regulation</h4>
+Regulated genes for each binding site are displayed below.
+{% with curation_site_instances=curation.curation_siteinstance_set.all %}
 <ul>
-  {% for site_instance in curation.site_instances.all %}
-  <li><span style="font-family: monospace">{{ site_instance.seq }} </span> 
+  {% for cs in curation_site_instances %}
+  <li><span style="font-family: monospace">{{ cs.site_instance.seq }} </span>
+    {% for regulation in cs.regulation_set.all %}
+    <span title="{{ regulation.gene.description }}" {% if regulation.evidence_type == "exp_verified" %} style="color:red" {% endif %}
+	  data-toggle="tooltip">
+    {{ regulation.gene.name }},
+    {% endfor %}
+
   </li>
   {% endfor %}
 </ul>
+{% endwith %}
+
 </section>
--->
+
 
 </div>
 
