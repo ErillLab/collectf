@@ -4,7 +4,6 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 import models
 
-@login_required
 def view_curation(request, cid):
     """Handler function for curation view"""
     curation = models.Curation.objects.get(curation_id=cid)
