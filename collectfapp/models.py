@@ -174,6 +174,14 @@ class SiteInstance(models.Model):
     def __unicode__(self):
         return u'%s [%s]' % (self.site_id, self.seq)
 
+    def to_fasta(self):
+        desc = "%s %s(%d, %d)" % (self.genome.genome_accession,
+                                    '+' if self.strand==1 else '-',
+                                    self.start,
+                                    self.end)
+        seq = self.seq
+        return ">%s\n%s\n" % (desc, seq)
+
 class Curation_SiteInstance(models.Model):
     # through model between Curation and SiteInstance models
     curation = models.ForeignKey("Curation")

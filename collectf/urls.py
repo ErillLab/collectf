@@ -51,6 +51,9 @@ urlpatterns = patterns('',
     url(r'^view_all_curations/$', browseapp.views.view_all_curations),
     # browse
     url(r'^browse/$', browseapp.views.browse),
+    # download sites (FASTA format)
+    url(r'^motif_download/(?P<TF_id>\d+)/(?P<species_id>\d+)', browseapp.views.report_FASTA),
+            
 )
 
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns

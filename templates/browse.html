@@ -14,7 +14,18 @@
 
 <div class="span9">
 
+
 {% if csi %}
+<a class="btn pull-right" href="{% url browseapp.views.report_FASTA form.TF.value form.species.value %}"><i class="icon-download"></i> Download sites</a>
+
+<div class="page-header">
+<h1>List of sites</h1>
+</div>
+
+
+
+
+
 <table class="table table-striped">
 <thead>
 <tr>
@@ -23,11 +34,13 @@
   <th>Curation</th>
 </tr>
 </thead>
+
 <tbody>
 {% for c in csi %}
 <tr>
   <td><span style="font-family: monospace">{{ c.site_instance.seq }}</span></td>
   {% with c.regulation_set.all|order_by:"gene__start" as rs %}
+  {% comment %}
   <td>
     {% for regulation in rs %}
     <span title="{{ regulation.gene.name }}">
@@ -40,6 +53,7 @@
     </span>
     {% endfor %}
   </td>
+  {% endcomment %}
   <td>
     {% for regulation in rs %}
     {% if regulation.evidence_type == "exp_verified" %}
