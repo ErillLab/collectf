@@ -50,9 +50,11 @@ urlpatterns = patterns('',
     # view all curations
     url(r'^view_all_curations/$', browseapp.views.view_all_curations),
     # browse
-    url(r'^browse/$', browseapp.views.browse),
+    #url(r'^browse/$', browseapp.views.browse),
     # download sites (FASTA format)
-    url(r'^motif_download/(?P<TF_id>\d+)/(?P<species_id>\d+)', browseapp.views.report_FASTA),
+    #url(r'^motif_download/(?P<TF_id>\d+)/(?P<species_id>\d+)/$', browseapp.views.report_FASTA),
+    # database statistics
+    url(r'^db_stats/$', browseapp.views.curation_stats),
             
 )
 

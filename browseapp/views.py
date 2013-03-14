@@ -61,3 +61,30 @@ def report_FASTA(request, TF_id, species_id):
         
     return response
     
+def curation_stats(request):
+    all_TFs = fetch.get_all_TFs()
+    all_species = fetch.get_all_species()
+    # number of curations by TF and site
+    curation_stats = {}  # dictionary of number of curations by TF and species
+    curation_stats2 = {} # dictionary of number of sites by TF and species
+    for TF in all_TFs:
+        curation_stats[TF.name] = {} # dict[species]
+        curation_stats2[TF.name] = {}
+        for sp in all_species:
+            curation_site_instances = fetch.get_curations(TF, sp)
+            curations = set(csi.curation for csi in curation_site_instances)
+            sites = set(csi.site_instance for csi in curation_site_instances)
+            curation_stats[TF.name][sp.name] = len(curations)  # num of curations
+            curation_stats2[TF.name][sp.name]= len(sites)      # num of sites
+
+
+    return render(request,
+                  "database_stats.html",
+                  dict(
+                      curation_stats = curation_stats,
+                      curation_stats2 = curation_stats2,
+                      TFs = [tf.name for tf in all_TFs],
+                      species = [sp.name for sp in all_species]
+                      ),
+                  context_instance=RequestContext(request))
+    
