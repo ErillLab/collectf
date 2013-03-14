@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% load order_by %}
+
+{% block content %}
+
+<div class="row-fluid">
+<div class="span3">
+<form method="POST" id="" action="">{% csrf_token %}
+  {{ form.as_p }}
+<input type="submit" value="submit" />
+</form>
+</div>
+
+<div class="span9">
+
+
+{% if csi %}
+<a class="btn pull-right" href="{% url browseapp.views.report_FASTA form.TF.value form.species.value %}"><i class="icon-download"></i> Download sites</a>
+
+<div class="page-header">
+<h1>List of sites</h1>
+</div>
+
+
+
+
+
+<table class="table table-striped">
+<thead>
+<tr>
+  <th>Binding site</th>
+  <th>Regulated genes</th>
+  <th>Curation</th>
+</tr>
+</thead>
+
+<tbody>
+{% for c in csi %}
+<tr>
+  <td><span style="font-family: monospace">{{ c.site_instance.seq }}</span></td>
+  {% with c.regulation_set.all|order_by:"gene__start" as rs %}
+  {% comment %}
+  <td>
+    {% for regulation in rs %}
+    <span title="{{ regulation.gene.name }}">
+    {% if regulation.gene.strand == -1 %}
+    <i class="icon-arrow-left"></i>
+    {% endif %}
+    {% if regulation.gene.strand == 1 %}
+    <i class="icon-arrow-right"></i>
+    {% endif %}
+    </span>
+    {% endfor %}
+  </td>
+  {% endcomment %}
+  <td>
+    {% for regulation in rs %}
+    {% if regulation.evidence_type == "exp_verified" %}
+    <span style="color:green">{{ regulation.gene.name }}</span>
+    {% else %}
+    {{ regulation.gene.name }}
+    {% endif %}
+    - {{ regulation.gene.description }}
+    <br />
+    {% endfor %}
+  </td>
+  {% endwith %}
+  <td><a href="{% url collectfapp.viewcurationview.view_curation c.curation.curation_id %}">[{{c.curation.curation_id}}]</a></td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% endif %}
+
+
+{% if csi == None %}
+Hello! Description goes here.
+{% endif %}
+
+</div>
+</div>
+
+{% endblock %}
