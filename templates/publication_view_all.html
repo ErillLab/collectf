@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>List of publications</h2>
+
+All papers that are present in the database are displayed below. The rows colored
+with green are papers that are already curated. The yellow ones are assigned to
+somebody and waiting to be curated (hopefully) soon. The red ones are not assigned to
+anyone yet.
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+  <th>PMID</th>
+  <th>Title</th>
+  <th>TF</th>
+  <th>Species</th>
+  <th>Promoter data?</th>
+  <th>Expression data?</th>
+</tr>
+
+</thead>
+
+<tbody data-provides="rowlink">
+{% for publication in publications %}
+<tr class="{% if publication.curation_complete %} success {% else %} {% if publication.assigned_to %} warning {% else %} error {% endif %} {% endif %}">
+  <td>{{ publication.pmid }}</td>
+  <td>{{ publication.title }}</td>
+  <td>{{ publication.reported_TF }}</td>
+  <td>{{ publication.reported_species }}</td>
+  <td><i class="{% if publication.contains_promoter_data %} icon-ok {% else %} icon-remove {% endif %}"></td>
+  <td><i class="{% if publication.contains_expression_data %} icon-ok {% else %} icon-remove {% endif %}"></td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+{% endblock %}

@@ -13,6 +13,9 @@ def get_curations(TF, species):
         curation__TF=TF)
     return csi
 
+def get_all_publications():
+    return models.Publication.objects.all()
+
 def get_all_TFs():
     return models.TF.objects.all()
 

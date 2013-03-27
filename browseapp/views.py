@@ -15,6 +15,14 @@ def view_all_curations(request):
                               template_vals,
                               context_instance=RequestContext(request))
 
+def view_all_publications(request):
+    """Handler function to see all publications in the database"""
+    template_vals = {
+        "publications": fetch.get_all_publications()
+    }
+    return render_to_response("publication_view_all.html",
+                              template_vals,
+                              context_instance=RequestContext(request))
 
 def browse_get(request):
     form = forms.BrowseForm()
