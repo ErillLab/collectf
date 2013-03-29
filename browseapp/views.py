@@ -62,6 +62,7 @@ def display_weblogo(request, image_data):
     return HttpResponse(image_data, mimetype="image/png")
 
 def weblogo_uri(sequences):
+    """Generate the weblogo and make it ready for direct embed into response html"""
     image_data = weblogo(sequences)
     encoded = b64encode(image_data)
     mime = "image/png"
