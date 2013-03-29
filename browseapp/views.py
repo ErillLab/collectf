@@ -2,6 +2,8 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.shortcuts import render
 from django.template import RequestContext
+from collectfapp.bioutils import weblogo
+from base64 import b64encode
 
 import fetch
 import forms
@@ -35,15 +37,19 @@ def browse_post(request):
     TF_id = request.POST.get('TF')
     species_id = request.POST.get('species')
     csi = fetch.get_curations(TF_id, species_id)
+    site_instances = set(curation_site_instance.site_instance for curation_site_instance in csi)
+    sites = [s.seq for s in site_instances]
+    
     response_dict = {
         'form': forms.BrowseForm(initial={'TF': TF_id, 'species': species_id}),
         'csi': csi if csi else False,
+        'weblogo_image_data': weblogo_uri(sites),
     }
+    
     return render(request,
                   "browse.html",
                   response_dict,
                   context_instance=RequestContext(request))
-
     
 def browse(request):
     """Handler function to browse database"""
@@ -51,6 +57,15 @@ def browse(request):
         return browse_get(request)
 
     return browse_post(request)
+
+def display_weblogo(request, image_data):
+    return HttpResponse(image_data, mimetype="image/png")
+
+def weblogo_uri(sequences):
+    image_data = weblogo(sequences)
+    encoded = b64encode(image_data)
+    mime = "image/png"
+    return ("data:" + mime + ';' + "base64," + encoded)
 
 def report_FASTA(request, TF_id, species_id):
     """Given a list of sites, report FASTA file containing sites for particular TF

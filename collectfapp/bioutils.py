@@ -113,3 +113,70 @@ def get_org_taxon(genome_record):
     rec = Entrez.read(handle)
     assert int(rec['Count']) == 1
     return rec['IdList'][0]
+
+def to_fasta(seqs):
+    """
+    FASTA representation of motif
+    """
+    str = ""
+    for i,inst in enumerate(seqs):
+        str = str + ">instance%d\n"%i + inst + "\n"
+    return str   
+
+def weblogo(sequences, format="PNG"):
+    """
+    uses the Berkeley weblogo service to download and save a weblogo of itself
+    
+    requires an internet connection.
+    The parameters from **kwds are passed directly to the weblogo server.
+    """
+    import urllib
+    import urllib2
+    al = to_fasta(sequences)
+
+    assert all(len(seq) == len(sequences[0]) for seq in sequences), "sequences do not have the same length"
+    
+    url = 'http://weblogo.berkeley.edu/logo.cgi'
+    values = {'sequence' : al,
+              'format' : format,
+              'logowidth' : '18',
+              'logoheight' : '5',
+              'logounits' : 'cm',
+              'kind' : 'AUTO',
+              'firstnum' : "1",
+              'command' : 'Create Logo',
+              'smallsamplecorrection' : "on",
+              'symbolsperline' : 32,
+              'res' : '96',
+              'res_units' : 'ppi',
+              'antialias' : 'on',
+              'title' : '',
+              'barbits' : '',
+              'xaxis': 'on',
+              'xaxis_label'  : '',
+              'yaxis': 'on',
+              'yaxis_label' : '',
+              'showends' : 'on',
+              'shrink' : '0.5',
+              'fineprint' : 'on',
+              'ticbits' : '1',
+              'colorscheme' : 'DEFAULT',
+              'color1' : 'green',
+              'color2' : 'blue',
+              'color3' : 'red',
+              'color4' : 'black',
+              'color5' : 'purple',
+              'color6' : 'orange',
+              'color1' : 'black',
+              }
+    
+    #for k,v in kwds.iteritems():
+    #    values[k]=str(v)
+
+    data = urllib.urlencode(values)
+    req = urllib2.Request(url, data)
+    response = urllib2.urlopen(req)
+    im=response.read()
+
+    return im
+
