@@ -5,109 +5,110 @@
 
 {% block content %}
 
-<div class="container-fluid">
-<div class="row-fluid">
-<div class="span3 well">
-<form method="POST" id="" action="">{% csrf_token %}
-  <label>TF</label>
-  {{ form.TF }}
-  <label>species</label>
-  {{ form.species }}
-<a class="btn" href="#myModal" role="button" class="btn" data-toggle="modal">Advanced options</a>
-<input class="btn" type="submit" value="submit" />
-</form>
 
-<!-- Modal for advanced search -->
-<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h3 id="myModalLabel">Advanced options</h3>
+<div class="row">
+  <div class="span3 well">
+    <form method="POST" id="" action="">{% csrf_token %}
+      <label>TF</label>
+      {{ form.TF }}
+      <label>species</label>
+      {{ form.species }}
+      <a class="btn" href="#myModal" role="button" class="btn" data-toggle="modal"><i class="icon-cogs"></i> Settings</a>
+      <input class="btn" type="submit" value="submit" />
+    </form>
+
+    <!-- Modal for advanced search -->
+    <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+	<h3 id="myModalLabel">Advanced options</h3>
+      </div>
+      <div class="modal-body">
+	{{ form.techniques }}
+      </div>
+      <div class="modal-footer">
+	<button class="btn" data-dismiss="modal" aria-hidden="true">OK</button>
+      </div>
+    </div>
   </div>
-  <div class="modal-body">
-    {{ form.techniques }}
-  </div>
-  <div class="modal-footer">
-    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-  </div>
-</div>
-
-</div>
-
-<div class="span9 well">
-
-<!--
-<button type="button" class="btn" onclick="$('#div_id_techniques .controls').collapse('toggle')">
-  simple collapsible
-</button>
--->
-
 
 {% if csi %}
-<a class="btn pull-right" href="{% url browseapp.views.report_FASTA form.TF.value form.species.value %}"><i class="icon-download"></i> Download sites</a>
+  <div class="span9">
+    <p></p>
+      <!-- weblogo here -->
+      <img src="{{ weblogo_image_data }}">
+      <!-- weblogo end -->
+  </div>
 
-<div class="page-header">
-</div>
+  <div class="span12 well">
+    
+    <!--
+    <a class="btn pull-right" href="{% url browseapp.views.report_FASTA form.TF.value form.species.value %}"><i class="icon-download"></i> Download sites</a>
+    -->
 
-<!-- weblogo here -->
-<img src="{{ weblogo_image_data }}">
-<!-- weblogo end -->
+    <div class="page-header">
+    </div>
 
-<h2>List of sites</h2>
 
-<table class="table table-striped">
-<thead>
-<tr>
-  <th>Binding site</th>
-  <th>Regulated genes</th>
-  <th>Curation</th>
-</tr>
-</thead>
+    <h2>List of sites</h2>
 
-<tbody>
-{% for c in csi %}
-<tr>
-  <td><span style="font-family: monospace">{{ c.site_instance.seq }}</span></td>
-  {% with c.regulation_set.all|order_by:"gene__start" as rs %}
-  {% comment %}
-  <td>
-    {% for regulation in rs %}
-    <span title="{{ regulation.gene.name }}">
-    {% if regulation.gene.strand == -1 %}
-    <i class="icon-arrow-left"></i>
-    {% endif %}
-    {% if regulation.gene.strand == 1 %}
-    <i class="icon-arrow-right"></i>
-    {% endif %}
-    </span>
-    {% endfor %}
-  </td>
-  {% endcomment %}
-  <td>
-    {% for regulation in rs %}
-    {% if regulation.evidence_type == "exp_verified" %}
-    <span style="color:green">{{ regulation.gene.name }}</span>
-    {% else %}
-    {{ regulation.gene.name }}
-    {% endif %}
-    - {{ regulation.gene.description }}
-    <br />
-    {% endfor %}
-  </td>
-  {% endwith %}
-  <td><a href="{% url collectfapp.viewcurationview.view_curation c.curation.curation_id %}">[{{c.curation.curation_id}}]</a></td>
-</tr>
-{% endfor %}
-</tbody>
-</table>
+    <table class="table table-striped">
+      <thead>
+	<tr>
+	  <th>Binding site</th>
+	  <th>Regulated genes</th>
+	  <th>Curation</th>
+	</tr>
+      </thead>
+
+      <tbody>
+	{% for c in csi %}
+	<tr>
+	  <td><span style="font-family: monospace">{{ c.site_instance.seq }}</span></td>
+	  {% with c.regulation_set.all|order_by:"gene__start" as rs %}
+	  {% comment %}
+	  <td>
+	    {% for regulation in rs %}
+	    <span title="{{ regulation.gene.name }}">
+	      {% if regulation.gene.strand == -1 %}
+	      <i class="icon-arrow-left"></i>
+	      {% endif %}
+	      {% if regulation.gene.strand == 1 %}
+	      <i class="icon-arrow-right"></i>
+	      {% endif %}
+	    </span>
+	    {% endfor %}
+	  </td>
+	  {% endcomment %}
+	  <td>
+	    {% for regulation in rs %}
+	    {% if regulation.evidence_type == "exp_verified" %}
+	    <span style="color:green">{{ regulation.gene.name }}</span>
+	    {% else %}
+	    {{ regulation.gene.name }}
+	    {% endif %}
+	    - {{ regulation.gene.description }}
+	    <br />
+	    {% endfor %}
+	  </td>
+	  {% endwith %}
+	  <td><a href="{% url collectfapp.viewcurationview.view_curation c.curation.curation_id %}">[{{c.curation.curation_id}}]</a></td>
+	</tr>
+	{% endfor %}
+      </tbody>
+    </table>
+  </div>
 {% endif %}
 
 
 {% if csi == None %}
+<div class="span9">
 Hello! Description goes here.
+</div>
 {% endif %}
 
 </div>
-</div>
-</div>
+
+
 
 {% endblock %}

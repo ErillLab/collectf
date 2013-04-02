@@ -1,31 +1,51 @@
 {% extends "base.html" %}
+{% load webdesign %}
 {% block content %}
 <div class="hero-unit">
   <h1>Welcome to collecTF</h1>
-  <p>CollecTF (a play on words using the French collectif [collective] and the
-    acronym for transcription factor [TF]) is a database of prokaryotic
-    transcription factor binding sites (TFBS) that aims at supplementing and, with
-    time, superseding the current major TFBS databases (RegulonDB and Prodoric).
-  </p>
+  <!--
+      <p>CollecTF (a play on words using the French collectif [collective] and the
+	acronym for transcription factor [TF]) is a database of prokaryotic
+	transcription factor binding sites (TFBS) that aims at supplementing and, with
+	time, superseding the current major TFBS databases (RegulonDB and Prodoric).
+      </p>
+      -->
+  <p>{% lorem 50 w %}</p>
   <p><a class="btn btn-large btn-primary" href="http://erilllab.biosci.umbc.edu/wiki/index.php5/CollecTF">
       Learn more</a></p>
 </div>
 
 {% if user.is_authenticated %}
-<div class="row">
-  <div class="span6">
-    <h2>Publication submission</h2>
 
-    <p><a class="btn btn-large" href="{% url collectfapp.pubview.pubmed_submission %}">Pubmed submission</a>
-       <a class="btn btn-large" href="{% url collectfapp.pubview.non_pubmed_submission %}">Non-Pubmed submission</a>
-    </p>
+<div class="row-fluid">
+  <div class="span4 ">
+    <h3><i class="icon-beaker"></i> Browse database</h3>
+    <p>{% lorem 20 w%}</p>
+    <ul class="unstyled">
+      <li><a class="" href="{% url browseapp.views.browse %}">Browse</a></li>
+    </ul>
+    <p></p>
+
   </div>
+  <div class="span4">
+    <h3><i class="icon-edit"></i> Data submission</h3>
+    <p>{% lorem 20 w %}</p>
+    <ul class="unstyled">
+      <li><a class="" href="{% url collectfapp.pubview.pubmed_submission %}">Pubmed submission</a></li>
+      <li><a class="" href="{% url collectfapp.pubview.non_pubmed_submission %}">Non-Pubmed submission</a></li>
+      <li><a class="" href="{% url collectfapp.curationview.curation %}">Submit a new curation</a></li>
+      <li><a class="" href="#myModal" role="button" class="btn" data-toggle="modal">View/Edit curation</a></li>
+    </ul>
 
-  <div class="span6">
-    <h2>Curation submission</h2>
-
-    <a class="btn btn-large" href="{% url collectfapp.curationview.curation %}">Submit a new curation</a>
-    <a class="btn btn-large" href="#myModal" role="button" class="btn" data-toggle="modal">View/Edit curation</a>
+  </div>
+  <div class="span4">
+    <h3><i class="icon-bar-chart"></i> Database statistics</h3>
+    <p>{% lorem 20 w%}</p>
+    <ul class="unstyled">
+      <li><a class="" href="{% url browseapp.views.view_all_publications %}">View all publications</a></li>
+      <li><a class="" href="{% url browseapp.views.view_all_curations %}">View all curations</a></li>
+      <li><a class="" href="{% url browseapp.views.curation_stats %}">Curation statistics</a></li>
+    </ul>
   </div>
 </div>
 
@@ -37,16 +57,16 @@
   </div>
   <div class="modal-body">
     <table class="table table-striped">
-    {% for c in curations %}
-    <tr>
-      <th>{{ c }}</th>
-      <th><div class="btn-group"><a class="btn" href="{% url collectfapp.viewcurationview.view_curation cid=c.curation_id %}">view</a>
-	  <a class="btn" href="{% url collectfapp.editcurationview.edit_curation cid=c.curation_id %}">edit</a>
-	</div>
-      </th>
+      {% for c in curations %}
+      <tr>
+	<th>{{ c }}</th>
+	<th><div class="btn-group"><a class="btn" href="{% url collectfapp.viewcurationview.view_curation cid=c.curation_id %}">view</a>
+	    <a class="btn" href="{% url collectfapp.editcurationview.edit_curation cid=c.curation_id %}">edit</a>
+	  </div>
+	</th>
 
-    </tr>
-    {% endfor %}
+      </tr>
+      {% endfor %}
     </table>
   </div>
   <div class="modal-footer">
