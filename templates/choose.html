@@ -2,7 +2,9 @@
 {% load webdesign %}
 {% block content %}
 <div class="hero-unit">
-  <h1>Welcome to collecTF</h1>
+      <h1>Welcome to collecTF</h1>
+
+
   <!--
       <p>CollecTF (a play on words using the French collectif [collective] and the
 	acronym for transcription factor [TF]) is a database of prokaryotic
@@ -11,8 +13,11 @@
       </p>
       -->
   <p>{% lorem 50 w %}</p>
+  
   <p><a class="btn btn-large btn-primary" href="http://erilllab.biosci.umbc.edu/wiki/index.php5/CollecTF">
-      Learn more</a></p>
+      Learn more</a>
+  </p>
+
 </div>
 
 {% if user.is_authenticated %}
