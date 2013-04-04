@@ -12,7 +12,7 @@ Match = namedtuple('Match', 'seq start end strand')
 SiteMatch = namedtuple('SiteMatch', 'match nearby_genes')
 
 def print_site_match(m):
-    strand = '+' if m.match.strand else '-'
+    strand = '+' if m.match.strand==1 else '-'
     nearby_genes = [g.locus_tag + (' (%s)' % g.name if g.name != g.locus_tag else '')
                     for g in m.nearby_genes]
     #nearby_genes = (g.name for g in m.nearby_genes)
