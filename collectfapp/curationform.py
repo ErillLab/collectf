@@ -168,10 +168,10 @@ class TechniquesForm(forms.Form):
     # get available techniques from db
     choices = []
     # used twitter-bootstrap tooltip for exp technique description
-    description_markup = u'<span data-toggle="tooltip" title="%s">%s</span>'
+    description_markup = u'<span data-toggle="popover" title="%s" data-content="%s">%s</span>'
     for t in ExperimentalTechnique.objects.order_by('name'):
         choices.append((t.technique_id,
-                        mark_safe(description_markup % (t.description, t.name))))
+                        mark_safe(description_markup % (t.name, t.description, t.name))))
     techniques = forms.MultipleChoiceField(choices = choices,
                                            label = "Techniques",
                                            help_text = """Select as many as apply to reported sites.
