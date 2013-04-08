@@ -19,6 +19,16 @@
     textarea {
     font-family: monospace, Courier;
     }
+    .footer {
+    margin-top: 70px;
+    padding: 30px 0;
+    border-top: 1px solid #E5E5E5;
+    background-color: whiteSmoke;
+    text-align: center;
+    }
+    .footer p{
+    color: #777;
+    }
 
   </style>
 
@@ -80,17 +90,18 @@
     {% endblock %}
   </div>
   
-  <footer>
+  <footer class="footer">
   <div class="container-fluid">
-    <hr/>
       <p>Please send comments to sefa1@umbc.edu. For help, visit
 	<a href="http://erilllab.biosci.umbc.edu/wiki/index.php5/CollecTF">
-	  CollecTF wiki</a>.</p>
+	  CollecTF wiki</a>.
+      </p>
 
-<!--      
+      <p>
       {% load static from staticfiles %}
-      <img class="pull-right" src="{% static "lablogo.png" %}">
--->
+      <a href="http://compbio.umbc.edu"><img width="25%" src="{% static "lablogo.png" %}"></a>
+      </p>
+
   </div>
   </footer>
 
