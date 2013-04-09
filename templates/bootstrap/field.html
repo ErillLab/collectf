@@ -15,17 +15,17 @@
   <div class="controls">
     {% if field|css_class == "checkboxselectmultiple" %}
     {% include "bootstrap/_field_errors_block.html" %}
-
-
+    <!-- checkboxselectmultiple -->
     {% for choice in field.field.choices %}
     <label class="checkbox">
-      <input type="checkbox" {% if choice.0|stringformat:"s" in field.value or choice.0|stringformat:"s" == field.value|stringformat:"s" %}checked="checked"{% endif %} 
+      <input type="checkbox" {% if choice.0|stringformat:"s" in field.value|stringformat:"s" %}checked="checked"{% endif %} 
 	     {% if field.field.widget.attrs.disabled == "disabled" %} disabled="disabled" {% endif %}
 	     name="{{ field.html_name }}" id="id_{{ field.html_name }}_{{ forloop.counter }}" value="{{ choice.0 }}">{{ choice.1 }}
     </label> 
     {% endfor %}
     {% include "bootstrap/_field_help_text.html" %}
     {% endif %}
+    <!-- radioselect -->
     {% if field|css_class == "radioselect" %}
     {% include "bootstrap/_field_errors_block.html" %}
     {% for choice in field.field.choices %}
@@ -36,6 +36,7 @@
     {% include "bootstrap/_field_help_text.html" %}
     {% endif %}
     {% if field|css_class != "checkboxselectmultiple" and field|css_class != "radioselect" %}
+    <!-- checkbox input -->
     {% if field|css_class == "checkboxinput" %}
     <label for="{{ field.auto_id }}" class="checkbox {% if field.field.required %}required-field{% endif %}">
       {{ field }}
