@@ -34,22 +34,29 @@ def browse_get(request):
                   context_instance=RequestContext(request))
 
 def browse_post(request):
-    TF_id = request.POST.get('TF')
-    species_id = request.POST.get('species')
-    csi = fetch.get_curations(TF_id, species_id)
-    site_instances = set(curation_site_instance.site_instance for curation_site_instance in csi)
-    sites = [s.seq for s in site_instances]
+    form = forms.BrowseForm(request.POST)
+    if form.is_valid():
+        TF_id = form.cleaned_data['TF']
+        species_id = form.cleaned_data['species']
+        experimental_techniques = form.cleaned_data['techniques']
+
+    # see collectfapp.models for description of model objects
+    # get all Curation_SiteInstance objects
+    curation_site_instances = fetch.get_curation_site_instances(TF_id, species_id)
+    # filter curation_site_instances based on used experimental techniques
+    # filter goes here
     
+    # group them by site instance?
+    site_curation_dict, site_regulation_dict = group_curation_site_instances(curation_site_instances)
+
     response_dict = {
-        'form': forms.BrowseForm(initial={'TF': TF_id, 'species': species_id}),
-        'csi': csi if csi else False,
-        'weblogo_image_data': weblogo_uri(sites),
-    }
-    
-    return render(request,
-                  "browse.html",
-                  response_dict,
-                  context_instance=RequestContext(request))
+        'form': forms.BrowseForm(initial={'TF': TF_id,
+                                          'species': species_id,
+                                          'experimental_techniques': experimental_techniques}),
+        'site_curation_dict': site_curation_dict,
+        'site_regulation_dict': site_regulation_dict,
+        }
+    return render(request, "browse.html", response_dict, context_instance=RequestContext(request))
     
 def browse(request):
     """Handler function to browse database"""
@@ -112,3 +119,40 @@ def curation_stats(request):
                       ),
                   context_instance=RequestContext(request))
     
+
+
+def browse_by_species(request):
+    """Handler for browse by species request"""
+    species = fetch.get_all_species()
+    response_dict = {'species': species}
+    return render(request,
+                  "browse_sp.html",
+                  response_dict,
+                  context_instance=RequestContext(request))
+
+
+def browse_by_TF(request):
+    """Handler for browse by TF request"""
+    TFs = fetch.get_all_TFs()
+    response_dict = {'TFs': TFs}
+    return render(request,
+                  "browse_tf.html",
+                  response_dict,
+                  context_instance=RequestContext(request))
+
+def group_curation_site_instances(curation_site_instances):
+    """Group curation_site_instance objects by site_instance"""
+    site_curation_dict = dict((csi.site_instance,[]) for csi in curation_site_instances)
+    site_regulation_dict = dict((csi.site_instance,[]) for csi in curation_site_instances)
+    for csi in curation_site_instances:
+        s = csi.site_instance
+        site_curation_dict[s].append(csi.curation)  # insert curation
+        for reg in csi.regulation_set.all():
+            # check if regulated gene is already in the list (from another curation)
+            same_gene_reg = [r for r in site_regulation_dict[s] if r.gene == reg.gene]
+            if not same_gene_reg:
+                site_regulation_dict[s].append(reg)
+            elif same_gene_reg[0].evidence_type == "inferred" and reg.evidence_type == "exp_verified":
+                same_gene_reg[0].evidence_type = "exp_verified"
+        
+    return site_curation_dict, site_regulation_dict

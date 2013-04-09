@@ -1,0 +1,25 @@
+
+<!-- browse by species -->
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<table class="table table-condensed table-striped">
+<thead>
+<tr>
+  <th>TF</th>
+  <th>function</th>
+</tr>
+</thead>
+<tbody>
+{% for TF in TFs %}
+<tr>
+  <td>{{ TF.name }}</td>
+  <td>{{ TF.description }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+{% endblock %}

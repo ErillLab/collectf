@@ -10,26 +10,69 @@
 
 
   <style>
-    * {
-    font-family: Helvetica, Arial, sans-serif;
-    }
-    body {
-    padding-top: 60px;
-    }
-    textarea {
-    font-family: monospace, Courier;
-    }
-    .footer {
-    margin-top: 70px;
-    padding: 40px;
-    border-top: 1px solid #E5E5E5;
-    background-color: whiteSmoke;
-    text-align: center;
-    }
-    .footer p{
-    color: #777;
-    }
+  * {
+      font-family: Helvetica, Arial, sans-serif;
+  }
+  body {
+      padding-top: 60px;
+  }
+  textarea {
+      font-family: monospace, Courier;
+  }
+  .sequence {
+      font-family: monospace, Courier;
+  }
+  .footer {
+      margin-top: 70px;
+      padding: 40px;
+      border-top: 1px solid #E5E5E5;
+      background-color: whiteSmoke;
+  }
+  .footer p{
+      color: #777;
+  }
 
+  .table-borderless td {
+      border: 0;
+  }
+  
+  .operon {
+  width: 200px;
+  white-space: nowrap;
+  }
+  .gene-img{
+      {% load static from staticfiles %}
+  
+      height: 20px;
+      width:60px;
+      display: inline-block;
+  }
+  .gene-img.pos.exp{
+      background-image: url({% static "genec.png" %});
+      background-repeat: no-repeat;
+  }
+  .gene-img.pos.inf{
+      background-image: url({% static "genea.png" %});
+      background-repeat: no-repeat;
+  }
+  .gene-img.neg.exp{
+      background-image: url({% static "gened.png" %});
+      background-repeat: no-repeat;
+  }
+  .gene-img.neg.inf{
+      background-image: url({% static "geneb.png" %});
+      background-repeat: no-repeat;
+  }
+
+
+  .tf-img{
+      {% load static from staticfiles %}
+      background-image: url({% static "tf.png" %});
+      background-repeat: no-repeat;
+      height: 20px;
+      width: 20px;
+      display: inline-block;
+  }
   </style>
 
 
@@ -44,13 +87,14 @@
     // use twitter-bootstrap tooltip feature
     $('body').tooltip({
        selector: '[data-toggle="tooltip"]',
-       placement: 'right',
+       placement: 'top',
     });
     $('body').popover({
        selector: '[data-toggle="popover"]',
-       placement: 'right',
        trigger: 'hover',
+       placement: 'right',
     });
+
   </script>
 
   <!-- header -->
@@ -97,9 +141,9 @@
 	  CollecTF wiki</a>.
       </p>
 
-      <p>
+      <p style="text-align:right">
       {% load static from staticfiles %}
-      <a href="http://compbio.umbc.edu"><img width="25%" src="{% static "lablogo.png" %}"></a>
+      <a href="http://compbio.umbc.edu"><img width="15%" src="{% static "lablogo.png" %}"></a>
       </p>
 
   </div>

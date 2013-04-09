@@ -12,12 +12,17 @@ Match = namedtuple('Match', 'seq start end strand')
 SiteMatch = namedtuple('SiteMatch', 'match nearby_genes')
 
 def print_site_match(m):
+    """Given a match object, make the html snippet to display it nice.  I am not sure
+    this is a proper solution (HTML in python), couldn't find a better&easier way to
+    do though"""
+    
     strand = '+' if m.match.strand==1 else '-'
     nearby_genes = [g.locus_tag + (' (%s)' % g.name if g.name != g.locus_tag else '')
                     for g in m.nearby_genes]
     #nearby_genes = (g.name for g in m.nearby_genes)
     s = (u'%s, %s[%d, %d]<br />nearby genes: %s' % 
          (m.match.seq, strand, m.match.start, m.match.end, ', '.join(nearby_genes)))
+
     return mark_safe(s)  # render newline correctly
 
 def parse_site_input(text):

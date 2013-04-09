@@ -1,115 +1,66 @@
 {% extends "base.html" %}
 
-{% load order_by %}
 {% load bootstrap_tags %}
 
 {% block content %}
 
-
-
-<div class="row">
-  <div class="span3 well">
-    <form method="POST" id="" action="">{% csrf_token %}
-      <label>TF</label>
-      {{ form.TF }}
-      <label>species</label>
-      {{ form.species }}
-      <a class="btn" href="#myModal" role="button" class="btn" data-toggle="modal"><i class="icon-cogs"></i> Settings</a>
+<form method="POST" id="" action="" class="form-horizontal">{% csrf_token %}
+  {{ form|as_bootstrap }}
+  <div class="control-group">
+    <div class="controls">
       <input class="btn" type="submit" value="submit" />
-    </form>
-
-    <!-- Modal for advanced search -->
-    <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-      <div class="modal-header">
-	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-	<h3 id="myModalLabel">Advanced options</h3>
-      </div>
-      <div class="modal-body">
-	{{ form.techniques }}
-      </div>
-      <div class="modal-footer">
-	<button class="btn" data-dismiss="modal" aria-hidden="true">OK</button>
-      </div>
     </div>
   </div>
+</form>
+
+{% if site_curation_dict and site_regulation_dict %}
+{% load utils %}
+<table class="table table-condensed table-borderless">
+  <thead>
+    <tr>
+      <th width="20%"></th>
+      <th width="20%">Gene</th>
+      <th width="40%">Function</th>
+      <th width="20%">Curation</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for site in site_curation_dict|get_keys %}
+    <tr><td colspan="4"><hr /></td></tr>
+    <tr>
+      <td colspan="3">
+	<div class="operon">{% with regs=site_regulation_dict|get_item:site %} {{ regs|gene_diagram:site }} {% endwith %}</div>
+	<!-- <span class="sequence">{{ site.seq }}</span> -->
+      </td>
+      <td>{% for cur in site_curation_dict|get_item:site %}
+	<a href="{% url collectfapp.viewcurationview.view_curation cur.curation_id %}">[{{cur.curation_id}}], </a>{% endfor %}
+      </td>
+    </tr>
+
+    {% for reg in site_regulation_dict|get_item:site %}
+    <tr>
+      <td></td>
+      <td>{{reg.gene.name}} ({{ reg.gene.locus_tag }})</td>
+      <td>{{reg.gene.description}}</td>
+      <td></td>
+    </tr>
+    {% endfor %}
+          
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
 
 {% if csi %}
-  <div class="span9">
-    <p></p>
-      <!-- weblogo here -->
-      <img src="{{ weblogo_image_data }}">
-      <!-- weblogo end -->
-  </div>
+<!-- weblogo here -->
+<img src="{{ weblogo_image_data }}">
+<!-- weblogo end -->
 
-  <div class="span12 well">
-    
-    <!--
+<!--
     <a class="btn pull-right" href="{% url browseapp.views.report_FASTA form.TF.value form.species.value %}"><i class="icon-download"></i> Download sites</a>
-    -->
-
-    <div class="page-header">
-    </div>
-
-
-    <h2>List of sites</h2>
-
-    <table class="table table-striped">
-      <thead>
-	<tr>
-	  <th>Binding site</th>
-	  <th>Regulated genes</th>
-	  <th>Curation</th>
-	</tr>
-      </thead>
-
-      <tbody>
-	{% for c in csi %}
-	<tr>
-	  <td><span style="font-family: monospace">{{ c.site_instance.seq }}</span></td>
-	  {% with c.regulation_set.all|order_by:"gene__start" as rs %}
-	  {% comment %}
-	  <td>
-	    {% for regulation in rs %}
-	    <span title="{{ regulation.gene.name }}">
-	      {% if regulation.gene.strand == -1 %}
-	      <i class="icon-arrow-left"></i>
-	      {% endif %}
-	      {% if regulation.gene.strand == 1 %}
-	      <i class="icon-arrow-right"></i>
-	      {% endif %}
-	    </span>
-	    {% endfor %}
-	  </td>
-	  {% endcomment %}
-	  <td>
-	    {% for regulation in rs %}
-	    {% if regulation.evidence_type == "exp_verified" %}
-	    <span style="color:green">{{ regulation.gene.name }}</span>
-	    {% else %}
-	    {{ regulation.gene.name }}
-	    {% endif %}
-	    - {{ regulation.gene.description }}
-	    <br />
-	    {% endfor %}
-	  </td>
-	  {% endwith %}
-	  <td><a href="{% url collectfapp.viewcurationview.view_curation c.curation.curation_id %}">[{{c.curation.curation_id}}]</a></td>
-	</tr>
-	{% endfor %}
-      </tbody>
-    </table>
-  </div>
+-->
 {% endif %}
-
-
-{% if csi == None %}
-<div class="span9">
-Hello! Description goes here.
-</div>
-{% endif %}
-
-</div>
-
 
 
 {% endblock %}

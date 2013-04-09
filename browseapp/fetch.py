@@ -5,13 +5,13 @@ import models
 def get_all_curations():
     return models.Curation.objects.all()
 
-def get_curations(TF, species):
-    """Return curations of a particular TF and species"""
-    # filter CurationSiteInstance objects
-    csi = models.Curation_SiteInstance.objects.filter(
+def get_curation_site_instances(TF, species):
+    """Return all Curation_SiteInstance objects for particular TF and species"""
+    curation_site_instances = models.Curation_SiteInstance.objects.filter(
         site_instance__genome__strain=species,
-        curation__TF=TF)
-    return csi
+        curation__TF=TF
+        )
+    return curation_site_instances
 
 def get_all_publications():
     return models.Publication.objects.all()

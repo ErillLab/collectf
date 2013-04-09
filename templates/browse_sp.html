@@ -1,0 +1,23 @@
+
+<!-- browse by species -->
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<table class="table table-condensed table-striped">
+<thead>
+<tr>
+  <th>species</th>
+</tr>
+</thead>
+<tbody>
+{% for sp in species %}
+<tr>
+  <td>{{ sp.name }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+{% endblock %}

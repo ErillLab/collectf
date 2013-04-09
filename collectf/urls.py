@@ -53,6 +53,10 @@ urlpatterns = patterns('',
     url(r'^view_all_publications/$', browseapp.views.view_all_publications),
     # browse
     url(r'^browse/$', browseapp.views.browse),
+    # browse by species
+    url(r'^browse_sp/$', browseapp.views.browse_by_species),
+    # browse by TF
+    url(r'^browse_tf/$', browseapp.views.browse_by_TF),
     # download sites (FASTA format)
     url(r'^motif_download/(?P<TF_id>\d+)/(?P<species_id>\d+)/$', browseapp.views.report_FASTA),
     # database statistics
