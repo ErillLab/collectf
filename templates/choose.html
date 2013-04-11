@@ -4,14 +4,6 @@
 <div class="hero-unit">
       <h1>Welcome to collecTF</h1>
 
-
-  <!--
-      <p>CollecTF (a play on words using the French collectif [collective] and the
-	acronym for transcription factor [TF]) is a database of prokaryotic
-	transcription factor binding sites (TFBS) that aims at supplementing and, with
-	time, superseding the current major TFBS databases (RegulonDB and Prodoric).
-      </p>
-      -->
       <p>collecTF, a play on words using the French collectif [collective] and the acronym
 	for transcription factor [TF], is a database of prokaryotic transcription factor
 	binding sites (TFBS). The main aim of collecTF is to provide high-quality,
@@ -35,31 +27,32 @@
 <div class="row-fluid">
   <div class="span4 ">
     <h3><i class="icon-beaker"></i> Browse database</h3>
-    <p>{% lorem 20 w%}</p>
+
     <ul class="unstyled">
-      <li><a class="" href="{% url browseapp.views.browse %}">Browse</a></li>
+      <li><i class="icon-ok"></i> <a class="" href="">Browse by taxonomy</a></li>
+      <li><i class="icon-ok"></i> <a class="" href="{% url browseapp.views.browse_by_TF_main %}">Browse by TF family</a></li>
+      <li><i class="icon-ok"></i> <a class="" href="{% url browseapp.views.browse %}">Search binding sites by TF and species</a></li>
     </ul>
     <p></p>
 
   </div>
   <div class="span4">
     <h3><i class="icon-edit"></i> Data submission</h3>
-    <p>{% lorem 20 w %}</p>
-    <ul class="unstyled">
-      <li><a class="" href="{% url collectfapp.pubview.pubmed_submission %}">Pubmed submission</a></li>
 
-      <li><a class="" href="{% url collectfapp.curationview.curation %}">Submit a new curation</a></li>
-      <li><a class="" href="#myModal" role="button" class="btn" data-toggle="modal">View/Edit curation</a></li>
+    <ul class="unstyled">
+      <li><i class="icon-ok"></i> <a class="" href="{% url collectfapp.pubview.pubmed_submission %}">Submit a paper for curation</a></li>
+      <li><i class="icon-ok"></i> <a class="" href="{% url collectfapp.curationview.curation %}">Submit a new curation</a></li>
+      <li><i class="icon-ok"></i> <a class="" href="#myModal" role="button" class="btn" data-toggle="modal">View/Edit previous curations</a></li>
     </ul>
 
   </div>
   <div class="span4">
     <h3><i class="icon-bar-chart"></i> Database statistics</h3>
-    <p>{% lorem 20 w%}</p>
+
     <ul class="unstyled">
-      <li><a class="" href="{% url browseapp.views.view_all_publications %}">View all publications</a></li>
-      <li><a class="" href="{% url browseapp.views.view_all_curations %}">View all curations</a></li>
-      <li><a class="" href="{% url browseapp.views.curation_stats %}">Curation statistics</a></li>
+      <li><i class="icon-ok"></i>  <a class="" href="{% url browseapp.views.view_all_publications %}">View all publications</a></li>
+      <li><i class="icon-ok"></i> <a class="" href="{% url browseapp.views.view_all_curations %}">View all curations</a></li>
+      <li><i class="icon-ok"></i> <a class="" href="{% url browseapp.views.curation_stats %}">Curation statistics</a></li>
     </ul>
   </div>
 </div>

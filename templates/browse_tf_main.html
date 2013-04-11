@@ -1,0 +1,29 @@
+
+<!-- browse by species -->
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<ul class="breadcrumb">
+  <li class="active">Home<span class="divider">/</span></li>
+</ul>
+
+<table class="table table-striped">
+<thead>
+<tr>
+  <th>TF family</th>
+  <th>Function</th>
+</tr>
+</thead>
+<tbody>
+{% for TF_family in TF_families %}
+<tr>
+  <td><a href="{% url browseapp.views.browse_by_TF_family TF_family.TF_family_id %}">{{ TF_family.name }}</a></td>
+  <td>{{ TF_family.description }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+{% endblock %}

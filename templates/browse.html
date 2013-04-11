@@ -4,7 +4,25 @@
 
 {% block content %}
 
-<form method="POST" id="" action="" class="form-horizontal">{% csrf_token %}
+<div class="row-fluid">
+<div class="span3 bs-docs-sidebar">
+<ul class="nav nav-list bs-docs-sidenav affix" id="sidebar">
+  <li><a href="#browse-form"><i class="icon-chevron-right"></i>Browse database</a></li>
+  <li><a href="#weblogo"><i class="icon-chevron-right"></i>Sequence logo</a></li>
+  <li><a href="#results"><i class="icon-chevron-right"></i>List of binding sites</a></li>
+  <li><a href="#export"><i class="icon-chevron-right"></i>Export data</a></li>
+</ul>
+</div>
+
+<div class="span9">
+
+<div class="page-header" id="browse-form">
+<h2>Browse database</h2>
+
+You can select a particular transcription factor and species to
+search for curation binding sites in the database.
+</div>
+<form method="POST" action="" class="form-horizontal">{% csrf_token %}
   {{ form|as_bootstrap }}
   <div class="control-group">
     <div class="controls">
@@ -14,6 +32,23 @@
 </form>
 
 {% if site_curation_dict and site_regulation_dict %}
+
+<script type="text/javascript">
+window.location.hash = '#weblogo';
+</script>
+
+<div class="page-header" id="weblogo">
+<h2>Sequence logo</h2>
+</div>
+<!-- weblogo here -->
+<img src="{{ weblogo_image_data }}">
+<!-- weblogo end -->
+
+<div class="page-header" id="results">
+<h2>List of transcription factor binding sites</h2>
+For the selected transcription factor and species, the list of curated binding sites in the database are displayed below.
+</div>
+
 {% load utils %}
 <table class="table table-condensed table-borderless">
   <thead>
@@ -28,12 +63,17 @@
     {% for site in site_curation_dict|get_keys %}
     <tr><td colspan="4"><hr /></td></tr>
     <tr>
-      <td colspan="3">
-	<div class="operon">{% with regs=site_regulation_dict|get_item:site %} {{ regs|gene_diagram:site }} {% endwith %}</div>
-	<!-- <span class="sequence">{{ site.seq }}</span> -->
-      </td>
+      <td colspan="3"><span class="sequence">{{ site.seq }}</span></td>
       <td>{% for cur in site_curation_dict|get_item:site %}
-	<a href="{% url collectfapp.viewcurationview.view_curation cur.curation_id %}">[{{cur.curation_id}}], </a>{% endfor %}
+	<a href="{% url collectfapp.viewcurationview.view_curation cur.curation_id %}">[{{cur.curation_id}}]</a>{% if not forloop.last %}, {% endif %}
+	{% endfor %}
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="4">
+	<div class="operon">{% with regs=site_regulation_dict|get_item:site %} {{ regs|regulation_diagram:site }} {% endwith %}</div>
+	<!-- <span class="sequence">{{ site.seq }}</span> -->
       </td>
     </tr>
 
@@ -49,18 +89,23 @@
     {% endfor %}
   </tbody>
 </table>
+
+<hr />
+<div class="page-header" id="export">
+<h2>Export</h2>
+<p>Export the list of binding sites in csv or fasta formats.</p>
+<p>
+<a class="btn btn-primary btn-large" href="" id="export_fasta"><i class="icon-download"></i> Download FASTA</a>
+<a class="btn btn-primary btn-large" href="" id="export_csv"><i class="icon-download"></i> Download CSV</a>
+</p>
+</div>
+
 {% endif %}
 
+</div>
 
-{% if csi %}
-<!-- weblogo here -->
-<img src="{{ weblogo_image_data }}">
-<!-- weblogo end -->
+</div>
 
-<!--
-    <a class="btn pull-right" href="{% url browseapp.views.report_FASTA form.TF.value form.species.value %}"><i class="icon-download"></i> Download sites</a>
--->
-{% endif %}
 
 
 {% endblock %}

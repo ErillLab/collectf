@@ -6,15 +6,10 @@
 {% block content %}
 
 <table class="table table-condensed table-striped">
-<thead>
-<tr>
-  <th>species</th>
-</tr>
-</thead>
 <tbody>
-{% for sp in species %}
+{% for order, species in orders.items %}
 <tr>
-  <td>{{ sp.name }}</td>
+  <td>{{ order }}</td>
 </tr>
 {% endfor %}
 </tbody>

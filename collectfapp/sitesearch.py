@@ -6,12 +6,26 @@ import StringIO
 from collections import namedtuple
 import regex
 from django.utils.safestring import mark_safe
+from templatetags import utils
 
 # Some namedtuple declarations
 Match = namedtuple('Match', 'seq start end strand')
 SiteMatch = namedtuple('SiteMatch', 'match nearby_genes')
 
-def print_site_match(m):
+def print_alignment(seqa, seqb):
+    """Given two sequences, pairwise align them and output HTML for curation
+    exact/inexact site match steps"""
+    from Bio import pairwise2
+    alignment = pairwise2.align.globalxx(seqa, seqb)[0]
+    s = []
+    s.append('<span class="sequence">')
+    s.append("%s<br/>" % alignment[0])
+    s.append(''.join('|' if alignment[0][i]==alignment[1][i] else ' ' for i in range(len(alignment[0]))) + '<br/>')
+    s.append('%s</br>' % alignment[1])
+    s.append('</span>')
+    return mark_safe( ''.join(s))
+
+def print_site_match(reported_site, m, is_exact):
     """Given a match object, make the html snippet to display it nice.  I am not sure
     this is a proper solution (HTML in python), couldn't find a better&easier way to
     do though"""
@@ -19,9 +33,22 @@ def print_site_match(m):
     strand = '+' if m.match.strand==1 else '-'
     nearby_genes = [g.locus_tag + (' (%s)' % g.name if g.name != g.locus_tag else '')
                     for g in m.nearby_genes]
-    #nearby_genes = (g.name for g in m.nearby_genes)
-    s = (u'%s, %s[%d, %d]<br />nearby genes: %s' % 
-         (m.match.seq, strand, m.match.start, m.match.end, ', '.join(nearby_genes)))
+
+    s = ""
+    if is_exact:
+        s += ('<span class="sequence"> %s %s(%d, %d)</span><br/>' %
+              (m.match.seq, '+' if m.match.strand == 1 else '-',  m.match.start, m.match.end))
+    else:
+        s += print_alignment(reported_site, m.match.seq)
+
+    s += (utils.match_diagram(m) +
+          '<table class="table table-condensed">' +
+          '<thead><tr><th>locus tag</th><th>gene name</th><th>function</th></tr></thead>' +
+          '<tbody>'
+          )
+    for g in m.nearby_genes:
+        s += "<tr><td>%s</td><td>%s</td><td>%s</td></tr>" % (g.locus_tag, g.name, g.description)
+    s += ('</tbody>' + "</table><br/>")
 
     return mark_safe(s)  # render newline correctly
 

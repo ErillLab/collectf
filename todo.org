@@ -1,0 +1,23 @@
+- Currently, the editing feature doesn't check the appropriate boxes for the methods.
+- different session data for each tab.
+
+
+- Homepage. links and buttons
+- browse
+- curation preview before submission.
+- textarea width height
+
+
+- figures
+
+- popover top
+
+- list of assigned papers under curator
+
+- download fasta/csv
+
+- sticky footer
+
+- browse by species
+
+- sequences do not have the same length

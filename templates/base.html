@@ -7,6 +7,7 @@
   {% load static from staticfiles %}
   <link href="{% static "bootstrap/css/bootstrap.min.css" %}" rel="stylesheet" media="screen">
   <link href="{% static "font-awesome/css/font-awesome.min.css" %}" rel="stylesheet">
+  <link href="{% static "bootstrap/css/docs.css" %}" rel="stylesheet" media="screen">
 
 
   <style>
@@ -35,7 +36,7 @@
   .table-borderless td {
       border: 0;
   }
-  
+
   .operon {
   width: 200px;
   white-space: nowrap;
@@ -63,7 +64,6 @@
       background-image: url({% static "geneb.png" %});
       background-repeat: no-repeat;
   }
-
 
   .tf-img{
       {% load static from staticfiles %}
@@ -93,9 +93,17 @@
        selector: '[data-toggle="popover"]',
        trigger: 'hover',
        placement: 'right',
+       html: 'true',
     });
 
+    $('#sidebar').affix();
+    
+    window.addEventListener("hashchange", function() { scrollBy(0, -50) })
+
+
   </script>
+
+
 
   <!-- header -->
   <div class="navbar navbar navbar-fixed-top">
@@ -135,18 +143,30 @@
   </div>
   
   <footer class="footer">
-  <div class="container-fluid">
-      <p>Please send comments to sefa1@umbc.edu. For help, visit
-	<a href="http://erilllab.biosci.umbc.edu/wiki/index.php5/CollecTF">
-	  CollecTF wiki</a>.
-      </p>
+      <div class="row-fluid">
+	<div class="span9">
+	  <p>Please send comments to sefa1@umbc.edu. For help, visit
+	    <a href="http://erilllab.biosci.umbc.edu/wiki/index.php5/CollecTF">
+	      CollecTF wiki</a>.
+	  </p>
 
-      <p style="text-align:right">
-      {% load static from staticfiles %}
-      <a href="http://compbio.umbc.edu"><img width="15%" src="{% static "lablogo.png" %}"></a>
-      </p>
+	  <p class="muted">
+	    This material is based upon work supported by the National Science Foundation under Grant Number MCB-1158056.
+	    Any opinions, findings, and conclusions or recommendations expressed in this material
+	    are those of the author(s) and do not necessarily reflect the views of the National
+	    Science Foundation.</p>
+	</div>
 
-  </div>
+	<div class="span3">
+	  <p class="text-right">
+	    {% load static from staticfiles %}
+	    <a href="http://compbio.umbc.edu"><img src="{% static "lablogo.png" %}"></a>
+	  </p>
+
+	</div>
+
+
+    </div>
   </footer>
 
 

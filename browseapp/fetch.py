@@ -1,6 +1,7 @@
 """Fetch objects from database"""
 
 import models
+import collectfapp.bioutils as bioutils
 
 def get_all_curations():
     return models.Curation.objects.all()
@@ -19,8 +20,20 @@ def get_all_publications():
 def get_all_TFs():
     return models.TF.objects.all()
 
+def get_TFs_by_family(TF_family):
+    return models.TF.objects.filter(family=TF_family)
+
+def get_TF_family_by_id(TF_family_id):
+    return models.TFFamily.objects.get(pk=TF_family_id)
+
+def get_all_TF_families():
+    return models.TFFamily.objects.all()
+
 def get_all_species():
     return models.Strain.objects.all()
+
+def get_lineage(species_taxon_id):
+    return bioutils.get_taxon_info(species_taxon_id)
 
 def get_all_exp_techniques():
     return models.ExperimentalTechnique.objects.all()

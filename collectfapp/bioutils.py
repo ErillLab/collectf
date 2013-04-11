@@ -114,6 +114,17 @@ def get_org_taxon(genome_record):
     assert int(rec['Count']) == 1
     return rec['IdList'][0]
 
+def get_taxon_info(tax_id):
+    handler = Entrez.efetch(db="Taxonomy", id=str(tax_id), retmode="xml")
+    records = Entrez.read(handler)
+    for i,r in enumerate(records):
+        for k,v in r.items():
+            print k, ':', v
+    lineage = records[0]['LineageEx']
+    order = [x for x in lineage if x['Rank']=='order']
+    order_name = order[0]['ScientificName']
+    return order_name
+    
 def to_fasta(seqs):
     """
     FASTA representation of motif
@@ -180,3 +191,5 @@ def weblogo(sequences, format="PNG"):
 
     return im
 
+
+    

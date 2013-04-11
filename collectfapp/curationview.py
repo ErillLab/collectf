@@ -93,15 +93,16 @@ def site_report_get_form(wiz, form):
     return form
 
 # helper function for site_exact_match_form and site_soft_match_forms
-def populate_match_choices(sid, matches):
+def populate_match_choices(site, matches, is_exact):
     # for a given site and its all matches, populate Django field choice
     # exact_match: True if populating exact match results, if false, soft search
     choices = []
     for mid, match in matches.items():
-        choices.append((mid, sitesearch.print_site_match(match)))
+        choices.append((mid, sitesearch.print_site_match(site, match, is_exact)))
     last_choice_msg = "No valid match"
     choices.append((None, last_choice_msg))
     return choices
+
     
 def site_exact_match_get_form(wiz, form):
     """Show list of sites and their exact matches."""
@@ -110,9 +111,10 @@ def site_exact_match_get_form(wiz, form):
     sites = sutils.sget(wiz.request.session, 'sites')
     site_match_choices = sutils.sget(wiz.request.session, 'site_match_choices')
     for sid, matches in site_match_choices.items(): # for all matches belong to a site
-        choices = populate_match_choices(sid, matches)
+        label = mark_safe('<span class="sequence">' + sites[sid] + '</span>')
+        choices = populate_match_choices(sites[sid], matches, is_exact=True)
         # make the form field
-        form.fields[sid] = forms.ChoiceField(label=sites[sid], choices=choices,
+        form.fields[sid] = forms.ChoiceField(label=label, choices=choices,
                                              widget=forms.RadioSelect())
     return form
 
@@ -125,9 +127,10 @@ def site_soft_match_get_form(wiz, form):
     # exact site matches: {sid: SiteMatch} -- they're already matched in prev form
     exact_site_matches = sutils.sget(wiz.request.session, 'exact_site_matches')
     for sid, matches in soft_site_match_choices.items():
-        choices = populate_match_choices(sid, matches)
+        label = mark_safe('<span class="sequence">' + sites[sid] + '</span>')
+        choices = populate_match_choices(sites[sid], matches, is_exact=False)
         # make the form field
-        form.fields[sid] = forms.ChoiceField(label=sites[sid], choices=choices,
+        form.fields[sid] = forms.ChoiceField(label=label, choices=choices,
                                              widget=forms.RadioSelect())
     return form
 
@@ -142,13 +145,15 @@ def site_regulation_get_form(wiz, form):
     exact_site_matches = sutils.sget(wiz.request.session, 'exact_site_matches')
     soft_site_matches = sutils.sget(wiz.request.session, 'soft_site_matches')
 
+    from templatetags import utils
     for sid,match in exact_site_matches.items() + soft_site_matches.items():
         choices = []  # list of genes to the site match
         for g in match.nearby_genes:
-            choices.append((g.gene_id, '%s (%s)' % (g.locus_tag, g.name)))
+            choices.append((g.gene_id, '%s (%s): %s' % (g.locus_tag, g.name, g.description)))
         form.fields[sid] = forms.MultipleChoiceField(label=match.match.seq,
                                                      choices=choices, required=False,
-                                                     widget=forms.CheckboxSelectMultiple)
+                                                     widget=forms.CheckboxSelectMultiple,
+                                                     help_text=utils.match_diagram(match))
         # disable checkbox if publication is marked as not having expression data
         if not publication.contains_expression_data:
             form.fields[sid].widget.attrs['disabled'] = 'disabled'
