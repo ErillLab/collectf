@@ -25,19 +25,22 @@ def regulation_diagram(regulations, site_instance):
     # draw genes
     for reg in regulations:
         feature = SeqFeature(FeatureLocation(reg.gene.start, reg.gene.end), strand=reg.gene.strand)
+        label_angle = 0 if reg.gene.strand == 1 else 180
+        label_position = 'middle'
         gds_features.add_feature(feature, name=reg.gene.name, label=True,
-                                 label_size=14, label_angle=0,
+                                 label_size=15, label_angle=label_angle,
+                                 label_position=label_position,
                                  sigil="ARROW", arrowshaft_height=1.0,
                                  color=colors.green if reg.evidence_type=="exp_verified" else colors.grey)
         
     # draw binding site
     feature = SeqFeature(FeatureLocation(site_instance.start, site_instance.end), strand=site_instance.strand)
-    gds_features.add_feature(feature, color=colors.red, name="site", label=True, label_size=12)
+    gds_features.add_feature(feature, color=colors.red, name="site", label=False, label_size=12)
 
     gdd.draw(format='linear', fragments=1,
              start=min(map(lambda r: r.gene.start, regulations)) - 50,
              end = max(map(lambda r: r.gene.end, regulations)) + 50,
-             pagesize = (3*cm, 25*cm))
+             pagesize = (3*cm, 20*cm))
     
     return mark_safe(gdd.write_to_string('svg'))
     
@@ -49,8 +52,10 @@ def site_match_diagram(site_match):
     # draw genes
     for g in site_match.nearby_genes:
         feature = SeqFeature(FeatureLocation(g.start, g.end), strand=g.strand)
+        label_angle = 0 if g.strand == 1 else 180
         gds_features.add_feature(feature, name=g.name, label=True,
-                                 label_size=14, label_angle=0,
+                                 label_size=14, label_angle=label_angle,
+                                 label_position = 'middle',
                                  sigil="ARROW", arrowshaft_height=1.0,
                                  color=colors.lightblue)
     # draw binding site
@@ -61,7 +66,7 @@ def site_match_diagram(site_match):
     gdd.draw(format='linear', fragments=1,
              start=min(map(lambda g: g.start, site_match.nearby_genes))-50,
              end = max(map(lambda g: g.end, site_match.nearby_genes))+50,
-             pagesize = (3*cm, 25*cm))
+             pagesize = (3*cm, 20*cm))
     return mark_safe(gdd.write_to_string('svg'))
 
 
