@@ -8,6 +8,11 @@ class CurationAdmin(admin.ModelAdmin):
     filter_horizontal = ("experimental_techniques",)
 admin.site.register(Curation, CurationAdmin) # register Curation
 
+class PublicationAdmin(admin.ModelAdmin):
+    list_display = ('publication_id', 'pmid', 'title', 'assigned_to')
+    list_filter = ('assigned_to', 'curation_complete', 'reported_TF', 'reported_species')
+admin.site.register(Publication, PublicationAdmin)
+
 # register rest of models
 app = get_app("collectfapp")
 for model in get_models(app):

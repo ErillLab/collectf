@@ -11,9 +11,7 @@
 
 - popover top
 
-- list of assigned papers under curator
-
-- download fasta/csv
+- download fasta/csv gene names
 
 - sticky footer
 
@@ -23,4 +21,3 @@
 
 - sequences do not have the same length
 
-- gene diagram to view curation

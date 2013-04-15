@@ -51,15 +51,17 @@ window.location.hash = '#results';
 
 
 <div class="page-header" id="sites">
-<h2>List of transcription factor binding sites</h2>
-For the selected transcription factor and species, the list of curated binding sites in the database are displayed below.
+<h2>List of transcription factor binding sites</h2> For the selected transcription
+factor and species, the list of curated binding sites in the database are displayed
+below. The binding site is displayed as red bar. Genes that are reported to have
+regulated by TF are colored with green.
 </div>
 
 {% load utils %}
 <table class="table table-condensed table-borderless">
   <thead>
     <tr>
-      <th width="20%"></th>
+      <th width="20%">Site sequence</th>
       <th width="20%">Gene</th>
       <th width="40%">Function</th>
       <th width="20%">Curation</th>
@@ -78,7 +80,7 @@ For the selected transcription factor and species, the list of curated binding s
 
     <tr>
       <td colspan="4">
-	<div class="operon">{% with regs=site_regulation_dict|get_item:site %} {{ regs|regulation_diagram:site }} {% endwith %}</div>
+	<div>{% with regs=site_regulation_dict|get_item:site %} {{ regs|regulation_diagram:site }} {% endwith %}</div>
 	<!-- <span class="sequence">{{ site.seq }}</span> -->
       </td>
     </tr>

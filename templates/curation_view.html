@@ -115,12 +115,15 @@
 Regulated genes for each binding site are displayed below. Genes that are reported
 for TF-site mediated regulation are displayed in <span style="color:green">green</span>.
 
+{% load utils %}
+
 {% with curation_site_instances=curation.curation_siteinstance_set.all %}
 <ul class="unstyled">
   {% for cs in curation_site_instances %}
   <li>
     <i class="icon-wrench"></i>
     <span style="font-family: monospace">{{ cs.site_instance.seq }}</span>
+    {{ cs.regulation_set.all|regulation_diagram:cs.site_instance }}
     <ul>
     {% for regulation in cs.regulation_set.all %}
     <li>
@@ -136,7 +139,6 @@ for TF-site mediated regulation are displayed in <span style="color:green">green
 {% endwith %}
 
 </section>
-
 
 </div>
 
