@@ -51,7 +51,8 @@ def browse_post_TF_sp(request, TF_id, species_id):
     """Handle Http requests with TF_id and species_id"""
     TF = fetch.get_TF_by_id(TF_id)
     species = fetch.get_species_by_id(species_id)
-    return get_sites_by_TF_species(request, TF, species, experimental_techniques=None)
+    return get_sites_by_TF_species(request, TF, species,
+                                   experimental_techniques=models.ExperimentalTechnique.objects.all())
     
 def group_curation_site_instances(curation_site_instances):
     """Group curation_site_instance objects by site_instance"""
@@ -95,7 +96,7 @@ def get_sites_by_TF_species(request, TF, species, experimental_techniques):
     site_sequences = set(csi.site_instance for csi in curation_site_instances)
 
     # create weblogo for the list of sites
-    weblogo_data = weblogo_uri(map(lambda x: x.seq, site_sequences))
+    #weblogo_data = weblogo_uri(map(lambda x: x.seq, site_sequences))
     # if there is no site, message
     if not site_curation_dict and not site_regulation_dict:
         messages.info(request, "No site found for transcription factor %s in the genome of %s." % (TF.name,
