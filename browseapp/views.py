@@ -77,13 +77,18 @@ def get_sites_by_TF_species(request, TF, species, experimental_techniques):
     # see collectfapp.models for description of model objects
     # get all Curation_SiteInstance objects
     curation_site_instances = fetch.get_curation_site_instances(TF, species)
+    print len(curation_site_instances)
     # filter curation_site_instances based on used experimental techniques
-    #for exp_technique in models.ExperimentalTechnique.objects.all():
-    #    x = x & Q(curation__experimental_techniques=exp_technique)
-    #print len(curation_site_instances)
-    #curation_site_instances = curation_site_instances.filter(x).distinct()
-    #print len(curation_site_instances)
-    
+    if experimental_techniques:
+        x = Q()
+        for exp_technique in experimental_techniques:
+            x = x | Q(curation__experimental_techniques=exp_technique)
+            
+        curation_site_instances = curation_site_instances.filter(x).distinct()
+    else:
+        curation_site_instances = []
+
+    print len(curation_site_instances)
     # group them by site instance?
     site_curation_dict, site_regulation_dict = group_curation_site_instances(curation_site_instances)
 
