@@ -21,6 +21,7 @@ class BrowseForm(forms.Form):
                         mark_safe(description_markup % (t.name, t.description, t.name))))
     techniques = forms.MultipleChoiceField(choices = choices,
                                            label = "Techniques",
+                                           required = False,
                                            widget = forms.CheckboxSelectMultiple(),
                                            initial = [c[0] for c in choices])
     

@@ -64,6 +64,14 @@
       background-image: url({% static "geneb.png" %});
       background-repeat: no-repeat;
   }
+  .gene-img.pos.match{
+      background-image: url({% static "genee.png" %});
+      background-repeat: no-repeat;
+  }
+  .gene-img.neg.match{
+      background-image: url({% static "genef.png" %});
+      background-repeat: no-repeat;
+  }
 
   .tf-img{
       {% load static from staticfiles %}
@@ -82,7 +90,6 @@
   <script src="http://code.jquery.com/jquery-latest.js"></script>
   <script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
   <script src="{% static "bootstrap/js/auxiliary.js" %}"></script>
-  <script src="{% static "bootstrap/js/bootstrap-rowlink.js" %}"></script>
   <script type="text/javascript">
     // use twitter-bootstrap tooltip feature
     $('body').tooltip({
@@ -96,10 +103,7 @@
        html: 'true',
     });
 
-    $('#sidebar').affix();
-    
-    window.addEventListener("hashchange", function() { scrollBy(0, -50) })
-
+    window.addEventListener("hashchange", function() { scrollBy(0, -60); });
 
   </script>
 
@@ -149,12 +153,13 @@
 	    <a href="http://erilllab.biosci.umbc.edu/wiki/index.php5/CollecTF">
 	      CollecTF wiki</a>.
 	  </p>
-
+	  <hr />
 	  <p class="muted">
+	    <small>
 	    This material is based upon work supported by the National Science Foundation under Grant Number MCB-1158056.
 	    Any opinions, findings, and conclusions or recommendations expressed in this material
 	    are those of the author(s) and do not necessarily reflect the views of the National
-	    Science Foundation.</p>
+	    Science Foundation.</small></p>
 	</div>
 
 	<div class="span3">

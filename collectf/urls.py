@@ -56,19 +56,17 @@ urlpatterns = patterns('',
     # browse by TF and species
     url(r'^browse_TF_sp/(?P<TF_id>\d+)/(?P<species_id>\d+)/$', browseapp.views.browse_post_TF_sp),
     # browse by species
-    url(r'^browse_sp_main/$', browseapp.views.browse_by_species_main),
+    #url(r'^browse_sp_main/$', browseapp.views.browse_by_species_main),
     # browse by TF main
     url(r'^browse_tf_main/$', browseapp.views.browse_by_TF_main),
     # browse by TF family
     url(r'^browse_tf_family/(?P<TF_family_id>\d+)$', browseapp.views.browse_by_TF_family),
     # browse by TF
     url(r'^browse_tf/(?P<TF_id>\d+)$', browseapp.views.browse_by_TF),
-    # download sites (FASTA format)
-    url(r'^motif_download/(?P<TF_id>\d+)/(?P<species_id>\d+)/$', browseapp.views.report_FASTA),
+    # export fasta/csv
+    url(r'^export_sites/$', browseapp.views.export_sites),
     # database statistics
     url(r'^db_stats/$', browseapp.views.curation_stats),
-    # display weblogo
-    url(r'^display_weblogo/$', browseapp.views.display_weblogo),
             
 )
 

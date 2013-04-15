@@ -4,17 +4,19 @@
 
 {% block content %}
 
+
 <div class="row-fluid">
+<!--
 <div class="span3 bs-docs-sidebar">
 <ul class="nav nav-list bs-docs-sidenav affix" id="sidebar">
   <li><a href="#browse-form"><i class="icon-chevron-right"></i>Browse database</a></li>
   <li><a href="#weblogo"><i class="icon-chevron-right"></i>Sequence logo</a></li>
-  <li><a href="#results"><i class="icon-chevron-right"></i>List of binding sites</a></li>
+  <li><a href="#sites"><i class="icon-chevron-right"></i>List of binding sites</a></li>
   <li><a href="#export"><i class="icon-chevron-right"></i>Export data</a></li>
 </ul>
 </div>
-
-<div class="span9">
+-->
+<div class="span12">
 
 <div class="page-header" id="browse-form">
 <h2>Browse database</h2>
@@ -34,17 +36,21 @@ search for curation binding sites in the database.
 {% if site_curation_dict and site_regulation_dict %}
 
 <script type="text/javascript">
-window.location.hash = '#weblogo';
+window.location.hash = '#results';
 </script>
 
+<h1 id="results">Collection of binding sites for {{ TF.name }} transcription factor in {{ species.name }}</h1>
+
+
+<!-- weblogo here 
 <div class="page-header" id="weblogo">
 <h2>Sequence logo</h2>
 </div>
-<!-- weblogo here -->
 <img src="{{ weblogo_image_data }}">
-<!-- weblogo end -->
+ weblogo end -->
 
-<div class="page-header" id="results">
+
+<div class="page-header" id="sites">
 <h2>List of transcription factor binding sites</h2>
 For the selected transcription factor and species, the list of curated binding sites in the database are displayed below.
 </div>
@@ -95,8 +101,13 @@ For the selected transcription factor and species, the list of curated binding s
 <h2>Export</h2>
 <p>Export the list of binding sites in csv or fasta formats.</p>
 <p>
-<a class="btn btn-primary btn-large" href="" id="export_fasta"><i class="icon-download"></i> Download FASTA</a>
-<a class="btn btn-primary btn-large" href="" id="export_csv"><i class="icon-download"></i> Download CSV</a>
+<form action="{% url browseapp.views.export_sites %}" method="POST">{% csrf_token %}
+{% for site in site_curation_dict|get_keys %}
+<input type="hidden" name="site_id" value="{{ site.site_id }}" />
+{% endfor %}
+<input type="submit" value="Download FASTA" class="btn btn-primary btn-large" name="fasta">
+<input type="submit" value="Download CSV" class="btn btn-primary btn-large" name="csv">
+</form>
 </p>
 </div>
 
@@ -106,6 +117,5 @@ For the selected transcription factor and species, the list of curated binding s
 
 </div>
 
-
-
 {% endblock %}
+

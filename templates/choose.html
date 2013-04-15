@@ -22,14 +22,15 @@
 
 </div>
 
-{% if user.is_authenticated %}
 
 <div class="row-fluid">
   <div class="span4 ">
     <h3><i class="icon-beaker"></i> Browse database</h3>
 
     <ul class="unstyled">
+      <!--
       <li><i class="icon-ok"></i> <a class="" href="">Browse by taxonomy</a></li>
+      -->
       <li><i class="icon-ok"></i> <a class="" href="{% url browseapp.views.browse_by_TF_main %}">Browse by TF family</a></li>
       <li><i class="icon-ok"></i> <a class="" href="{% url browseapp.views.browse %}">Search binding sites by TF and species</a></li>
     </ul>
@@ -82,6 +83,6 @@
   </div>
 </div>
 
-{% endif %}
+
 
 {% endblock %}

@@ -182,6 +182,15 @@ class SiteInstance(models.Model):
         seq = self.seq
         return ">%s\n%s\n" % (desc, seq)
 
+    def to_csv(self):
+        fields = [self.genome.genome_accession,
+                  '+' if self.strand == 1 else '-',
+                  '%d' % self.start,
+                  '%d' % self.end,
+                  self.seq]
+        return ', '.join(fields) + '\n'
+                  
+
 class Curation_SiteInstance(models.Model):
     # through model between Curation and SiteInstance models
     curation = models.ForeignKey("Curation")

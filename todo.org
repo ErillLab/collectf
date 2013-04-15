@@ -2,7 +2,6 @@
 - different session data for each tab.
 
 
-- Homepage. links and buttons
 - browse
 - curation preview before submission.
 - textarea width height
@@ -20,4 +19,8 @@
 
 - browse by species
 
+- filter by experimental technique
+
 - sequences do not have the same length
+
+- gene diagram to view curation

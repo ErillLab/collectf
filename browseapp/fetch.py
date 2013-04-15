@@ -10,8 +10,7 @@ def get_curation_site_instances(TF, species):
     """Return all Curation_SiteInstance objects for particular TF and species"""
     curation_site_instances = models.Curation_SiteInstance.objects.filter(
         site_instance__genome__strain=species,
-        curation__TF=TF
-        )
+        curation__TF=TF)
     return curation_site_instances
 
 def get_all_publications():
@@ -48,7 +47,7 @@ def get_site_instances_by_species(strain):
     return models.SiteInstance.objects.filter(genome__strain=strain)
 
 def get_TF_by_id(TF_id):
-    return models.TF.objects.get(pk=TF_id)
+    return models.TF.objects.get(TF_id=TF_id)
 
 def get_species_by_id(species_id):
     return models.Strain.objects.get(pk=species_id)

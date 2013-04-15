@@ -39,6 +39,31 @@ def regulation_diagram(regulations, site_instance):
             mark_safe(site_html_output) +
             regulation_diagram_helper(right_regulations))
 
+
+def biopython_diagram(site_match):
+    from Bio.SeqFeature import SeqFeature, FeatureLocation
+    from Bio.Graphics import GenomeDiagram
+    from reportlab.lib import colors
+    from reportlab.lib.units import cm
+
+    gdd = GenomeDiagram.Diagram('Test Diagram')
+    gdt_features = gdd.new_track(1, greytrack=False)
+    gds_features = gdt_features.new_set()
+
+    for g in site_match.nearby_genes:
+        feature = SeqFeature(FeatureLocation(g.start, g.end), strand=g.strand)
+        gds_features.add_feature(feature, name=g.name, label=True,
+                                 sigil="ARROW", arrowshaft_height=1.0,
+                                 color=colors.lightblue)
+        
+    gdd.draw(format='linear', fragments=1,
+             start=min(map(lambda g: g.start, site_match.nearby_genes))-50,
+             end = max(map(lambda g: g.end, site_match.nearby_genes))+50)
+
+
+    return gdd.write_to_string('svg')
+
+
 def match_diagram(site_match):
     """Ouput HTML for the diagram of site search matches.  The difference from the
     previous one is that this method is called on curation forms. Since there is no
@@ -49,7 +74,7 @@ def match_diagram(site_match):
         html_output = ""
         for g in genes:
             assert g.strand in [1, -1]
-            gene_img_div = "gene-img inf %s" % ("pos" if g.strand == 1 else "neg")
+            gene_img_div = "gene-img match %s" % ("pos" if g.strand == 1 else "neg")
             data_title = g.name
             data_content = gene_info(g)
             html_output += ('<div class="%s" data-toggle="popover" data-original-title="%s" data-content="%s"></div>' %
