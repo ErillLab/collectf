@@ -153,7 +153,7 @@ def site_regulation_get_form(wiz, form):
         form.fields[sid] = forms.MultipleChoiceField(label=match.match.seq,
                                                      choices=choices, required=False,
                                                      widget=forms.CheckboxSelectMultiple,
-                                                     help_text=utils.biopython_diagram(match))
+                                                     help_text=utils.site_match_diagram(match))
         # disable checkbox if publication is marked as not having expression data
         if not publication.contains_expression_data:
             form.fields[sid].widget.attrs['disabled'] = 'disabled'
