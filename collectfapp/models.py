@@ -223,8 +223,16 @@ class NotAnnotatedSiteInstance(models.Model):
         return u'%s [%s]' % (self.id, self.sequence)  
     
 class ExperimentalTechnique(models.Model):
+    CATEGORIES = (("binding", "Detection of binding"),
+                  ("induction", "Assessment of regulation"),
+                  ("insilico", "In-silico prediction"))
+    
+    SUBCATEGORIES = (('other', 'other'),)
     technique_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
+    technique_category = models.CharField(max_length=60, choices=CATEGORIES)
+    technique_subcategory = models.CharField(max_length=60, choices=SUBCATEGORIES)
+    
     description = models.TextField()
 
     def __unicode__(self):

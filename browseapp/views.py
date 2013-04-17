@@ -30,21 +30,55 @@ def view_all_publications(request):
                               template_vals,
                               context_instance=RequestContext(request))
 
+
+def make_browse_response_dict():
+    # make response dict for browse view pages
+    binding_techniques = []
+    induction_techniques = []
+    insilico_techniques = []
+    import random
+    for exp_technique in models.ExperimentalTechnique.objects.all():
+        i = random.randint(1,3)
+        if i==1: binding_techniques.append(exp_technique)
+        elif i==2: induction_techniques.append(exp_technique)
+        elif i==3: insilico_techniques.append(exp_technique)
+        else: assert False
+    return dict(TFs=models.TF.objects.all(),
+                species=models.Strain.objects.all(),
+                binding_techniques=binding_techniques,
+                induction_techniques=induction_techniques,
+                insilico_techniques=insilico_techniques)
+    
+
 def browse_get(request):
     """Return empty browse form"""
-    form = forms.BrowseForm()
-    return render(request,
-                  "browse.html",
-                  {'form': forms.BrowseForm(),},
+    #form = forms.BrowseForm()
+    # group techniques
+    return render(request, "browse.html",
+                  make_browse_response_dict(),
                   context_instance=RequestContext(request))
 
 def browse_post(request):
     """Process form for browsing"""
-    form = forms.BrowseForm(request.POST)
-    if form.is_valid():
-        TF = form.cleaned_data['TF']
-        species = form.cleaned_data['species']
-        experimental_techniques = form.cleaned_data['techniques']
+    print request.POST
+    TF = fetch.get_TF_by_id(request.POST['TF'])
+    species = fetch.get_species_by_id(request.POST['species'])
+    # experimental techniques is a list of sublist, where members of each sublist
+    # have an OR relation
+    # example: if techniques is [['emsa', 'pssm'], ['footprinting', 'survival']] and
+    # boolean is ['and'], it is ((emsa or pssm) and (footprinting or survival)
+    
+    import json
+    experimental_techniques_1 = json.loads(request.POST['tech1'])
+    experimental_techniques_2 = json.loads(request.POST['tech2'])
+    experimental_techniques_3 = json.loads(request.POST['tech3'])
+    boolean1 = request.POST['boolean1']
+    boolean2 = request.POST['boolean2']
+    print boolean1
+    print experimental_techniques_1[0]['values']
+
+
+    experimental_techniques = None
     return get_sites_by_TF_species(request, TF, species, experimental_techniques)
 
 def browse_post_TF_sp(request, TF_id, species_id):
@@ -52,7 +86,7 @@ def browse_post_TF_sp(request, TF_id, species_id):
     TF = fetch.get_TF_by_id(TF_id)
     species = fetch.get_species_by_id(species_id)
     return get_sites_by_TF_species(request, TF, species,
-                                   experimental_techniques=models.ExperimentalTechnique.objects.all())
+                                   experimental_techniques=fetch.get_all_exp_techniques())
     
 def group_curation_site_instances(curation_site_instances):
     """Group curation_site_instance objects by site_instance"""
@@ -87,9 +121,9 @@ def get_sites_by_TF_species(request, TF, species, experimental_techniques):
             
         curation_site_instances = curation_site_instances.filter(x).distinct()
     else:
-        curation_site_instances = []
+        #curation_site_instances = []
+        pass
 
-    print len(curation_site_instances)
     # group them by site instance?
     site_curation_dict, site_regulation_dict = group_curation_site_instances(curation_site_instances)
 
@@ -101,17 +135,16 @@ def get_sites_by_TF_species(request, TF, species, experimental_techniques):
     if not site_curation_dict and not site_regulation_dict:
         messages.info(request, "No site found for transcription factor %s in the genome of %s." % (TF.name,
                                                                                                    species.name))
-
-    response_dict = {'form': forms.BrowseForm(initial={'TF': TF,
-                                                       'species': species,
-                                                       'experimental_techniques': experimental_techniques}),
-                     'TF': TF,
-                     'species': species,
-                     'site_curation_dict': site_curation_dict,
-                     'site_regulation_dict': site_regulation_dict,
-                     #'weblogo_image_data': weblogo_data
-                     }
-    return render(request, "browse.html", response_dict, context_instance=RequestContext(request))
+    result_dict = {'site_curation_dict':site_curation_dict,
+                   'site_regulation_dict':site_regulation_dict,
+                   'TF':TF,
+                   'sp':species
+                   }
+    response_dict = dict(make_browse_response_dict().items() +
+                         result_dict.items())
+                        
+    return render(request, "browse.html", response_dict,
+                  context_instance=RequestContext(request))
     
 def browse(request):
     """Handler function to browse database"""

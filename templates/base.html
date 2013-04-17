@@ -3,110 +3,27 @@
 <head>
   <!-- Bootstrap -->
   <link href='http://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet' type='text/css'>
-
   {% load static from staticfiles %}
   <link href="{% static "bootstrap/css/bootstrap.min.css" %}" rel="stylesheet" media="screen">
   <link href="{% static "font-awesome/css/font-awesome.min.css" %}" rel="stylesheet">
   <link href="{% static "bootstrap/css/docs.css" %}" rel="stylesheet" media="screen">
-
-
-  <style>
-  * {
-      font-family: Helvetica, Arial, sans-serif;
-  }
-  body {
-      padding-top: 60px;
-  }
-  textarea {
-      font-family: monospace, Courier;
-  }
-  .sequence {
-      font-family: monospace, Courier;
-  }
-  .footer {
-      margin-top: 70px;
-      padding: 40px;
-      border-top: 1px solid #E5E5E5;
-      background-color: whiteSmoke;
-  }
-  .footer p{
-      color: #777;
-  }
-
-  .table-borderless td {
-      border: 0;
-  }
-
-  .operon {
-  width: 200px;
-  white-space: nowrap;
-  }
-  .gene-img{
-      {% load static from staticfiles %}
-  
-      height: 20px;
-      width:60px;
-      display: inline-block;
-  }
-  .gene-img.pos.exp{
-      background-image: url({% static "genec.png" %});
-      background-repeat: no-repeat;
-  }
-  .gene-img.pos.inf{
-      background-image: url({% static "genea.png" %});
-      background-repeat: no-repeat;
-  }
-  .gene-img.neg.exp{
-      background-image: url({% static "gened.png" %});
-      background-repeat: no-repeat;
-  }
-  .gene-img.neg.inf{
-      background-image: url({% static "geneb.png" %});
-      background-repeat: no-repeat;
-  }
-  .gene-img.pos.match{
-      background-image: url({% static "genee.png" %});
-      background-repeat: no-repeat;
-  }
-  .gene-img.neg.match{
-      background-image: url({% static "genef.png" %});
-      background-repeat: no-repeat;
-  }
-
-  .tf-img{
-      {% load static from staticfiles %}
-      background-image: url({% static "tf.png" %});
-      background-repeat: no-repeat;
-      height: 20px;
-      width: 20px;
-      display: inline-block;
-  }
-  </style>
+  <link href="{% static "bootstrap-listTree.css" %}" rel="stylesheet" type="text/css">
+  <link href="{% static "select2.css" %}" rel="stylesheet">
+  <link href="{% static "collectf.css" %}" rel="stylesheet">
 
 
 </head>
 
 <body>
+
   <script src="http://code.jquery.com/jquery-latest.js"></script>
   <script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
   <script src="{% static "bootstrap/js/auxiliary.js" %}"></script>
-  <script type="text/javascript">
-    // use twitter-bootstrap tooltip feature
-    $('body').tooltip({
-       selector: '[data-toggle="tooltip"]',
-       placement: 'top',
-    });
-    $('body').popover({
-       selector: '[data-toggle="popover"]',
-       trigger: 'hover',
-       placement: 'right',
-       html: 'true',
-    });
-
-    window.addEventListener("hashchange", function() { scrollBy(0, -60); });
-
-  </script>
-
+  <script src="{% static "bootstrap-select.min.js" %}"></script>
+  <script src="{% static "underscore-min.js" %}"></script>
+  <script src="{% static "bootstrap-listTree.js" %}"></script>
+  <script src="{% static "select2.min.js" %}"></script>
+  <script src="{% static "collectf.js" %}"></script>
 
 
   <!-- header -->
@@ -167,9 +84,7 @@
 	    {% load static from staticfiles %}
 	    <a href="http://compbio.umbc.edu"><img src="{% static "lablogo.png" %}"></a>
 	  </p>
-
 	</div>
-
 
     </div>
   </footer>

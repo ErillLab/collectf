@@ -13,6 +13,10 @@ class PublicationAdmin(admin.ModelAdmin):
     list_filter = ('assigned_to', 'curation_complete', 'reported_TF', 'reported_species')
 admin.site.register(Publication, PublicationAdmin)
 
+class ExperimentalTechniqueAdmin(admin.ModelAdmin):
+    list_display = ('name', 'technique_category', 'technique_subcategory')
+admin.site.register(ExperimentalTechnique, ExperimentalTechniqueAdmin)
+
 # register rest of models
 app = get_app("collectfapp")
 for model in get_models(app):

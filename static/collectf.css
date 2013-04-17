@@ -1,0 +1,29 @@
+* {
+    font-family: Helvetica, Arial, sans-serif;
+}
+body {
+    padding-top: 60px;
+}
+textarea {
+    font-family: monospace, Courier;
+}
+.sequence {
+    font-family: monospace, Courier;
+}
+.footer {
+    margin-top: 70px;
+    padding: 40px;
+    border-top: 1px solid #E5E5E5;
+    background-color: whiteSmoke;
+}
+.footer p{
+    color: #777;
+}
+
+.table-borderless td {
+    border: 0;
+}
+
+.spacer {
+    margin-top: 20px; /* define margin as you see fit */
+}

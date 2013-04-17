@@ -10,7 +10,7 @@ class BrowseForm(forms.Form):
                                      label="species",
                                      initial=0)
 
-    
+    '''
     # generate techniques field
     # get available techniques from db
     choices = []
@@ -24,4 +24,6 @@ class BrowseForm(forms.Form):
                                            required = False,
                                            widget = forms.CheckboxSelectMultiple(),
                                            initial = [c[0] for c in choices])
+    '''
+    
     
