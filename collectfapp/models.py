@@ -176,9 +176,9 @@ class SiteInstance(models.Model):
 
     def to_fasta(self):
         desc = "%s %s(%d, %d)" % (self.genome.genome_accession,
-                                    '+' if self.strand==1 else '-',
-                                    self.start,
-                                    self.end)
+                                  '+' if self.strand==1 else '-',
+                                  self.start,
+                                  self.end)
         seq = self.seq
         return ">%s\n%s\n" % (desc, seq)
 
@@ -187,8 +187,8 @@ class SiteInstance(models.Model):
                   '+' if self.strand == 1 else '-',
                   '%d' % self.start,
                   '%d' % self.end,
-                  self.seq]
-        return ', '.join(fields) + '\n'
+                  self.seq,]
+        return '\t'.join(fields)
                   
 
 class Curation_SiteInstance(models.Model):

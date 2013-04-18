@@ -99,7 +99,9 @@ def techniques_JSON_to_Q(JSON_string):
     q = Q(curation__curation_id=-9999)
     
     for t in techniques:
-        q = q | Q(curation__experimental_techniques=models.ExperimentalTechnique.objects.get(name=t))
+        technique_object = models.ExperimentalTechnique.objects.get(name=t)
+        print technique_object
+        q = q | Q(curation__experimental_techniques=technique_object)
     return q
 
 def browse_post_TF_sp(request, TF_id, species_id):
@@ -189,8 +191,17 @@ def export_sites(request):
     response = HttpResponse(content_type='application/download')
     response['Content-Disposition'] = 'attachment;filename="%s"' % filename
     # write all sites to file
+    if export_format == 'csv':
+        response.write('\t'.join(['genome', 'site_strand', 'site_start', 'site_end', 'site_seq', 'techniques']))
+        response.write('\n')
     for site in sites:
         response.write(site.to_fasta() if export_format=='fasta' else site.to_csv())
+        if export_format == 'csv':
+            techniques = []
+            for csi in site.curation_siteinstance_set.all():
+                techniques.append(', '.join(t.name for t in csi.curation.experimental_techniques.all()) + '(%s)' % csi.curation.publication.pmid)
+            response.write('\t' + '\t'.join(techniques))
+            response.write('\n')
     return response
 
 
