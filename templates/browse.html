@@ -13,7 +13,7 @@
     </div>
     
     <div class="container">
-    <form id="browse_form" method="POST" action="/browse/">{% csrf_token %}
+    <form id="browse_form" method="POST" action="{% url browseapp.views.browse %}">{% csrf_token %}
       
       <div class="page-header">
       <h3>1) Select the transcription factor</h3>
@@ -230,9 +230,9 @@ var insilico_techniques = [
     {% endfor %}
 ];
 
-$('.techniques1.listTree').listTree(binding_techniques, {'startCollapsed': true, });
-$('.techniques2.listTree').listTree(induction_techniques, {'startCollapsed': true, });
-$('.techniques3.listTree').listTree(insilico_techniques, {'startCollapsed': true, });
+$('.techniques1.listTree').listTree(binding_techniques, {'startCollapsed': true, 'selected': []});
+$('.techniques2.listTree').listTree(induction_techniques, {'startCollapsed': true,'selected': [] });
+$('.techniques3.listTree').listTree(insilico_techniques, {'startCollapsed': true, 'selected': []});
 
 
 function bind_selectors(select_picker, list_tree)
@@ -243,13 +243,13 @@ function bind_selectors(select_picker, list_tree)
 	var new_val = $(select_picker).val();
 	switch(new_val) {
 	case 'b':
-	    $(list_tree).listTree('update', binding_techniques, {'startCollapsed': true});
+	    $(list_tree).listTree('update', binding_techniques, {'startCollapsed': true, 'selected': []});
 	    break;
 	case 'i':
-	    $(list_tree).listTree('update', induction_techniques, {'startCollapsed': true});
+	    $(list_tree).listTree('update', induction_techniques, {'startCollapsed': true, 'selected': []});
 	    break;
 	case 'is':
-	    $(list_tree).listTree('update', insilico_techniques, {'startCollapsed': true});
+	    $(list_tree).listTree('update', insilico_techniques, {'startCollapsed': true, 'selected': []});
             break;
 	}
     });

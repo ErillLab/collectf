@@ -63,33 +63,52 @@ def browse_post(request):
     assert 'tech1' in request.POST and 'tech2' in request.POST and 'tech3' in request.POST
 
     print request.POST
-    q = Q()
     q1 = techniques_JSON_to_Q(experimental_techniques_1)
     q2 = techniques_JSON_to_Q(experimental_techniques_2)
     q3 = techniques_JSON_to_Q(experimental_techniques_3)
-    return get_sites_by_TF_species(request, TF, species, Q())
+
+    #  get curation objects
+    curation_site_instances = fetch.get_curation_site_instances(TF, species)
+    # filter them by experiemntal techniques
+    print len(curation_site_instances)
+    if boolean1 == 'and' and boolean2 == 'and':
+        curation_site_instances = curation_site_instances.filter(q1).filter(q2).filter(q3)
+    elif boolean1 == 'and' and boolean2 == 'or':
+        # (A and B) or C <-> (A or C) and (B or C)
+        curation_site_instances = curation_site_instances.filter(q1 | q3).filter(q2 | q3)
+    elif boolean1 == 'or' and boolean2 == 'and':
+        curation_site_instances = curation_site_instances.filter(q1 | q2).filter(q3)
+    elif boolean1 == 'or' and boolean2 == 'or':
+        curation_site_instances = curation_site_instances.filter(q1 | q2 | q3)
+    else:
+        assert False, "shouldn't be here, query"
+    
+    print len(curation_site_instances)
+
+    return get_sites_by_TF_species(request, TF, species, curation_site_instances)
 
 
 def techniques_JSON_to_Q(JSON_string):
     """Given JSON string received from the form, parse the techniques (names), get
     the ids for them, build the Q object for filtering"""
+    j = json.loads(JSON_string)
+
+    techniques = map(lambda x: map(lambda y: y['key'], x['values']), j)
+    techniques = [t for grp in techniques for t in grp] # flatten list
+    print techniques
+    q = Q(curation__curation_id=-9999)
     
-    if not JSON_string:
-        # no technique is selected
-        return Q()
-    # find techniques
-    print JSON_string
-    return Q()
+    for t in techniques:
+        q = q | Q(curation__experimental_techniques=models.ExperimentalTechnique.objects.get(name=t))
+    return q
 
 def browse_post_TF_sp(request, TF_id, species_id):
     """Handle Http requests with TF_id and species_id"""
     TF = fetch.get_TF_by_id(TF_id)
     species = fetch.get_species_by_id(species_id)
-    # retrieve curations having any technique (all curations, in other words)
-    q = Q()
-    for t in fetch.get_all_exp_techniques():
-        q = q | Q(curation__experimental_techniques=t)
-    return get_sites_by_TF_species(request, TF, species, q)
+    curation_site_instances = fetch.get_curation_site_instances(TF, species)
+
+    return get_sites_by_TF_species(request, TF, species, curation_site_instances)
 
 def browse_by_TF_main(request):
     """Handler for browse by TF request"""
@@ -226,21 +245,7 @@ def group_curation_site_instances(curation_site_instances):
         
     return site_curation_dict, site_regulation_dict
 
-def get_sites_by_TF_species(request, TF, species, technique_filter):
-    """Given a TF, species and a list of experimental techniques, query the database
-    to search sites for the particular TF and species, filtering out not selected
-    experimental techniques.
-
-    technique_filter -- django.db.models.Q object which allows you to build complex
-    queries
-
-    See also collectfapp.models for description of model objects.
-    """
-    #  get curation objects
-    curation_site_instances = fetch.get_curation_site_instances(TF, species)
-    # filter them by experiemntal techniques
-    curation_site_instances = curation_site_instances.filter(technique_filter).distinct()
-    
+def get_sites_by_TF_species(request, TF, species, curation_site_instances):    
     # group them by site instance?
     site_curation_dict, site_regulation_dict = group_curation_site_instances(curation_site_instances)
     site_sequences = set(csi.site_instance for csi in curation_site_instances)

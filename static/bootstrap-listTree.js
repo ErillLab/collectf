@@ -111,29 +111,34 @@
     /** Updates the internal object of selected nodes.
      */
     function _updateSelectedObject() {
-        var data = $('.listTree').data('listTree');
-
-        // Filter the context to the selected parents.
-        var selected = _.filter($.extend(true, {}, data.context), function (parent) {
-            return $('.listTree > ul > li > span > input[value="' + parent.key + '"]').prop('checked')
-        });
-
-        // For each parent in the working context...
-        _.each(selected, function (parent) {
-
-            // Filter the children to the selected children.
-            parent.values = _.filter(parent.values, function (child) {
-                return $('.listTree > ul > li > ul > li > span > input[value="' + child.key + '"]').prop('checked');
+	    // this is a temporary solution. 
+	var techniques = ['.techniques1', '.techniques2', '.techniques3'];
+	for (i = 0; i < techniques.length; i++) {
+	    t = techniques[i];
+            var data = $(t + '.listTree').data('listTree');
+	    
+            // Filter the context to the selected parents.
+            var selected = _.filter($.extend(true, {}, data.context), function (parent) {
+		return $(t + '.listTree > ul > li > span > input[value="' + parent.key + '"]').prop('checked')
             });
-        });
-
-        // Update the plugin's selected object.
-        $('.listTree').data('listTree', {
-            "target": data.target,
+	    
+            // For each parent in the working context...
+            _.each(selected, function (parent) {
+		
+		// Filter the children to the selected children.
+		parent.values = _.filter(parent.values, function (child) {
+                    return $(t + '.listTree > ul > li > ul > li > span > input[value="' + child.key + '"]').prop('checked');
+		});
+            });
+	    
+            // Update the plugin's selected object.
+            $(t + '.listTree').data('listTree', {
+		"target": data.target,
                 "context": data.context,
                 "options": data.options,
                 "selected": selected
-        });
+            });
+	}
     }
 
     var methods = {
