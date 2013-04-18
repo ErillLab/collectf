@@ -13,7 +13,7 @@
     </div>
     
     <div class="container">
-    <form id="browse_form" method="POST" action="">{% csrf_token %}
+    <form id="browse_form" method="POST" action="/browse/">{% csrf_token %}
       
       <div class="page-header">
       <h3>1) Select the transcription factor</h3>
@@ -45,16 +45,16 @@
       
       <div class="page-header">
       <h3>3) Filter binding sites by experimental techniques that they are
-      reported</h3>
-      Filter transcription factor binding site search by experimental
+      reported</h3> Filter transcription factor binding site search by experimental
       methods that are used to report the sites. You can filter the search by
-      selecting particular methods for each category (i.e. binding, induction,
-      in-silico) and combine them using Boolean operators.
+      selecting particular categories and combine them using Boolean operators. You
+      can also select individual techniques by expanding the category that they are
+      under.
       </div>
       
       <div class="row-fluid">
 	<div class="span3">
-	  <select id="selectpicker1">
+	  <select name="main_category1" id="selectpicker1">
 	    <option value="b" selected="selected">Binding</option>
 	    <option value="i">Induction</option>
 	    <option value="is">In-silico</option>
@@ -72,10 +72,9 @@
 	</div>
 	
 	<div class="span3">
-	  <select id="selectpicker2">
-	    <option value="na" selected="selected">N/A</option>
+	  <select name="main_category2" id="selectpicker2">
 	    <option value="b">Binding</option>
-	    <option value="i">Induction</option>
+	    <option value="i" selected="selected">Induction</option>
 	    <option value="is">In-silico</option>
 	  </select>
 	  <div class="row spacer"></div>
@@ -91,19 +90,16 @@
 	</div>
 	
 	<div class="span3">
-	  <select  id="selectpicker3">
-	    <option value="na" selected="selected">N/A</option>
+	  <select name="main_category3" id="selectpicker3">
 	    <option value="b">Binding</option>
 	    <option value="i">Induction</option>
-	    <option value="is">In-silico</option>
+	    <option value="is" selected="selected">In-silico</option>
 	  </select>
 	  <div class="row spacer"></div>
 	  <div class="techniques3 listTree"></div>
 	  <input type="hidden" name="tech3" id="selectionJSON3" value="">
 	</div>
       </div>
-      
-
       
       <div class="page-header">
       <h3>4) Submit form</h3>
@@ -207,29 +203,37 @@
 
 
 <script type="text/javascript">
+  {% load utils %}
   // data
-    var data1 = [
-	{
-	    "key": "Binding",
-	    "values": [{% for t in binding_techniques %} {"key": "{{ t.name }}"}, {% endfor %}]
-	}
-    ];
-var data2 = [
+var binding_techniques = [
+    {% for subcategory in binding_techniques|get_keys %}
     {
-	"key": "Induction",
-	"values": [{% for t in induction_techniques %} {"key": "{{ t.name }}"}, {% endfor %}]
-    }
+	"key": "{{ subcategory.name }}",
+	"values": [{% for technique in binding_techniques|get_item:subcategory %} {"key": "{{ technique.name }}"}, {% endfor %}]
+    },
+    {% endfor %}
 ];
-var data3 = [
+var induction_techniques = [
+    {% for subcategory in induction_techniques|get_keys %}
     {
-	"key": "In-silico",
-	"values": [{% for t in insilico_techniques %} {"key": "{{ t.name }}"}, {% endfor %}]
-    }
+	"key": "{{ subcategory.name }}",
+	"values": [{% for technique in induction_techniques|get_item:subcategory %} {"key": "{{ technique.name }}"}, {% endfor %}]
+    },
+    {% endfor %}
+];
+var insilico_techniques = [
+    {% for subcategory in insilico_techniques|get_keys %}
+    {
+	"key": "{{ subcategory.name }}",
+	"values": [{% for technique in insilico_techniques|get_item:subcategory %} {"key": "{{ technique.name }}"}, {% endfor %}]
+    },
+    {% endfor %}
 ];
 
-$('.techniques1.listTree').listTree(data1, {'startCollapsed': true});
-$('.techniques2.listTree').listTree([], {'startCollapsed': true});
-$('.techniques3.listTree').listTree([], {'startCollapsed': true});
+$('.techniques1.listTree').listTree(binding_techniques, {'startCollapsed': true, });
+$('.techniques2.listTree').listTree(induction_techniques, {'startCollapsed': true, });
+$('.techniques3.listTree').listTree(insilico_techniques, {'startCollapsed': true, });
+
 
 function bind_selectors(select_picker, list_tree)
 {
@@ -239,16 +243,13 @@ function bind_selectors(select_picker, list_tree)
 	var new_val = $(select_picker).val();
 	switch(new_val) {
 	case 'b':
-	    $(list_tree).listTree('update', data1, {'startCollapsed': true});
+	    $(list_tree).listTree('update', binding_techniques, {'startCollapsed': true});
 	    break;
 	case 'i':
-	    $(list_tree).listTree('update', data2, {'startCollapsed': true});
+	    $(list_tree).listTree('update', induction_techniques, {'startCollapsed': true});
 	    break;
 	case 'is':
-	    $(list_tree).listTree('update', data3, {'startCollapsed': true});
-            break;
-        case 'na':
-            $(list_tree).listTree('update', [])
+	    $(list_tree).listTree('update', insilico_techniques, {'startCollapsed': true});
             break;
 	}
     });
@@ -259,9 +260,9 @@ bind_selectors('#selectpicker2', '.techniques2.listTree');
 bind_selectors('#selectpicker3', '.techniques3.listTree');
 
 $('#browse_form').on('click', '.btn', function(e) {
-    $('#selectionJSON1').val(JSON.stringify($('.techniques1.listTree').data('listTree').selected));
-    $('#selectionJSON2').val(JSON.stringify($('.techniques2.listTree').data('listTree').selected));
-    $('#selectionJSON3').val(JSON.stringify($('.techniques3.listTree').data('listTree').selected));
+  $('#selectionJSON1').val(JSON.stringify($('.techniques1.listTree').data('listTree').selected));
+  $('#selectionJSON2').val(JSON.stringify($('.techniques2.listTree').data('listTree').selected));
+  $('#selectionJSON3').val(JSON.stringify($('.techniques3.listTree').data('listTree').selected));
 });
 
 // selectpicker initialize

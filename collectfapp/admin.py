@@ -14,7 +14,7 @@ class PublicationAdmin(admin.ModelAdmin):
 admin.site.register(Publication, PublicationAdmin)
 
 class ExperimentalTechniqueAdmin(admin.ModelAdmin):
-    list_display = ('name', 'technique_category', 'technique_subcategory')
+    list_display = ('name', )
 admin.site.register(ExperimentalTechnique, ExperimentalTechniqueAdmin)
 
 # register rest of models

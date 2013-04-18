@@ -130,6 +130,7 @@ INSTALLED_APPS = (
     'collectfapp',
     'browseapp',
     'django.contrib.webdesign',
+    'django_extensions',
 )
 
 # A sample logging configuration. The only tangible logging
