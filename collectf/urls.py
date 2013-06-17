@@ -11,6 +11,7 @@ import collectfapp.curationview as curationview
 import collectfapp.editcurationview as editcurationview
 import collectfapp.viewcurationview as viewcurationview
 import browseapp.views
+import browseapp.export_db
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -63,10 +64,14 @@ urlpatterns = patterns('',
     url(r'^browse_tf_family/(?P<TF_family_id>\d+)$', browseapp.views.browse_by_TF_family),
     # browse by TF
     url(r'^browse_tf/(?P<TF_id>\d+)$', browseapp.views.browse_by_TF),
+    # browse site
+    url(r'^browse_site/(?P<site_instance_id>\d+)$', browseapp.views.browse_by_site),
     # export fasta/csv
     url(r'^export_sites/$', browseapp.views.export_sites),
     # database statistics
     url(r'^db_stats/$', browseapp.views.curation_stats),
+    # export ncbi
+    url(r'^export_db/$', browseapp.export_db.export_db),
             
 )
 

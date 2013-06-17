@@ -152,6 +152,13 @@ def browse_by_TF(request, TF_id):
     return render(request, "browse_tf.html", response_dict,
                   context_instance=RequestContext(request))
 
+def browse_by_site(request, site_instance_id):
+    """Handler for browsing site instances"""
+    site_instance = models.SiteInstance.objects.get(site_id=site_instance_id)
+    response_dict = {'site_instance': site_instance}
+    return render(request, "browse_site.html", response_dict,
+                  context_instance=RequestContext(request))
+
 def curation_stats(request):
     """Handler for curation statistics page. Count the number of curations/sites for
     each TF and species in the database, pass dictionary to the HTML template"""
@@ -192,15 +199,20 @@ def export_sites(request):
     response['Content-Disposition'] = 'attachment;filename="%s"' % filename
     # write all sites to file
     if export_format == 'csv':
-        response.write('\t'.join(['genome', 'site_strand', 'site_start', 'site_end', 'site_seq', 'techniques']))
+        response.write('\t'.join(['genome', 'site_start', 'site_end', 'site_strand', 'site_seq', 'regulated_genes', 'references']))
         response.write('\n')
     for site in sites:
         response.write(site.to_fasta() if export_format=='fasta' else site.to_csv())
         if export_format == 'csv':
+            """
             techniques = []
             for csi in site.curation_siteinstance_set.all():
                 techniques.append(', '.join(t.name for t in csi.curation.experimental_techniques.all()) + '(%s)' % csi.curation.publication.pmid)
             response.write('\t' + '\t'.join(techniques))
+            """
+            regulations = models.Regulation.objects.filter(curation_site_instance__site_instance=site)
+
+            response.write('\t' + ','.join(reg.gene.name for reg in regulations))
             response.write('\n')
     return response
 
