@@ -177,10 +177,18 @@ def curation_stats(request):
             curation_stats[TF.name][sp.name] = num_curations
             curation_stats2[TF.name][sp.name]= num_sites
 
-    response_dict = dict(curation_stats=curation_stats,
-                         curation_stats2=curation_stats2,
-                         TFs = [tf.name for tf in all_TFs],
-                         species = [sp.name for sp in all_species])
+    response_dict = dict(
+        number_TFs = len(all_TFs),
+        number_species = len(all_species),
+        number_curations = len(models.Curation.objects.all()),
+        number_sites = len(models.SiteInstance.objects.all()),
+        number_publications = len(models.Publication.objects.all()),
+        pub_completed = '%.1f' % (len(models.Publication.objects.filter(curation_complete=True)) * 100.0 /
+                                  len(models.Publication.objects.all())),
+        curation_stats=curation_stats,
+        curation_stats2=curation_stats2,
+        TFs = [tf.name for tf in all_TFs],
+        species = [sp.name for sp in all_species])
     
     return render(request, "database_stats.html", response_dict,
                   context_instance=RequestContext(request))
