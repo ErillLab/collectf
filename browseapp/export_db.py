@@ -8,7 +8,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 import collectfapp
 import views
-
+import utils
 
 @login_required
 def export_db(request):
@@ -51,8 +51,8 @@ def export2tsv(request):
         fields.append(', '.join(regulated_genes) if regulated_genes else 'N/A')
         fields.append(csi.curation.publication.pmid)             # publication PMID
         fields.append(', '.join(tech.name for tech in csi.curation.experimental_techniques.all())) # tecniques
-        fields.append('CollecTF:EXPSITE_%s' % utils.id2dbxref(site_instance.id)),
-        fields.append('collectf.umbc.edu/' + reverse('browseapp.views.browse_by_site', kwargs={'dbxref':utils.id2dbxref(site_instance.id)})),
+        fields.append('CollecTF:EXPSITE_%s' % utils.id2dbxref(int(csi.site_instance.site_id))),
+        fields.append('collectf.umbc.edu' + reverse('browseapp.views.browse_by_site', kwargs={'dbxref_id':utils.id2dbxref(int(csi.site_instance.site_id))})),
         line = separator.join(fields)
         line = re.sub('[\n\r]', ' ', line) # remove newlines
 

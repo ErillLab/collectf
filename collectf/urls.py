@@ -65,7 +65,7 @@ urlpatterns = patterns('',
     # browse by TF
     url(r'^browse_tf/(?P<TF_id>\d+)$', browseapp.views.browse_by_TF),
     # browse site
-    url(r'^EXPSITE_(?P<dbxref>\d+)$', browseapp.views.browse_by_site),
+    url(r'^expsite_(?P<dbxref_id>\w+)$', browseapp.views.browse_by_site),
            
     # export fasta/csv
     url(r'^export_sites/$', browseapp.views.export_sites),

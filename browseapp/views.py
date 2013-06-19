@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 
+import utils
 import models
 import fetch
 import forms
@@ -152,8 +153,9 @@ def browse_by_TF(request, TF_id):
     return render(request, "browse_tf.html", response_dict,
                   context_instance=RequestContext(request))
 
-def browse_by_site(request, site_instance_id):
+def browse_by_site(request, dbxref_id):
     """Handler for browsing site instances"""
+    site_instance_id = utils.dbxref2id(dbxref_id)
     site_instance = models.SiteInstance.objects.get(site_id=site_instance_id)
     response_dict = {'site_instance': site_instance}
     return render(request, "browse_site.html", response_dict,
