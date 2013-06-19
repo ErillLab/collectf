@@ -18,7 +18,7 @@ def export_db(request):
     
 
 def export2tsv(request):
-    filename = 'collectf_db_export.csv'
+    filename = 'collectf_db_export.tab'
     separator = '\t'
     tsv_file = HttpResponse(content_type='application/download')
     tsv_file['Content-Disposition'] = 'attachment;filename="%s"' % filename
@@ -29,12 +29,11 @@ def export2tsv(request):
                                    'end_pos',
                                    'strand',
                                    'sequence',
-                                   'regulated_genes',
-                                   'reference (PMID)',
-                                   'techniques used for site identification',
-                                   'experimental process',
-                                   'curation notes',
-                                   'link to site instance'
+                                   'regulated_genes (locus_tag)',
+                                   'PMID',
+                                   'Experimental evidence',
+                                   'DBXRef',
+                                   'DBXRef_link'
                                    ]))
     tsv_file.write('\n')
 
@@ -48,13 +47,12 @@ def export2tsv(request):
         fields.append('%d' % csi.site_instance.end)                     # site end
         fields.append('%d' % csi.site_instance.strand)                  # site strand
         fields.append(csi.site_instance.seq)                     # site sequence
-        regulated_genes = ['%s(%s)' % (reg.gene.name, reg.gene.locus_tag) for reg in csi.regulation_set.all() if reg.evidence_type=="exp_verified"]
+        regulated_genes = [reg.gene.locus_tag for reg in csi.regulation_set.all() if reg.evidence_type=="exp_verified"]
         fields.append(', '.join(regulated_genes) if regulated_genes else 'N/A')
         fields.append(csi.curation.publication.pmid)             # publication PMID
         fields.append(', '.join(tech.name for tech in csi.curation.experimental_techniques.all())) # tecniques
-        fields.append(csi.curation.experimental_process)
-        fields.append(csi.curation.notes)
-        fields.append('http://' + request.get_host() + reverse('browseapp.views.browse_by_site', kwargs={'site_instance_id':csi.site_instance.site_id}))
+        fields.append('CollecTF:EXPSITE_%s' % utils.id2dbxref(site_instance.id)),
+        fields.append('collectf.umbc.edu/' + reverse('browseapp.views.browse_by_site', kwargs={'dbxref':utils.id2dbxref(site_instance.id)})),
         line = separator.join(fields)
         line = re.sub('[\n\r]', ' ', line) # remove newlines
 
