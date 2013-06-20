@@ -112,7 +112,19 @@ class Gene(models.Model):
 
 class Genome(models.Model):
     GENOME_TYPE = (("chromosome", "chromosome"), ("plasmid", "plasmid"))
-    genome_accession = models.CharField(max_length=20, primary_key=True)
+
+    
+    genome_id = models.AutoField(primary_key=True)
+
+    """from S.Lott@stackoverflow: The formal primary key should always be a surrogate
+    key. Never anything else. [Strong words. Been database designer since the
+    1980's. Important lessoned learned is this: everything is changeable, even when
+    the user's swear on their mother's graves that the value cannot be changed is is
+    truly a natural key that can be taken as primary. It isn't primary. Only
+    surrogates can be primary.]"""
+    genome_accession = models.CharField(max_length=20, unique=True)
+
+    #genome_accession = models.CharField(max_length=20, primary_key=True)
     #genome_type = models.CharField(max_length=20, choices=GENOME_TYPE)
     sequence = models.TextField()
     GC_content = models.FloatField()
