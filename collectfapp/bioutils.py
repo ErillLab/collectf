@@ -16,24 +16,28 @@ def get_pubmed(pmid):
         print 'err'
         return None
 
-def get_seq_rec(accession, db):
-    """Base function to retrieve genome or TF sequence record from NCBI database"""
+def get_genome(accession):
+    """Retrieve genome from NCBI database"""
     try:
-        h = Entrez.efetch(db=db, rettype="gb", retmode="text", id=accession)
-        seq_record = SeqIO.read(h, "gb")
+        print accession
+        h = Entrez.efetch(db='nuccore', id=accession, retmode='gbwithparts', rettype='text')
+        seq_record = SeqIO.read(h, 'gb')
         h.close()
         return seq_record
     except:
-        print 'err2'
+        print 'Something went wrong during refseq retrieval'
         return None
-
-def get_genome(accession):
-    """Retrieve genome from NCBI database"""
-    return get_seq_rec(accession, db="nuccore")
 
 def get_TF(accession):
     """Retrieve transcription factor from NCBI database"""
-    return get_seq_rec(accession, db="protein")
+    try:
+        h = Entrez.efetch(db='protein', id=accession, retmode='gb', rettype='text')
+        seq_record = SeqIO.read(h, 'gb')
+        h.close()
+        return seq_record
+    except:
+        print 'Something went wrong during TF sequence retrieval'
+        return None
 
 
 def get_gene_id(feature):

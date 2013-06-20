@@ -80,8 +80,9 @@ class GenomeForm(forms.Form):
     
     def clean_genome_accession(self):
         genome_accession = self.cleaned_data['genome_accession'].strip()
-        # remove version
-        genome_accession = genome_accession.split('.')[0]
+        if '.' not in genome_accession:
+            msg = 'Please enter RefSeq accession number with version number'
+            raise forms.ValidationError(msg)
         try: # to retrieve genome from database (if exists)
             g = Genome.objects.get(genome_accession=genome_accession)
         except Genome.DoesNotExist: # try to retrieve from NCBI database

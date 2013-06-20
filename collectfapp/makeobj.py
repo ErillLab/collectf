@@ -44,8 +44,7 @@ def make_genome(genome_record):
     strain, crt = Strain.objects.get_or_create(taxonomy_id=strain_taxon,
                                                defaults={'name':org})
     # create genome object
-    g = Genome(genome_accession=genome_record.name,
-               #genome_type=None,
+    g = Genome(genome_accession=genome_record.id,
                sequence=genome_record.seq.tostring(),
                GC_content=gc,
                strain=strain)
@@ -55,7 +54,7 @@ def make_all_genes(genome_record):
     """Given genome record from NCBI db, create gene objects for all genes in
     the genome"""
     genes = bioutils.get_genes(genome_record)
-    genome = Genome.objects.get(genome_accession=genome_record.name)
+    genome = Genome.objects.get(genome_accession=genome_record.id)
     assert genome
     for g in genes:
         Gene(genome=genome, **g).save()
