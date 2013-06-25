@@ -5,7 +5,7 @@ import bioutils
 from makeobj import *
 import sitesearch
 from django.utils.safestring import mark_safe
-
+import re
 
 class PublicationForm(forms.Form):
     """Publication selection form"""
@@ -202,17 +202,76 @@ class TechniquesForm(forms.Form):
 
 class SiteReportForm(forms.Form):
     """Form to input the list of sites reported in the paper"""
-    sites = forms.CharField(widget=forms.Textarea,
-                            label="")
+    motif_associated = forms.BooleanField(required=False,
+                                          initial=True,
+                                          label="Reported sites are motif associated.",
+                                          help_text = """This checkbox should be unchecked if reported sequences are not actual sites,
+                                          but sequences that have binding sites 'somewhere' in them.""")
+    
+    is_coordinate = forms.BooleanField(initial=False, required=False,
+                                       label="Binding sequence coordinates are reported in the paper.",
+                                       help_text = """If the paper reports coordinates instead of actual sequences, check this
+                                       option. Input coordinates for all sequences
+                                       below (one for each line). Each line should
+                                       have start and end positions (and intensity
+                                       values for Chip-Seq papers). Fields can be
+                                       tab, comma or space separated.""")
 
-    def clean_sites(self):
-        sites_cd = self.cleaned_data['sites']
-        sites = sitesearch.parse_site_input(sites_cd)
-        if not sites:
-            raise forms.ValidationError("ambiguous DNA sequence")
-        return sites_cd
-        
+    is_chip_seq_data = forms.BooleanField(initial=False, required=False,
+                                          label="This paper reports Chip-Seq data",
+                                          help_text="""If the paper reports sequences/coordinates identified using Chip-Seq, check this
+                                          box. A few extra fields will be populated""")
+    
+    # fields about chip-seq data. To be used only if data is chip-seq
+    #peak_intensity = forms.FloatField(required=False, label="Peak intensity")
+    peak_calling_method = forms.CharField(required=False, label="Peak calling method")
+    assay_conditions = forms.CharField(required=False, label="Assay conditions", widget=forms.Textarea)
+    method_notes = forms.CharField(required=False, label="Method notes", widget=forms.Textarea)
+    
+                                          
+    sites = forms.CharField(required=True, widget=forms.Textarea, label="Sites") # fill help text with js
 
+
+    def clean(self):
+        cleaned_data = super(SiteReportForm, self).clean()
+        if "sites" not in cleaned_data:
+            return  # raise form validation error
+
+        print cleaned_data
+        c_motif_associated = cleaned_data.get("motif_associated")
+        c_is_coordinate = cleaned_data.get("is_coordinate")
+        if c_motif_associated:
+            # Reported sites are motif associated. In other words, they are true
+            # binding sites that TF binds, not a arbitrarily long sequence (that have
+            # the actual binding site somewhere in it) identified using Chip-Seq or
+            # some other experimental method.
+            sites_cd = cleaned_data.get("sites")
+            sites = sitesearch.parse_site_input(sites_cd)
+            if not sites:
+                raise forms.ValidationError("ambiguous DNA sequence")
+        else:
+            # means the site is not a true site, it can be a few 100s bp and have site somewhere in it.
+            if not c_is_coordinate: # reported text is a list of sequences
+                sites_cd = cleaned_data.get("sites")
+                sites = sitesearch.parse_site_input(sites_cd)
+                if not sites:
+                    raise forms.ValidationError("ambiguous DNA sequence")
+            else:  # reported text is a list of coordinates for each sequences.
+                sites_cd = cleaned_data.get("sites")
+                while sites_cd[-1] in "\r\n\t ":
+                    sites_cd = sites_cd[:-1]
+                coordinates = [re.split("[\t ,]+", line) for line in re.split("[\r\n]+", sites_cd)]
+                print coordinates
+                if any(len(coordinates[i]) != 2 for i in xrange(len(coordinates))):
+                    raise forms.ValidationError("""Invalid coordinate input, all instances should have 2 fields (start, end). If it is
+                                                Chip-Seq data, they may contain intensity value as well
+                                                (i.e. start-end-intensity)""")
+                if any(int(coor[0]) >= int(coor[1]) for coor in coordinates):
+                    raise forms.ValidationError("Invalid coordinates")
+                
+        return self.cleaned_data
+
+            
 class SiteExactMatchForm(forms.Form):
     """Form to select and match reported sites to their equivalents in the
     genome. This form displays only exact matches (i.e. ones that is present in

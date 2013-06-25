@@ -6,12 +6,14 @@
 <div id="div_{{ field.auto_id }}" class="control-group {% if field.errors %}error{% endif %} {% if field.css_classes %} {{ field.css_classes }}{% endif %}">
 
   {% if field.label and not field|css_class == "checkboxinput" %}
+  <div class="">
   <label for="{{ field.auto_id }}" class="control-label {% if field.field.required %}required-field{% endif %}">
     {{ field.label|safe }}
   </label>
+  </div>
   {% endif %}
 
-
+  
   <div class="controls">
     {% if field|css_class == "checkboxselectmultiple" %}
     {% include "bootstrap/_field_errors_block.html" %}

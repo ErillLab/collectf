@@ -5,7 +5,7 @@ From Django docs:
 Here's the basic workflow for how a user would use a wizard:
 
 1) The user visits the first page of the wizard, fills in the form and submits it.
-2) The server validates the data. If it's invalid, the form is displayed again,
+n2) The server validates the data. If it's invalid, the form is displayed again,
 with error messages. If it's valid, the server saves the current state of the
 wizard in the backend and redirects to the next step.
 3) Step 1  and 2 repeat, for every subsequent form in the wizard.
@@ -110,7 +110,9 @@ def site_exact_match_get_form(wiz, form):
     # Dynamically add fields to site search results step.
     sites = sutils.sget(wiz.request.session, 'sites')
     site_match_choices = sutils.sget(wiz.request.session, 'site_match_choices')
+
     for sid, matches in site_match_choices.items(): # for all matches belong to a site
+        
         label = mark_safe('<span class="sequence">' + sites[sid] + '</span>')
         choices = populate_match_choices(sites[sid], matches, is_exact=True)
         # make the form field
@@ -124,6 +126,7 @@ def site_soft_match_get_form(wiz, form):
     sites = sutils.sget(wiz.request.session, 'sites')
     # soft site matches: {sid: {mid: SiteMatch}}
     soft_site_match_choices = sutils.sget(wiz.request.session, 'soft_site_match_choices')
+
     # exact site matches: {sid: SiteMatch} -- they're already matched in prev form
     exact_site_matches = sutils.sget(wiz.request.session, 'exact_site_matches')
     for sid, matches in soft_site_match_choices.items():
@@ -146,11 +149,19 @@ def site_regulation_get_form(wiz, form):
     soft_site_matches = sutils.sget(wiz.request.session, 'soft_site_matches')
 
     from templatetags import utils
-    for sid,match in exact_site_matches.items() + soft_site_matches.items():
+    all_site_matches = []
+    all_site_matches += exact_site_matches.items() if exact_site_matches else []
+    all_site_matches += soft_site_matches.items() if soft_site_matches else []
+    
+    for sid,match in all_site_matches:
         choices = []  # list of genes to the site match
         for g in match.nearby_genes:
             choices.append((g.gene_id, '%s (%s): %s' % (g.locus_tag, g.name, g.description)))
-        form.fields[sid] = forms.MultipleChoiceField(label=match.match.seq,
+
+        label = match.match.seq if len(match.match.seq) <= 25 else 'loc %s %d,%d' % ('+' if match.match.strand == 1 else '-',
+                                                                                    match.match.start,
+                                                                                    match.match.end)
+        form.fields[sid] = forms.MultipleChoiceField(label=label,
                                                      choices=choices, required=False,
                                                      widget=forms.CheckboxSelectMultiple,
                                                      help_text=utils.site_match_diagram(match))
@@ -217,13 +228,38 @@ def site_report_process(wiz, form):
     # read genome from session data
     genome = sutils.sget(wiz.request.session, 'genome')
     genes = models.Gene.objects.filter(genome=genome).order_by('start')
-    # get reported sites -- list of (sid, site)
-    sites = sitesearch.parse_site_input(form.cleaned_data['sites'])
-    # find exact matches
-    site_match_choices = sitesearch.match_all_exact(genome, genes, sites)
-    # put sites and site matches into session data
-    sutils.sput(wiz.request.session, 'site_match_choices', site_match_choices)
-    sutils.sput(wiz.request.session, 'sites', sites)
+    if form.cleaned_data.get('motif_associated') or not form.cleaned_data.get('is_coordinate'):
+        print 'sequence data'
+        # get reported sites -- list of (sid, site)
+        sites = sitesearch.parse_site_input(form.cleaned_data['sites'])
+        # find exact matches
+        site_match_choices = sitesearch.match_all_exact(genome, genes, sites)
+        # put sites and site matches into session data
+        sutils.sput(wiz.request.session, 'site_match_choices', site_match_choices)
+        sutils.sput(wiz.request.session, 'sites', sites)
+        
+    else: # coordinates
+        print 'coordinate data'
+        coordinate_text = form.cleaned_data['sites']
+        while coordinate_text[-1] in "\r\n\t ":
+            coordinate_text = coordinate_text[:-1]
+        coordinates = [re.split("[\t ,]+", line) for line in re.split("[\r\n]+", coordinate_text)]
+        coordinates = [(int(x[0]), int(x[1])) for x in coordinates]
+        
+        sites, exact_site_matches = sitesearch.match_all_exact_coordinates(genome, genes, coordinates)
+        
+        sutils.sput(wiz.request.session, 'exact_site_matches', exact_site_matches)
+        sutils.sput(wiz.request.session, 'sites', sites)
+        sutils.sput(wiz.request.session, 'sotf_site_matches', {})
+        sutils.sput(wiz.request.session, 'not_matched_sites', [])
+        sutils.sput(wiz.request.session, 'site_match_choices', {})
+        sutils.sput(wiz.request.session, 'soft_site_match_choices', {})
+
+        print wiz.form_list
+        #del wiz.form_list['4']
+        #del wiz.form_list['5']
+
+            
     
 def site_exact_match_process(wiz, form):
     """In the form, reported sites and their matches are displayed. For some
@@ -322,6 +358,7 @@ def techniques_done(wiz, form, **kwargs):
 def site_report_done(wiz, form, **kwargs):
     pass
 
+
 def site_exact_match_done(wiz, form, **kwargs):
     """Get data from exact site match form"""
     pass
@@ -366,7 +403,11 @@ def site_match_done(wiz, curation, regulations):
     soft_site_matches = sutils.sget(wiz.request.session, 'soft_site_matches')
     genome = sutils.sget(wiz.request.session, 'genome')  # get genome
     # combine exact and soft site matches
-    all_site_matches = dict(exact_site_matches.items() + soft_site_matches.items())
+    all_site_matches = []
+    all_site_matches += exact_site_matches.items() if exact_site_matches else []
+    all_site_matches += soft_site_matches.items() if soft_site_matches else []
+    all_site_matches = dict(all_site_matches)
+    
     for sid, match in all_site_matches.items():
         # create SiteInstance object (or get if available)
         si, created  = models.SiteInstance.objects.get_or_create(
@@ -517,10 +558,19 @@ report gene expression.""",
         if sutils.sin(self.request.session, 'old_curation'):
              # this is a revision for an existing curation
              form_list.insert(0, None)
-             
-        genome_cd = genome_done(self, form_list[1], **kwargs)
-        techniques_cd = techniques_done(self, form_list[2], **kwargs)
-        curation_review_cd = curation_review_done(self, form_list[7], **kwargs)
+
+        print form_list
+        
+        head = lambda x: x[0]
+
+        genome_form = head([f for f in form_list if type(f) == GenomeForm])
+        genome_cd = genome_done(self, genome_form, **kwargs)
+
+        techniques_form = head([f for f in form_list if type(f) == TechniquesForm])
+        techniques_cd = techniques_done(self, techniques_form, **kwargs)
+
+        curation_review_form = head([f for f in form_list if type(f) == CurationReviewForm])
+        curation_review_cd = curation_review_done(self, curation_review_form, **kwargs)
 
         # find curator
         curator = models.Curator.objects.get(user=self.request.user)
@@ -540,13 +590,18 @@ report gene expression.""",
                                    confidence=curation_review_cd['confidence'],
                                    NCBI_submission_ready=curation_review_cd['NCBI_submission_ready'],
                                    curator=curator)
+
+
         curation.save()
 
         # add techniques
         for t in techniques_cd['techniques']:
             curation.experimental_techniques.add(t)
 
-        regulations = site_regulation_done(self, form_list[6], **kwargs)
+        curation.save()
+
+        site_regulation_form = head([f for f in form_list if type(f) == SiteRegulationForm])
+        regulations = site_regulation_done(self, site_regulation_form, **kwargs)
         # create matched site instances & regulations
         site_match_done(self, curation, regulations)
         # create not annotated sites objects
@@ -582,7 +637,6 @@ def paper_contains_no_data(cleaned_data):
 def curation(request):
     # clear session data from previous forms
 
-
     # If user selects the old curation and then go back, the session will have the
     # old_curation key in table, and it will cause trouble.
     if sutils.sin(request.session, 'old_curation'):
@@ -597,7 +651,14 @@ def curation(request):
                                    SiteExactMatchForm,
                                    SiteSoftMatchForm,
                                    SiteRegulationForm,
-                                   CurationReviewForm])
+                                   CurationReviewForm],
+                                  condition_dict = {'4': exact_site_match_form_condition,
+                                                    '5': inexact_site_match_form_condition})
 
     return view(request)
-                                   
+
+def exact_site_match_form_condition(wizard):
+    return sutils.sget(wizard.request.session,'site_match_choices')
+
+def inexact_site_match_form_condition(wizard):
+    return sutils.sget(wizard.request.session, 'soft_site_match_choices')

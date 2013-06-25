@@ -256,3 +256,8 @@ class ExperimentalTechniqueCategory(models.Model):
         return u'%s (%s)' % (self.name, self.main_category)
     
 
+class ChipValues(models.Model):
+    """This model was included in later versions of CollecTF, to be able to store
+    binding site data from Chip-Seq papers."""
+
+    pass

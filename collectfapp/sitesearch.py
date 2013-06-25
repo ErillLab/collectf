@@ -165,7 +165,24 @@ def locate_nearby_genes(genes, site_loc, dist_th=50):
            dist(genes[rhs_index], genes[rhs_index+1]) < dist_th):
         nearby_genes.append(genes[rhs_index+1])
         rhs_index += 1
-    return nearby_genes    
+    return nearby_genes
+
+def match_all_exact_coordinates(genome, genes, coordinates):
+    """Return sites and matches for chip-seq data. Session Data structures don't make
+    much sense, but it is this way to be in the same format with motif-associated
+    sites"""
+    
+    sites = {}
+    site_matches = {} # for all coordinates, there will be one exact match
+    for cid, coor in enumerate(coordinates):
+        start, end = coor
+        print start,end
+        match = Match(seq=genome.sequence[start-1:end-1], start=start, end=end, strand=1)
+        nearby_genes = locate_nearby_genes(genes, match)
+        sites[cid] = match.seq
+        site_matches[cid] = SiteMatch(match=match, nearby_genes=nearby_genes)
+    return sites, site_matches
+    
 
 def match_all_exact(genome, genes, sites):
     """For all sites in list, find exact matches on the genome"""
