@@ -36,6 +36,7 @@ class Curation_SiteInstanceAdmin(admin.ModelAdmin):
 class PublicationAdmin(admin.ModelAdmin):
     list_display = ('publication_id', 'pmid', 'title', 'assigned_to')
     list_filter = ('assigned_to', 'curation_complete', 'reported_TF', 'reported_species')
+    search_fields = ('pmid',)
 
 class ExperimentalTechniqueAdmin(admin.ModelAdmin):
     list_display = ('name', )
@@ -52,6 +53,10 @@ class GenomeAdmin(admin.ModelAdmin):
 class TFAdmin(admin.ModelAdmin):
     list_display = ('TF_id', 'name', 'family')
     list_filter = ('family',)
+
+class TFInstance(admin.ModelAdmin):
+    list_display = ('protein_accession', 'name')
+    list_filter = ('')
 
 # register edited models
 admin.site.register(Curation, CurationAdmin)
