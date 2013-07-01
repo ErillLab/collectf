@@ -35,7 +35,7 @@ def init_genome_form(curation):
 def get_used_techniques(curation):
     # return curation techniques
     ts = curation.experimental_techniques.all()
-    return [t.technique_id for t in ts]
+    return [str(t.technique_id) for t in ts]
 
 def init_techniques_form(curation):
     """Return techniques form data from old curation for new one."""
