@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 
 import utils
+import lasagna
 import models
 import fetch
 import forms
@@ -282,20 +283,30 @@ def get_sites_by_TF_species(request, TF, species, curation_site_instances):
     # group them by site instance?
     site_curation_dict, site_regulation_dict = group_curation_site_instances(curation_site_instances)
     site_sequences = set(csi.site_instance for csi in curation_site_instances)
-    # create weblogo for the list of sites
-    #weblogo_data = weblogo_uri(map(lambda x: x.seq, site_sequences))
+
     # if there is no site, message
     if not site_curation_dict and not site_regulation_dict:
         msg = "No site found for transcription factor %s in the genome of %s." % (TF.name, species.name)
         messages.info(request, msg)
+        return browse_get(request)
+
+    # use LASAGNA to align sites
+    aligned, idxAligned, strands = lasagna.LASAGNA(map(lambda s: str(s.seq.lower()), site_curation_dict.keys()), 0)
+    trimmed = lasagna.TrimAlignment(aligned)
+    trimmed = [s.upper() for s in trimmed]
+    # create weblogo for the list of sites
+    weblogo_data = weblogo_uri(trimmed)
 
     result_dict = {'site_curation_dict':site_curation_dict,
                    'site_regulation_dict':site_regulation_dict,
                    'TF':TF,
-                   'sp':species}
+                   'sp':species,
+                   'weblogo_image_data': weblogo_data,
+                   'aligned_sites': trimmed,
+                   }
     response_dict = dict(make_browse_response_dict().items() + result_dict.items())
                         
-    return render(request, "browse.html", response_dict,
+    return render(request, "browse_results.html", response_dict,
                   context_instance=RequestContext(request))
     
 

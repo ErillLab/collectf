@@ -1,95 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <!-- Bootstrap -->
-  <link href='http://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet' type='text/css'>
-  {% load static from staticfiles %}
-  <link href="{% static "bootstrap/css/bootstrap.min.css" %}" rel="stylesheet" media="screen">
-  <link href="{% static "font-awesome/css/font-awesome.min.css" %}" rel="stylesheet">
-  <link href="{% static "bootstrap/css/docs.css" %}" rel="stylesheet" media="screen">
-  <link href="{% static "bootstrap-listTree.css" %}" rel="stylesheet" type="text/css">
-  <link href="{% static "select2.css" %}" rel="stylesheet">
-  <link href="{% static "collectf.css" %}" rel="stylesheet">
+  <head>
+    <!-- Bootstrap -->
+    <link href='http://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet' type='text/css'>
+    {% load static from staticfiles %}
+    <link href="{% static "bootstrap/css/bootstrap.min.css" %}" rel="stylesheet" media="screen">
+    <link href="{% static "font-awesome/css/font-awesome.min.css" %}" rel="stylesheet">
+    <link href="{% static "bootstrap/css/docs.css" %}" rel="stylesheet" media="screen">
+    <link href="{% static "bootstrap-listTree.css" %}" rel="stylesheet" type="text/css">
+    <link href="{% static "select2.css" %}" rel="stylesheet">
+    <link href="{% static "collectf.css" %}" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
+    <script src="{% static "bootstrap/js/auxiliary.js" %}"></script>
+    <script src="{% static "bootstrap-select.min.js" %}"></script>
+    <script src="{% static "underscore-min.js" %}"></script>
+    <script src="{% static "bootstrap-listTree.js" %}"></script>
+    <script src="{% static "select2.min.js" %}"></script>
+    <script src="{% static "collectf.js" %}"></script>
 
 
-</head>
+    <div id="wrap">
+      <!-- header -->
+      <div class="navbar navbar-fixed-top">
+	<div class="navbar-inner">
+	  <div class="container-fluid">
+	    <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </a>
+            <a class="brand" href="{% url collectfapp.views.home %}">collecTF</a>
+	    <div class="nav-collapse collapse">
+              <p class="navbar-text pull-right">
+		{% if user.is_authenticated %}
+		logged in as {{user.username}} &nbsp; | &nbsp; 
+		<a href="{% url collectfapp.signupview.logout %}" class="navbar-link"> logout</a>
+		{% else %}
+		<a class="navbar-link" href="{% url collectfapp.signupview.login %}">login</a>
+		{% endif %}
+              </p>
+            </div><!--/.nav-collapse -->
+	  </div>
+	</div>
+      </div>
+      
+      <div class="container-fluid" id="main">
+	<!-- any messages? -->
+	{% for message in messages %}
+	<div class="alert alert-block alert-{{message.tags}}">
+	  <button type="button" class="close" data-dismiss="alert">x</button>
+	  {{ message }}
+	</div>
+	{% endfor %}
+	<!-- main stuff -->
+	{% block content %}
+	{% endblock %}
+      </div>
+    <div id="push"></div>
+    </div>
 
-<body>
-
-  <script src="http://code.jquery.com/jquery-latest.js"></script>
-  <script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
-  <script src="{% static "bootstrap/js/auxiliary.js" %}"></script>
-  <script src="{% static "bootstrap-select.min.js" %}"></script>
-  <script src="{% static "underscore-min.js" %}"></script>
-  <script src="{% static "bootstrap-listTree.js" %}"></script>
-  <script src="{% static "select2.min.js" %}"></script>
-  <script src="{% static "collectf.js" %}"></script>
 
 
-  <!-- header -->
-  <div class="navbar navbar navbar-fixed-top">
-    <div class="navbar-inner">
+    <div id="footer">
       <div class="container-fluid">
-	<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </a>
-        <a class="brand" href="{% url collectfapp.views.home %}">collecTF</a>
-	<div class="nav-collapse collapse">
-          <p class="navbar-text pull-right">
-	    {% if user.is_authenticated %}
-            logged in as {{user.username}} &nbsp; | &nbsp; 
-	    <a href="{% url collectfapp.signupview.logout %}" class="navbar-link"> logout</a>
-	    {% else %}
-	    <a class="navbar-link" href="{% url collectfapp.signupview.login %}">login</a>
-	    {% endif %}
-          </p>
-        </div><!--/.nav-collapse -->
+	<div class="row-fluid">
+	  <div class="span9">
+	    <p>Please send comments to sefa1@umbc.edu. For help, visit
+	      <a href="http://erilllab.biosci.umbc.edu/wiki/index.php5/CollecTF">
+		CollecTF wiki</a>.
+	    </p>
+	    <hr />
+	    <p class="muted">
+	      <small>
+		This material is based upon work supported by the National Science Foundation under Grant Number MCB-1158056.
+		Any opinions, findings, and conclusions or recommendations expressed in this material
+		are those of the author(s) and do not necessarily reflect the views of the National
+		Science Foundation.</small></p>
+	  </div>
+
+	  <div class="span3">
+	    <p class="text-right">
+	      {% load static from staticfiles %}
+	      <a href="http://compbio.umbc.edu"><img src="{% static "lablogo.png" %}"></a>
+	    </p>
+	  </div>
+	</div>
       </div>
     </div>
-  </div>
 
-  <div class="container-fluid">
-    <!-- any messages? -->
-    {% for message in messages %}
-    <div class="alert alert-block alert-{{message.tags}}">
-      <button type="button" class="close" data-dismiss="alert">x</button>
-      {{ message }}
-    </div>
-    {% endfor %}
-    <!-- main stuff -->
-    {% block content %}
-    {% endblock %}
-  </div>
-  
-  <footer class="footer">
-      <div class="row-fluid">
-	<div class="span9">
-	  <p>Please send comments to sefa1@umbc.edu. For help, visit
-	    <a href="http://erilllab.biosci.umbc.edu/wiki/index.php5/CollecTF">
-	      CollecTF wiki</a>.
-	  </p>
-	  <hr />
-	  <p class="muted">
-	    <small>
-	    This material is based upon work supported by the National Science Foundation under Grant Number MCB-1158056.
-	    Any opinions, findings, and conclusions or recommendations expressed in this material
-	    are those of the author(s) and do not necessarily reflect the views of the National
-	    Science Foundation.</small></p>
-	</div>
-
-	<div class="span3">
-	  <p class="text-right">
-	    {% load static from staticfiles %}
-	    <a href="http://compbio.umbc.edu"><img src="{% static "lablogo.png" %}"></a>
-	  </p>
-	</div>
-
-    </div>
-  </footer>
-
-
-</body>
+  </body>
 </html>
 

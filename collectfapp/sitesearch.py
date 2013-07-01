@@ -96,7 +96,7 @@ def soft_locate_site_strand(genome_seq, strand, site_seq, mismatch_th):
     # find all matches upto <mismatch_th> substitutions
     for m in regex.finditer(pattern, genome_seq, overlapped=True):
         matched_seq = m.group() if strand==1 else reverse_complement(m.group())
-        match = Match(seq=matched_seq, start=m.span()[0], end=m.span()[1], strand=strand)
+        match = Match(seq=matched_seq, start=m.span()[0], end=m.span()[1]-1, strand=strand)
         matches.append(match)
     return matches
 
@@ -174,14 +174,18 @@ def match_all_exact_coordinates(genome, genes, coordinates):
     
     sites = {}
     site_matches = {} # for all coordinates, there will be one exact match
+    peak_intensities = {} 
     for cid, coor in enumerate(coordinates):
-        start, end = coor
+        start = int(coor[0])
+        end = int(coor[1])
         print start,end
         match = Match(seq=genome.sequence[start-1:end-1], start=start, end=end, strand=1)
         nearby_genes = locate_nearby_genes(genes, match)
         sites[cid] = match.seq
         site_matches[cid] = SiteMatch(match=match, nearby_genes=nearby_genes)
-    return sites, site_matches
+        if len(coor) == 3:
+            peak_intensities[cid] = float(coor[2])
+    return sites, site_matches, peak_intensities
     
 
 def match_all_exact(genome, genes, sites):

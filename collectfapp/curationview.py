@@ -225,6 +225,19 @@ def techniques_process(wiz, form):
 
 
 def site_report_process(wiz, form):
+
+    if form.cleaned_data.get('motif_associated'):
+        sutils.sput(wiz.request.session, 'motif_associated', True)
+    else:
+        sutils.sput(wiz.request.session, 'motif_associated', False)
+    if form.cleaned_data.get('is_chip_seq_data'):
+        sutils.sput(wiz.request.session, 'chip_seq_data', True)
+        sutils.sput(wiz.request.session, 'peak_calling_method', form.cleaned_data['peak_calling_method'])
+        sutils.sput(wiz.request.session, 'assay_conditions', form.cleaned_data['assay_conditions'])
+        sutils.sput(wiz.request.session, 'method_notes', form.cleaned_data['method_notes'])
+    else:
+        sutils.sput(wiz.request.session, 'chip_seq_data', False)
+
     # read genome from session data
     genome = sutils.sget(wiz.request.session, 'genome')
     genes = models.Gene.objects.filter(genome=genome).order_by('start')
@@ -237,6 +250,7 @@ def site_report_process(wiz, form):
         # put sites and site matches into session data
         sutils.sput(wiz.request.session, 'site_match_choices', site_match_choices)
         sutils.sput(wiz.request.session, 'sites', sites)
+        sutils.sput(wiz.request.session, 'peak_intensities', {})
         
     else: # coordinates
         print 'coordinate data'
@@ -244,12 +258,12 @@ def site_report_process(wiz, form):
         while coordinate_text[-1] in "\r\n\t ":
             coordinate_text = coordinate_text[:-1]
         coordinates = [re.split("[\t ,]+", line) for line in re.split("[\r\n]+", coordinate_text)]
-        coordinates = [(int(x[0]), int(x[1])) for x in coordinates]
         
-        sites, exact_site_matches = sitesearch.match_all_exact_coordinates(genome, genes, coordinates)
+        sites, exact_site_matches, peak_intensities = sitesearch.match_all_exact_coordinates(genome, genes, coordinates)
         
         sutils.sput(wiz.request.session, 'exact_site_matches', exact_site_matches)
         sutils.sput(wiz.request.session, 'sites', sites)
+        sutils.sput(wiz.request.session, 'peak_intensities', peak_intensities)
         sutils.sput(wiz.request.session, 'sotf_site_matches', {})
         sutils.sput(wiz.request.session, 'not_matched_sites', [])
         sutils.sput(wiz.request.session, 'site_match_choices', {})
@@ -401,22 +415,42 @@ def site_match_done(wiz, curation, regulations):
     sites = sutils.sget(wiz.request.session, 'sites')
     exact_site_matches = sutils.sget(wiz.request.session, 'exact_site_matches')
     soft_site_matches = sutils.sget(wiz.request.session, 'soft_site_matches')
+    peak_intensities = sutils.sget(wiz.request.session, 'peak_intensities') # if any
     genome = sutils.sget(wiz.request.session, 'genome')  # get genome
     # combine exact and soft site matches
     all_site_matches = []
     all_site_matches += exact_site_matches.items() if exact_site_matches else []
     all_site_matches += soft_site_matches.items() if soft_site_matches else []
     all_site_matches = dict(all_site_matches)
+
+    is_motif_associated = sutils.sget(wiz.request.session, 'motif_associated')
+    is_chip_seq_data = sutils.sget(wiz.request.session, 'chip_seq_data')
+
+    #create ChipSeqInfo object if data is chip_seq data
+    chip_seq_data = None
+    if is_chip_seq_data:
+        peak_calling_method = sutils.sget(wiz.request.session, 'peak_calling_method')
+        assay_conditions = sutils.sget(wiz.request.session, 'assay_conditions')
+        method_notes = sutils.sget(wiz.request.session, 'method_notes')
+        chip_seq_data = models.ChipSeqInfo(peak_calling_method=peak_calling_method,
+                                           assay_conditions=assay_conditions,
+                                           method_notes=method_notes)
+        chip_seq_data.save()
     
     for sid, match in all_site_matches.items():
         # create SiteInstance object (or get if available)
         si, created  = models.SiteInstance.objects.get_or_create(
             genome=genome, start=match.match.start, end=match.match.end,
-            strand=match.match.strand, seq=sites[sid])
+            strand=match.match.strand, seq=match.match.seq)
+
                 
         # create curation_siteinstance object (through relation)
         cs = models.Curation_SiteInstance(curation=curation, site_instance=si,
-                                          annotated_seq=match.match.seq)
+                                          annotated_seq=sites[sid],
+                                          is_motif_associated = is_motif_associated,
+                                          chipseq_info=chip_seq_data,
+                                          peak_intensity = peak_intensities.get(sid) if peak_intensities else None)
+                                          
         cs.save()
 
         # for site instance, add regulation information
@@ -429,8 +463,9 @@ def not_matched_sites_done(wiz, curation):
     """Create not matched site instances."""
     sites = sutils.sget(wiz.request.session, 'sites')
     not_matched_sites = sutils.sget(wiz.request.session, 'not_matched_sites')
-    for sid in not_matched_sites:
-        models.NotAnnotatedSiteInstance(sequence=sites[sid], curation=curation).save()
+    if not_matched_sites:
+        for sid in not_matched_sites:
+            models.NotAnnotatedSiteInstance(sequence=sites[sid], curation=curation).save()
   
 
 class CurationWizard(SessionWizardView):

@@ -5,21 +5,17 @@
 {% block content %}
 
 <div class="container">
-  
   <div class="span12">
 
     <div class="page-header" id="browse-form">
       <h2>Browse database</h2>
     </div>
     
-    <div class="container">
     <form id="browse_form" method="POST" action="{% url browseapp.views.browse %}">{% csrf_token %}
-      
-      <div class="page-header">
-      <h3>1) Select the transcription factor</h3>
-      </div>
-      
       <div id="form_TF">
+	<div class="page-header">
+	  <h3>1) Select the transcription factor</h3>
+	</div>
 	<div class="controls">
 	  <select class="select2" style="width:50%" name="TF" id="id_TF">
 	    {% for TF in TFs %}
@@ -29,11 +25,10 @@
 	</div>
       </div>
       
-      <div class="page-header">
-	<h3>2) Select the species</h3>
-      </div>
-
       <div id="form_species">
+	<div class="page-header">
+	  <h3>2) Select the species</h3>
+	</div>
 	<div class="controls">
 	  <select name="species" id="id_species" class="select2" style="width:50%">
 	    {% for sp in species %}
@@ -42,165 +37,86 @@
 	  </select>
 	</div>
       </div>
-      
-      <div class="page-header">
-      <h3>3) Filter binding sites by experimental techniques that they are
-      reported</h3> Filter transcription factor binding site search by experimental
-      methods that are used to report the sites. You can filter the search by
-      selecting particular categories and combine them using Boolean operators. You
-      can also select individual techniques by expanding the category that they are
-      under.
-      </div>
-      
-      <div class="row-fluid">
-	<div class="span3">
-	  <select name="main_category1" id="selectpicker1">
-	    <option value="b" selected="selected">Binding</option>
-	    <option value="i">Induction</option>
-	    <option value="is">In-silico</option>
-	  </select>
-	  <div class="row spacer"></div>
-	  <div class="techniques1 listTree"></div>
-	  <input type="hidden" name="tech1" id="selectionJSON1" value="">
-	</div>
-	
-	<div class="span1">
-	  <select name="boolean1" class="span12">
-	    <option value="and">and</option>
-	    <option value="or" selected="selected">or</option>
-	  </select>
-	</div>
-	
-	<div class="span3">
-	  <select name="main_category2" id="selectpicker2">
-	    <option value="b">Binding</option>
-	    <option value="i" selected="selected">Induction</option>
-	    <option value="is">In-silico</option>
-	  </select>
-	  <div class="row spacer"></div>
-	  <div class="techniques2 listTree"></div>
-	  <input type="hidden" name="tech2" id="selectionJSON2" value="">
-	</div>
-	
-	<div class="span1">
-	  <select name="boolean2" class="span12">
-	    <option value="and">and</option>
-	    <option value="or" selected="selected">or</option>
-	  </select>
-	</div>
-	
-	<div class="span3">
-	  <select name="main_category3" id="selectpicker3">
-	    <option value="b">Binding</option>
-	    <option value="i">Induction</option>
-	    <option value="is" selected="selected">In-silico</option>
-	  </select>
-	  <div class="row spacer"></div>
-	  <div class="techniques3 listTree"></div>
-	  <input type="hidden" name="tech3" id="selectionJSON3" value="">
-	</div>
-      </div>
-      
-      <div class="page-header">
-      <h3>4) Submit form</h3>
-      </div>
-      
-      <div class="row span6">
-      <input class="btn btn-large btn-block btn-info" type="submit" value="submit" />
-      </div>
 
+      <div id="form_techniques">
+	<div class="page-header">
+	  <h3>3) Filter binding sites by experimental techniques that they are
+	    reported</h3> Filter transcription factor binding site search by experimental
+	  methods that are used to report the sites. You can filter the search by
+	  selecting particular categories and combine them using Boolean operators. You
+	  can also select individual techniques by expanding the category that they are
+	  under.
+	</div>
+      
+	<div class="row-fluid">
+	  <div class="span3">
+	    <select name="main_category1" id="selectpicker1">
+	      <option value="b" selected="selected">Binding</option>
+	      <option value="i">Induction</option>
+	      <option value="is">In-silico</option>
+	    </select>
+	    <div class="row spacer"></div>
+	    <div class="techniques1 listTree"></div>
+	    <input type="hidden" name="tech1" id="selectionJSON1" value="">
+	  </div>
+	  
+	  <div class="span1">
+	    <select name="boolean1" class="span12">
+	      <option value="and">and</option>
+	      <option value="or" selected="selected">or</option>
+	    </select>
+	  </div>
+	  
+	  <div class="span3">
+	    <select name="main_category2" id="selectpicker2">
+	      <option value="b">Binding</option>
+	      <option value="i" selected="selected">Induction</option>
+	      <option value="is">In-silico</option>
+	    </select>
+	    <div class="row spacer"></div>
+	    <div class="techniques2 listTree"></div>
+	    <input type="hidden" name="tech2" id="selectionJSON2" value="">
+	  </div>
+	  
+	  <div class="span1">
+	    <select name="boolean2" class="span12">
+	      <option value="and">and</option>
+	      <option value="or" selected="selected">or</option>
+	    </select>
+	  </div>
+	  
+	  <div class="span3">
+	    <select name="main_category3" id="selectpicker3">
+	      <option value="b">Binding</option>
+	      <option value="i">Induction</option>
+	      <option value="is" selected="selected">In-silico</option>
+	    </select>
+	    <div class="row spacer"></div>
+	    <div class="techniques3 listTree"></div>
+	    <input type="hidden" name="tech3" id="selectionJSON3" value="">
+	  </div>
+	</div>
+      </div>
+      
+      <div id="form_submit">
+	<div class="page-header">
+	  <h3>4) Submit form</h3>
+	</div>
+	<div class="row span6">
+	  <input class="btn btn-large btn-block btn-info" type="submit" value="submit" />
+	</div>
+      </div>
     </form>
-    </div>
+
 
     <div class="row spacer"></div>
     <hr />
     <div class="row spacer"></div>
 
-    {% if site_curation_dict and site_regulation_dict %}
-    
-    <script type="text/javascript">
-      window.location.hash = '#results';
-    </script>
 
-    <h1 id="results">Collection of binding sites for {{ TF.name }} transcription factor in {{ sp.name }}</h1>
-
-
-    <!-- weblogo here 
-	 <div class="page-header" id="weblogo">
-	   <h2>Sequence logo</h2>
-	 </div>
-	 <img src="{{ weblogo_image_data }}">
-	 weblogo end -->
-
-
-    <div class="page-header" id="sites">
-      <h2>List of transcription factor binding sites</h2> For the selected transcription
-      factor and species, the list of curated binding sites in the database are displayed
-      below. The binding site is displayed as red bar. Genes that are reported to have
-      regulated by TF are colored with green.
-    </div>
-
-    {% load utils %}
-    <table class="table table-condensed table-borderless">
-      <thead>
-	<tr>
-	  <th width="20%">Site sequence</th>
-	  <th width="20%">Gene</th>
-	  <th width="40%">Function</th>
-	  <th width="20%">Curation</th>
-	</tr>
-      </thead>
-      <tbody>
-	{% for site in site_curation_dict|get_keys %}
-	<tr><td colspan="4"><hr /></td></tr>
-	<tr>
-	  <td colspan="3"><span class="sequence">{{ site.seq }}</span></td>
-	  <td>{% for cur in site_curation_dict|get_item:site %}
-	    <a href="{% url collectfapp.viewcurationview.view_curation cur.curation_id %}">[{{cur.curation_id}}]</a>{% if not forloop.last %}, {% endif %}
-	    {% endfor %}
-	  </td>
-	</tr>
-
-	<tr>
-	  <td colspan="4">
-	    <div>{% with regs=site_regulation_dict|get_item:site %} {{ regs|regulation_diagram:site }} {% endwith %}</div>
-	    <!-- <span class="sequence">{{ site.seq }}</span> -->
-	  </td>
-	</tr>
-
-	{% for reg in site_regulation_dict|get_item:site %}
-	<tr>
-	  <td></td>
-	  <td>{{reg.gene.name}} ({{ reg.gene.locus_tag }})</td>
-	  <td>{{reg.gene.description}}</td>
-	  <td></td>
-	</tr>
-	{% endfor %}
-        
-	{% endfor %}
-      </tbody>
-    </table>
-
-    <hr />
-    <div class="page-header" id="export">
-      <h2>Export</h2>
-      <p>Export the list of binding sites in csv or fasta formats.</p>
-      <p>
-	<form action="{% url browseapp.views.export_sites %}" method="POST">{% csrf_token %}
-	  {% for site in site_curation_dict|get_keys %}
-	  <input type="hidden" name="site_id" value="{{ site.site_id }}" />
-	  {% endfor %}
-	  <input type="submit" value="Download FASTA" class="btn btn-info btn-large" name="fasta">
-	  <input type="submit" value="Download CSV" class="btn btn-info btn-large" name="csv">
-	</form>
-      </p>
-    </div>
-
-    {% endif %}
-    
   </div>
 </div>
-
+    
 
 <script type="text/javascript">
   {% load utils %}

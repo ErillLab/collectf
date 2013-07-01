@@ -2,7 +2,7 @@
     font-family: Helvetica, Arial, sans-serif;
 }
 body {
-    padding-top: 60px;
+ 
 }
 textarea {
     font-family: monospace, Courier;
@@ -10,14 +10,28 @@ textarea {
 .sequence {
     font-family: monospace, Courier;
 }
-.footer {
-    margin-top: 70px;
-    padding: 40px;
+#footer {
+    padding-top: 20px;
+    bottom: 0;
     border-top: 1px solid #E5E5E5;
     background-color: whiteSmoke;
-}
-.footer p{
+
+ }
+
+#footer p{
     color: #777;
+}
+
+#wrap {
+
+}
+
+#main {
+    padding-top: 60px;
+}
+
+#push, #footer {
+    height: 140px;
 }
 
 .table-borderless td {
@@ -25,5 +39,40 @@ textarea {
 }
 
 .spacer {
-    margin-top: 20px; /* define margin as you see fit */
+    padding-top: 40px;
+}
+
+.grey {
+    color: #5A5A5A;
+}
+
+.myanchor {
+    display: block;
+    padding-top: 40px;
+}
+
+
+.bs-docs-sidenav {
+    width: 228px;
+    margin: 30px 0 0;
+    padding: 0;
+    background-color: #fff;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+    -webkit-box-shadow: 0 1px 4px rgba(0,0,0,.065);
+    -moz-box-shadow: 0 1px 4px rgba(0,0,0,.065);
+    box-shadow: 0 1px 4px rgba(0,0,0,.065);
+}
+
+
+.bs-docs-sidenav > .active > a {
+    position: relative;
+    z-index: 2;
+    padding: 9px 15px;
+    border: 0;
+    text-shadow: 0 1px 0 rgba(0,0,0,.15);
+    -webkit-box-shadow: inset 1px 0 0 rgba(0,0,0,.1), inset -1px 0 0 rgba(0,0,0,.1);
+    -moz-box-shadow: inset 1px 0 0 rgba(0,0,0,.1), inset -1px 0 0 rgba(0,0,0,.1);
+    box-shadow: inset 1px 0 0 rgba(0,0,0,.1), inset -1px 0 0 rgba(0,0,0,.1);
 }

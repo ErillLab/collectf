@@ -23,7 +23,7 @@ $(document).ready(function() {
     });
 
     // scroll page down a little bit
-    window.addEventListener("hashchange", function() { scrollBy(0, -50); });
+    //window.addEventListener("hashchange", function() { scrollBy(0, -50); });
 
     defaultSpeed = 200;
 
@@ -32,8 +32,14 @@ $(document).ready(function() {
     // Hide <is_it_sequence> field by default
     if ($("#id_3-motif_associated").is(":checked")) {
 	$("#id_3-is_coordinate").parent().parent().hide(defaultSpeed);
+	$("#id_3-is_coordinate").prop('checked', false);
 	$("#id_3-is_chip_seq_data").parent().parent().hide(defaultSpeed);
+	$("#id_3-is_chip_seq_data").prop('checked', false);
+	$("#id_3-peak_calling_method").parent().parent().hide(defaultSpeed);
+	$("#id_3-assay_conditions").parent().parent().hide(defaultSpeed);
+	$("#id_3-method_notes").parent().parent().hide(defaultSpeed);
     }
+
     
     if ($("#id_3-is_chip_seq_data").not(":checked")) {
 	$("#id_3-peak_intensity").parent().parent().hide(defaultSpeed);
@@ -41,6 +47,14 @@ $(document).ready(function() {
 	$("#id_3-assay_conditions").parent().parent().hide(defaultSpeed);
 	$("#id_3-method_notes").parent().parent().hide(defaultSpeed);
     }
+
+    if ($("#id_3-is_chip_seq_data").is(":checked")) {
+	$("#id_3-peak_intensity").parent().parent().show(defaultSpeed);
+	$("#id_3-peak_calling_method").parent().parent().show(defaultSpeed);
+	$("#id_3-assay_conditions").parent().parent().show(defaultSpeed);
+	$("#id_3-method_notes").parent().parent().show(defaultSpeed);
+    }
+
     
 
     // Based on whether <is_motif_associated> field is checked or not, hide/show
@@ -49,19 +63,25 @@ $(document).ready(function() {
 	if ($(this).is(":checked")) {
 	    $("#id_3-is_coordinate").parent().parent().hide(defaultSpeed);
 	    $("#id_3-is_chip_seq_data").parent().parent().hide(defaultSpeed);
+	    $("#id_3-peak_calling_method").parent().parent().hide(defaultSpeed);
+	    $("#id_3-assay_conditions").parent().parent().hide(defaultSpeed);
+	    $("#id_3-method_notes").parent().parent().hide(defaultSpeed);
 	} else {
 	    $("#id_3-is_coordinate").parent().parent().show(defaultSpeed);
 	    $("#id_3-is_chip_seq_data").parent().parent().show(defaultSpeed);
+
 	}
     });
 
     $("#id_3-is_chip_seq_data").on('change', function() {
 	if ($(this).is(":checked")) {
+	    $("#id_3-is_coordinate").prop("checked", true);
 	    $("#id_3-peak_intensity").parent().parent().show(defaultSpeed);
 	    $("#id_3-peak_calling_method").parent().parent().show(defaultSpeed);
 	    $("#id_3-assay_conditions").parent().parent().show(defaultSpeed);
 	    $("#id_3-method_notes").parent().parent().show(defaultSpeed);
 	} else {
+	    $("#id_3-is_coordinate").prop("checked", false);
 	    $("#id_3-peak_intensity").parent().parent().hide(defaultSpeed);
 	    $("#id_3-peak_calling_method").parent().parent().hide(defaultSpeed);
 	    $("#id_3-assay_conditions").parent().parent().hide(defaultSpeed);

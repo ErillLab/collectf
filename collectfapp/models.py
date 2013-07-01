@@ -179,8 +179,8 @@ class SiteInstance(models.Model):
     site_id = models.AutoField(primary_key=True)
     seq = models.TextField()
     genome = models.ForeignKey("Genome")
-    start = models.IntegerField() # genome start position
-    end = models.IntegerField()   # genome end position
+    start = models.IntegerField() # genome start position (0 index)
+    end = models.IntegerField()   # genome end position (end position! not the first position after site sequence, 0 index too.)
     strand = models.IntegerField(choices=Gene.STRAND) # genome strand (1 or -1)
 
     def __unicode__(self):
@@ -207,9 +207,17 @@ class Curation_SiteInstance(models.Model):
     # through model between Curation and SiteInstance models
     curation = models.ForeignKey("Curation")
     site_instance = models.ForeignKey("SiteInstance")
+    is_motif_associated = models.BooleanField(null=False) # is the site instance actual motif,
+                                                 # or a (longer) sequence that
+                                                 # contains the site somewhere
+
     annotated_seq = models.TextField()
     # regulation
     regulates = models.ManyToManyField("Gene", through="Regulation")
+    # chipseq link (NULL if site instance is not curated as chip-seq data)
+    peak_intensity = models.FloatField(null=True)
+    chipseq_info = models.ForeignKey("ChipSeqInfo", null=True)
+    
     
     def __unicode__(self):
         return u"reported: %s, matched: %s" % (self.site_instance, self.annotated_seq)
@@ -254,10 +262,9 @@ class ExperimentalTechniqueCategory(models.Model):
 
     def __unicode__(self):
         return u'%s (%s)' % (self.name, self.main_category)
-    
 
-class ChipValues(models.Model):
-    """This model was included in later versions of CollecTF, to be able to store
-    binding site data from Chip-Seq papers."""
-
-    pass
+class ChipSeqInfo(models.Model):
+    chipseq_info_id = models.AutoField(primary_key=True)
+    peak_calling_method = models.CharField(max_length=500)
+    assay_conditions = models.CharField(max_length=500)
+    method_notes = models.CharField(max_length=2000)

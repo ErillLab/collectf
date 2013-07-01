@@ -223,14 +223,10 @@ class SiteReportForm(forms.Form):
                                           box. A few extra fields will be populated""")
     
     # fields about chip-seq data. To be used only if data is chip-seq
-    #peak_intensity = forms.FloatField(required=False, label="Peak intensity")
     peak_calling_method = forms.CharField(required=False, label="Peak calling method")
     assay_conditions = forms.CharField(required=False, label="Assay conditions", widget=forms.Textarea)
     method_notes = forms.CharField(required=False, label="Method notes", widget=forms.Textarea)
-    
-                                          
     sites = forms.CharField(required=True, widget=forms.Textarea, label="Sites") # fill help text with js
-
 
     def clean(self):
         cleaned_data = super(SiteReportForm, self).clean()
@@ -240,6 +236,8 @@ class SiteReportForm(forms.Form):
         print cleaned_data
         c_motif_associated = cleaned_data.get("motif_associated")
         c_is_coordinate = cleaned_data.get("is_coordinate")
+        c_is_chip_seq_data = cleaned_data.get("is_chip_seq_data")
+        
         if c_motif_associated:
             # Reported sites are motif associated. In other words, they are true
             # binding sites that TF binds, not a arbitrarily long sequence (that have
@@ -262,12 +260,27 @@ class SiteReportForm(forms.Form):
                     sites_cd = sites_cd[:-1]
                 coordinates = [re.split("[\t ,]+", line) for line in re.split("[\r\n]+", sites_cd)]
                 print coordinates
-                if any(len(coordinates[i]) != 2 for i in xrange(len(coordinates))):
-                    raise forms.ValidationError("""Invalid coordinate input, all instances should have 2 fields (start, end). If it is
-                                                Chip-Seq data, they may contain intensity value as well
-                                                (i.e. start-end-intensity)""")
+                if (c_is_chip_seq_data and any(len(coordinates[i]) != 3 for i in xrange(len(coordinates)))):
+                    raise forms.ValidationError("Invalid coordinate input, all instances should have 3 fields (start, end, intensity-value).")
+                if (not c_is_chip_seq_data and any(len(coordinates[i]) != 2 for i in xrange(len(coordinates)))):
+                    raise forms.ValidationError("Invalid coordinate input, all instances should have 2 fields (start, end).")
+
                 if any(int(coor[0]) >= int(coor[1]) for coor in coordinates):
                     raise forms.ValidationError("Invalid coordinates")
+
+        if c_is_chip_seq_data:
+            c_peak_calling_method = cleaned_data.get("peak_calling_method")
+            if not c_peak_calling_method:
+                msg = "Peak calling method can not be blank."
+                self._errors["peak_calling_method"] = self.error_class([msg])
+            c_assay_conditions = cleaned_data.get("assay_conditions")
+            if not c_assay_conditions:
+                msg = "Assay conditions field can not be blank."
+                self._errors["assay_conditions"] = self.error_class([msg])
+            c_method_notes = cleaned_data.get("method_notes")
+            if not c_method_notes:
+                msg = "Method notes field can not be blank."
+                self._errors["method_notes"] = self.error_class([msg])
                 
         return self.cleaned_data
 
