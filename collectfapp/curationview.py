@@ -60,7 +60,8 @@ def genome_get_form(wiz, form):
         form.initial["TF"] = c.TF
         form.initial["TF_type"] = c.TF_type
         form.initial["TF_function"] = c.TF_function
-        form.initial["genome_accession"] = c.site_instances.all()[0].genome.genome_accession
+        if c.site_instances.all():
+            form.initial["genome_accession"] = c.site_instances.all()[0].genome.genome_accession
         form.initial["TF_accession"] = c.TF_instance.protein_accession
         
         form.initial["TF_species"] = c.TF_species
