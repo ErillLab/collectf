@@ -246,22 +246,28 @@ class ExperimentalTechnique(models.Model):
     technique_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     description = models.TextField()
-    category = models.ForeignKey("ExperimentalTechniqueCategory")
+    FUNCTION_CATEGORIES = (("binding", "Detection of binding"),
+                           ("expression", "Assessment of expression"),
+                           ("insilico", "In-silico prediction"))
+    preset_function = models.CharField(max_length=50, choices=FUNCTION_CATEGORIES, null=True)
+    categories = models.ManyToManyField("ExperimentalTechniqueCategory")
 
     def __unicode__(self):
         return u'%s' % self.name
 
+#class Curation_ExperimentalTechnique(models.Model):
+#    used_for = models.CharField(max_length=50, choices=ExperimentalTechnique.FUNCTION_CATEGORIES, null=False)
+
 class ExperimentalTechniqueCategory(models.Model):
-    MAIN_CATEGORIES = (("binding", "Detection of binding"),
-                       ("induction", "Assessment of regulation"),
-                       ("insilico", "In-silico prediction"))
     category_id = models.AutoField(primary_key=True)
-    main_category = models.CharField(max_length=60, choices=MAIN_CATEGORIES)
     name = models.CharField(max_length=100)
     description = models.TextField()
 
     def __unicode__(self):
-        return u'%s (%s)' % (self.name, self.main_category)
+        return u'[%d] %s' % (self.category_id, self.name)
+    
+    class Meta:
+        verbose_name_plural = "experimental_technique_categories"
 
 class ChipSeqInfo(models.Model):
     chipseq_info_id = models.AutoField(primary_key=True)

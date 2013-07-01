@@ -131,6 +131,7 @@ INSTALLED_APPS = (
     'browseapp',
     'django.contrib.webdesign',
     'django_extensions',
+    'south',
 )
 
 # A sample logging configuration. The only tangible logging
