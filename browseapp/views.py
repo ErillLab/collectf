@@ -162,39 +162,6 @@ def browse_by_site(request, dbxref_id):
     return render(request, "browse_site.html", response_dict,
                   context_instance=RequestContext(request))
 
-def curation_stats(request):
-    """Handler for curation statistics page. Count the number of curations/sites for
-    each TF and species in the database, pass dictionary to the HTML template"""
-    all_TFs = fetch.get_all_TFs()
-    all_species = fetch.get_all_species()
-    # number of curations by TF and site
-    curation_stats = {}  # dictionary of number of curations by TF and species
-    curation_stats2 = {} # dictionary of number of sites by TF and species
-    for TF in all_TFs:
-        curation_stats[TF.name] = {} # dict[species]
-        curation_stats2[TF.name] = {} 
-        for sp in all_species:
-            csi = fetch.get_curation_site_instances(TF, sp) # curation_site_instances
-            num_sites = csi.values_list('site_instance', flat=True).distinct().count()
-            num_curations = csi.values_list('curation', flat=True).distinct().count()
-            curation_stats[TF.name][sp.name] = num_curations
-            curation_stats2[TF.name][sp.name]= num_sites
-
-    response_dict = dict(
-        number_TFs = len(all_TFs),
-        number_species = len(all_species),
-        number_curations = len(models.Curation.objects.all()),
-        number_sites = len(models.SiteInstance.objects.all()),
-        number_publications = len(models.Publication.objects.all()),
-        pub_completed = '%.1f' % (len(models.Publication.objects.filter(curation_complete=True)) * 100.0 /
-                                  len(models.Publication.objects.all())),
-        curation_stats=curation_stats,
-        curation_stats2=curation_stats2,
-        TFs = [tf.name for tf in all_TFs],
-        species = [sp.name for sp in all_species])
-    
-    return render(request, "database_stats.html", response_dict,
-                  context_instance=RequestContext(request))
 
 def export_sites(request):
     """Given a list of sites, report FASTA/CSV file containing sites for particular
@@ -237,6 +204,7 @@ def make_browse_response_dict():
     one and call this function from them."""
     # group techniques
     # binding
+    """
     techniques = [t for t in models.ExperimentalTechnique.objects.filter(category__main_category='binding')]
     binding_techniques = {} # dictionary of (subcategory, list of techniques in that subcategory)
     for t in techniques:
@@ -254,12 +222,12 @@ def make_browse_response_dict():
     for t in techniques:
         cat = t.category
         insilico_techniques[cat] = insilico_techniques.get(cat, []) + [t]
-
+        """
     return dict(TFs=models.TF.objects.all(),
                 species=models.Strain.objects.all(),
-                binding_techniques=binding_techniques,
-                induction_techniques=induction_techniques,
-                insilico_techniques=insilico_techniques)
+                binding_techniques={},
+                induction_techniques={},
+                insilico_techniques={})
     
    
 def group_curation_site_instances(curation_site_instances):

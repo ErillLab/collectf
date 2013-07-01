@@ -129,6 +129,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'collectfapp',
     'browseapp',
+    'dbstatsapp',
     'django.contrib.webdesign',
     'django_extensions',
     'south',

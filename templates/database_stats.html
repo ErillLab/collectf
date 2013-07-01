@@ -12,7 +12,7 @@ function drawChart() {
     var data = google.visualization.arrayToDataTable([
 	['species', {% for tf in TFs %} '{{ tf }}', {% endfor %}],
 	{% for sp in species %}
-	['{{ sp }}', {% for tf in TFs %} {{ curation_stats|get_item:tf|get_item:sp }}, {% endfor %}],
+	['{{ sp }}', {% for tf in TFs %} {{ num_curations_by_TF_species|get_item:tf|get_item:sp }}, {% endfor %}],
 	{% endfor %}
     ]);
     var options = {
@@ -31,7 +31,7 @@ function drawChart2() {
     var data = google.visualization.arrayToDataTable([
 	['species', {% for tf in TFs %} '{{ tf }}', {% endfor %}],
 	{% for sp in species %}
-	['{{ sp }}', {% for tf in TFs %} {{ curation_stats2|get_item:tf|get_item:sp }}, {% endfor %}],
+	['{{ sp }}', {% for tf in TFs %} {{ num_sites_by_TF_species|get_item:tf|get_item:sp }}, {% endfor %}],
 	{% endfor %}
     ]);
     var options = {

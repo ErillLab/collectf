@@ -6,3 +6,5 @@
 
 sitestatic/*
 collectfapp/migrations/*
+
+*pickle
