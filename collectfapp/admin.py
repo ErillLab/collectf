@@ -40,6 +40,7 @@ class PublicationAdmin(admin.ModelAdmin):
 
 class ExperimentalTechniqueAdmin(admin.ModelAdmin):
     list_display = ('name', )
+    filter_horizontal = ('categories',)
 
 class GeneAdmin(admin.ModelAdmin):
     list_display = ('gene_accession', 'name')

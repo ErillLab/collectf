@@ -30,3 +30,5 @@ def success(request):
     template_vals = {"user": request.user}
     return render_to_response("success.html", template_vals,
                               context_instance = RequestContext(request))
+
+

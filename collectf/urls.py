@@ -74,7 +74,8 @@ urlpatterns = patterns('',
     url(r'^db_stats/$', dbstatsapp.views.curation_stats),
     # export ncbi
     url(r'^export_db/$', browseapp.export_db.export_db),
-            
+
+                       
 )
 
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
