@@ -22,7 +22,7 @@ the curation process will be ended as the paper has no data to be curated.""")
 
 class GenomeForm(forms.Form):
     """Form for submission of genome and TF accession numbers and others"""
-    TF = forms.ModelChoiceField(queryset=TF.objects.all(),
+    TF = forms.ModelChoiceField(queryset=TF.objects.order_by('name'),
                                 label="TF",
                                 help_text="""Select the transcription factor you
                                 are curating on from list. If not in list,

@@ -34,8 +34,8 @@ def curation_stats():
                                   len(models.Publication.objects.all())),
         num_curations_by_TF_species = num_curations_by_TF_species,
         num_sites_by_TF_species = num_sites_by_TF_species,
-        TFs= [tf.name for tf in all_TFs],
-        species = [sp.name for sp in all_species]
+        TFs= sorted([tf.name for tf in all_TFs]),
+        species = sorted([sp.name for sp in all_species])
         )
 
     # write stats to pickle
