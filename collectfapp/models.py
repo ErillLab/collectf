@@ -268,3 +268,6 @@ class ChipSeqInfo(models.Model):
     peak_calling_method = models.CharField(max_length=500)
     assay_conditions = models.CharField(max_length=500)
     method_notes = models.CharField(max_length=2000)
+
+    def __unicode__(self):
+        return u'[%d] %s - %s ' % (self.chipseq_info_id, self.peak_calling_method[:10], self.assay_conditions[:10])

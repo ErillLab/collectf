@@ -112,7 +112,6 @@ def site_exact_match_get_form(wiz, form):
     site_match_choices = sutils.sget(wiz.request.session, 'site_match_choices')
 
     for sid, matches in site_match_choices.items(): # for all matches belong to a site
-        
         label = mark_safe('<span class="sequence">' + sites[sid] + '</span>')
         choices = populate_match_choices(sites[sid], matches, is_exact=True)
         # make the form field
