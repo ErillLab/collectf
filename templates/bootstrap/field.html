@@ -20,9 +20,9 @@
     <!-- checkboxselectmultiple -->
     {% for choice in field.field.choices %}
     <label class="checkbox">
-      <input type="checkbox" {% if choice.0|stringformat:"s" in field.value|stringformat:"s" %}checked="checked"{% endif %} 
+      <input type="checkbox" {% if choice.0|stringformat:"s" in field.value %}checked="checked"{% endif %} 
 	     {% if field.field.widget.attrs.disabled == "disabled" %} disabled="disabled" {% endif %}
-	     name="{{ field.html_name }}" id="id_{{ field.html_name }}_{{ forloop.counter }}" value="{{ choice.0 }}">{{ choice.1 }}
+	     name="{{ field.html_name }}" id="id_{{ field.html_name }}_{{ forloop.counter }}" value="{{ choice.0 }}"> {{ choice.1 }} 
     </label> 
     {% endfor %}
     {% include "bootstrap/_field_help_text.html" %}
