@@ -254,8 +254,9 @@ def get_sites_by_TF_species(request, TF, species, curation_site_instances):
 
     # use LASAGNA to align sites
     aligned, idxAligned, strands = lasagna.LASAGNA(map(lambda s: str(s.seq.lower()), site_curation_dict.keys()), 0)
-    trimmed = lasagna.TrimAlignment(aligned)
+    trimmed = lasagna.TrimAlignment(aligned) if len(aligned) > 1 else aligned
     trimmed = [s.upper() for s in trimmed]
+
     # create weblogo for the list of sites
     weblogo_data = weblogo_uri(trimmed)
 
