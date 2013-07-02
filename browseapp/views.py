@@ -59,6 +59,11 @@ def browse_post(request):
     experimental_techniques_1 = request.POST['tech1']
     experimental_techniques_2 = request.POST['tech2']
     experimental_techniques_3 = request.POST['tech3']
+
+    print experimental_techniques_1
+    print experimental_techniques_2
+    print experimental_techniques_3
+    
     boolean1 = request.POST['boolean1']
     boolean2 = request.POST['boolean2']
     assert boolean1 in ['and', 'or'] and boolean2 in ['and', 'or']
@@ -97,12 +102,10 @@ def techniques_JSON_to_Q(JSON_string):
 
     techniques = map(lambda x: map(lambda y: y['key'], x['values']), j)
     techniques = [t for grp in techniques for t in grp] # flatten list
-    print techniques
     q = Q(curation__curation_id=-9999)
     
     for t in techniques:
         technique_object = models.ExperimentalTechnique.objects.get(name=t)
-        print technique_object
         q = q | Q(curation__experimental_techniques=technique_object)
     return q
 
@@ -182,14 +185,7 @@ def export_sites(request):
     for site in sites:
         response.write(site.to_fasta() if export_format=='fasta' else site.to_csv())
         if export_format == 'csv':
-            """
-            techniques = []
-            for csi in site.curation_siteinstance_set.all():
-                techniques.append(', '.join(t.name for t in csi.curation.experimental_techniques.all()) + '(%s)' % csi.curation.publication.pmid)
-            response.write('\t' + '\t'.join(techniques))
-            """
             regulations = models.Regulation.objects.filter(curation_site_instance__site_instance=site)
-
             response.write('\t' + ','.join(reg.gene.name for reg in regulations))
             response.write('\n')
     return response
@@ -198,36 +194,34 @@ def export_sites(request):
 # View helper functions
 
 def make_browse_response_dict():
-    """For several browse handlers (browse.GET, browse.POST, ..), the form to search
+    """For both browse.GET and browse.POST, the form to search
     database is always displayed on top. The data that go in this form is always
     same. Instead of preparing same data in all view functions, create a dict in this
     one and call this function from them."""
     # group techniques
-    # binding
-    """
-    techniques = [t for t in models.ExperimentalTechnique.objects.filter(category__main_category='binding')]
-    binding_techniques = {} # dictionary of (subcategory, list of techniques in that subcategory)
-    for t in techniques:
-        cat = t.category
-        binding_techniques[cat] = binding_techniques.get(cat, []) + [t]
-    # induction
-    techniques = [t for t in models.ExperimentalTechnique.objects.filter(category__main_category='induction')]
-    induction_techniques = {}
-    for t in techniques:
-        cat = t.category
-        induction_techniques[cat] = induction_techniques.get(cat, []) + [t]
-    # insilico
-    techniques = [t for t in models.ExperimentalTechnique.objects.filter(category__main_category='insilico')]
+    binding_techniques = {}
+    expression_techniques = {}
     insilico_techniques = {}
-    for t in techniques:
-        cat = t.category
-        insilico_techniques[cat] = insilico_techniques.get(cat, []) + [t]
-        """
+
+    all_categories = models.ExperimentalTechniqueCategory.objects.all()
+    for category in all_categories:
+        # find all techniques that belong to that category
+        # category and techniques have n:n relationship
+        techs = models.ExperimentalTechnique.objects.filter(categories=category)
+        binding_techniques[category] = [t for t in techs if t.preset_function=='binding']
+        expression_techniques[category] = [t for t in techs if t.preset_function=='expression']
+        insilico_techniques[category] = [t for t in techs if t.preset_function=='insilico']
+
+    # remove empty keys from dict
+    binding_techniques = dict((x,y) for (x,y) in binding_techniques.items() if y)
+    expression_techniques = dict((x,y) for (x,y) in expression_techniques.items() if y)
+    insilico_techniques = dict((x,y) for (x,y) in insilico_techniques.items() if y)
+    
     return dict(TFs=models.TF.objects.all(),
                 species=models.Strain.objects.all(),
-                binding_techniques={},
-                induction_techniques={},
-                insilico_techniques={})
+                binding_techniques=binding_techniques,
+                expression_techniques=expression_techniques,
+                insilico_techniques=insilico_techniques)
     
    
 def group_curation_site_instances(curation_site_instances):

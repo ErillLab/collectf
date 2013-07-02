@@ -12,7 +12,6 @@ import numpy
 
 complement = string.maketrans('acgtACGT-', 'tgcaTGCA-')
 def ReverseComplement(s):
-    print 's', s
     return s[::-1].translate(complement)
 
 def ComputeCounts(sites, SCOPE, counts_2mer=None, alphabet='acgt-'):
