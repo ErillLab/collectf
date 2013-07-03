@@ -3,26 +3,21 @@
 
 {% load bootstrap_tags %}
 
+{% for f in form.non_field_errors %}
+<div class="alert alert-error">
+{{ f }} 
+</div>
+{% endfor %}
 
-<h2>Please sign in</h2>
-<form class="form-horizontal" action="" method="post">{% csrf_token %}
+<form class="form-signin" action="" method="post">{% csrf_token %}
+  
+  <h2>Please sign in</h2>
+  <input id="id_username" name="username" type="text" class="input-block-level" placeholder="Username">
+  <input id="id_password" name="password" type="password" class="input-block-level" placeholder="Password">
+  <input class="btn btn-large btn-primary" type="submit" value="Sign in" />
+  <input type="hidden" name="next" value="{{ next|escape }}" />
 
-  {{ form|as_bootstrap}}
-  <!--
-  {% for field in form %}
-  <div class="field">
-    <div class="field-label">{{ field.label_tag }}</div>
-    <div class="field-field">{{ field }}</div>
-    <div class="field-error">{{ field.errors }}</div>
-  </div>
-  {% endfor %}
-  -->
-  <div class="control-group">
-    <div class="controls">
-      <input class="btn btn-large" type="submit" value="login" />
-      <input type="hidden" name="next" value="{{ next|escape }}" />
-    </div>
-  </div>  
 </form>
+
 
 {% endblock %}

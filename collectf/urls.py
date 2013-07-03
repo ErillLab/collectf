@@ -11,8 +11,8 @@ import collectfapp.curationview as curationview
 import collectfapp.editcurationview as editcurationview
 import collectfapp.viewcurationview as viewcurationview
 import browseapp.views
-import browseapp.export_db
 import dbstatsapp.views
+import ncbiapp.views
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -72,8 +72,8 @@ urlpatterns = patterns('',
     url(r'^export_sites/$', browseapp.views.export_sites),
     # database statistics
     url(r'^db_stats/$', dbstatsapp.views.curation_stats),
-    # export ncbi
-    url(r'^export_db/$', browseapp.export_db.export_db),
+    # export tbl for ncbi submission
+    url(r'^export_ncbi/$', ncbiapp.views.export_tbl_view)
 
                        
 )
