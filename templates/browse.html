@@ -56,6 +56,9 @@
 	      <option value="insilico">In-silico</option>
 	    </select>
 	    <div class="row spacer"></div>
+	    <label class="checkbox">
+	      <input type="checkbox" id="select_all_tech1">Select all
+	    </label>
 	    <div class="techniques1 listTree"></div>
 	    <input type="hidden" name="tech1" id="selectionJSON1" value="">
 	  </div>
@@ -74,6 +77,10 @@
 	      <option value="insilico">In-silico</option>
 	    </select>
 	    <div class="row spacer"></div>
+	    <label class="checkbox">
+	      <input type="checkbox" id="select_all_tech2">Select all
+	    </label>
+
 	    <div class="techniques2 listTree"></div>
 	    <input type="hidden" name="tech2" id="selectionJSON2" value="">
 	  </div>
@@ -92,6 +99,10 @@
 	      <option value="insilico" selected="selected">In-silico</option>
 	    </select>
 	    <div class="row spacer"></div>
+	    <label class="checkbox">
+	      <input type="checkbox" id="select_all_tech3">Select all
+	    </label>
+
 	    <div class="techniques3 listTree"></div>
 	    <input type="hidden" name="tech3" id="selectionJSON3" value="">
 	  </div>
@@ -166,7 +177,6 @@ $('.techniques3.listTree').listTree(insilico_techniques, {'startCollapsed': true
 function bind_selectors(select_picker, list_tree)
 {
     // bind select_picker and list_tree, so when select_picker changes, so does list_tree
-
     $(document).on('change', select_picker, function() {
 	var new_val = $(select_picker).val();
 	switch(new_val) {
@@ -183,9 +193,22 @@ function bind_selectors(select_picker, list_tree)
     });
 }
 
+function bind_togglers(toggle_a, list_tree) {
+    $(document).on('change', toggle_a, function() {
+	if($(toggle_a).is(":checked"))
+	    $(list_tree).listTree('selectAll');
+	else
+	    $(list_tree).listTree('deselectAll');
+	return false;
+    });
+}
+
 bind_selectors('#selectpicker1', '.techniques1.listTree');
 bind_selectors('#selectpicker2', '.techniques2.listTree');
 bind_selectors('#selectpicker3', '.techniques3.listTree');
+bind_togglers('#select_all_tech1', '.techniques1.listTree');
+bind_togglers('#select_all_tech2', '.techniques2.listTree');
+bind_togglers('#select_all_tech3', '.techniques3.listTree');
 
 $('#browse_form').on('click', '.btn', function(e) {
   $('#selectionJSON1').val(JSON.stringify($('.techniques1.listTree').data('listTree').selected));
