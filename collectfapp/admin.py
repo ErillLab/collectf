@@ -51,13 +51,19 @@ class GenomeAdmin(admin.ModelAdmin):
         return obj.strain.name
     list_display = ('genome_accession', 'strain_name')
 
+class TFFamilyAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    ordering = ('name',)
+    
 class TFAdmin(admin.ModelAdmin):
-    list_display = ('TF_id', 'name', 'family')
+    list_display = ('name', 'family')
     list_filter = ('family',)
+    ordering = ('name',)
 
 class TFInstance(admin.ModelAdmin):
     list_display = ('protein_accession', 'name')
     list_filter = ('')
+    ordering = ('name')
 
 # register edited models
 admin.site.register(Curation, CurationAdmin)
@@ -68,6 +74,7 @@ admin.site.register(Publication, PublicationAdmin)
 admin.site.register(ExperimentalTechnique, ExperimentalTechniqueAdmin)
 admin.site.register(Gene, GeneAdmin)
 admin.site.register(Genome, GenomeAdmin)
+admin.site.register(TFFamily, TFFamilyAdmin)
 admin.site.register(TF, TFAdmin)
 
 

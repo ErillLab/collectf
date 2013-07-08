@@ -50,6 +50,10 @@ textarea {
     color:green;
 }
 
+sup > a {
+    text-decoration:underline;
+}
+
 .myanchor {
     display: block;
     padding-top: 40px;

@@ -4,6 +4,8 @@ from Bio.SeqFeature import SeqFeature, FeatureLocation
 from Bio.Graphics import GenomeDiagram
 from reportlab.lib import colors
 from reportlab.lib.units import cm
+import re
+
 
 register = Library()
 
@@ -70,5 +72,19 @@ def site_match_diagram(site_match):
     return mark_safe(gdd.write_to_string('svg'))
 
 
+@register.filter
+def description_process(description_text):
+    """Given a description text, check if it has special text that needs to be
+    processed."""
+
+    # replace PMIDs
+    description_text = re.sub("\[PMID::([0-9]+)\]",
+                              '<sup><a href="http://www.ncbi.nlm.nih.gov/pubmed/?term=\g<1>">[\g<1>]</a></sup>',
+                              description_text)
+    # replace PFAMs
+    description_text = re.sub("\[PFAM::(\w+)\]",
+                              '<sup><a href="http://pfam.sanger.ac.uk/family/\g<1>">[\g<1>]</a></sup>',
+                              description_text)
+    return mark_safe(description_text)
     
 

@@ -7,6 +7,7 @@ from base64 import b64encode
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from collectfapp import bioutils
 
 import utils
 import lasagna
@@ -14,27 +15,25 @@ import models
 import fetch
 import forms
 import json
-from collectfapp import bioutils
+
 
 
 # View Functions
-
 @login_required
 def view_all_curations(request):
     """Handler function to see all curations at once. This function renders the page
     with the list of all curations in the database"""
-    template_vals = {"curations": fetch.get_all_curations()}
     return render_to_response("curation_view_all.html",
-                              template_vals,
+                              {"curations": fetch.get_all_curations()},
                               context_instance=RequestContext(request))
 
 @login_required
 def view_all_publications(request):
     """Handler function to see all publications in the database. This is for internal
     use, to see all publications in the database."""
-    template_vals = {"publications": fetch.get_all_publications()}
+    
     return render_to_response("publication_view_all.html",
-                              template_vals,
+                              {"publications": fetch.get_all_publications()},
                               context_instance=RequestContext(request))
 
 def browse(request):
@@ -46,7 +45,8 @@ def browse(request):
 def browse_get(request):
     """Handler for main browse page. Renders the page with the form which enables
     user to query the database."""
-    return render(request, "browse.html",
+    return render(request,
+                  "browse.html",
                   make_browse_response_dict(),
                   context_instance=RequestContext(request))
 
@@ -54,6 +54,7 @@ def browse_post(request):
     """Process form to get selected TF, species and experimental techniques. Retrieve
     binding sites for selected TF and species from database, filter them by
     experimental techniques, return to the user."""
+    
     TF = fetch.get_TF_by_id(request.POST['TF'])
     species = fetch.get_species_by_id(request.POST['species'])
 
@@ -91,8 +92,6 @@ def browse_post(request):
     else:
         assert False, "shouldn't be here, query"
     
-    print len(curation_site_instances)
-
     return get_sites_by_TF_species(request, TF, species, curation_site_instances)
 
 
@@ -100,11 +99,9 @@ def techniques_JSON_to_Q(JSON_string):
     """Given JSON string received from the form, parse the techniques (names), get
     the ids for them, build the Q object for filtering"""
     j = json.loads(JSON_string)
-
     techniques = map(lambda x: map(lambda y: y['key'], x['values']), j)
     techniques = [t for grp in techniques for t in grp] # flatten list
     q = Q(curation__curation_id=-9999)
-    
     for t in techniques:
         technique_object = models.ExperimentalTechnique.objects.get(name=t)
         q = q | Q(curation__experimental_techniques=technique_object)

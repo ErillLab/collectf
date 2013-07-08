@@ -3,6 +3,8 @@
 
 {% extends "base.html" %}
 
+{% load utils %}
+
 {% block content %}
 
 <ul class="breadcrumb">
@@ -20,7 +22,7 @@
 {% for TF_family in TF_families %}
 <tr>
   <td><a href="{% url browseapp.views.browse_by_TF_family TF_family.TF_family_id %}">{{ TF_family.name }}</a></td>
-  <td>{{ TF_family.description }}</td>
+  <td>{% with desc=TF_family.description %} {{ desc|description_process }} {% endwith %}</td>
 </tr>
 {% endfor %}
 </tbody>
