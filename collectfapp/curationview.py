@@ -75,9 +75,7 @@ best to check that they are correct before proceeding to the next step."""
         
         messages.warning(wiz.request, mark_safe(msg))
         
-        # delete session data, if user change any field and then come back,
-        # store users last entered data, instead of populated data.
-        sutils.sput(wiz.request.session, "previously_curated_paper", None)
+
     return form
 
 def techniques_get_form(wiz, form):
@@ -88,6 +86,18 @@ def techniques_get_form(wiz, form):
     pub = models.Publication.objects.get(publication_id=pid)
     form.fields["contains_promoter_data"].initial = pub.contains_promoter_data
     form.fields["contains_expression_data"].initial = pub.contains_expression_data
+    c = sutils.sget(wiz.request.session, 'previously_curated_paper')
+    # if selected paper is previously curated, prepopulate experimental techniques
+    if c:
+        
+        form.fields['techniques'].initial = [str(t.technique_id) for t in c.experimental_techniques.all()]
+        print form.fields['techniques'].initial
+
+
+        # delete session data, if user change any field and then come back,
+        # store users last entered data, instead of populated data.
+        sutils.sput(wiz.request.session, "previously_curated_paper", None)
+
     return form
 
 def site_report_get_form(wiz, form):
@@ -670,7 +680,6 @@ def paper_contains_no_data(cleaned_data):
 # for form definitions, go curationform.py
 @login_required
 def curation(request):
-    # clear session data from previous forms
 
     # If user selects the old curation and then go back, the session will have the
     # old_curation key in table, and it will cause trouble.
