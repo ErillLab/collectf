@@ -22,10 +22,8 @@
     </div>
 
     <div class="span9">
-      
       <section class="spacer" id="overview">
 	<h1>Collection of binding sites for {{ TF.name }} transcription factor in {{ sp.name }}</h1>
-	
 
 	<section class="spacer "id="list_of_sites">
 	  <div class="grey">
@@ -120,9 +118,11 @@
 	      <tr>
 		<td></td>
 		<td>
-		  <span {% if reg.evidence_type == "exp_verified" %} style="color:green" {% endif %}>
-		    {{reg.gene.name}} ({{ reg.gene.locus_tag }})
-		  </span>
+		  <a href="http://www.ncbi.nlm.nih.gov/gene/{{ reg.gene.gene_accession }}">
+		    <span {% if reg.evidence_type == "exp_verified" %} style="color:green" {% endif %}>
+		      {{reg.gene.name}} ({{ reg.gene.locus_tag }})
+		    </span>
+		  </a>
 		</td>
 		<td>
 		  <span {% if reg.evidence_type == "exp_verified" %} style="color:green" {% endif %}>
