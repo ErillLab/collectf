@@ -36,13 +36,23 @@
             </a>
             <a class="brand" href="{% url collectfapp.views.home %}">collecTF</a>
 	    <div class="nav-collapse collapse">
-              <p class="navbar-text pull-right">
+              <p class="navbar-text">
+		<span class="pull-left">
+		  {% if user.is_superuser %}
+		  | 
+		  <a href="{% url admin:index %}" class="navbar-link">Admin page </a> |
+		  <a href="{% url ncbiapp.views.export_tbl_view %}" class="navbar-link">NCBI export</a> |
+		  {% endif %}
+		</span>
+		<span class="pull-right">
+
 		{% if user.is_authenticated %}
 		logged in as {{user.username}} &nbsp; | &nbsp; 
 		<a href="{% url collectfapp.signupview.logout %}" class="navbar-link"> logout</a>
 		{% else %}
 		<a class="navbar-link" href="{% url collectfapp.signupview.login %}">login</a>
 		{% endif %}
+		</span>
               </p>
             </div><!--/.nav-collapse -->
 	  </div>
