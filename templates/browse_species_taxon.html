@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<ul class="breadcrumb">
+  <li><a href="{% url browseapp.views.browse_by_species_main %}">Home</a><span class="divider">/</span></li>
+  <li class="active">{{ taxon_elm }}<span class="divider">/</span></li>
+</ul>
+
+<div class="page-header">
+  <h2>{{ taxon_elm }}</h2>
+  <p></p>
+</div>
+
+<table class="table table-striped">
+<thead>  
+  <tr>
+  </tr>
+</thead>
+
+<tbody>
+  {% for sp in filtered_strains %}
+  <tr>
+    <td><a href="{% url browseapp.views.browse_by_species sp.taxonomy_id %}">{{ sp.name }}</a></td>
+  </tr>
+  {% endfor %}
+</tbody>
+</table>
+
+{% endblock %}

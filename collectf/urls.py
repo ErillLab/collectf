@@ -57,14 +57,19 @@ urlpatterns = patterns('',
     url(r'^browse/$', browseapp.views.browse),
     # browse by TF and species
     url(r'^browse_TF_sp/(?P<TF_id>\d+)/(?P<species_id>\d+)/$', browseapp.views.browse_post_TF_sp),
-    # browse by species
-    #url(r'^browse_sp_main/$', browseapp.views.browse_by_species_main),
     # browse by TF main
     url(r'^browse_tf_main/$', browseapp.views.browse_by_TF_main),
     # browse by TF family
     url(r'^browse_tf_family/(?P<TF_family_id>\d+)$', browseapp.views.browse_by_TF_family),
     # browse by TF
     url(r'^browse_tf/(?P<TF_id>\d+)$', browseapp.views.browse_by_TF),
+    # browse by species main
+    url(r'^browse_sp_main/$', browseapp.views.browse_by_species_main),
+    # browse by taxon elms
+    url(r'^browse_sp_taxon/(?P<taxon_name>\w+)/$', browseapp.views.browse_by_species_taxon),
+    # browse by species
+    url(r'^browse_sp/(?P<sp_tax_id>\d+)/$', browseapp.views.browse_by_species),
+                       
     # browse site
     url(r'^expsite_(?P<dbxref_id>\w+)$', browseapp.views.browse_by_site),
            

@@ -46,6 +46,10 @@ textarea {
     color: #5A5A5A;
 }
 
+.exp_verified_reg {
+    color:green;
+}
+
 .myanchor {
     display: block;
     padding-top: 40px;
@@ -100,4 +104,5 @@ textarea {
         margin-bottom: 15px;
         padding: 7px 9px;
       }
+
 

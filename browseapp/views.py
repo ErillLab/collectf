@@ -14,6 +14,7 @@ import models
 import fetch
 import forms
 import json
+from collectfapp import bioutils
 
 
 # View Functions
@@ -114,23 +115,88 @@ def browse_post_TF_sp(request, TF_id, species_id):
     TF = fetch.get_TF_by_id(TF_id)
     species = fetch.get_species_by_id(species_id)
     curation_site_instances = fetch.get_curation_site_instances(TF, species)
-
     return get_sites_by_TF_species(request, TF, species, curation_site_instances)
 
+# Browse hierarchy (species-wise) is as follows
+# browse_by_species_main
+#   browse_by_taxon
+#     browse_by_species
+
+def browse_by_species_main(request):
+    """Handler for browse by species. Return the taxonomy."""
+    strains = fetch.get_all_species()
+    taxon = bioutils.get_all_taxon_info([strain.taxonomy_id for strain in strains])
+    return render(request,
+                  "browse_species_main.html",
+                  {'taxon_names': sorted(list(set(taxon.values())))},
+                  context_instance=RequestContext(request))
+
+def browse_by_species_taxon(request, taxon_name):
+    """Handler for browse by taxonomy. Return species only with having <taxon_name> in
+    their higher level hierarchy"""
+    strains = fetch.get_all_species()
+    taxon = bioutils.get_all_taxon_info([strain.taxonomy_id for strain in strains])
+    filtered_strains = [strain for strain in strains if taxon[strain.taxonomy_id]==taxon_name]
+    return render(request,
+                  "browse_species_taxon.html",
+                  {
+                      'taxon_elm': taxon_name,
+                      'filtered_strains': filtered_strains
+                  },
+                  context_instance=RequestContext(request))
+
+def browse_by_species(request, sp_tax_id):
+    """Handler for browse by species. For the selected species (indicated by
+    sp_tax_id), return the list of TFs and link to the corresponding result page."""
+    sp = fetch.get_species_by_id(sp_tax_id)
+    # fetch TFs that have curation data with this strain
+    csi = models.Curation_SiteInstance.objects.filter(curation__site_instances__genome__strain=sp)
+    TF_ids = csi.values_list('curation__TF', flat=True).distinct()
+    TFs = models.TF.objects.filter(TF_id__in=TF_ids).order_by('name')
+    num_site_instances= {} # dictionary of num_site_instances by TF_instance_id
+    num_curations = {}     # dictionary of num_curations by TF_instance_id
+    # get number of sites and curations for each TF
+    for TF in TFs:
+        filtered_csi = csi.filter(curation__TF=TF)
+        num_site_instances[TF.TF_id] = filtered_csi.values_list('site_instance', flat=True).distinct().count()
+        num_curations[TF.TF_id] = filtered_csi.values_list('curation', flat=True).distinct().count()
+        
+    return render(request,
+                  "browse_species.html",
+                  {
+                      'taxon_name': bioutils.get_taxon_info_from_file(sp_tax_id),
+                      'sp': sp,
+                      'TFs': TFs,
+                      'num_site_instances': num_site_instances,
+                      'num_curations': num_curations,
+                  },
+                  context_instance=RequestContext(request))
+
+    
+# Similarly, browse hiearchy (TF-wise) is as follows
+# browse_by_TF_main
+#   browse_by_TF_family
+#     browse_by_TF
+    
 def browse_by_TF_main(request):
     """Handler for browse by TF request"""
     TFs = fetch.get_all_TFs()
     TF_families = fetch.get_all_TF_families()
-    response_dict = {'TF_families': TF_families}
-    return render(request, "browse_tf_main.html", response_dict,
+    return render(request,
+                  "browse_tf_main.html",
+                  {'TF_families': TF_families},
                   context_instance=RequestContext(request))
 
 def browse_by_TF_family(request, TF_family_id):
     """Handler for browse TF family"""
     TF_family = fetch.get_TF_family_by_id(TF_family_id)
     TFs = fetch.get_TFs_by_family(TF_family)
-    response_dict = {'TF_family': TF_family, 'TFs': TFs}
-    return render(request, "browse_tf_family.html", response_dict,
+    return render(request,
+                  "browse_tf_family.html",
+                  {
+                      'TF_family': TF_family,
+                      'TFs': TFs
+                  },
                   context_instance=RequestContext(request))
 
 def browse_by_TF(request, TF_id):
@@ -150,19 +216,25 @@ def browse_by_TF(request, TF_id):
         num_site_instances[sp.taxonomy_id] = filtered_csi.values_list('site_instance', flat=True).distinct().count()
         num_curations[sp.taxonomy_id] = filtered_csi.values_list('curation', flat=True).distinct().count()
 
-    response_dict = {'TF': TF,
-                     'species': species,
-                     'num_site_instances': num_site_instances,
-                     'num_curations': num_curations}
-    return render(request, "browse_tf.html", response_dict,
+    return render(request,
+                  "browse_tf.html",
+                  {
+                      'TF': TF,
+                      'species': species,
+                      'num_site_instances': num_site_instances,
+                      'num_curations': num_curations
+                  },
                   context_instance=RequestContext(request))
 
 def browse_by_site(request, dbxref_id):
     """Handler for browsing site instances"""
     site_instance_id = utils.dbxref2id(dbxref_id)
     site_instance = models.SiteInstance.objects.get(site_id=site_instance_id)
-    response_dict = {'site_instance': site_instance}
-    return render(request, "browse_site.html", response_dict,
+    return render(request,
+                  "browse_site.html",
+                  {
+                      'site_instance': site_instance,
+                  },
                   context_instance=RequestContext(request))
 
 
@@ -260,13 +332,14 @@ def get_sites_by_TF_species(request, TF, species, curation_site_instances):
     # create weblogo for the list of sites
     weblogo_data = weblogo_uri(trimmed)
 
-    result_dict = {'site_curation_dict':site_curation_dict,
-                   'site_regulation_dict':site_regulation_dict,
-                   'TF':TF,
-                   'sp':species,
-                   'weblogo_image_data': weblogo_data,
-                   'aligned_sites': trimmed,
-                   }
+    result_dict = {
+        'site_curation_dict':site_curation_dict,
+        'site_regulation_dict':site_regulation_dict,
+        'TF':TF,
+        'sp':species,
+        'weblogo_image_data': weblogo_data,
+        'aligned_sites': trimmed,
+    }
     response_dict = dict(make_browse_response_dict().items() + result_dict.items())
                         
     return render(request, "browse_results.html", response_dict,

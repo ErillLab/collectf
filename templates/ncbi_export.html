@@ -7,7 +7,11 @@
 <div class="container">
 <form method="POST" class="form-horizontal"> {% csrf_token %}
   {{ form|as_bootstrap }}
-  <input class="btn btn-large btn-block btn-info" type="submit" value="submit" />
+  <div class="control-group">
+    <div class="controls">
+      <button class="btn btn-info" type="submit">Submit</button>
+    </div>
+  </div>
 </form>
 </div>
 

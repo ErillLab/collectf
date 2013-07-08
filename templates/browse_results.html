@@ -119,13 +119,13 @@
 		<td></td>
 		<td>
 		  <a href="http://www.ncbi.nlm.nih.gov/gene/{{ reg.gene.gene_accession }}">
-		    <span {% if reg.evidence_type == "exp_verified" %} style="color:green" {% endif %}>
+		    <span {% if reg.evidence_type == "exp_verified" %} class="exp_verified_reg" {% endif %}>
 		      {{reg.gene.name}} ({{ reg.gene.locus_tag }})
 		    </span>
 		  </a>
 		</td>
 		<td>
-		  <span {% if reg.evidence_type == "exp_verified" %} style="color:green" {% endif %}>
+		  <span {% if reg.evidence_type == "exp_verified" %} class="exp_verified_reg" {% endif %}>
 		    {{reg.gene.description}}
 		  </span>
 		</td>

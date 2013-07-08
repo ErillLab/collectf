@@ -41,7 +41,7 @@
 		  {% if user.is_superuser %}
 		  | 
 		  <a href="{% url admin:index %}" class="navbar-link">Admin page </a> |
-		  <a href="{% url ncbiapp.views.export_tbl_view %}" class="navbar-link">NCBI export</a> |
+		  <a href="{% url ncbiapp.views.export_tbl_view %}" class="navbar-link">.tbl export</a> |
 		  {% endif %}
 		</span>
 		<span class="pull-right">

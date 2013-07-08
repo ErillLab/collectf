@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<ul class="breadcrumb">
+  <li class="active">Home<span class="divider">/</span></li>
+</ul>
+
+
+<div class="page-header">
+<h2>List of species grouped by order</h2>
+<p></p>
+</div>
+
+<table class="table table-striped">
+<thead>  
+  <tr>
+  </tr>
+</thead>
+
+
+<tbody>
+  {% for taxon_elm in taxon_names %}
+  <tr>
+    <td><a href="{% url browseapp.views.browse_by_species_taxon taxon_elm %}">{{ taxon_elm }}</a></td>
+  </tr>
+  {% endfor %}
+</tbody>
+</table>
+
+{% endblock %}

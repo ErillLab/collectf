@@ -17,7 +17,7 @@ def get_all_publications():
     return models.Publication.objects.all()
 
 def get_all_TFs():
-    return models.TF.objects.all()
+    return models.TF.objects.order_by('name')
 
 def get_TFs_by_family(TF_family):
     return models.TF.objects.filter(family=TF_family)
@@ -26,10 +26,10 @@ def get_TF_family_by_id(TF_family_id):
     return models.TFFamily.objects.get(pk=TF_family_id)
 
 def get_all_TF_families():
-    return models.TFFamily.objects.all()
+    return models.TFFamily.objects.order_by('name')
 
 def get_all_species():
-    return models.Strain.objects.all()
+    return models.Strain.objects.order_by('name')
 
 def get_lineage(species_taxon_id):
     return bioutils.get_taxon_info(species_taxon_id)
