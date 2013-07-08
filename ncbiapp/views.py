@@ -22,7 +22,10 @@ def export_tbl_view(request):
             export_tbl(form.cleaned_data['TF_instances'],
                        form.cleaned_data['genomes'])
             return render_to_response('ncbi_export_result.html',
-                                      {'tbl': open('test.tbl').read()},
+                                      {'tbl': open('test.tbl').read(),
+                                       'TF_instance': form.cleaned_data['TF_instances'],
+                                       'genome': form.cleaned_data['genomes'],
+                                       },
                                       context_instance=RequestContext(request))
 
 
