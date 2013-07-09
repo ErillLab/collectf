@@ -56,6 +56,10 @@ MEDIA_ROOT = ''
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
 MEDIA_URL = ''
 
+# Absolute path to the directory of pickle files that are used.
+# Don't put anything in this directory yourself.
+PICKLE_ROOT = os.path.join(os.path.dirname(os.path.dirname(__file__)), "pickles")
+
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.

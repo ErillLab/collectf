@@ -3,6 +3,9 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqUtils import GC
 import time
+import os
+import pickle
+from collectf import settings
 
 Entrez.email = "sefakilic@gmail.com"
 
@@ -121,34 +124,37 @@ def get_org_taxon(genome_record):
     return rec['IdList'][0]
 
 def get_taxon_info(tax_id):
-    handler = Entrez.efetch(db="Taxonomy", id=str(tax_id), retmode="xml")
-    records = Entrez.read(handler)
-    assert len(records) == 1
-    for i,r in enumerate(records):
-        for k,v in r.items():
-            print k, ':', v
-    lineage = records[0]['LineageEx']
-    order = [x for x in lineage if x['Rank']=='order']
-    order_name = order[0]['ScientificName']
+    try:
+        handler = Entrez.efetch(db="Taxonomy", id=str(tax_id), retmode="xml")
+        records = Entrez.read(handler)
+        record = records[0]
+        lineage = record['LineageEx']
+        order = [x for x in lineage if x['Rank']=='order']
+        order_name = order[0]['ScientificName']
+    except:
+        order_name = 'other'
     print tax_id, order_name
     return order_name
+
+
+TAXON_FILE = os.path.join(settings.PICKLE_ROOT, "taxon.pickle")
 
 def get_all_taxon_info(tax_ids):
     """For all taxonomy ids in tax_ids, get taxonomy id information and pickle it"""
     import pickle
     taxon = {}
     try:
-        taxon = pickle.load(open("taxon.pickle"))
+        taxon = pickle.load(open(TAXON_FILE))
     except:
         pass
     for tax_id in [tax_id for tax_id in tax_ids if tax_id not in taxon]:
         taxon[tax_id] = get_taxon_info(tax_id)
-    pickle.dump(taxon, open("taxon.pickle", 'w'))
+    pickle.dump(taxon, open(TAXON_FILE, 'w'))
     return taxon
 
 def get_taxon_info_from_file(tax_id):
     try:
-        taxon = pickle.load(open("taxon.pickle"))
+        taxon = pickle.load(open(TAXON_FILE))
         if tax_id not in taxon:
             raise Exception("tax id not found")
     except:

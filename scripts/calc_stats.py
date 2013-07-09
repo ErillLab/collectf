@@ -1,5 +1,7 @@
 import pickle
+import os
 from collectfapp import models
+from collectf import settings
 
 def curation_stats():
     """Curation statistics.. Count the number of curations/sites for each TF and
@@ -39,8 +41,10 @@ def curation_stats():
         )
 
     # write stats to pickle
-    pickle.dump(master_dict, open('dbstats.pickle', 'w'))
+    pickle_file = os.path.join(settings.PICKLE_ROOT, "dbstats.pickle")
+    pickle.dump(master_dict, open(pickle_file, 'w'))
 
 def run():
     curation_stats()
+    #print settings.PICKLE_ROOT
     print "I am a script!"
