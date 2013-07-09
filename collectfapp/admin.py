@@ -4,6 +4,10 @@ from django.db.models import get_models
 from django.db.models import get_app
 
 # curation admin view
+class CurationSiteInstanceInline(admin.StackedInline):
+    model = Curation_SiteInstance
+    extra = 0
+    
 class CurationAdmin(admin.ModelAdmin):
     def PMID(self, obj):
         return obj.publication.pmid
@@ -12,6 +16,7 @@ class CurationAdmin(admin.ModelAdmin):
     list_display = ('curation_id', 'TF_species', 'PMID', 'curator')
     list_filter = ('curator', 'NCBI_submission_ready', 'requires_revision')
     ordering = ('-curation_id',)
+    inlines = (CurationSiteInstanceInline,)
 
 class CuratorAdmin(admin.ModelAdmin):
     def username(self, obj):
@@ -32,11 +37,12 @@ class Curation_SiteInstanceAdmin(admin.ModelAdmin):
     raw_id_fields = ('chipseq_info',)
     list_filter = ('is_motif_associated',)
     ordering = ('-id',)
-    
+
 class PublicationAdmin(admin.ModelAdmin):
     list_display = ('publication_id', 'pmid', 'title', 'assigned_to')
     list_filter = ('assigned_to', 'curation_complete', 'reported_TF', 'reported_species')
     search_fields = ('pmid',)
+
 
 class ExperimentalTechniqueAdmin(admin.ModelAdmin):
     list_display = ('name', )

@@ -70,7 +70,7 @@
       {% for c in curations %}
       <tr>
 	<th>{{ c }}</th>
-	<th><div class="btn-group"><a class="btn" href="{% url collectfapp.viewcurationview.view_curation cid=c.curation_id %}">view</a>
+	<th><div class="btn-group"><a class="btn" href="{% url browseapp.browse_main.browse_curation cid=c.curation_id %}">view</a>
 	    <a class="btn" href="{% url collectfapp.editcurationview.edit_curation cid=c.curation_id %}">edit</a>
 	  </div>
 	</th>

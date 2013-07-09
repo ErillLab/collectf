@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% load publication_tags %}
+{% block content %}
+
+<div class="span9">
+
+<!-- curation information -->
+<section id="curation-info">
+<h4>Curation Information</h4>
+<ul class="unstyled">
+  <!-- TF -->
+  <li><i class="icon-tags"></i> <strong>TF:</strong> {{ curation.TF.name }}</li>
+  <li><i class="icon-tags"></i> <strong>TF species:</strong> {{ curation.TF_species }}</li>
+  <li><i class="icon-tags"></i> <strong>Site species:</strong> {{ curation.site_species }}</li>
+  <!-- curator -->
+  <li><i class="icon-user"></i> curated by {{ curation.curator.user.username}}</li>
+  <!-- curation confidence -->
+  <li>
+  {% if curation.confidence %}
+  <i class="icon-ok"></i>
+  Experimental techniques and results meet standards specified in the curation guide.
+  {% else %}
+  <i class="icon-remove"></i>
+  Experimental techniques and results DO NOT meet standards specified in the curation guide.
+  {% endif %}
+  </li>
+  <!-- NCBI submission ready -->
+  <li>
+  {% if curation.NCBI_submission_ready %}
+  <i class="icon-ok"></i>
+  Curation is ready for submission to NCBI.
+  {% else %}
+  <i class="icon-remove"></i>
+  Curation is NOT ready for submission to NCBI.
+  {% endif %}
+  </li>
+  <!-- requires revision? -->
+  <li>
+  {% if curation.requires_revision != "None" and curation.requires_revision != "none" %}
+  <i class="icon-remove"></i> The curation requires revision: {{ curation.get_requires_revision_display }}.
+  {% else %}
+  <i class="icon-ok"></i> The curation does not require revision.
+  {% endif %}
+  </li>
+</ul>
+
+<!-- curation notes -->
+{% if curation.notes %}
+<h5>Curation notes</h5>
+<blockquote><p>{{ curation.notes }}</p></blockquote>
+{% endif %}
+
+</section>
+<hr/>
+
+<!-- publication -->
+<section id="publication">
+<h4>Publication</h4>
+<i class="icon-file"></i>
+{% with pub=curation.publication %}
+{{ pub.title }};{{ pub.authors }};{{ pub.journal }} {{pub.publication_date}};
+{{pub.volume}}({{pub.issue}}):{{pub.pages}}
+{% endwith %}
+</section>
+<hr/>
+
+<!-- genome and TF information -->
+<section id="genome">
+<h4>Genome and TF information</h4>
+<ul>
+  <li><strong>TF:</strong> {{ curation.TF.name }}</li>
+  <li><strong>TF instance:</strong> {{ curation.TF_instance.protein_accession }}; {{ curation.TF_instance.description }}</li>
+  <li><strong>TF structure:</strong> {{ curation.get_TF_type_display }}</li>
+  <li><strong>TF function:</strong> {{ curation.get_TF_function_display }}</li>
+</ul>
+</section>
+<hr/>
+
+<!-- experimental process -->
+<section id="exp_techniques">
+<h4>Experimental Process</h4>
+
+<h5>Used techniques</h5>
+<ul class="unstyled">
+  {% for exp_technique in curation.experimental_techniques.all %}
+  <li><i class="icon-tint"></i> <span data-toggle="tooltip" title="{{ exp_technique.description }}">{{ exp_technique.name }}</li>
+  {% endfor %}
+</ul>
+
+{% if curation.experimental_process %}
+<h5><i class="icon-pencil"></i> Experimental process notes</h5>
+<blockquote><p>{{ curation.experimental_process }}</p></blockquote>
+{% endif %}
+
+{% if curation.forms_complex %}
+<p><i class="icon-pencil"></i> The paper reports that TF forms complex with other proteins for binding with reported sites.</p>
+<blockquote><p>{{ curation.complex_notes }}</p></blockquote>
+{% endif %}
+
+</section>
+<hr/>
+
+<!-- site information -->
+<section id="sites">
+<h4>Reported Sites</h4>
+<pre>{% for site_instance in curation.site_instances.all %}{{ site_instance.seq }}
+{% endfor %}</pre>
+</section>
+<hr/>
+
+<!-- gene regulation -->
+<section id="gene-regulation">
+<h4>Gene Regulation</h4>
+
+Regulated genes for each binding site are displayed below. Genes that are reported
+for TF-site mediated regulation are displayed in <span style="color:green">green</span>.
+
+{% load gene_diagram %}
+
+{% with curation_site_instances=curation.curation_siteinstance_set.all %}
+<ul class="unstyled">
+  {% for cs in curation_site_instances %}
+  <li>
+    <i class="icon-wrench"></i>
+    <span style="font-family: monospace">{{ cs.site_instance.seq }}</span>
+    {{ cs.regulation_set.all|regulation_diagram:cs.site_instance }}
+    <ul>
+    {% for regulation in cs.regulation_set.all %}
+    <li>
+      <span {% if regulation.evidence_type == "exp_verified" %} style="color:green" {% endif %}>
+	{{ regulation.gene.name }} - {{ regulation.gene.description }}
+      </span>
+    </li>
+    {% endfor %}
+    </ul>
+  </li>
+  {% endfor %}
+</ul>
+{% endwith %}
+
+</section>
+
+</div>
+
+
+{% endblock %}
+
+

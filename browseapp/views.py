@@ -2,14 +2,14 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.shortcuts import render
 from django.template import RequestContext
-from collectfapp.bioutils import weblogo
 from base64 import b64encode
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-from collectfapp import bioutils
+from baseapp import bioutils
+from baseapp.bioutils import weblogo
+from baseapp import utils
 
-import utils
 import lasagna
 import models
 import fetch
@@ -136,9 +136,8 @@ def browse_by_species_taxon(request, taxon_name):
     filtered_strains = [strain for strain in strains if taxon[strain.taxonomy_id]==taxon_name]
     return render(request,
                   "browse_species_taxon.html",
-                  {
-                      'taxon_elm': taxon_name,
-                      'filtered_strains': filtered_strains
+                  {'taxon_elm': taxon_name,
+                   'filtered_strains': filtered_strains
                   },
                   context_instance=RequestContext(request))
 
@@ -160,12 +159,11 @@ def browse_by_species(request, sp_tax_id):
         
     return render(request,
                   "browse_species.html",
-                  {
-                      'taxon_name': bioutils.get_taxon_info_from_file(sp_tax_id),
-                      'sp': sp,
-                      'TFs': TFs,
-                      'num_site_instances': num_site_instances,
-                      'num_curations': num_curations,
+                  {'taxon_name': bioutils.get_taxon_info_from_file(sp_tax_id),
+                   'sp': sp,
+                   'TFs': TFs,
+                   'num_site_instances': num_site_instances,
+                   'num_curations': num_curations,
                   },
                   context_instance=RequestContext(request))
 
@@ -190,9 +188,8 @@ def browse_by_TF_family(request, TF_family_id):
     TFs = fetch.get_TFs_by_family(TF_family)
     return render(request,
                   "browse_tf_family.html",
-                  {
-                      'TF_family': TF_family,
-                      'TFs': TFs
+                  {'TF_family': TF_family,
+                   'TFs': TFs
                   },
                   context_instance=RequestContext(request))
 
@@ -215,24 +212,13 @@ def browse_by_TF(request, TF_id):
 
     return render(request,
                   "browse_tf.html",
-                  {
-                      'TF': TF,
-                      'species': species,
-                      'num_site_instances': num_site_instances,
-                      'num_curations': num_curations
+                  {'TF': TF,
+                   'species': species,
+                   'num_site_instances': num_site_instances,
+                   'num_curations': num_curations
                   },
                   context_instance=RequestContext(request))
 
-def browse_by_site(request, dbxref_id):
-    """Handler for browsing site instances"""
-    site_instance_id = utils.dbxref2id(dbxref_id)
-    site_instance = models.SiteInstance.objects.get(site_id=site_instance_id)
-    return render(request,
-                  "browse_site.html",
-                  {
-                      'site_instance': site_instance,
-                  },
-                  context_instance=RequestContext(request))
 
 
 def export_sites(request):

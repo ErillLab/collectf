@@ -27,6 +27,7 @@ import views
 from templatetags import publication_tags
 from django.utils.safestring import mark_safe
 from django.contrib import messages
+from baseapp.templatetags import gene_diagram
 
 # curation get form functions
 # get_form constructs the form for a given step
@@ -158,7 +159,6 @@ def site_regulation_get_form(wiz, form):
     exact_site_matches = sutils.sget(wiz.request.session, 'exact_site_matches')
     soft_site_matches = sutils.sget(wiz.request.session, 'soft_site_matches')
 
-    from templatetags import utils
     all_site_matches = []
     all_site_matches += exact_site_matches.items() if exact_site_matches else []
     all_site_matches += soft_site_matches.items() if soft_site_matches else []
@@ -174,7 +174,7 @@ def site_regulation_get_form(wiz, form):
         form.fields[sid] = forms.MultipleChoiceField(label=label,
                                                      choices=choices, required=False,
                                                      widget=forms.CheckboxSelectMultiple,
-                                                     help_text=utils.site_match_diagram(match))
+                                                     help_text=gene_diagram.site_match_diagram(match))
         # disable checkbox if publication is marked as not having expression data
         if not publication.contains_expression_data:
             form.fields[sid].widget.attrs['disabled'] = 'disabled'

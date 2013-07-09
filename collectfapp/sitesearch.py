@@ -8,6 +8,9 @@ import regex
 from django.utils.safestring import mark_safe
 from templatetags import utils
 
+from baseapp.templatetags import gene_diagram
+
+
 # Some namedtuple declarations
 Match = namedtuple('Match', 'seq start end strand')
 SiteMatch = namedtuple('SiteMatch', 'match nearby_genes')
@@ -39,7 +42,7 @@ def print_site_match(reported_site, m, is_exact):
     else:
         s += print_alignment(reported_site, m.match.seq)
 
-    s += (utils.site_match_diagram(m) +
+    s += (gene_diagram.site_match_diagram(m) +
           '<table class="table table-condensed">' +
           '<thead><tr><th>locus tag</th><th>gene name</th><th>function</th></tr></thead>' +
           '<tbody>'

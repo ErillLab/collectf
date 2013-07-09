@@ -9,8 +9,9 @@ import collectfapp.signupview as signupview
 import collectfapp.pubview as pubview
 import collectfapp.curationview as curationview
 import collectfapp.editcurationview as editcurationview
-import collectfapp.viewcurationview as viewcurationview
+
 import browseapp.views
+import browseapp.browse_main
 import dbstatsapp.views
 import ncbiapp.views
 
@@ -45,8 +46,7 @@ urlpatterns = patterns('',
     url(r'^curation/$', curationview.curation),
     # edit curation
     url(r'^edit_curation/(?P<cid>\d+)/$', editcurationview.edit_curation),
-    # view curation
-    url(r'^view_curation/(?P<cid>\d+)/$', viewcurationview.view_curation),
+                       
     # success page
     url(r'^success/$', collectfapp.views.success),
     # view all curations
@@ -69,9 +69,13 @@ urlpatterns = patterns('',
     url(r'^browse_sp_taxon/(?P<taxon_name>\w+)/$', browseapp.views.browse_by_species_taxon),
     # browse by species
     url(r'^browse_sp/(?P<sp_tax_id>\d+)/$', browseapp.views.browse_by_species),
+
                        
+    # browse curation
+    url(r'^browse_curation/(?P<cid>\d+)/$', browseapp.browse_main.browse_curation),
     # browse site
-    url(r'^expsite_(?P<dbxref_id>\w+)$', browseapp.views.browse_by_site),
+    url(r'^expsite_(?P<dbxref_id>\w+)$', browseapp.browse_main.browse_by_site),
+    url(r'^EXPSITE_(?P<dbxref_id>\w+)$', browseapp.browse_main.browse_by_site),
            
     # export fasta/csv
     url(r'^export_sites/$', browseapp.views.export_sites),

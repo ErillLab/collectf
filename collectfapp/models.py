@@ -215,8 +215,8 @@ class Curation_SiteInstance(models.Model):
     # regulation
     regulates = models.ManyToManyField("Gene", through="Regulation")
     # chipseq link (NULL if site instance is not curated as chip-seq data)
-    peak_intensity = models.FloatField(null=True)
-    chipseq_info = models.ForeignKey("ChipSeqInfo", null=True)
+    peak_intensity = models.FloatField(null=True, blank=True)
+    chipseq_info = models.ForeignKey("ChipSeqInfo", null=True, blank=True)
     
     
     def __unicode__(self):

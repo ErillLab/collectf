@@ -1,6 +1,2 @@
-from django.db import models
+from baseapp.models import *
 
-# Create your models here.
-
-# Use models of collectfapp
-from collectfapp.models import *

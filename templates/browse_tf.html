@@ -2,6 +2,7 @@
 
 {% block content %}
 {% load utils %}
+{% load TF_desc_htmlify %}
 
 <ul class="breadcrumb">
   <li><a href="{% url browseapp.views.browse_by_TF_main %}">Home</a><span class="divider">/</span></li>
@@ -12,7 +13,7 @@
 
 <div class="page-header">
 <h2>{{ TF.name }}</h2>
-<p>{{ TF.description }}</p>
+<p>{{ TF.description|htmlify }}</p>
 </div>
 
 {% if species %}

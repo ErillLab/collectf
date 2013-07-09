@@ -1,7 +1,7 @@
 """Fetch objects from database"""
 
 import models
-import collectfapp.bioutils as bioutils
+import baseapp.bioutils as bioutils
 
 def get_all_curations():
     return models.Curation.objects.all()

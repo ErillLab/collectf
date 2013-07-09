@@ -9,6 +9,7 @@
   {% if site_curation_dict and site_regulation_dict %}
 
   {% load utils %}
+  {% load gene_diagram %}
 
   <div class="row">
     <div class="span3" id="navparent">
@@ -100,7 +101,7 @@
 	      <tr>
 		<td colspan="3"><span class="sequence">{{ site.seq }}</span></td>
 		<td>{% for cur in site_curation_dict|get_item:site %}
-		  <a href="{% url collectfapp.viewcurationview.view_curation cur.curation_id %}">[{{cur.curation_id}}]</a>{% if not forloop.last %}, {% endif %}
+		  <a href="{% url browseapp.browse_main.browse_curation cur.curation_id %}">[{{cur.curation_id}}]</a>{% if not forloop.last %}, {% endif %}
 		  {% endfor %}
 		</td>
 	      </tr>
@@ -111,7 +112,7 @@
 		    <div class="regulation_diagram">{% with regs=site_regulation_dict|get_item:site %} {{ regs|regulation_diagram:site }} {% endwith %}</div>
 		  </td>
 		</tr>
-	      </div>
+ 	      </div>
 
 
 	      {% for reg in site_regulation_dict|get_item:site %}
