@@ -199,7 +199,7 @@ def browse_by_TF(request, TF_id):
     # fetch species that have curation data on this TF
     csi = models.Curation_SiteInstance.objects.filter(curation__TF=TF)
     species_ids = csi.values_list('site_instance__genome__strain', flat=True).distinct()
-    species = models.Strain.objects.filter(taxonomy_id__in=species_ids)
+    species = models.Strain.objects.filter(taxonomy_id__in=species_ids).order_by('name')
 
     num_site_instances = {} # dictionary of num_site_instances by species_id
     num_curations = {}      # dictionary of num_curations by species_id
@@ -272,8 +272,8 @@ def make_browse_response_dict():
     expression_techniques = dict((x,y) for (x,y) in expression_techniques.items() if y)
     insilico_techniques = dict((x,y) for (x,y) in insilico_techniques.items() if y)
     
-    return dict(TFs=models.TF.objects.all(),
-                species=models.Strain.objects.all(),
+    return dict(TFs=models.TF.objects.all().order_by('name'),
+                species=models.Strain.objects.all().order_by('name'),
                 binding_techniques=binding_techniques,
                 expression_techniques=expression_techniques,
                 insilico_techniques=insilico_techniques)

@@ -20,7 +20,7 @@ def get_all_TFs():
     return models.TF.objects.order_by('name')
 
 def get_TFs_by_family(TF_family):
-    return models.TF.objects.filter(family=TF_family)
+    return models.TF.objects.filter(family=TF_family).order_by('name')
 
 def get_TF_family_by_id(TF_family_id):
     return models.TFFamily.objects.get(pk=TF_family_id)
