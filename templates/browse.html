@@ -143,28 +143,31 @@
 
 <script type="text/javascript">
   {% load utils %}
+
   // data
+
 var binding_techniques = [
+
     {% for subcategory in binding_techniques|get_keys %}
     {
-	"key": "{{ subcategory.name }}",
-	"values": [{% for technique in binding_techniques|get_item:subcategory %} {"key": "{{ technique.name }}"}, {% endfor %}]
+	"key": "{{ subcategory }}",
+	"values": [{% for technique in binding_techniques|get_item:subcategory|sort_by:'name' %} {"key": "{{ technique.name }}"}, {% endfor %}]
     },
     {% endfor %}
 ];
 var expression_techniques = [
     {% for subcategory in expression_techniques|get_keys %}
     {
-	"key": "{{ subcategory.name }}",
-	"values": [{% for technique in expression_techniques|get_item:subcategory %} {"key": "{{ technique.name }}"}, {% endfor %}]
+	"key": "{{ subcategory}}",
+	"values": [{% for technique in expression_techniques|get_item:subcategory|sort_by:'name' %} {"key": "{{ technique.name }}"}, {% endfor %}]
     },
     {% endfor %}
 ];
 var insilico_techniques = [
     {% for subcategory in insilico_techniques|get_keys %}
     {
-	"key": "{{ subcategory.name }}",
-	"values": [{% for technique in insilico_techniques|get_item:subcategory %} {"key": "{{ technique.name }}"}, {% endfor %}]
+	"key": "{{ subcategory }}",
+	"values": [{% for technique in insilico_techniques|get_item:subcategory|sort_by:'name' %} {"key": "{{ technique.name }}"}, {% endfor %}]
     },
     {% endfor %}
 ];

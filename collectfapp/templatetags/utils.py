@@ -15,10 +15,9 @@ def get_item(dictionary, key):
 
 @register.filter
 def get_keys(dictionary):
-    return dictionary.keys()
+    return sorted(dictionary.keys())
 
 
 @register.filter
-def get_keys_sorted_by_val(dictionary):
-    sorted_dict = sorted(dictionary.iteritems(), key=operator.itemgetter(1))
-    return map(lambda x: x[0], sorted_dict)
+def sort_by(queryset, order):
+    return queryset.order_by(order)

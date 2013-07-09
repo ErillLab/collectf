@@ -263,9 +263,9 @@ def make_browse_response_dict():
         # find all techniques that belong to that category
         # category and techniques have n:n relationship
         techs = models.ExperimentalTechnique.objects.filter(categories=category)
-        binding_techniques[category] = [t for t in techs if t.preset_function=='binding']
-        expression_techniques[category] = [t for t in techs if t.preset_function=='expression']
-        insilico_techniques[category] = [t for t in techs if t.preset_function=='insilico']
+        binding_techniques[category.name] = techs.filter(preset_function='binding')
+        expression_techniques[category.name] = techs.filter(preset_function='expression')
+        insilico_techniques[category.name] = techs.filter(preset_function='insilico')
 
     # remove empty keys from dict
     binding_techniques = dict((x,y) for (x,y) in binding_techniques.items() if y)
