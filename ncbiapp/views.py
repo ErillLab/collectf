@@ -4,8 +4,10 @@ from django.shortcuts import render
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 import models
+import os
 from forms import ExportForm
 from baseapp import utils
+import tempfile
 
 @user_passes_test(lambda u: u.is_staff)
 def export_tbl_view(request):
@@ -18,10 +20,10 @@ def export_tbl_view(request):
     else:
         form = ExportForm(request.POST)
         if form.is_valid():
-            export_tbl(form.cleaned_data['TF_instances'],
-                       form.cleaned_data['genomes'])
+            tbl_data = export_tbl(form.cleaned_data['TF_instances'],
+                                  form.cleaned_data['genomes'])
             return render_to_response('ncbi_export_result.html',
-                                      {'tbl': open('test.tbl').read(),
+                                      {'tbl': tbl_data,
                                        'TF_instance': form.cleaned_data['TF_instances'],
                                        'genome': form.cleaned_data['genomes'],
                                        },
@@ -32,7 +34,7 @@ def export_tbl(TF_instance, genome):
     """For given TF instance and genome, return all site instances in .tbl format"""
 
     # open tbl file to write
-    tbl_file = open("test.tbl", 'w')
+    tbl_file = tempfile.TemporaryFile()
     tbl_file.write('>Feature prot_%s_genome_%s\n' % (TF_instance.protein_accession, genome.genome_accession))
     
     # get all curation_site_instances
@@ -54,11 +56,9 @@ def export_tbl(TF_instance, genome):
         csis = [csi for csi in curation_site_instances if csi.site_instance==site_instance]
         # TF name
         if not all(csis[i].curation.TF.name == csis[0].curation.TF.name for i in xrange(len(csis))):
-            tbl_file.close()
-            tbl_file = open("test.tbl", 'w')
+            tbl_file.truncate()  # remove the contents (if any)
             tbl_file.write('Inconsistent TF - TF_instance matches: This TF_instance is related to more than one TFs\n')
-            tbl_file.close()
-            return
+            return tbl_file.read()
         
         tbl_file.write('\t\t\tbound_moiety\t%s\n' % (csis[0].curation.TF.name))
         tbl_file.write('\t\t\tnote\tTranscription factor binding site\n')        
@@ -86,6 +86,7 @@ def export_tbl(TF_instance, genome):
 
         # write dbxref
         tbl_file.write('\t\t\tdb_xref\t%s\n' % utils.id2dbxref(int(site_instance.site_id)))
-                       
 
-    tbl_file.close()
+    tbl_file.seek(0) # goto beginnning of the file
+    return tbl_file.read()
+

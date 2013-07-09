@@ -24,10 +24,11 @@ import models
 import sutils
 import sitesearch
 import views
-from templatetags import publication_tags
+
 from django.utils.safestring import mark_safe
 from django.contrib import messages
 from baseapp.templatetags import gene_diagram
+from baseapp.templatetags import publication_tags
 
 # curation get form functions
 # get_form constructs the form for a given step
