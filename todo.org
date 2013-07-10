@@ -1,39 +1,15 @@
-- Currently, the editing feature doesn't check the appropriate boxes for the methods.
 - different session data for each tab.
-
-
-- browse
 - curation preview before submission.
-- textarea width height
-
-
-- figures
-
-- popover top
-
-- download fasta/csv gene names
-
 - sticky footer
-
-- browse by species
-
-- filter by experimental technique
-
-- sequences do not have the same length
-
 
 -- Before paper submission
 
-1. How to submit to NCBI.
-2. CSV
-3. Integrate motif generation (Lasagna) and MEME.
-4. Chip-Seq data
 5. Motif comparison
 6. Operon prediction
 7. Setup external interface
    1. submit a CSV
    2. External submission, send email
-8. DBXREF
-9. Site page report
-10. DB stats
-11. 
+
+
+- validate protein and genome accession number (check if it's refseq)
+- 
