@@ -14,3 +14,6 @@
 - validate protein and genome accession number (check if it's refseq)
 - protein record parser fix
 - curation view add xref
+- complex notes and xdbref fields combine
+- overlapping sites in browse page
+

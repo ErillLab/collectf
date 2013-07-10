@@ -1,4 +1,6 @@
-"""Handler class for curation process.
+"""
+
+Handler class for curation process.
 
 From Django docs:
 
@@ -12,6 +14,7 @@ wizard in the backend and redirects to the next step.
 4) Once the user has submitted all the forms and all the data has been
 validated, the wizard processes the data - saving it to the database, sending an
 email, or whatever the application needs to do.
+
 """
 
 from django.contrib.auth.decorators import login_required
@@ -34,7 +37,6 @@ from baseapp.templatetags import publication_tags
 # get_form constructs the form for a given step
 def publication_get_form(wiz, form):
     """Publication selection form"""
-
     user = wiz.request.user
     curator = models.Curator.objects.get(user=user)
     # select papers assigned to user
@@ -42,19 +44,16 @@ def publication_get_form(wiz, form):
     # select papers which are not complete yet
     not_completed_pubs = assigned_pubs.filter(curation_complete=False)
     # put them in form choices, populate form field
-    choices = [(p.publication_id,
-                mark_safe("[%s] %s" % (p.publication_id,
-                                       publication_tags.as_publication(p))))
-                for p in not_completed_pubs]
+    choices = [(p.publication_id, mark_safe("[%s] %s" % (p.publication_id, publication_tags.as_publication(p))))
+               for p in not_completed_pubs]
     form.fields["pub"].choices = choices
-
     return form
     
 def genome_get_form(wiz, form):
     """Genome, TF, TF_family, tf instance, .. selection form"""
 
     c = sutils.sget(wiz.request.session, "previously_curated_paper")
-    # if selected publication is the one most recently curated, the related curation
+    # If selected publication is the one most recently curated, the related curation
     # should be in object c. Otherwise, c = None.  If so, populate "Genome and TF
     # information" form fields from the previously submitted curation to make things
     # easier for curator.
@@ -70,13 +69,12 @@ def genome_get_form(wiz, form):
         form.initial["site_species"] = c.site_species
 
         msg = """
-<h4>Warning!</h4> It seems that the paper you selected is previously
-curated. For convenience, fields in this form are automatically filled based on
-the previous curation of the paper. They may differ in this curation, so it is
-best to check that they are correct before proceeding to the next step."""
+        <h4>Warning!</h4> It seems that the paper you selected is previously
+        curated. For convenience, fields in this form are automatically filled based on
+        the previous curation of the paper. They may differ in this curation, so it is
+        best to check that they are correct before proceeding to the next step."""
         
-        messages.warning(wiz.request, mark_safe(msg))
-        
+        messages.warning(wiz.request, mark_safe(msg))        
 
     return form
 
@@ -188,17 +186,17 @@ def curation_review_get_form(wiz, form):
 # curation process step functions
 # Post process the form data before the data gets stored
 def publication_process(wiz, form):
+    
     pubid = form.cleaned_data['pub']
     sutils.sput(wiz.request.session, 'publication', pubid)
 
-    if paper_contains_no_data(form.cleaned_data):
+    if form.cleaned_data["no_data"]:
         # mark paper as having no data
         paper = models.Publication.objects.get(publication_id=pubid)
         note = " \nPaper has no TF-binding site data."
         paper.submission_notes += note
         paper.curation_complete = True
         paper.save()
-        
         sutils.sput(wiz.request.session, "paper_contains_no_data", True)
         return
 
@@ -210,10 +208,8 @@ def publication_process(wiz, form):
     cs = models.Curation.objects.filter(publication=p)
     if cs.count() >= 1:
         sutils.sput(wiz.request.session, "previously_curated_paper", cs[0])
-        print "this pub previously curated"
     else:
         sutils.sput(wiz.request.session, "previously_curated_paper", None)
-        print "this pub is new (not curated previously)"        
 
 def genome_process(wiz, form):
     genome_accession = form.cleaned_data['genome_accession']
@@ -507,27 +503,26 @@ class CurationWizard(SessionWizardView):
         descriptions = {
             '0': "Please choose a publication to curate.",
             '1': """This step collects information on the transcription factor (TF), the specific
-strains reported in the manuscript and the NCBI GenBank sequences that reported
-sites and TF will be mapped onto.""",
+            strains reported in the manuscript and the NCBI GenBank sequences that reported
+            sites and TF will be mapped onto.""",
             '2': """Select the experimental techniques and the describe the basic experimental
-procedure used to verify binding/expression of the sites reported in this
-curation.""",
-            '3': """Enter the list of sites as reported in the paper. Supported formats are:\n(a)
-Raw sequence (one site per line)\n(b) FASTA format""",
+            procedure used to verify binding/expression of the sites reported in this
+            curation.""",
+            '3': """Enter the list of sites as reported in the paper. Supported formats are:\n(a) Raw
+            sequence (one site per line)\n(b) FASTA format""",
             '4': """For each reported site, all exact matches in the chosen genome are listed. If a
-reported site does not have any exact matches, or the matched position/genes do
-not coincide with reported positions/gene, select the \"No valid match\"
-option. This will initiate a non-exact search.""",
+            reported site does not have any exact matches, or the matched position/genes do
+            not coincide with reported positions/gene, select the \"No valid match\"
+            option. This will initiate a non-exact search.""",
             '5': """Inexact matches for sites without valid matches are listed here, sorted by
-affinity to the TF-binding motif.  If the matched position/genes do not coincide
-with reported positions/gene, select the \"No valid match\" option.""",
+            affinity to the TF-binding motif.  If the matched position/genes do not coincide
+            with reported positions/gene, select the \"No valid match\" option.""",
             '6': """Nearby genes are
-displayed for identified sites. Check all genes for which TF-site mediated
-regulation is reported in the manuscript. Skip this step if manuscript does not
-report gene expression.""",
+            displayed for identified sites. Check all genes for which TF-site mediated
+            regulation is reported in the manuscript. Skip this step if manuscript does not
+            report gene expression.""",
             '7': """This step finalizes the curation. Fill all required fields."""
         }
-
         context["form_title"] = titles[self.steps.current]
         context["form_description"] = descriptions[self.steps.current]
         return context
@@ -568,8 +563,6 @@ report gene expression.""",
         return self.get_form_step_data(form)
 
     def render(self, form=None, **kwargs):
-
-        
         form = form or self.get_form()
         context = self.get_context_data(form=form, **kwargs)
 
@@ -683,11 +676,7 @@ report gene expression.""",
         return HttpResponseRedirect(reverse(views.home))
 
 
-def paper_contains_no_data(cleaned_data):
-    """Return true if user checks the box "Paper contains no data" button in the
-    publication selection form."""
-    # get step data for publication step
-    return cleaned_data["no_data"]
+
 
 # curation handler
 

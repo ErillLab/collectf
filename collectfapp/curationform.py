@@ -50,16 +50,6 @@ class GenomeForm(forms.Form):
     TF_accession = forms.CharField(label="TF accession number",
                                    help_text=help_dict['TF_accession'])
 
-    # form fields
-    # TF_species_same / TF_species and
-    # site_species_same / site_species
-    # are redundant.  When the form is displayed, the curator can either input
-    # TF and site species manually, or he can select the option that they are
-    # same species with genome. If they are same species with genome, he doesn't
-    # need to input whole species name
-    
-
-
     TF_species = forms.CharField(label="Organism of origin for reported TF",
                                  required=False,
                                  help_text=help_dict['TF_species'])
@@ -67,12 +57,16 @@ class GenomeForm(forms.Form):
     site_species = forms.CharField(label="Organism TF binding sites are reported in",
                                    required=False,
                                    help_text=help_dict['site_species'])
+
     
     def clean_genome_accession(self):
+        """Validate entered genome accession number."""
         genome_accession = self.cleaned_data['genome_accession'].strip()
+        
         if '.' not in genome_accession:
             msg = 'Please enter RefSeq accession number with version number'
             raise forms.ValidationError(msg)
+        
         try: # to retrieve genome from database (if exists)
             g = Genome.objects.get(genome_accession=genome_accession)
         except Genome.DoesNotExist: # try to retrieve from NCBI database

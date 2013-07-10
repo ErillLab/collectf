@@ -104,16 +104,12 @@ class Gene(models.Model):
     end = models.IntegerField()
     strand = models.IntegerField(choices=STRAND)
     locus_tag = models.CharField(max_length=20)
-    # COG id?
-    # KEGG id?
-    # homology
     def __unicode__(self):
         return '%s (%s - %s)' % (self.gene_id, self.name, self.genome.strain.name)
 
 class Genome(models.Model):
     GENOME_TYPE = (("chromosome", "chromosome"), ("plasmid", "plasmid"))
 
-    
     genome_id = models.AutoField(primary_key=True)
 
     """from S.Lott@stackoverflow: The formal primary key should always be a surrogate
