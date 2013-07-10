@@ -6,43 +6,36 @@ from makeobj import *
 import sitesearch
 from django.utils.safestring import mark_safe
 import re
+import helptext
 
 class PublicationForm(forms.Form):
     """Publication selection form"""
+    help_dict = helptext.publication_form
     pub = forms.ChoiceField(widget=forms.RadioSelect(),
-                            label="Publications")
+                            label="Publications",
+                            help_text=help_dict['pub'])
+    
     no_data = forms.BooleanField(label="This paper contains no data.",
                                  required=False,
-                                 help_text="""
-                                 Check this button if, after examining the paper, you find that the paper does
-                                 not have data on binding sites. Checking this button will mark the paper as
-                                 having no binding site data and set it to the 'curation complete' status. Also,
-                                 the curation process will be ended as the paper has no data to be curated.""")
+                                 help_text=help_dict['no_data'])
 
 class GenomeForm(forms.Form):
     """Form for submission of genome and TF accession numbers and others"""
+    help_dict = helptext.genome_form
     TF = forms.ModelChoiceField(queryset=TF.objects.order_by('name'),
                                 label="TF",
-                                help_text="""Select the transcription factor you
-                                are curating on from list. If not in list,
-                                please contact the master curator.""")
+                                help_text=help_dict['TF'])
     
-    TF_type = forms.ChoiceField(Curation.TF_TYPE, label="TF structure",
-                                help_text="""If specified in the manuscript,
-                                select the quaternary structure for the
-                                transcription factor when binding to the sites
-                                reported in this curation.""")
+    TF_type = forms.ChoiceField(Curation.TF_TYPE,
+                                label="TF structure",
+                                help_text=help_dict['TF_type'])
     
-    TF_function = forms.ChoiceField(Curation.TF_FUNCTION, label="TF function",
-                                    help_text="""If specified in the manuscript,
-                                    select the mode of operation for the TF on
-                                    the sites reported in this curation.""")
-    
+    TF_function = forms.ChoiceField(Curation.TF_FUNCTION,
+                                    label="TF function",
+                                    help_text=help_dict['TF_function'])
+
     genome_accession = forms.CharField(label="Genome NCBI accession number",
-                                       help_text="""Paste the NCBI GenBank
-                                       genome accession number for the species
-                                       closest to the reported
-                                       species/strain. """)
+                                       help_text=help_dict['genome_accession'])
     
     TF_species_same = forms.BooleanField(required=False,
                                          label="""This is the exact same
@@ -55,10 +48,7 @@ class GenomeForm(forms.Form):
 
 
     TF_accession = forms.CharField(label="TF accession number",
-                                   help_text="""Paste the NCBI TF protein
-                                   accession number for the species closest to
-                                   the reported species/strain.""")
-
+                                   help_text=help_dict['TF_accession'])
 
     # form fields
     # TF_species_same / TF_species and
@@ -72,14 +62,11 @@ class GenomeForm(forms.Form):
 
     TF_species = forms.CharField(label="Organism of origin for reported TF",
                                  required=False,
-                                 help_text="""Type the full name of the
-                                 species/strain the TF belongs to as reported in
-                                 the manuscript.""")
+                                 help_text=help_dict['TF_species'])
+
     site_species = forms.CharField(label="Organism TF binding sites are reported in",
                                    required=False,
-                                   help_text="""Type the full name of the
-                                   species/strain in which the sites are reported
-                                   in the manuscript.""")
+                                   help_text=help_dict['site_species'])
     
     def clean_genome_accession(self):
         genome_accession = self.cleaned_data['genome_accession'].strip()
@@ -160,14 +147,14 @@ class GenomeForm(forms.Form):
 
 class TechniquesForm(forms.Form):
     """Form to enter experimental techniques used to identify TFBS"""
+    help_dict = helptext.techniques_form
     contains_promoter_data = forms.BooleanField(required=False,
-        label="The manuscript contains promoter information",
-        help_text="The paper provides experimental data on the structure and sequence of TF-regulated promoter")
-    
+                                                label="The manuscript contains promoter information",
+                                                help_text=help_dict['contains_promoter_data'])
+
     contains_expression_data = forms.BooleanField(required=False,
-        label="The manuscript contains expression data",
-        help_text="The paper provides experimental support for TF-mediated regulation of genes")
-    
+                                                  label="The manuscript contains expression data",
+                                                  help_text=help_dict['contains_expression_data'])
     # generate techniques field
     # get available techniques from db
     choices = []
@@ -178,68 +165,68 @@ class TechniquesForm(forms.Form):
                         mark_safe(description_markup % (t.name, t.description, t.name))))
     techniques = forms.MultipleChoiceField(choices = choices,
                                            label = "Techniques",
-                                           help_text = """Select as many as apply to reported sites.
-                                           Hover over any technique to see the description.""",
+                                           help_text=help_dict['techniques'],
                                            widget = forms.CheckboxSelectMultiple())
 
-    '''
-    techniques = forms.ModelMultipleChoiceField(
-        queryset=ExperimentalTechnique.objects.order_by('name'),
-        widget=forms.CheckboxSelectMultiple(),
-        label="Techniques",
-        help_text="Select as many as apply to reported sites")
-    '''
-    
-    experimental_process = forms.CharField(widget=forms.Textarea, required=False,
+    experimental_process = forms.CharField(widget=forms.Textarea,
+                                           required=False,
                                            label="Experimental process",
-                                           help_text="""Write a concise, intuitive description of the
-                                           experimental process to ascertain binding/induced expression""")
+                                           help_text=help_dict['experimental_process'])
 
     external_db_type_choices = [(None, "None"),]
     for db in ExternalDatabase.objects.all():
-        print 'db', db
         external_db_type_choices.append((db.ext_database_id, db.ext_database_name))
     external_db_type = forms.ChoiceField(choices=external_db_type_choices,
                                          required=False,
-                                         label="External DB type")
+                                         label="External DB type",
+                                         help_text=help_dict['external_db_type'])
+    
     external_db_accession = forms.CharField(required=False,
-                                           label="External DB accession number")
+                                           label="External DB accession number",
+                                           help_text=help_dict['external_db_accession'])
     
     forms_complex = forms.BooleanField(required=False,
                                        label="""The manuscript reports that TF forms complex
                                        with other proteins for binding with reported sites""")
+    
     complex_notes = forms.CharField(widget=forms.Textarea, required=False,
                                     label="Notes",
-                                    help_text="""Provide brief description of the proteins involved in
-                                    the complex and how it affects binding""")
+                                    help_text=help_dict['complex_notes'])
+
 
 class SiteReportForm(forms.Form):
     """Form to input the list of sites reported in the paper"""
+    help_dict = helptext.site_report_form
     motif_associated = forms.BooleanField(required=False,
                                           initial=True,
                                           label="Reported sites are motif associated.",
-                                          help_text = """This checkbox should be unchecked if reported sequences are not actual sites,
-                                          but sequences that have binding sites 'somewhere' in them.""")
+                                          help_text=help_dict['motif_associated'])
     
-    is_coordinate = forms.BooleanField(initial=False, required=False,
+    is_coordinate = forms.BooleanField(initial=False,
+                                       required=False,
                                        label="Binding sequence coordinates are reported in the paper.",
-                                       help_text = """If the paper reports coordinates instead of actual sequences, check this
-                                       option. Input coordinates for all sequences
-                                       below (one for each line). Each line should
-                                       have start and end positions (and intensity
-                                       values for Chip-Seq papers). Fields can be
-                                       tab, comma or space separated.""")
+                                       help_text=help_dict['is_coordinate'])
 
-    is_chip_seq_data = forms.BooleanField(initial=False, required=False,
+    is_chip_seq_data = forms.BooleanField(initial=False,
+                                          required=False,
                                           label="This paper reports Chip-Seq data",
-                                          help_text="""If the paper reports sequences/coordinates identified using Chip-Seq, check this
-                                          box. A few extra fields will be populated""")
+                                          help_text=help_dict['is_chip_seq_data'])
     
     # fields about chip-seq data. To be used only if data is chip-seq
-    peak_calling_method = forms.CharField(required=False, label="Peak calling method")
-    assay_conditions = forms.CharField(required=False, label="Assay conditions", widget=forms.Textarea)
-    method_notes = forms.CharField(required=False, label="Method notes", widget=forms.Textarea)
-    sites = forms.CharField(required=True, widget=forms.Textarea, label="Sites") # fill help text with js
+    peak_calling_method = forms.CharField(required=False,
+                                          label="Peak calling method")
+    
+    assay_conditions = forms.CharField(required=False,
+                                       label="Assay conditions",
+                                       widget=forms.Textarea)
+    
+    method_notes = forms.CharField(required=False,
+                                   label="Method notes",
+                                   widget=forms.Textarea)
+    
+    sites = forms.CharField(required=True,
+                            widget=forms.Textarea,
+                            label="Sites") # fill help text with js
 
     def clean(self):
         cleaned_data = super(SiteReportForm, self).clean()
@@ -325,36 +312,30 @@ class SiteRegulationForm(forms.Form):
 
 class CurationReviewForm(forms.Form):
     """Form to see all data entered so far. The last step to submit curation."""
+    help_dict = helptext.curation_review_form
+    
     choices = ((None, "None"),) + Curation.REVISION_REASONS
     revision_reasons = forms.ChoiceField(choices=choices,
                                          label="Revision required",
-                                         help_text="""
-Select, if needed, the reason why this curation requires revision.
-See detailed list of reasons in the curation guide.""")
+                                         help_text=help_dict['revision_reasons'])
     
     confidence = forms.BooleanField(required=False,
                                     label="I am confident of the results reported in this manuscript.",
-                                    help_text="""
-Check this if experimental techniques and results meet the standards specified in the curation guide""")
+                                    help_text=help_dict['confidence'])
+
     NCBI_submission_ready = forms.BooleanField(required=False,
                                                label="Curation is ready to submit to NCBI.",
-                                               help_text="""
-A curation is ready for submission if: (a) the identified genome sequence
-matches the reported one or (b) identified and reported genomes match at the
-species level and at least 90% of reported sites are located as exact matches.""")
+                                               help_text=help_dict['NCBI_submission_ready'])
                                                
     paper_complete = forms.BooleanField(required=False,
                                         label="Curation for this paper is complete.",
-                                        help_text="""
-Check this box if there are no more curations pending for this paper (additional
-    sites, different techniques, other TF, etc.""")
-    notes = forms.CharField(widget=forms.Textarea, required=False, label="Notes",
-                            help_text="""
-Type in any additional notes on the curation process. For instance, if reported
-sites were left out for some reason, what prompted selection of a surrogate
-genome instead of another, general comments on the experimental process, etc.
-""")
+                                        help_text=help_dict['paper_complete'])
+
+    notes = forms.CharField(widget=forms.Textarea,
+                            required=False,
+                            label="Notes",
+                            help_text=help_dict['notes'])
     
     confirm = forms.BooleanField(required=True,
                                  label="I want to submit this curation",
-                                 help_text="Check to submit when you click \"next step\"")
+                                 help_text=help_dict['confirm'])
