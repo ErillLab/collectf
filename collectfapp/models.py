@@ -277,3 +277,22 @@ class ChipSeqInfo(models.Model):
 
     def __unicode__(self):
         return u'[%d] %s - %s ' % (self.chipseq_info_id, self.peak_calling_method[:10], self.assay_conditions[:10])
+
+class ExternalDatabase(models.Model):
+    ext_database_id = models.AutoField(primary_key=True)
+    ext_database_name = models.CharField(max_length=50, null=False, unique=True)
+    ext_database_descripton = models.CharField(max_length=500)
+    ext_database_url_format = models.CharField(max_length=500)
+    def __unicode__(self):
+        return u'%s' % self.ext_database_name
+
+class Curation_ExternalDatabase(models.Model):
+    curation = models.ForeignKey(Curation)
+    external_database = models.ForeignKey(ExternalDatabase)
+    accession_number = models.CharField(max_length=50, null=False)
+    def __unicode__(self):
+        return u'curation: %d - xref: %s [%s]' % (self.curation.curation_id,
+                                                  self.external_database.ext_database_name,
+                                                  self.accession_number)
+
+

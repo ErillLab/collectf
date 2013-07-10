@@ -6,9 +6,9 @@ import StringIO
 from collections import namedtuple
 import regex
 from django.utils.safestring import mark_safe
-from templatetags import utils
 
 from baseapp.templatetags import gene_diagram
+from baseapp.templatetags import utils
 
 
 # Some namedtuple declarations

@@ -374,10 +374,14 @@ def genome_done(wiz, form, **kwargs):
 def techniques_done(wiz, form, **kwargs):
     """Get techniques and experimental process data from form"""
     cd = {}  # cleaned data to be returned
+    print form.cleaned_data
     cd['techniques'] = form.cleaned_data['techniques']
     cd['experimental_process'] = form.cleaned_data['experimental_process']
     cd['forms_complex'] = form.cleaned_data['forms_complex']
     cd['complex_notes'] = form.cleaned_data['complex_notes']
+    cd['external_db_type'] = form.cleaned_data['external_db_type']
+    cd['external_db_accession'] = form.cleaned_data['external_db_accession']
+    print cd
     return cd
 
 def site_report_done(wiz, form, **kwargs):
@@ -643,6 +647,15 @@ report gene expression.""",
         # add techniques
         for t in techniques_cd['techniques']:
             curation.experimental_techniques.add(t)
+
+        # add external db references
+        if techniques_cd['external_db_type'] != "None" and techniques_cd['external_db_accession']:
+            print techniques_cd['external_db_type']
+            external_db_type = models.ExternalDatabase.objects.get(ext_database_id=techniques_cd['external_db_type'])
+            curation_ext_ref = models.Curation_ExternalDatabase(curation = curation,
+                                                                external_database=external_db_type,
+                                                                accession_number=techniques_cd['external_db_accession'])
+            curation_ext_ref.save()
 
         curation.save()
 

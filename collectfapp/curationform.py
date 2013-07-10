@@ -11,14 +11,13 @@ class PublicationForm(forms.Form):
     """Publication selection form"""
     pub = forms.ChoiceField(widget=forms.RadioSelect(),
                             label="Publications")
-
     no_data = forms.BooleanField(label="This paper contains no data.",
                                  required=False,
                                  help_text="""
-Check this button if, after examining the paper, you find that the paper does
-not have data on binding sites. Checking this button will mark the paper as
-having no binding site data and set it to the 'curation complete' status. Also,
-the curation process will be ended as the paper has no data to be curated.""")
+                                 Check this button if, after examining the paper, you find that the paper does
+                                 not have data on binding sites. Checking this button will mark the paper as
+                                 having no binding site data and set it to the 'curation complete' status. Also,
+                                 the curation process will be ended as the paper has no data to be curated.""")
 
 class GenomeForm(forms.Form):
     """Form for submission of genome and TF accession numbers and others"""
@@ -27,24 +26,28 @@ class GenomeForm(forms.Form):
                                 help_text="""Select the transcription factor you
                                 are curating on from list. If not in list,
                                 please contact the master curator.""")
+    
     TF_type = forms.ChoiceField(Curation.TF_TYPE, label="TF structure",
                                 help_text="""If specified in the manuscript,
                                 select the quaternary structure for the
                                 transcription factor when binding to the sites
-                                reported in this curation.""") 
+                                reported in this curation.""")
+    
     TF_function = forms.ChoiceField(Curation.TF_FUNCTION, label="TF function",
                                     help_text="""If specified in the manuscript,
                                     select the mode of operation for the TF on
                                     the sites reported in this curation.""")
+    
     genome_accession = forms.CharField(label="Genome NCBI accession number",
                                        help_text="""Paste the NCBI GenBank
                                        genome accession number for the species
                                        closest to the reported
                                        species/strain. """)
+    
     TF_species_same = forms.BooleanField(required=False,
                                          label="""This is the exact same
                                          strain as reported in the manuscript for the TF.""")
-
+    
     site_species_same = forms.BooleanField(required=False,
                                            label="""This is the exact same
                                            strain as reported in the
@@ -191,7 +194,17 @@ class TechniquesForm(forms.Form):
                                            label="Experimental process",
                                            help_text="""Write a concise, intuitive description of the
                                            experimental process to ascertain binding/induced expression""")
-                                           
+
+    external_db_type_choices = [(None, "None"),]
+    for db in ExternalDatabase.objects.all():
+        print 'db', db
+        external_db_type_choices.append((db.ext_database_id, db.ext_database_name))
+    external_db_type = forms.ChoiceField(choices=external_db_type_choices,
+                                         required=False,
+                                         label="External DB type")
+    external_db_accession = forms.CharField(required=False,
+                                           label="External DB accession number")
+    
     forms_complex = forms.BooleanField(required=False,
                                        label="""The manuscript reports that TF forms complex
                                        with other proteins for binding with reported sites""")
