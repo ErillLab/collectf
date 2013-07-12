@@ -213,7 +213,7 @@ class SiteReportForm(forms.Form):
 
     # ChIP Fields
     peak_calling_method = forms.CharField(required=False,
-                                          label="Peak calling method")
+                                          label="Quantiative data format")
     
     assay_conditions = forms.CharField(required=False,
                                        label="Assay conditions",
