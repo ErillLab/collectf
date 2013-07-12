@@ -28,7 +28,33 @@ $(document).ready(function() {
     defaultSpeed = 200;
 
     // JS for reported sites step of curation form.
+    if ($('#id_3-is_chip_data').not(':checked')) {
+	$('#id_3-peak_calling_method').parent().parent().hide(defaultSpeed);
+	$('#id_3-assay_conditions').parent().parent().hide(defaultSpeed);
+	$('#id_3-chip_method_notes').parent().parent().hide(defaultSpeed);
+	$('#id_3-chip_data_extra_field').parent().parent().hide(defaultSpeed);
+    }
+    if ($('#id_3-is_chip_data').is(':checked')) {
+	$('#id_3-peak_calling_method').parent().parent().show(defaultSpeed);
+	$('#id_3-assay_conditions').parent().parent().show(defaultSpeed);
+	$('#id_3-chip_method_notes').parent().parent().show(defaultSpeed);
+	$('#id_3-chip_data_extra_field').parent().parent().show(defaultSpeed);
+    }
+    $("#id_3-is_chip_data").on('change', function() {
+	if ($(this).is(":checked")) {
+	    $("#id_3-peak_calling_method").parent().parent().show(defaultSpeed);
+	    $("#id_3-assay_conditions").parent().parent().show(defaultSpeed);
+	    $("#id_3-chip_method_notes").parent().parent().show(defaultSpeed);
+	    $('#id_3-chip_data_extra_field').parent().parent().show(defaultSpeed);
+	} else {
+	    $("#id_3-peak_calling_method").parent().parent().hide(defaultSpeed);
+	    $("#id_3-assay_conditions").parent().parent().hide(defaultSpeed);
+	    $("#id_3-chip_method_notes").parent().parent().hide(defaultSpeed);
+	    $('#id_3-chip_data_extra_field').parent().parent().hide(defaultSpeed);
+	}
+    });
 
+    /*
     // Hide <is_it_sequence> field by default
     if ($("#id_3-motif_associated").is(":checked")) {
 	$("#id_3-is_coordinate").parent().parent().hide(defaultSpeed);
@@ -88,6 +114,8 @@ $(document).ready(function() {
 	    $("#id_3-method_notes").parent().parent().hide(defaultSpeed);
 	}
     });
+
+    */
     
 });
 

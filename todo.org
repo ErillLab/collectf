@@ -16,4 +16,5 @@
 - curation view add xref
 - complex notes and xdbref fields combine
 - overlapping sites in browse page
-
+- session control
+- operon prediction

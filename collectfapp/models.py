@@ -210,10 +210,13 @@ class Curation_SiteInstance(models.Model):
     annotated_seq = models.TextField()
     # regulation
     regulates = models.ManyToManyField("Gene", through="Regulation")
-    # chipseq link (NULL if site instance is not curated as chip-seq data)
-    peak_intensity = models.FloatField(null=True, blank=True)
-    chipseq_info = models.ForeignKey("ChipSeqInfo", null=True, blank=True)
+
+    # ChIP link (NULL if site instance is not curated as ChIP data)
+    chip_info = models.ForeignKey("ChipInfo", null=True, blank=True)
     
+    quantitative_value = models.FloatField(null=True, blank=True)
+    
+
     
     def __unicode__(self):
         return u"reported: %s, matched: %s" % (self.site_instance, self.annotated_seq)
@@ -265,14 +268,16 @@ class ExperimentalTechniqueCategory(models.Model):
     class Meta:
         verbose_name_plural = "experimental_technique_categories"
 
-class ChipSeqInfo(models.Model):
-    chipseq_info_id = models.AutoField(primary_key=True)
+class ChipInfo(models.Model):
+    chip_info_id = models.AutoField(primary_key=True)
     peak_calling_method = models.CharField(max_length=500)
     assay_conditions = models.CharField(max_length=500)
     method_notes = models.CharField(max_length=2000)
 
     def __unicode__(self):
-        return u'[%d] %s - %s ' % (self.chipseq_info_id, self.peak_calling_method[:10], self.assay_conditions[:10])
+        return u'[%d] %s - %s ' % (self.chip_info_id,
+                                   self.peak_calling_method[:10],
+                                   self.assay_conditions[:10])
 
 class ExternalDatabase(models.Model):
     ext_database_id = models.AutoField(primary_key=True)

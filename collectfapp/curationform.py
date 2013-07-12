@@ -191,22 +191,27 @@ class TechniquesForm(forms.Form):
 class SiteReportForm(forms.Form):
     """Form to input the list of sites reported in the paper"""
     help_dict = helptext.site_report_form
-    motif_associated = forms.BooleanField(required=False,
-                                          initial=True,
-                                          label="Reported sites are motif associated.",
-                                          help_text=help_dict['motif_associated'])
+    is_motif_associated = forms.BooleanField(required=False,
+                                             initial=True,
+                                             label="Reported sites are motif associated.",
+                                             help_text=help_dict['is_motif_associated'])
+
+    is_chip_data = forms.BooleanField(initial=False,
+                                      required=False,
+                                      label="This paper reports ChIP data",
+                                      help_text=help_dict['is_chip_data'])
+
+    has_quantitative_data = forms.BooleanField(initial=False,
+                                               required=False,
+                                               label="Sites are associated with quantitative data",
+                                               help_text=help_dict['has_quantitative_data'])
     
     is_coordinate = forms.BooleanField(initial=False,
                                        required=False,
                                        label="Binding sequence coordinates are reported in the paper.",
                                        help_text=help_dict['is_coordinate'])
 
-    is_chip_seq_data = forms.BooleanField(initial=False,
-                                          required=False,
-                                          label="This paper reports Chip-Seq data",
-                                          help_text=help_dict['is_chip_seq_data'])
-    
-    # fields about chip-seq data. To be used only if data is chip-seq
+    # ChIP Fields
     peak_calling_method = forms.CharField(required=False,
                                           label="Peak calling method")
     
@@ -214,67 +219,300 @@ class SiteReportForm(forms.Form):
                                        label="Assay conditions",
                                        widget=forms.Textarea)
     
-    method_notes = forms.CharField(required=False,
-                                   label="Method notes",
-                                   widget=forms.Textarea)
-    
+    chip_method_notes = forms.CharField(required=False,
+                                        label="ChIP Method notes",
+                                        widget=forms.Textarea)
+
+    # Extra ChIP-field for associating quantitative values from non-motif reported
+    # ChIP sites to motif-associated ones. If user selects both ChIP-data and
+    # motif-associated-site and quantitative-data options, it means that, user wants
+    # to enter both sites (without peak intensities) and longer regions (with peak
+    # intensities). The idea here is to associate peak_intensity values from longer
+    # regions to the motif_associated ones.
+    chip_data_extra_field = forms.CharField(required=False,
+                                            label="ChIP data extra field.",
+                                            help_text=help_dict['chip_data_extra_field'],
+                                            widget=forms.Textarea)
+
+    # End of ChIP fields
+
     sites = forms.CharField(required=True,
                             widget=forms.Textarea,
-                            label="Sites") # fill help text with js
+                            label="Sites",
+                            help_text=help_dict['sites'])
+
+
+    # Based on variables about site data, namely
+    # - is_motif_associated
+    # - is_chip_data
+    # - has_quantitative_data
+    # - is_coordinate
+    # the way that form is handled properly (at least trying).
+    # To avoid long and ugly if/else clauses, all cases are handled in separate
+    # functions which are called from clean(self) function.
+
+    # Before introducing those clean_helper functions, here are some verify functions
+    def verify_coordinates(self, coor_a, coor_b):
+        try:
+            x,y = int(coor_a), int(coor_b)
+            return x,y
+        except ValueError:
+            return None
+
+    def verify_float(self, s):
+        # given string s, check if it is in float format
+        try:
+            x = float(s)
+            return x
+        except ValueError:
+            return None
+
+    # verify_site_sequences -- in sitesearch.py (handles FASTA format too.)
+
+
+    # -- helper helper functions
+    def verify_only_sites(self, cleaned_data):
+        # Clean function to check if all site sequences are valid
+        sites_cd = cleaned_data.get('sites')
+        sites = sitesearch.parse_site_input(sites_cd)
+        if not sites:
+            msg = "Ambiguous DNA sequence"
+            raise forms.ValidationError(msg)
+        return cleaned_data
+
+    def verify_only_coordinates(self, cleaned_data):
+        # Clean function to check if all coordinates are valid
+        sites_cd = cleaned_data.get('sites')
+        coordinates = [re.split('[\t ]+', line) for line in re.split('[\r\n]+', sites_cd)]
+        msg = "Invalid coordinate format."
+        for instance in coordinates:
+            if len(instance) != 2:
+                raise forms.ValidationError(msg)
+            if not self.verify_coordinates(instance[0], instance[1]):
+                raise forms.ValidationError(msg)
+        return cleaned_data
+
+    def verify_only_sites_and_values(self, cleaned_data):
+        # Verify input fields which may have
+        # - either only sequences, or
+        # - sequences and quantitative values (one per site)
+        sites_cd = cleaned_data.get('sites').strip()
+        lines = [re.split('[\t ]+', line) for line in re.split('[\r\n]+', sites_cd)]
+        if (all(len(line) == 2 for line in lines) and
+            all(nuc in 'ACTGactg' for line in lines for nuc in line[0]) and
+            all(self.verify_float(line[1]) for line in lines)):
+            pass
+        else:
+            raise forms.ValidationError("invalid format")
+        
+        return cleaned_data
+
+    def verify_only_coordinates_and_values(self, cleaned_data):
+        # Verify input fields which may have
+        # - either only coordinates, or
+        # - coordinates and quantitative values (one per site)
+        sites_cd = cleaned_data.get('sites')
+        lines = [re.split('[\t ]+', line) for line in re.split('[\r\n]+', sites_cd)]
+        if (all(len(line)==3 for line in lines) and
+            all(self.verify_coordinates(line[0], line[1]) for line in lines) and
+            all(self.verify_float(line[2]) for line in lines)):
+            pass
+        else:
+            raise forms.ValidationError("Invalid input format.")
+        return cleaned_data
+
+    def verify_chip_data_extra_field(self, cleaned_data):
+        # verify chip_data extra field
+        # This field is used to associate motif-associated-sites with quantitative values, 
+        chip_data_extra_field = cleaned_data.get('chip_data_extra_field')
+        lines = [re.split('[\t ]+', line) for line in re.split('[\r\n]+', chip_data_extra_field)]
+        if (all(len(line)==3 for line in lines) and
+            all(self.verify_coordinates(line[0], line[1]) for line in lines) and
+            all(self.verify_float(line[2]) for line in lines)):
+            pass
+        else:
+            raise forms.ValidationError("Invalid ChIP data extra field format.")
+
+
+    # real clean_helper functions (16 of them -- wow)
+    def clean_helper_0(self, cleaned_data):
+        # NOT is_motif_associated
+        # NOT is_chip_data
+        # NOT has_quantitative_data
+        # NOT is_coordinate
+        # Just site sequences are expected. Nothing to handle specially.
+        return self.verify_only_sites(cleaned_data)
+    
+    def clean_helper_1(self, cleaned_data):
+        # NOT is_motif_associated
+        # NOT is_chip_data
+        # NOT has_quantitative_data
+        # is_coordinate
+        # The site input field contains only coordinates (start,end)
+        return self.verify_only_coordinates(cleaned_data)
+
+    def clean_helper_2(self, cleaned_data):
+        # NOT is_motif_associated
+        # NOT is_chip_data
+        # has_quantitative_data
+        # NOT is_coordinate
+        # In this input type, each site is reported with sequence and quantitative data.
+        # after soft_site_search (in that form, for each matched site instance, quantitative values are asked
+        # to be entered.
+        # Check if all fields have either only sequence or, sequence and quantitative values
+        return self.verify_only_sites_and_values(cleaned_data)
+
+    def clean_helper_3(self, cleaned_data):
+        # NOT is_motif_associated
+        # NOT is_chip_data
+        # has_quantitative_data
+        # is_coordinate
+        # Coordinates may be entered in this step or later. Therefore, all lines either
+        # - must have only coordinates, or
+        # - must have coordinates + quantitative values
+        return self.verify_only_coordinates_and_values(cleaned_data)
+
+    def clean_helper_4(self, cleaned_data):
+        # NOT is_motif_associated
+        # is_chip_data
+        # NOT has_quantitative_data
+        # NOT is_coordinate
+        # only sequence
+        return self.verify_only_sites(cleaned_data)
+
+    def clean_helper_5(self, cleaned_data):
+        # NOT is_motif_associated
+        # is_chip_data
+        # NOT has_quantitative_data
+        # is_coordinate
+        # only coordinates
+        return self.verify_only_coordinates(cleaned_data)
+
+    def clean_helper_6(self, cleaned_data):
+        # NOT is_motif_associated
+        # is_chip_data
+        # has_quantitative_data
+        # NOT is_coordinate
+        # If it is ChIP but not reported with coordinates, we don't handle this case yet.
+        # For now, ChIP data must be with coordinates (unless it is is_motif_associated)
+        return self.verify_only_sites_and_values(cleaned_data)
+
+    def clean_helper_7(self, cleaned_data):
+        # NOT is_motif_associated
+        # is_chip_data
+        # has_quantitative_data
+        # is_coordinate
+        # Both coordinates and quantitative data. However, quantitative data may be entered later.
+        return self.verify_only_coordinates_and_values(cleaned_data)
+
+    def clean_helper_8(self, cleaned_data):
+        # is_motif_associated
+        # NOT is_chip_data
+        # NOT has_quantitative_data
+        # NOT is_coordinate
+        # Just site sequences are expected. Nothing to handle specially.
+        return self.verify_only_sites(cleaned_data)
+
+    def clean_helper_9(self, cleaned_data):
+        # is__motif_associated
+        # NOT is_chip_data
+        # NOT has_quantitative_data
+        # is_coordinate
+        # ONLY coordinates are reported, nothing more.
+        return self.verify_only_coordinates(cleaned_data)
+
+    def clean_helper_10(self, cleaned_data):
+        # is_motif_associated
+        # NOT is_chip_data
+        # has_quantitative_data
+        # NOT is_coordinate
+        # If this is the case, nothing special needs to be handled.
+        return self.verify_only_sites_and_values(cleaned_data)
+
+    def clean_helper_11(self, cleaned_data):
+        # is_motif_associated
+        # NOT is_chip_data
+        # has_quantitative_data
+        # is_coordinate
+        return self.verify_only_coordinates_and_values(cleaned_data)
+
+    def clean_helper_12(self, cleaned_data):
+        # is_motif_associated
+        # is_chip_data
+        # NOT has_quantitative_data
+        # NOT is_coordinate
+        return self.verify_only_sites(cleaned_data)
+
+    def clean_helper_13(self, cleaned_data):
+        # is_motif_associated
+        # is_chip_data
+        # NOT has_quantitative_data
+        # is_coordinate
+        # The site input field contains only coordinates
+        return self.verify_only_coordinates(cleaned_data)
+
+    def clean_helper_14(self, cleaned_data):
+        # is_motif_associated
+        # is_chip_data
+        # has_quantitative_data
+        # NOT is_coordinate
+        self.verify_only_sites(cleaned_data)
+        # extra check on ChIP extra field.
+        # Always coordinates and quantitative data are expected here.
+        self.verify_chip_data_extra_field(cleaned_data)
+        return cleaned_data
+
+    def clean_helper_15(self, cleaned_data):
+        # is_motif_associated
+        # is_chip_data
+        # has_quantitative_data
+        # is_coordinate
+        self.verify_only_coordinates(cleaned_data)
+        # extra check on ChIP extra field.
+        # Always coordinates and quantitative data are expected here.
+        self.verify_chip_data_extra_field(cleaned_data)
+        return cleaned_data
 
     def clean(self):
+        # Form fields that depend on each other are handled in this function.
         cleaned_data = super(SiteReportForm, self).clean()
         if "sites" not in cleaned_data:
             return  # raise form validation error
+        
+        cleaned_data['sites'].strip()  # remove trailing spaces
+        if not cleaned_data['sites']: return # raise form validation error
 
         print cleaned_data
-        c_motif_associated = cleaned_data.get("motif_associated")
-        c_is_coordinate = cleaned_data.get("is_coordinate")
-        c_is_chip_seq_data = cleaned_data.get("is_chip_seq_data")
-        
-        if c_motif_associated:
-            # Reported sites are motif associated. In other words, they are true
-            # binding sites that TF binds, not a arbitrarily long sequence (that have
-            # the actual binding site somewhere in it) identified using Chip-Seq or
-            # some other experimental method.
-            sites_cd = cleaned_data.get("sites")
-            sites = sitesearch.parse_site_input(sites_cd)
-            if not sites:
-                raise forms.ValidationError("ambiguous DNA sequence")
-        else:
-            # means the site is not a true site, it can be a few 100s bp and have site somewhere in it.
-            if not c_is_coordinate: # reported text is a list of sequences
-                sites_cd = cleaned_data.get("sites")
-                sites = sitesearch.parse_site_input(sites_cd)
-                if not sites:
-                    raise forms.ValidationError("ambiguous DNA sequence")
-            else:  # reported text is a list of coordinates for each sequences.
-                sites_cd = cleaned_data.get("sites")
-                while sites_cd[-1] in "\r\n\t ":
-                    sites_cd = sites_cd[:-1]
-                coordinates = [re.split("[\t ,]+", line) for line in re.split("[\r\n]+", sites_cd)]
-                print coordinates
-                if (c_is_chip_seq_data and any(len(coordinates[i]) != 3 for i in xrange(len(coordinates)))):
-                    raise forms.ValidationError("Invalid coordinate input, all instances should have 3 fields (start, end, intensity-value).")
-                if (not c_is_chip_seq_data and any(len(coordinates[i]) != 2 for i in xrange(len(coordinates)))):
-                    raise forms.ValidationError("Invalid coordinate input, all instances should have 2 fields (start, end).")
 
-                if any(int(coor[0]) >= int(coor[1]) for coor in coordinates):
-                    raise forms.ValidationError("Invalid coordinates")
+        is_motif_associated = cleaned_data.get("is_motif_associated")
+        is_chip_data = cleaned_data.get("is_chip_data")
+        has_quantitative_data = cleaned_data.get('has_quantitative_data')
+        is_coordinate = cleaned_data.get("is_coordinate")
 
-        if c_is_chip_seq_data:
-            c_peak_calling_method = cleaned_data.get("peak_calling_method")
-            if not c_peak_calling_method:
+        # Input validation
+        # Don't let user proceeed if it is not exact genome and coordinate data is selected.
+        # TODO
+
+        func = (('1' if is_motif_associated else '0') +
+                ('1' if is_chip_data else '0') +
+                ('1' if has_quantitative_data else '0') +
+                ('1' if is_coordinate else '0'))
+        func_call_str = 'self.clean_helper_%d(cleaned_data)' % int(func,2)
+        print 'form_validation:', func_call_str
+        eval(func_call_str)
+
+        # extra validations for ChIP data
+        if is_chip_data:
+            if not cleaned_data.get('peak_calling_method'):
                 msg = "Peak calling method can not be blank."
                 self._errors["peak_calling_method"] = self.error_class([msg])
-            c_assay_conditions = cleaned_data.get("assay_conditions")
-            if not c_assay_conditions:
+            if not cleaned_data.get('assay_conditions'):
                 msg = "Assay conditions field can not be blank."
                 self._errors["assay_conditions"] = self.error_class([msg])
-            c_method_notes = cleaned_data.get("method_notes")
-            if not c_method_notes:
+            if not cleaned_data.get('chip_method_notes'):
                 msg = "Method notes field can not be blank."
-                self._errors["method_notes"] = self.error_class([msg])
+                self._errors["chip_method_notes"] = self.error_class([msg])
+
                 
         return self.cleaned_data
 
@@ -333,3 +571,13 @@ class CurationReviewForm(forms.Form):
     confirm = forms.BooleanField(required=True,
                                  label="I want to submit this curation",
                                  help_text=help_dict['confirm'])
+
+
+# One extra form goes here: Site quantitative value form
+class SiteQuantitativeDataForm(forms.Form):
+    """In this form, all matched sites are presented with prefilled quantitative
+    values (if any). The purpose is to let user review quantitative data associated
+    with each site, before writing anything to database. This form is displayed only
+    if the curation is marked as 'sites with quantitative data'.
+    """
+    

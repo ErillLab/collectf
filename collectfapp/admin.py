@@ -34,7 +34,6 @@ class SiteInstanceAdmin(admin.ModelAdmin):
     
 class Curation_SiteInstanceAdmin(admin.ModelAdmin):
     list_display = ('id',)
-    raw_id_fields = ('chipseq_info',)
     list_filter = ('is_motif_associated',)
     ordering = ('-id',)
 
@@ -42,7 +41,6 @@ class PublicationAdmin(admin.ModelAdmin):
     list_display = ('publication_id', 'pmid', 'title', 'assigned_to')
     list_filter = ('assigned_to', 'curation_complete', 'reported_TF', 'reported_species')
     search_fields = ('pmid',)
-
 
 class ExperimentalTechniqueAdmin(admin.ModelAdmin):
     list_display = ('name', )

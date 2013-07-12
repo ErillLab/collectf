@@ -78,7 +78,7 @@ def edit_curation(request, cid):
                '1': init_genome_form(old_curation),
                '2': init_techniques_form(old_curation),
                '3': init_site_report_form(old_curation),
-               '7': init_curation_review_form(old_curation),
+               '9': init_curation_review_form(old_curation),
               }
     
     # since if paper complete, it will not be displayed in the first form as
@@ -107,6 +107,7 @@ def edit_curation(request, cid):
                                   SiteReportForm,
                                   SiteExactMatchForm,
                                   SiteSoftMatchForm,
+                                  SiteQuantitativeDataForm,
                                   SiteRegulationForm,
                                   CurationReviewForm],
                                  initial_dict=initial,

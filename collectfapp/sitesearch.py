@@ -30,8 +30,8 @@ def print_alignment(seqa, seqb):
 def print_site_match(reported_site, m, is_exact):
     """Given a match object, make the html snippet to display it nice.  I am not sure
     this is a proper solution (HTML in python), couldn't find a better&easier way to
-    do though"""
-    
+    do though.
+    """
     strand = '+' if m.match.strand==1 else '-'
     nearby_genes = [g.locus_tag + (' (%s)' % g.name if g.name != g.locus_tag else '')
                     for g in m.nearby_genes]
@@ -56,6 +56,7 @@ def print_site_match(reported_site, m, is_exact):
 def parse_site_input(text):
     """Parse text of reported sites. It can be either in FASTA format, or plain
     list of site sequences"""
+    print 'text', text
     if text.strip().startswith('>'): # FASTA format
         l = SeqIO.parse(StringIO.StringIO(text), 'fasta')
         sites = [item.seq.tostring() for item in l]
@@ -170,26 +171,20 @@ def locate_nearby_genes(genes, site_loc, dist_th=50):
         rhs_index += 1
     return nearby_genes
 
-def match_all_exact_coordinates(genome, genes, coordinates):
-    """Return sites and matches for chip-seq data. Session Data structures don't make
-    much sense, but it is this way to be in the same format with motif-associated
-    sites"""
-    
+def match_all_exact_coordinates_only(genome, genes, coordinates):
+    """Return sites and matches for coordinate input."""
     sites = {}
     site_matches = {} # for all coordinates, there will be one exact match
-    peak_intensities = {} 
+    site_quantitative_data = {} # for all sites <site_id, val>
     for cid, coor in enumerate(coordinates):
         start = int(coor[0])
         end = int(coor[1])
-        print start,end
         match = Match(seq=genome.sequence[start-1:end-1], start=start, end=end, strand=1)
         nearby_genes = locate_nearby_genes(genes, match)
         sites[cid] = match.seq
         site_matches[cid] = SiteMatch(match=match, nearby_genes=nearby_genes)
-        if len(coor) == 3:
-            peak_intensities[cid] = float(coor[2])
-    return sites, site_matches, peak_intensities
-    
+        site_quantitative_data[cid] = float(coor[2]) if len(coor)==3 else None
+    return sites, site_matches, site_quantitative_data
 
 def match_all_exact(genome, genes, sites):
     """For all sites in list, find exact matches on the genome"""

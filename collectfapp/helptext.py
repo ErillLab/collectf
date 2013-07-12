@@ -60,16 +60,25 @@ techniques_form = {
 }
 
 site_report_form = {
-    'motif_associated': """This checkbox should be unchecked if reported sequences are not actual sites, but
-    sequences that have binding sites 'somewhere' in them.""",
+    'is_motif_associated': """If reported binding sites are 'true' binding sites, check this option. If a
+    reported site is much longer than actual binding site sequence and contains the true binding
+    site somewhere in its sequence, it is called a non-motif-associated site. In
+    that case, this option must be un-checked.""",
 
     'is_coordinate': """If the paper reports coordinates instead of actual sequences, check this
-    option. Input coordinates for all sequences below (one for each line). Each line
-    should have start and end positions (and intensity values for Chip-Seq
-    papers). Fields can be tab, comma or space separated.""",
+    option. Enter coordinates for all sequences below (one for each line). Each line should have
+    start and end positions, separated by space or tab characters. If the reported sites have quantitative data,
+    they should be given as third item for each site instance (i.e. {start end quantitative_value}).""",
 
-    'is_chip_seq_data': """If the paper reports sequences/coordinates identified using Chip-Seq, check this
-    box. A few extra fields will be populated""",
+    'is_chip_data': """If the paper reports sequences/coordinates identified using ChIP methods, check this
+    box. A few extra fields will be populated.""",
+
+    'has_quantitative_data': """If the paper has some quantitative values associated with each site, please check
+    this option. For example, if the used technique is ChIP, these values are peak
+    intensities. Also, for some other tecnhiques, for each site, a quantitative value
+    may be reported. They should be given as the last item for each site instance
+    (i.e. If sequences are reported, the format would be {sequence value}, and if
+    the coordinates are reported, the format would be {start_pos end_pos value}.""",
 
     'peak_calling_method': '',
 
@@ -77,9 +86,16 @@ site_report_form = {
 
     'method_notes': '',
 
-    'sites': '',
+    'sites': """Type either site sequences or coordinates. Site instances must be given in separate lines.
+    If only sequence input is given, FASTA format is supported.""",
 
-    }
+    'chip_data_extra_field': """If the used technique is ChIP and reported sites are motif-associated,
+    paste ChIP peaks to this field with intensity values (the format is {peak_start_pos peak_end_pos intensity_value}).
+    The identified motif-associated sites (given in 'Sites' field) will be searched in list of peaks (given in this field),
+    and peak intensities will be associated with motif-associated sites. The mapped peak intensity values will be displayed
+    before curation submission for review.""",
+
+}
 
 site_exact_match_form = {
     
