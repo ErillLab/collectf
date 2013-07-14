@@ -125,7 +125,7 @@ def site_exact_match_get_form(wiz, form):
     site_match_choices = sutils.sget(wiz.request.session, 'site_match_choices')
 
     for sid, matches in site_match_choices.items(): # for all matches belong to a site
-        label = mark_safe('<span class="sequence">' + sites[sid] + '</span>')
+        label = mark_safe('<span class="sequence">' + ('[%d] '%sid) + sites[sid] + '</span>')
         choices = populate_match_choices(sites[sid], matches, is_exact=True)
         # make the form field
         form.fields[sid] = forms.ChoiceField(label=label, choices=choices,
@@ -142,7 +142,7 @@ def site_soft_match_get_form(wiz, form):
     # exact site matches: {sid: SiteMatch} -- they're already matched in prev form
     exact_site_matches = sutils.sget(wiz.request.session, 'exact_site_matches')
     for sid, matches in soft_site_match_choices.items():
-        label = mark_safe('<span class="sequence">' + sites[sid] + '</span>')
+        label = mark_safe('<span class="sequence">' + ('[%d] '%sid) + sites[sid] + '</span>')
         choices = populate_match_choices(sites[sid], matches, is_exact=False)
         # make the form field
         form.fields[sid] = forms.ChoiceField(label=label, choices=choices,
@@ -156,7 +156,7 @@ def site_quantitative_data_get_form(wiz, form):
     print set(site_quantitative_data)
     assert set(sites) == set(site_quantitative_data) # make sure keys are same
     for sid,site in sites.items():
-        form.fields[sid] = forms.FloatField(label=site,
+        form.fields[sid] = forms.FloatField(label= ('[%d] '%sid) + site,
                                             initial=site_quantitative_data[sid])
         
     return form
@@ -186,6 +186,8 @@ def site_regulation_get_form(wiz, form):
         else: 'loc %s %d,%d' % ('+' if match.match.strand == 1 else '-',
                                 match.match.start,
                                 match.match.end)
+
+        label =  ('[%d] '%sid) + label # put site id in label
         
         form.fields[sid] = forms.MultipleChoiceField(label=label,
                                                      choices=choices,
