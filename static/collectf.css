@@ -111,3 +111,6 @@ sup > a {
       }
 
 
+.tooltip-inner {
+    text-align:left;
+}

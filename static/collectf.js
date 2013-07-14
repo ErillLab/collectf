@@ -22,6 +22,15 @@ $(document).ready(function() {
 	html: 'true',
     });
 
+    $('body').tooltip({
+	selector: '[data-toggle="tooltip"]',
+	trigger: 'hover',
+	placement: 'top',
+	html: 'true',
+    });
+    
+    
+
     // scroll page down a little bit
     //window.addEventListener("hashchange", function() { scrollBy(0, -50); });
 

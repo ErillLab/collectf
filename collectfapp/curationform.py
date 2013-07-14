@@ -191,36 +191,53 @@ class TechniquesForm(forms.Form):
 class SiteReportForm(forms.Form):
     """Form to input the list of sites reported in the paper"""
     help_dict = helptext.site_report_form
+    description_markup = u'<span data-toggle="tooltip" title="%s">%s</span>'
+
+    # for these fields, show help text as popover
     is_motif_associated = forms.BooleanField(required=False,
                                              initial=True,
-                                             label="Reported sites are motif associated.",
-                                             help_text=help_dict['is_motif_associated'])
+                                             label=description_markup%(help_dict['is_motif_associated'],
+                                                                       "Reported sites are motif associated."))
+                                                                       
+                                             #help_text=help_dict['is_motif_associated'])
 
     is_chip_data = forms.BooleanField(initial=False,
                                       required=False,
-                                      label="This paper reports ChIP data",
-                                      help_text=help_dict['is_chip_data'])
+                                      label=description_markup%(help_dict['is_chip_data'],
+                                                                "This paper reports ChIP data"))
+                                      #label="This paper reports ChIP data",
+                                      #help_text=help_dict['is_chip_data'])
 
     has_quantitative_data = forms.BooleanField(initial=False,
                                                required=False,
-                                               label="Sites with quantitative data",
-                                               help_text=help_dict['has_quantitative_data'])
+                                               label=description_markup%(help_dict['has_quantitative_data'],
+                                                                         "Sites with quantitative data"))
+                                               #label="Sites with quantitative data",
+                                               #help_text=help_dict['has_quantitative_data'])
     
     is_coordinate = forms.BooleanField(initial=False,
                                        required=False,
-                                       label="Coordinate entry mode",
-                                       help_text=help_dict['is_coordinate'])
+                                       label=description_markup%(help_dict['is_coordinate'],
+                                                                 "Coordinate entry mode"))
+                                       #label="Coordinate entry mode",
+                                       #help_text=help_dict['is_coordinate'])
 
     # ChIP Fields
     peak_calling_method = forms.CharField(required=False,
-                                          label="Quantitative data format")
+                                          label=description_markup%('',
+                                                                    "Quantitative data format"))
+                                          #label="Quantitative data format")
     
     assay_conditions = forms.CharField(required=False,
-                                       label="Assay conditions",
+                                       label=description_markup%('',
+                                                                 "Assay conditions"),
+                                       #label="Assay conditions",
                                        widget=forms.Textarea)
     
     chip_method_notes = forms.CharField(required=False,
-                                        label="ChIP Method notes",
+                                        label=description_markup%('',
+                                                                  "ChIP method notes"),
+                                        #label="ChIP Method notes",
                                         widget=forms.Textarea)
 
     # Extra ChIP-field for associating quantitative values from non-motif reported
@@ -230,8 +247,10 @@ class SiteReportForm(forms.Form):
     # intensities). The idea here is to associate peak_intensity values from longer
     # regions to the motif_associated ones.
     chip_data_extra_field = forms.CharField(required=False,
-                                            label="Supporting ChIP quantitative data.",
-                                            help_text=help_dict['chip_data_extra_field'],
+                                            label=description_markup%(help_dict['chip_data_extra_field'],
+                                                                      "Supporting ChIP quantitative data"),
+                                            #label="Supporting ChIP quantitative data.",
+                                            #help_text=help_dict['chip_data_extra_field'],
                                             widget=forms.Textarea)
 
     # End of ChIP fields
