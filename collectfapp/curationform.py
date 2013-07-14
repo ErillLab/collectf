@@ -600,4 +600,5 @@ class SiteQuantitativeDataForm(forms.Form):
     with each site, before writing anything to database. This form is displayed only
     if the curation is marked as 'sites with quantitative data'.
     """
+    pass
     

@@ -32,6 +32,7 @@ from django.utils.safestring import mark_safe
 from django.contrib import messages
 from baseapp.templatetags import gene_diagram
 from baseapp.templatetags import publication_tags
+from baseapp.templatetags import pretty_print
 
 # curation get form functions
 # get_form constructs the form for a given step
@@ -106,16 +107,16 @@ def site_report_get_form(wiz, form):
     return form
 
 # helper function for site_exact_match_form and site_soft_match_forms
-def populate_match_choices(site, matches, is_exact):
+def populate_match_choices(site, matches, is_exact, add_no_valid_opt=False):
     # for a given site and its all matches, populate Django field choice
     # exact_match: True if populating exact match results, if false, soft search
     choices = []
     for mid, match in matches.items():
         choices.append((mid, sitesearch.print_site_match(site, match, is_exact)))
-    last_choice_msg = "No valid match"
-    choices.append((None, last_choice_msg))
+    if add_no_valid_opt:
+        last_choice_msg = "No valid match"
+        choices.append((None, last_choice_msg))
     return choices
-
     
 def site_exact_match_get_form(wiz, form):
     """Show list of sites and their exact matches."""
@@ -124,12 +125,24 @@ def site_exact_match_get_form(wiz, form):
     sites = sutils.sget(wiz.request.session, 'sites')
     site_match_choices = sutils.sget(wiz.request.session, 'site_match_choices')
 
+    is_coordinate = sutils.sget(wiz.request.session, 'is_coordinate')
+
+    # If sites are reported as coordinates, this form is read only
+    add_no_valid_opt = not is_coordinate
     for sid, matches in site_match_choices.items(): # for all matches belong to a site
-        label = mark_safe('<span class="sequence">' + ('[%d] '%sid) + sites[sid] + '</span>')
-        choices = populate_match_choices(sites[sid], matches, is_exact=True)
+        label = pretty_print.site2label(sid,sites[sid])
+        choices = populate_match_choices(sites[sid],
+                                         matches,
+                                         is_exact=True,
+                                         add_no_valid_opt=add_no_valid_opt)
         # make the form field
-        form.fields[sid] = forms.ChoiceField(label=label, choices=choices,
+        form.fields[sid] = forms.ChoiceField(label=label,
+                                             choices=choices,
                                              widget=forms.RadioSelect())
+
+        if is_coordinate: # make the first option selected
+            #form.fields[sid].widget.attrs['disabled']='disabled'
+            form.fields[sid].initial = choices[0][0]
     return form
 
 def site_soft_match_get_form(wiz, form):
@@ -142,7 +155,7 @@ def site_soft_match_get_form(wiz, form):
     # exact site matches: {sid: SiteMatch} -- they're already matched in prev form
     exact_site_matches = sutils.sget(wiz.request.session, 'exact_site_matches')
     for sid, matches in soft_site_match_choices.items():
-        label = mark_safe('<span class="sequence">' + ('[%d] '%sid) + sites[sid] + '</span>')
+        label = pretty_print.site2label(sid, sites[sid])
         choices = populate_match_choices(sites[sid], matches, is_exact=False)
         # make the form field
         form.fields[sid] = forms.ChoiceField(label=label, choices=choices,
@@ -153,10 +166,13 @@ def site_quantitative_data_get_form(wiz, form):
     sites = sutils.sget(wiz.request.session, 'sites')
     site_quantitative_data = sutils.sget(wiz.request.session, 'site_quantitative_data')
     print set(sites)
+    print sites
     print set(site_quantitative_data)
     assert set(sites) == set(site_quantitative_data) # make sure keys are same
+    print sites
     for sid,site in sites.items():
-        form.fields[sid] = forms.FloatField(label= ('[%d] '%sid) + site,
+        print pretty_print.site2label(sid,site)
+        form.fields[sid] = forms.FloatField(label=pretty_print.site2label(sid,site),
                                             initial=site_quantitative_data[sid])
         
     return form
@@ -181,14 +197,8 @@ def site_regulation_get_form(wiz, form):
         for g in match.nearby_genes:
             choices.append((g.gene_id, '%s (%s): %s' % (g.locus_tag, g.name, g.description)))
 
-        if (len(match.match.seq) <= 25):
-            label = match.match.seq
-        else: 'loc %s %d,%d' % ('+' if match.match.strand == 1 else '-',
-                                match.match.start,
-                                match.match.end)
+        label = pretty_print.match2label(sid, match)
 
-        label =  ('[%d] '%sid) + label # put site id in label
-        
         form.fields[sid] = forms.MultipleChoiceField(label=label,
                                                      choices=choices,
                                                      required=False,
@@ -298,18 +308,19 @@ def site_report_process(wiz, form):
         coordinates = form.cleaned_data['sites'].strip()
         coordinates = [re.split('[\t ]+', line) for line in re.split('[\r\n]+', coordinates)]
         res = sitesearch.match_all_exact_coordinates_only(genome, genes, coordinates)
-        sites, exact_site_matches, site_quantitative_data = res
+        sites, site_match_choices, site_quantitative_data = res
         print 'sites2', sites
         # This assertion should stay here (site_quantitative_data = {} -> request.session below)
         if not with_quantitative: # no quantitative data should be present
             assert all(not val for val in site_quantitative_data.values()), "site_quantitative_data not null"
+            site_quantitative_data = {}
         # Put sites and site matches into session data
-        sutils.sput(wiz.request.session, 'exact_site_matches', exact_site_matches)
+        sutils.sput(wiz.request.session, 'site_match_choices', site_match_choices)
         sutils.sput(wiz.request.session, 'sites', sites)
-        sutils.sput(wiz.request.session, 'site_quantitative_data', {})
+        sutils.sput(wiz.request.session, 'site_quantitative_data', site_quantitative_data)
         sutils.sput(wiz.request.session, 'soft_site_matches', {})
         sutils.sput(wiz.request.session, 'not_matched_sites', [])
-        sutils.sput(wiz.request.session, 'site_match_choices', {})
+        sutils.sput(wiz.request.session, 'exact_site_matches', {})
         sutils.sput(wiz.request.session, 'soft_site_match_choices', {})
 
     def process_helper_chip_assoc():
@@ -546,7 +557,11 @@ def site_soft_match_process(wiz, form):
 
 
 def site_quantitative_data_process(wiz, form):
-    pass
+    print form.cleaned_data
+    quantitative_vals = sutils.sget(wiz.request.session, 'site_quantitative_data')
+    for id,val in form.cleaned_data.items():
+        quantitative_vals[id] = val
+    sutils.sput(wiz.request.session, 'site_quantitative_data', quantitative_vals)
         
 def site_regulation_process(wiz, form):
     pass
@@ -643,7 +658,7 @@ def site_match_done(wiz, curation, regulations):
     sites = sutils.sget(wiz.request.session, 'sites')
     exact_site_matches = sutils.sget(wiz.request.session, 'exact_site_matches')
     soft_site_matches = sutils.sget(wiz.request.session, 'soft_site_matches')
-    
+    quantitative_vals = sutils.sget(wiz.request.session, 'site_quantitative_data')
     genome = sutils.sget(wiz.request.session, 'genome')  # get genome
     # combine exact and soft site matches
     all_site_matches = []
@@ -932,6 +947,7 @@ def curation(request):
     return view(request)
 
 def exact_site_match_form_condition(wizard):
+    return True
     return sutils.sget(wizard.request.session,'site_match_choices')
 
 def inexact_site_match_form_condition(wizard):

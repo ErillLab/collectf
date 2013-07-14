@@ -182,7 +182,8 @@ def match_all_exact_coordinates_only(genome, genes, coordinates):
         match = Match(seq=genome.sequence[start-1:end-1], start=start, end=end, strand=1)
         nearby_genes = locate_nearby_genes(genes, match)
         sites[cid] = match.seq
-        site_matches[cid] = SiteMatch(match=match, nearby_genes=nearby_genes)
+        site_matches[cid] = {}
+        site_matches[cid][0] = SiteMatch(match=match, nearby_genes=nearby_genes)
         site_quantitative_data[cid] = float(coor[2]) if len(coor)==3 else None
     return sites, site_matches, site_quantitative_data
 
