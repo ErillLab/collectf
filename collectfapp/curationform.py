@@ -203,17 +203,17 @@ class SiteReportForm(forms.Form):
 
     has_quantitative_data = forms.BooleanField(initial=False,
                                                required=False,
-                                               label="Sites are associated with quantitative data",
+                                               label="Sites with quantitative data",
                                                help_text=help_dict['has_quantitative_data'])
     
     is_coordinate = forms.BooleanField(initial=False,
                                        required=False,
-                                       label="Binding sequence coordinates are reported in the paper.",
+                                       label="Coordinate entry mode",
                                        help_text=help_dict['is_coordinate'])
 
     # ChIP Fields
     peak_calling_method = forms.CharField(required=False,
-                                          label="Peak calling method")
+                                          label="Quantitative data format")
     
     assay_conditions = forms.CharField(required=False,
                                        label="Assay conditions",
@@ -230,7 +230,7 @@ class SiteReportForm(forms.Form):
     # intensities). The idea here is to associate peak_intensity values from longer
     # regions to the motif_associated ones.
     chip_data_extra_field = forms.CharField(required=False,
-                                            label="ChIP data extra field.",
+                                            label="Supporting ChIP quantitative data.",
                                             help_text=help_dict['chip_data_extra_field'],
                                             widget=forms.Textarea)
 
