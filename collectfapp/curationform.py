@@ -222,6 +222,11 @@ class SiteReportForm(forms.Form):
                                        #label="Coordinate entry mode",
                                        #help_text=help_dict['is_coordinate'])
 
+    sites = forms.CharField(required=True,
+                            widget=forms.Textarea,
+                            label="Sites",
+                            help_text=help_dict['sites'])
+
     # ChIP Fields
     peak_calling_method = forms.CharField(required=False,
                                           label=description_markup%('',
@@ -255,10 +260,6 @@ class SiteReportForm(forms.Form):
 
     # End of ChIP fields
 
-    sites = forms.CharField(required=True,
-                            widget=forms.Textarea,
-                            label="Sites",
-                            help_text=help_dict['sites'])
 
 
     # Based on variables about site data, namely
@@ -292,7 +293,7 @@ class SiteReportForm(forms.Form):
     # -- helper helper functions
     def verify_only_sites(self, cleaned_data):
         # Clean function to check if all site sequences are valid
-        sites_cd = cleaned_data.get('sites')
+        sites_cd = cleaned_data.get('sites').strip()
         sites = sitesearch.parse_site_input(sites_cd)
         if not sites:
             msg = "Ambiguous DNA sequence"
@@ -301,7 +302,7 @@ class SiteReportForm(forms.Form):
 
     def verify_only_coordinates(self, cleaned_data):
         # Clean function to check if all coordinates are valid
-        sites_cd = cleaned_data.get('sites')
+        sites_cd = cleaned_data.get('sites').strip()
         coordinates = [re.split('[\t ]+', line) for line in re.split('[\r\n]+', sites_cd)]
         msg = "Invalid coordinate format."
         for instance in coordinates:
@@ -330,7 +331,7 @@ class SiteReportForm(forms.Form):
         # Verify input fields which may have
         # - either only coordinates, or
         # - coordinates and quantitative values (one per site)
-        sites_cd = cleaned_data.get('sites')
+        sites_cd = cleaned_data.get('sites').strip()
         lines = [re.split('[\t ]+', line) for line in re.split('[\r\n]+', sites_cd)]
         if (all(len(line)==3 for line in lines) and
             all(self.verify_coordinates(line[0], line[1]) for line in lines) and
@@ -343,7 +344,7 @@ class SiteReportForm(forms.Form):
     def verify_chip_data_extra_field(self, cleaned_data):
         # verify chip_data extra field
         # This field is used to associate motif-associated-sites with quantitative values, 
-        chip_data_extra_field = cleaned_data.get('chip_data_extra_field')
+        chip_data_extra_field = cleaned_data.get('chip_data_extra_field').strip()
         lines = [re.split('[\t ]+', line) for line in re.split('[\r\n]+', chip_data_extra_field)]
         if (all(len(line)==3 for line in lines) and
             all(self.verify_coordinates(line[0], line[1]) for line in lines) and
