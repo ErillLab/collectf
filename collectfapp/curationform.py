@@ -36,27 +36,27 @@ class GenomeForm(forms.Form):
 
     genome_accession = forms.CharField(label="Genome NCBI accession number",
                                        help_text=help_dict['genome_accession'])
-    
+
+    site_species_same = forms.BooleanField(required=False,
+                                           label="""This is the exact same
+                                           strain as reported in the
+                                           manuscript for the sites.""")   
+
+    TF_accession = forms.CharField(label="TF accession number",
+                                   help_text=help_dict['TF_accession'])
+
     TF_species_same = forms.BooleanField(required=False,
                                          label="""This is the exact same
                                          strain as reported in the manuscript for the TF.""")
     
-    site_species_same = forms.BooleanField(required=False,
-                                           label="""This is the exact same
-                                           strain as reported in the
-                                           manuscript for the sites.""") 
-
-
-    TF_accession = forms.CharField(label="TF accession number",
-                                   help_text=help_dict['TF_accession'])
+    site_species = forms.CharField(label="Organism TF binding sites are reported in",
+                                   required=False,
+                                   help_text=help_dict['site_species'])   
 
     TF_species = forms.CharField(label="Organism of origin for reported TF",
                                  required=False,
                                  help_text=help_dict['TF_species'])
 
-    site_species = forms.CharField(label="Organism TF binding sites are reported in",
-                                   required=False,
-                                   help_text=help_dict['site_species'])
 
     
     def clean_genome_accession(self):
