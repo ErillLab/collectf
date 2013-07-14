@@ -40,7 +40,7 @@ def site_match_diagram(site_match):
              fragments=1,
              start=min(map(lambda g: g.start, site_match.nearby_genes))-50,
              end=max(map(lambda g: g.end, site_match.nearby_genes))+50,
-             pagesize=(3*cm, 17*cm))
+             pagesize=(2*cm, 14*cm))
     return mark_safe(gdd.write_to_string('svg'))
                          
 @register.filter

@@ -112,7 +112,7 @@ def populate_match_choices(site, matches, is_exact, add_no_valid_opt=False):
     # exact_match: True if populating exact match results, if false, soft search
     choices = []
     for mid, match in matches.items():
-        choices.append((mid, sitesearch.print_site_match(site, match, is_exact)))
+        choices.append((mid, pretty_print.print_site_match(site, match, is_exact)))
     if add_no_valid_opt:
         last_choice_msg = "No valid match"
         choices.append((None, last_choice_msg))
@@ -158,22 +158,26 @@ def site_soft_match_get_form(wiz, form):
         label = pretty_print.site2label(sid, sites[sid])
         choices = populate_match_choices(sites[sid], matches, is_exact=False)
         # make the form field
-        form.fields[sid] = forms.ChoiceField(label=label, choices=choices,
+        form.fields[sid] = forms.ChoiceField(label=label,
+                                             choices=choices,
                                              widget=forms.RadioSelect())
     return form
 
 def site_quantitative_data_get_form(wiz, form):
     sites = sutils.sget(wiz.request.session, 'sites')
+    exact_site_matches = sutils.sget(wiz.request.session, 'exact_site_matches')
+    soft_site_matches = sutils.sget(wiz.request.session, 'soft_site_matches')
+    all_site_matches = dict(exact_site_matches.items() + soft_site_matches.items())
+    print 'all_site_matches', all_site_matches
+    
     site_quantitative_data = sutils.sget(wiz.request.session, 'site_quantitative_data')
-    print set(sites)
-    print sites
-    print set(site_quantitative_data)
+
     assert set(sites) == set(site_quantitative_data) # make sure keys are same
-    print sites
     for sid,site in sites.items():
-        print pretty_print.site2label(sid,site)
-        form.fields[sid] = forms.FloatField(label=pretty_print.site2label(sid,site),
-                                            initial=site_quantitative_data[sid])
+        form.fields[sid] = forms.FloatField(
+            label=pretty_print.site2label(sid,site),
+            help_text=pretty_print.print_site_match(site, all_site_matches[sid], is_exact=True),
+            initial=site_quantitative_data[sid])
         
     return form
 
