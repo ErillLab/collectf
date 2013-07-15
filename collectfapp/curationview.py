@@ -281,7 +281,6 @@ def site_report_process(wiz, form):
     given as well. The case that makes everything complicated (and makes me writing
     this comment at 1 am in the morning) is that user may prefer to enter those
     quantitative values in another form step (after the site match step)."""
-    
     def process_helper_sites_only():
         # process data in case of only site sequence data
         # Get reported sites -- [(sid, site), ..]
@@ -331,12 +330,14 @@ def site_report_process(wiz, form):
         sutils.sput(wiz.request.session, 'exact_site_matches', {})
         sutils.sput(wiz.request.session, 'soft_site_match_choices', {})
 
+
     def process_helper_chip_assoc():
         # The list of motif-associated sites are read from -sites- field.  The list
         # of ChIP sequences (not-motif-associated-sites), with peak-intensity-values
         # are read from ChIP-extra-field and peak-intensity-values are associated
         # with motif-associated-sites.
 
+        print 'process_helper_chip_assoc'
         # make sure quantitative values exist.
         assert form.cleaned_data['has_quantitative_data'], "has_quantitative_data error"
         # First, check whether <sites> field in sequence or coordinate format.
@@ -363,12 +364,11 @@ def site_report_process(wiz, form):
                     break
             else:
                 site_quantitative_data[site_id] = None
+                
         assert len(site_quantitative_data) == len(sites)
-        
         sutils.sput(wiz.request.session, 'site_quantitative_data', site_quantitative_data)
         sutils.sput(wiz.request.session, 'soft_site_matches', {})
         sutils.sput(wiz.request.session, 'not_matched_sites', [])
-        sutils.sput(wiz.request.session, 'site_match_choices', {})
         sutils.sput(wiz.request.session, 'soft_site_match_choices', {})
     
     def site_report_process_helper_0():
@@ -483,7 +483,9 @@ def site_report_process(wiz, form):
         #  has_quantitative_data
         #  is_coordinate
         process_helper_chip_assoc()
-     
+
+    print 'process_begin'
+    
     is_motif_associated = form.cleaned_data.get('is_motif_associated')
     is_chip_data = form.cleaned_data.get('is_chip_data')
     is_coordinate = form.cleaned_data.get('is_coordinate')
@@ -499,6 +501,7 @@ def site_report_process(wiz, form):
                     ('1' if is_coordinate else '0'))
     
     call_func_str = 'site_report_process_helper_%d()' % int(call_func_id,2)
+    print 'process_func', call_func_str
     eval(call_func_str)
 
     # store booleans
@@ -507,9 +510,19 @@ def site_report_process(wiz, form):
     sutils.sput(wiz.request.session, 'is_coordinate', is_coordinate)
     sutils.sput(wiz.request.session, 'has_quantitative_data', has_quantitative_data)
 
-    if not form.cleaned_data.get('has_quantitative_data'):
+    if form.cleaned_data.get('has_quantitative_data'):
+        print form.cleaned_data.get('quantitative_data_format')
+        sutils.sput(wiz.request.session, 'quantitative_data_format', form.cleaned_data.get('quantitative_data_format'))
+    else:
         sutils.sput(wiz.request.session, 'site_quantitative_data', {})
-    
+        sutils.sput(wiz.request.sessionm, 'quantitative_data_format', None)
+
+    if is_chip_data:
+        sutils.sput(wiz.request.session, 'assay_conditions', form.cleaned_data.get('assay_conditions'))
+        sutils.sput(wiz.request.session, 'chip_method_notes', form.cleaned_data.get('chip_method_notes'))
+    else:
+        sutils.sput(wiz.request.session, 'assay_conditions', None)
+        sutils.sput(wiz.request.session, 'chip_method_notes', None)
     
 def site_exact_match_process(wiz, form):
     """In the form, reported sites and their matches are displayed. For some
@@ -674,13 +687,14 @@ def site_match_done(wiz, curation, regulations):
 
     chip_data = None
     if is_chip_data:
-        peak_calling_method = sutils.sget(wiz.request.session, 'peak_calling_method')
         assay_conditions = sutils.sget(wiz.request.session, 'assay_conditions')
         chip_method_notes = sutils.sget(wiz.request.session, 'chip_method_notes')
-        chip_data = models.ChipInfo(peak_calling_method=peak_calling_method,
-                                    assay_conditions=assay_conditions,
-                                    chip_method_notes=chip_method_notes)
+        chip_data = models.ChipInfo(assay_conditions=assay_conditions,
+                                    method_notes=chip_method_notes)
         chip_data.save()
+
+    quantitative_data_format = sutils.sget(wiz.request.session, 'quantitative_data_format')
+    print 'quant format',quantitative_data_format
 
     for sid, match in all_site_matches.items():
         # create SiteInstance object (or get if available)
@@ -698,6 +712,7 @@ def site_match_done(wiz, curation, regulations):
                                           annotated_seq=sites[sid],
                                           is_motif_associated=is_motif_associated,
                                           chip_info=chip_data,
+                                          quantitative_data_format=quantitative_data_format,
                                           quantitative_value = quantitative_vals.get(sid, None))
         cs.save()
 
@@ -769,7 +784,6 @@ class CurationWizard(SessionWizardView):
         # add some extra content for some steps
 
         if self.steps.current == '4':
-            print 'x'
             sites = sutils.sget(self.request.session, 'sites')
             context.update({'weblogo_img': bioutils.weblogo_uri(sites.values())})
         

@@ -228,7 +228,7 @@ class SiteReportForm(forms.Form):
                             help_text=help_dict['sites'])
 
     # ChIP Fields
-    peak_calling_method = forms.CharField(required=False,
+    quantitative_data_format = forms.CharField(required=False,
                                           label=description_markup%('',
                                                                     "Quantitative data format"))
                                           #label="Quantitative data format")
@@ -521,11 +521,14 @@ class SiteReportForm(forms.Form):
         print 'form_validation:', func_call_str
         eval(func_call_str)
 
+        # extra validation for quantitative data
+        if has_quantitative_data:
+            if not cleaned_data.get('quantitative_data_format'):
+                msg = "This field can not be blank."
+                self._errors["quantitative_data_format"] = self.error_class([msg])
+
         # extra validations for ChIP data
         if is_chip_data:
-            if not cleaned_data.get('peak_calling_method'):
-                msg = "Peak calling method can not be blank."
-                self._errors["peak_calling_method"] = self.error_class([msg])
             if not cleaned_data.get('assay_conditions'):
                 msg = "Assay conditions field can not be blank."
                 self._errors["assay_conditions"] = self.error_class([msg])

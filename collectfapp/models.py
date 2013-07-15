@@ -213,7 +213,7 @@ class Curation_SiteInstance(models.Model):
 
     # ChIP link (NULL if site instance is not curated as ChIP data)
     chip_info = models.ForeignKey("ChipInfo", null=True, blank=True)
-    
+    quantitative_data_format = models.CharField(max_length=500,null=True, blank=True)
     quantitative_value = models.FloatField(null=True, blank=True)
     
 
@@ -270,14 +270,12 @@ class ExperimentalTechniqueCategory(models.Model):
 
 class ChipInfo(models.Model):
     chip_info_id = models.AutoField(primary_key=True)
-    peak_calling_method = models.CharField(max_length=500)
     assay_conditions = models.CharField(max_length=500)
     method_notes = models.CharField(max_length=2000)
 
     def __unicode__(self):
-        return u'[%d] %s - %s ' % (self.chip_info_id,
-                                   self.peak_calling_method[:10],
-                                   self.assay_conditions[:10])
+        return u'[%d] %s' % (self.chip_info_id,
+                             self.assay_conditions[:10])
 
 class ExternalDatabase(models.Model):
     ext_database_id = models.AutoField(primary_key=True)
