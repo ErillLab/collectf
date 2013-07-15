@@ -515,7 +515,7 @@ def site_report_process(wiz, form):
         sutils.sput(wiz.request.session, 'quantitative_data_format', form.cleaned_data.get('quantitative_data_format'))
     else:
         sutils.sput(wiz.request.session, 'site_quantitative_data', {})
-        sutils.sput(wiz.request.sessionm, 'quantitative_data_format', None)
+        sutils.sput(wiz.request.session, 'quantitative_data_format', None)
 
     if is_chip_data:
         sutils.sput(wiz.request.session, 'assay_conditions', form.cleaned_data.get('assay_conditions'))
@@ -785,7 +785,9 @@ class CurationWizard(SessionWizardView):
 
         if self.steps.current == '4':
             sites = sutils.sget(self.request.session, 'sites')
-            context.update({'weblogo_img': bioutils.weblogo_uri(sites.values())})
+            is_motif_associated = sutils.sget(self.request.session, 'is_motif_associated')
+            if is_motif_associated and len(sites) > 1:
+                context.update({'weblogo_img': bioutils.weblogo_uri(sites.values())})
         
         return context
 
