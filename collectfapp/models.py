@@ -297,3 +297,4 @@ class Curation_ExternalDatabase(models.Model):
                                                   self.accession_number)
 
 
+    

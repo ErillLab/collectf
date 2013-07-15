@@ -39,10 +39,18 @@ def get_used_techniques(curation):
 
 def init_techniques_form(curation):
     """Return techniques form data from old curation for new one."""
+    try:
+        external_db = models.Curation_ExternalDatabase.objects.get(curation=curation)
+    except Curation_ExternalDatabase.DoesNotExist:
+        external_db = None
+        
     return dict(techniques = get_used_techniques(curation),
                 experimental_process = curation.experimental_process,
                 forms_complex = curation.forms_complex,
-                complex_notes = curation.complex_notes)
+                complex_notes = curation.complex_notes,
+                external_db_type = external_db.external_database.ext_database_id if external_db else None,
+                external_db_accession = external_db.accession_number if external_db else "")
+        
 
 def init_site_report_form(curation):
     """Return reported sites from old curation"""

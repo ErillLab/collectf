@@ -90,9 +90,17 @@ def techniques_get_form(wiz, form):
     c = sutils.sget(wiz.request.session, 'previously_curated_paper')
     # if selected paper is previously curated, prepopulate experimental techniques
     if c:
-        
+        print c.curation_id
         form.fields['techniques'].initial = [str(t.technique_id) for t in c.experimental_techniques.all()]
-
+        form.fields['experimental_process'].initial = c.experimental_process
+        try:
+            external_db = models.Curation_ExternalDatabase.objects.get(curation=c)
+        except models.Curation_ExternalDatabase.DoesNotExist:
+            external_db = None
+        form.fields['external_db_type'].initial = external_db.external_database.ext_database_id if external_db else None
+        form.fields['external_db_accession'].initial = external_db.accession_number if external_db else ""
+        form.fields['forms_complex'].initial = c.forms_complex
+        form.fields['complex_notes'].initial = c.complex_notes
 
         # delete session data, if user change any field and then come back,
         # store users last entered data, instead of populated data.
