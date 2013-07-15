@@ -232,7 +232,7 @@ class SiteReportForm(forms.Form):
                                           label=description_markup%('',
                                                                     "Quantitative data format"))
                                           #label="Quantitative data format")
-    
+
     assay_conditions = forms.CharField(required=False,
                                        label=description_markup%('',
                                                                  "Assay conditions"),

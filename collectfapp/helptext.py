@@ -38,21 +38,22 @@ genome_form = {
 }
 
 techniques_form = {
-    'contains_promoter_data': "The paper provides experimental data on the structure and sequence of TF-regulated promoter",
+    'contains_promoter_data': "The paper provides experimental data on the structure and sequence of a TF-regulated promoter",
 
     'contains_expression_data': "The paper provides experimental support for TF-mediated regulation of genes",
 
-    'techniques':  """Select as many as apply to reported sites. Hover over any technique to see the
+    'techniques':  """Select as many as apply to sites reported in this submission. Hover over any technique to see the
     description.""",
 
     'experimental_process': """Write a concise, intuitive description of the experimental process to ascertain
     binding/induced expression""",
 
-    'external_db_type': '',
+    'external_db_type': """Select type of external database containing data (e.g. DNA-array data) reported in paper""",
 
-    'external_db_accession': '',
+    'external_db_accession': """Type the accession number for external database referenced in paper.""",
 
-    'forms_complex': '',
+    'forms_complex': """Check if the manuscript reports characterization of the interaction of the TF with another
+    protein""",
 
     'complex_notes': """Provide brief description of the proteins involved in the complex and how it affects
     binding"""
@@ -60,40 +61,36 @@ techniques_form = {
 }
 
 site_report_form = {
-    'is_motif_associated': """If reported binding sites are 'true' binding sites, check this option. If a
-    reported site is much longer than actual binding site sequence and contains the true binding
-    site somewhere in its sequence, it is called a non-motif-associated site. In
-    that case, this option must be un-checked.""",
+    'is_motif_associated': """Check this option if sites are reported by the authors as being associated with
+    a known TF-binding motif. Uncheck if sites are reported solely as DNA fragments shown to be bound by the TF,
+    without reporting any specific binding sequences.""",
 
-    'is_coordinate': """If the paper reports coordinates instead of actual sequences, check this
-    option. Enter coordinates for all sequences below (one for each line). Each line should have
-    start and end positions, separated by space or tab characters. If the reported sites have quantitative data,
-    they should be given as third item for each site instance (i.e. {start end quantitative_value}).""",
+    'is_coordinate': """Check this option to enter reported sites as coordinates instead of sequences.
+    Coordinates should be {start end}. Coordinate order determines strand. One site per line.""",
 
-    'is_chip_data': """If the paper reports sequences/coordinates identified using ChIP methods, check this
-    box. A few extra fields will be populated.""",
+    'is_chip_data': """Check if reported sites come from ChIP experiments (e.g. ChIP-chip, ChIP-seq).
+    A few ChIP-specific fields will be populated.""",
 
-    'has_quantitative_data': """If the paper has some quantitative values associated with each site, please check
-    this option. For example, if the used technique is ChIP, these values are peak
-    intensities. Also, for some other tecnhiques, for each site, a quantitative value
-    may be reported. They should be given as the last item for each site instance
-    (i.e. If sequences are reported, the format would be {sequence value}, and if
-    the coordinates are reported, the format would be {start_pos end_pos value}.""",
+    'has_quantitative_data': """Check to report quantitative data associated with individual site instances (e.g.
+    binding affinity). Quantitative data for each site may be entered at the end of the line, separated by tab/space.
+    For sequence entry: {sequence value}. For coordinate entry: {start end value}.""",
 
-    'peak_calling_method': '',
+    'peak_calling_method': """Describe briefly the nature and range of quantitative data (e.g. intensity readout from
+    EMSA. Range: 2.3 - 5.7). For ChIP experiments, simply state: 'ChIP peak intensity' and list the peak calling method
+    used.""",
 
-    'assay_conditions': '',
+    'assay_conditions': """Describe the conditions of the ChIP experiment that capture the specifics of the in-vivo 
+    setting for cross-linking. Were cells at exponetial-phase? Was the system induced? How were cells grown?""",
 
-    'method_notes': '',
+    'method_notes': """Describe (use copy-paste if appropriate) the ChIP protocol. What antibodies were used? What
+    chip/sequencer and using what parameters? Etc.""",
 
-    'sites': """Type either site sequences or coordinates. Site instances must be given in separate lines.
-    If only sequence input is given, FASTA format is supported.""",
+    'sites': """Type either site sequences or coordinates. One site per line.
+    FASTA format is supported for sequence entry mode.""",
 
-    'chip_data_extra_field': """If the used technique is ChIP and reported sites are motif-associated,
-    paste ChIP peaks to this field with intensity values (the format is {peak_start_pos peak_end_pos intensity_value}).
-    The identified motif-associated sites (given in 'Sites' field) will be searched in list of peaks (given in this field),
-    and peak intensities will be associated with motif-associated sites. The mapped peak intensity values will be displayed
-    before curation submission for review.""",
+    'chip_data_extra_field': """Quantitative data can be automatically associated to motif-associated sites. Paste 
+    corresponding ChIP peak data here {peak_start_pos peak_end_pos intensity_value}. The system will search entered sites
+    in peaks and associate peak intensities. Mapped peak intensity values will be displayed for review before curation submission.""",
 
 }
 
@@ -110,19 +107,18 @@ site_regulation_form = {
 }
 
 curation_review_form = {
-    'revision_reasons': """Select, if needed, the reason why this curation requires revision.  See detailed list
+    'revision_reasons': """Select, if needed, the reason why this curation may require revision.  See detailed list
     of reasons in the curation guide.""",
 
     'confidence': """Check this if experimental techniques and results meet the
     standards specified in the curation guide""",
     
     'NCBI_submission_ready': """A curation is ready for submission if: (a) the identified genome sequence
-    matches the reported one or (b) identified and reported genomes match at the
-    species level and at least 90% of reported sites are located as exact
-    matches.""",
+    matches the reported one or (b) identified and reported genomes match at the species level and at least
+    90% of reported sites are located as exact matches.""",
 
     'paper_complete': """Check this box if there are no more curations pending for this paper (additional
-    sites, different techniques, other TF, etc.""",
+    sites, sites supported by different techniques, sites for other TFs, etc.""",
 
     'notes': """Type in any additional notes on the curation process. For instance, if reported sites
     were left out for some reason, what prompted selection of a surrogate genome instead
