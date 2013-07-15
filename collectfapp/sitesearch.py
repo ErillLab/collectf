@@ -86,7 +86,11 @@ def build_motif(seqs):
     """Create motif from sequences"""
     m = Motif.Motif(alphabet=IUPAC.unambiguous_dna)
     for seq in seqs:
-        m.add_instance(Seq(seq, m.alphabet))
+        try:
+            m.add_instance(Seq(seq, m.alphabet))
+        except:
+            print "Diff motif size length?"
+            return None
     return m
 
 def score_match(motif, sequence):

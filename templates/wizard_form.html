@@ -11,9 +11,19 @@
   </div>
 </div>
 
+
   <h2>{{ form_title }} </h2>
   <p>{{ form_description }}</p>
   <legend></legend>
+
+
+
+<!--
+{% if weblogo_img %}
+  <div><img src="{{ weblogo_img }}"></div>
+{% endif %}
+-->
+
 
 <form method="post" action="" class="form-horizontal well">  {% csrf_token %}
 

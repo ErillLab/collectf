@@ -2,15 +2,14 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.shortcuts import render
 from django.template import RequestContext
-from base64 import b64encode
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from baseapp import bioutils
-from baseapp.bioutils import weblogo
 from baseapp import utils
+from baseapp import lasagna
 
-import lasagna
 import models
 import fetch
 import forms
@@ -313,7 +312,7 @@ def get_sites_by_TF_species(request, TF, species, curation_site_instances):
     trimmed = [s.upper() for s in trimmed]
 
     # create weblogo for the list of sites
-    weblogo_data = weblogo_uri(trimmed)
+    weblogo_data = bioutils.weblogo_uri(trimmed)
 
     result_dict = {
         'site_curation_dict':site_curation_dict,
@@ -329,10 +328,4 @@ def get_sites_by_TF_species(request, TF, species, curation_site_instances):
                   context_instance=RequestContext(request))
     
 
-def weblogo_uri(sequences):
-    """Generate the weblogo and make it ready for direct embed into response html"""
-    image_data = weblogo(sequences)
-    encoded = b64encode(image_data)
-    mime = "image/png"
-    return ("data:" + mime + ';' + "base64," + encoded)
 

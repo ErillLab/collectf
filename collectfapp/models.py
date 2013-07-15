@@ -173,7 +173,7 @@ class TFInstance(models.Model):
         
 class SiteInstance(models.Model):
     site_id = models.AutoField(primary_key=True)
-    seq = models.TextField()
+    seq = models.TextField(max_length=100000)
     genome = models.ForeignKey("Genome")
     start = models.IntegerField() # genome start position (0 index)
     end = models.IntegerField()   # genome end position (end position! not the first position after site sequence, 0 index too.)
@@ -207,7 +207,7 @@ class Curation_SiteInstance(models.Model):
                                                  # or a (longer) sequence that
                                                  # contains the site somewhere
 
-    annotated_seq = models.TextField()
+    annotated_seq = models.TextField(max_length=100000)
     # regulation
     regulates = models.ManyToManyField("Gene", through="Regulation")
 
@@ -236,7 +236,7 @@ class Regulation(models.Model):
 
 class NotAnnotatedSiteInstance(models.Model):
     """If no matching sequence found in genome, use this class"""
-    sequence = models.TextField()
+    sequence = models.TextField(max_length=100000)
     curation = models.ForeignKey("Curation")
     def __unicode__(self):
         return u'%s [%s]' % (self.id, self.sequence)  

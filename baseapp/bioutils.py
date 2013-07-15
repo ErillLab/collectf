@@ -6,6 +6,10 @@ import time
 import os
 import pickle
 from collectf import settings
+from base64 import b64encode
+import lasagna
+
+
 
 Entrez.email = "sefakilic@gmail.com"
 
@@ -179,9 +183,16 @@ def weblogo(sequences, format="PNG"):
     """
     import urllib
     import urllib2
-    al = to_fasta(sequences)
 
-    assert all(len(seq) == len(sequences[0]) for seq in sequences), "sequences do not have the same length"
+    # if all sequences don't have the same length, apply LASAGNA
+    # use LASAGNA to align sites
+    aligned, idxAligned, strands = lasagna.LASAGNA(map(lambda s: str(s.lower()), sequences), 0)
+    trimmed = lasagna.TrimAlignment(aligned) if len(aligned) > 1 else aligned
+    trimmed = [s.upper() for s in trimmed]
+    
+    assert all(len(seq) == len(trimmed[0]) for seq in trimmed), "sequences do not have the same length"
+
+    al = to_fasta(trimmed)
     
     url = 'http://weblogo.berkeley.edu/logo.cgi'
     values = {'sequence' : al,
@@ -226,6 +237,11 @@ def weblogo(sequences, format="PNG"):
     im=response.read()
 
     return im
-
-
     
+def weblogo_uri(sequences):
+    """Generate the weblogo and make it ready for direct embed into response html"""
+    image_data = weblogo(sequences)
+    encoded = b64encode(image_data)
+    mime = "image/png"
+    
+    return ("data:" + mime + ';' + "base64," + encoded)

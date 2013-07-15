@@ -92,7 +92,6 @@ def techniques_get_form(wiz, form):
     if c:
         
         form.fields['techniques'].initial = [str(t.technique_id) for t in c.experimental_techniques.all()]
-        print form.fields['techniques'].initial
 
 
         # delete session data, if user change any field and then come back,
@@ -168,7 +167,6 @@ def site_quantitative_data_get_form(wiz, form):
     exact_site_matches = sutils.sget(wiz.request.session, 'exact_site_matches')
     soft_site_matches = sutils.sget(wiz.request.session, 'soft_site_matches')
     all_site_matches = dict(exact_site_matches.items() + soft_site_matches.items())
-    print 'all_site_matches', all_site_matches
     
     site_quantitative_data = sutils.sget(wiz.request.session, 'site_quantitative_data')
 
@@ -292,7 +290,6 @@ def site_report_process(wiz, form):
         # process data of site sequences with quantitative values
         # parse sites and quantitative values
         lines = re.split('[\r\n]+', form.cleaned_data['sites'].strip())
-        print 'lines', lines
         sites = [line.split()[0] for line in lines]
         quantitative_values = [line.split()[1] for line in lines]
         assert len(sites) == len(quantitative_values)
@@ -313,7 +310,6 @@ def site_report_process(wiz, form):
         coordinates = [re.split('[\t ]+', line) for line in re.split('[\r\n]+', coordinates)]
         res = sitesearch.match_all_exact_coordinates_only(genome, genes, coordinates)
         sites, site_match_choices, site_quantitative_data = res
-        print 'sites2', sites
         # This assertion should stay here (site_quantitative_data = {} -> request.session below)
         if not with_quantitative: # no quantitative data should be present
             assert all(not val for val in site_quantitative_data.values()), "site_quantitative_data not null"
@@ -480,8 +476,6 @@ def site_report_process(wiz, form):
         #  is_coordinate
         process_helper_chip_assoc()
      
-    print form.cleaned_data
-
     is_motif_associated = form.cleaned_data.get('is_motif_associated')
     is_chip_data = form.cleaned_data.get('is_chip_data')
     is_coordinate = form.cleaned_data.get('is_coordinate')
@@ -497,7 +491,6 @@ def site_report_process(wiz, form):
                     ('1' if is_coordinate else '0'))
     
     call_func_str = 'site_report_process_helper_%d()' % int(call_func_id,2)
-    print 'process:', call_func_str
     eval(call_func_str)
 
     # store booleans
@@ -561,7 +554,6 @@ def site_soft_match_process(wiz, form):
 
 
 def site_quantitative_data_process(wiz, form):
-    print form.cleaned_data
     quantitative_vals = sutils.sget(wiz.request.session, 'site_quantitative_data')
     for id,val in form.cleaned_data.items():
         quantitative_vals[id] = val
@@ -604,14 +596,12 @@ def genome_done(wiz, form, **kwargs):
 def techniques_done(wiz, form, **kwargs):
     """Get techniques and experimental process data from form"""
     cd = {}  # cleaned data to be returned
-    print form.cleaned_data
     cd['techniques'] = form.cleaned_data['techniques']
     cd['experimental_process'] = form.cleaned_data['experimental_process']
     cd['forms_complex'] = form.cleaned_data['forms_complex']
     cd['complex_notes'] = form.cleaned_data['complex_notes']
     cd['external_db_type'] = form.cleaned_data['external_db_type']
     cd['external_db_accession'] = form.cleaned_data['external_db_accession']
-    print cd
     return cd
 
 def site_report_done(wiz, form, **kwargs):
@@ -767,6 +757,14 @@ class CurationWizard(SessionWizardView):
         }
         context["form_title"] = titles[self.steps.current]
         context["form_description"] = descriptions[self.steps.current]
+
+        # add some extra content for some steps
+
+        if self.steps.current == '4':
+            print 'x'
+            sites = sutils.sget(self.request.session, 'sites')
+            context.update({'weblogo_img': bioutils.weblogo_uri(sites.values())})
+        
         return context
 
     def get_form(self, step=None, data=None, files=None):
@@ -846,8 +844,6 @@ class CurationWizard(SessionWizardView):
              # this is a revision for an existing curation
              form_list.insert(0, None)
 
-        print form_list
-        
         head = lambda x: x[0]
 
         genome_form = head([f for f in form_list if type(f) == GenomeForm])
@@ -887,7 +883,6 @@ class CurationWizard(SessionWizardView):
 
         # add external db references
         if techniques_cd['external_db_type'] != "None" and techniques_cd['external_db_accession']:
-            print techniques_cd['external_db_type']
             external_db_type = models.ExternalDatabase.objects.get(ext_database_id=techniques_cd['external_db_type'])
             curation_ext_ref = models.Curation_ExternalDatabase(curation = curation,
                                                                 external_database=external_db_type,
