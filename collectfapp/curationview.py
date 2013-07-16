@@ -971,7 +971,6 @@ def curation(request):
 
 def exact_site_match_form_condition(wizard):
     return True
-    return sutils.sget(wizard.request.session,'site_match_choices')
 
 def inexact_site_match_form_condition(wizard):
     return sutils.sget(wizard.request.session, 'soft_site_match_choices')

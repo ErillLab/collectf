@@ -119,7 +119,18 @@ def edit_curation(request, cid):
                                   SiteRegulationForm,
                                   CurationReviewForm],
                                  initial_dict=initial,
-                                 condition_dict={'0': False}) # Don't show publication form
+                                 condition_dict={'0': False,
+                                                 '4': exact_site_match_form_condition,
+                                                 '5': inexact_site_match_form_condition,
+                                                 '6': site_quantitative_data_form_condition})
                                  
     return wiz(request)
     
+def exact_site_match_form_condition(wizard):
+    return True
+
+def inexact_site_match_form_condition(wizard):
+    return sutils.sget(wizard.request.session, 'soft_site_match_choices')
+
+def site_quantitative_data_form_condition(wizard):
+    return sutils.sget(wizard.request.session, 'has_quantitative_data')
