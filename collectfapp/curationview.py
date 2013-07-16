@@ -898,6 +898,8 @@ class CurationWizard(SessionWizardView):
         is_chip_data = sutils.sget(self.request.session, 'is_chip_data')
         has_quantitative_data = sutils.sget(self.request.session, 'has_quantitative_data')
         chip_data = None
+        quantitative_data_format = None
+        
         if is_chip_data:
             assay_conditions = sutils.sget(self.request.session, 'assay_conditions')
             chip_method_notes = sutils.sget(self.request.session, 'chip_method_notes')
