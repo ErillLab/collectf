@@ -48,6 +48,10 @@ class Curation(models.Model):
     experimental_techniques = models.ManyToManyField("ExperimentalTechnique")
     site_instances = models.ManyToManyField("SiteInstance", through="Curation_SiteInstance")
 
+    # ChIP link (NULL if site instance is not curated as ChIP data)
+    chip_info = models.ForeignKey("ChipInfo", null=True, blank=True)
+    quantitative_data_format = models.CharField(max_length=500,null=True, blank=True)
+
     def __unicode__(self):
         return u'%s - %s - %s, %s, %s' % (self.curation_id, self.TF.name,
                                                     self.publication.title,
@@ -197,12 +201,13 @@ class SiteInstance(models.Model):
                   '%d' % self.end,
                   self.seq,]
         return '\t'.join(fields)
-                  
+
 
 class Curation_SiteInstance(models.Model):
     # through model between Curation and SiteInstance models
-    curation = models.ForeignKey("Curation")
-    site_instance = models.ForeignKey("SiteInstance")
+    curation = models.ForeignKey("Curation", null=False)
+    site_instance = models.ForeignKey("SiteInstance", null=False)
+    #meta_site_instance = models.ForeignKey("MetaSiteInstance")
     is_motif_associated = models.BooleanField(null=False) # is the site instance actual motif,
                                                  # or a (longer) sequence that
                                                  # contains the site somewhere
@@ -210,14 +215,9 @@ class Curation_SiteInstance(models.Model):
     annotated_seq = models.TextField(max_length=100000)
     # regulation
     regulates = models.ManyToManyField("Gene", through="Regulation")
-
-    # ChIP link (NULL if site instance is not curated as ChIP data)
-    chip_info = models.ForeignKey("ChipInfo", null=True, blank=True)
-    quantitative_data_format = models.CharField(max_length=500,null=True, blank=True)
+    # quantitative value
     quantitative_value = models.FloatField(null=True, blank=True)
-    
 
-    
     def __unicode__(self):
         return u"reported: %s, matched: %s" % (self.site_instance, self.annotated_seq)
 
@@ -253,9 +253,6 @@ class ExperimentalTechnique(models.Model):
 
     def __unicode__(self):
         return u'%s' % self.name
-
-#class Curation_ExperimentalTechnique(models.Model):
-#    used_for = models.CharField(max_length=50, choices=ExperimentalTechnique.FUNCTION_CATEGORIES, null=False)
 
 class ExperimentalTechniqueCategory(models.Model):
     category_id = models.AutoField(primary_key=True)

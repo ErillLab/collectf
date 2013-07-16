@@ -174,17 +174,21 @@ def site_quantitative_data_get_form(wiz, form):
     sites = sutils.sget(wiz.request.session, 'sites')
     exact_site_matches = sutils.sget(wiz.request.session, 'exact_site_matches')
     soft_site_matches = sutils.sget(wiz.request.session, 'soft_site_matches')
-    all_site_matches = dict(exact_site_matches.items() + soft_site_matches.items())
+
+    all_site_matches = []
+    all_site_matches += exact_site_matches.items() if exact_site_matches else []
+    all_site_matches += soft_site_matches.items() if soft_site_matches else []
+    all_site_matches = dict(all_site_matches)
     
     site_quantitative_data = sutils.sget(wiz.request.session, 'site_quantitative_data')
-
     assert set(sites) == set(site_quantitative_data) # make sure keys are same
-    for sid,site in sites.items():
+    for sid in all_site_matches:
         form.fields[sid] = forms.FloatField(
-            label=pretty_print.site2label(sid,site),
-            help_text=pretty_print.print_site_match(site, all_site_matches[sid], is_exact=True),
+            label=pretty_print.site2label(sid,sites[sid]),
+            help_text=pretty_print.print_site_match(sites[sid], all_site_matches[sid], is_exact=True),
             initial=site_quantitative_data[sid])
-        
+
+    print 'form_ready'
     return form
 
 def site_regulation_get_form(wiz, form):
@@ -309,8 +313,9 @@ def site_report_process(wiz, form):
         sutils.sput(wiz.request.session, 'site_match_choices', site_match_choices)
         sutils.sput(wiz.request.session, 'sites', sites)
         sutils.sput(wiz.request.session, 'site_quantitative_data', site_quantitative_data)
-
-
+        print sites
+        print site_quantitative_data
+        
     def process_helper_coordinates(with_quantitative=False):
         # process data in case of only coordinate data is given.
         coordinates = form.cleaned_data['sites'].strip()
@@ -533,6 +538,7 @@ def site_exact_match_process(wiz, form):
     sites = sutils.sget(wiz.request.session, 'sites')        # all sites
     # get all match choices for each reported site
     site_match_choices = sutils.sget(wiz.request.session, 'site_match_choices')
+
     exact_site_matches = {} # {sid: SiteMatch} to store which sites are exactly matched
     for sid, mid in form.cleaned_data.items():  # siteid and matchid
         if mid != 'None':
@@ -682,19 +688,7 @@ def site_match_done(wiz, curation, regulations):
     all_site_matches = dict(all_site_matches)
 
     is_motif_associated = sutils.sget(wiz.request.session, 'is_motif_associated')
-    is_chip_data = sutils.sget(wiz.request.session, 'is_chip_data')
-    has_quantitative_data = sutils.sget(wiz.request.session, 'has_quantitative_data')
-
-    chip_data = None
-    if is_chip_data:
-        assay_conditions = sutils.sget(wiz.request.session, 'assay_conditions')
-        chip_method_notes = sutils.sget(wiz.request.session, 'chip_method_notes')
-        chip_data = models.ChipInfo(assay_conditions=assay_conditions,
-                                    method_notes=chip_method_notes)
-        chip_data.save()
-
-    quantitative_data_format = sutils.sget(wiz.request.session, 'quantitative_data_format')
-    print 'quant format',quantitative_data_format
+    
 
     for sid, match in all_site_matches.items():
         # create SiteInstance object (or get if available)
@@ -711,8 +705,8 @@ def site_match_done(wiz, curation, regulations):
                                           site_instance=si,
                                           annotated_seq=sites[sid],
                                           is_motif_associated=is_motif_associated,
-                                          chip_info=chip_data,
-                                          quantitative_data_format=quantitative_data_format,
+                                          #chip_info=chip_data,
+                                          #quantitative_data_format=quantitative_data_format,
                                           quantitative_value = quantitative_vals.get(sid, None))
         cs.save()
 
@@ -899,6 +893,24 @@ class CurationWizard(SessionWizardView):
                                    curator=curator)
 
 
+        curation.save()
+
+        is_chip_data = sutils.sget(self.request.session, 'is_chip_data')
+        has_quantitative_data = sutils.sget(self.request.session, 'has_quantitative_data')
+        chip_data = None
+        if is_chip_data:
+            assay_conditions = sutils.sget(self.request.session, 'assay_conditions')
+            chip_method_notes = sutils.sget(self.request.session, 'chip_method_notes')
+            chip_data = models.ChipInfo(assay_conditions=assay_conditions,
+                                        method_notes=chip_method_notes)
+            chip_data.save()
+
+        if has_quantitative_data:
+            quantitative_data_format = sutils.sget(self.request.session, 'quantitative_data_format')
+            print 'quant format', quantitative_data_format
+
+        curation.chip_info = chip_data
+        curation.quantitative_data_format = quantitative_data_format
         curation.save()
 
         # add techniques
