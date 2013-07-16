@@ -101,7 +101,7 @@ def dist(a, b):
     """Given two genes (or gene and Match), return distance"""
     return max(a.start, b.start) - min(a.end, b.end)
 
-def locate_nearby_genes(genes, site_loc, dist_th=50):
+def locate_nearby_genes(genes, site_loc, dist_th=150):
     """Given the list of models.Gene objects, locate genes close to the
     site_loc. Return list of nearby genes."""
     # make sure all genes are sorted by start position
