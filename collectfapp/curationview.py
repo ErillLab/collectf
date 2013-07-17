@@ -940,6 +940,10 @@ class CurationWizard(SessionWizardView):
         if curation_review_cd['paper_complete']:
             publication.curation_complete = True
             publication.save()
+
+        else:
+            publication.curation_complete = False
+            publication.save()
             
         # if this curation finalizes the curation of the paper, mark paper as so.
         if sutils.sin(self.request.session, 'old_curation'):
