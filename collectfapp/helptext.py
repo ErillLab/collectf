@@ -75,14 +75,14 @@ site_report_form = {
     binding affinity). Quantitative data for each site may be entered at the end of the line, separated by tab/space.
     For sequence entry: {sequence value}. For coordinate entry: {start end value}.""",
 
-    'peak_calling_method': """Describe briefly the nature and range of quantitative data (e.g. intensity readout from
+    'quantitative_data_format': """Describe briefly the nature and range of quantitative data (e.g. intensity readout from
     EMSA. Range: 2.3 - 5.7). For ChIP experiments, simply state: 'ChIP peak intensity' and list the peak calling method
     used.""",
 
     'assay_conditions': """Describe the conditions of the ChIP experiment that capture the specifics of the in-vivo 
     setting for cross-linking. Were cells at exponetial-phase? Was the system induced? How were cells grown?""",
 
-    'method_notes': """Describe (use copy-paste if appropriate) the ChIP protocol. What antibodies were used? What
+    'chip_method_notes': """Describe (use copy-paste if appropriate) the ChIP protocol. What antibodies were used? What
     chip/sequencer and using what parameters? Etc.""",
 
     'sites': """Type either site sequences or coordinates. One site per line.

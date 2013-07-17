@@ -229,18 +229,18 @@ class SiteReportForm(forms.Form):
 
     # ChIP Fields
     quantitative_data_format = forms.CharField(required=False,
-                                          label=description_markup%('',
+                                          label=description_markup%(help_dict['quantitative_data_format'],
                                                                     "Quantitative data format"))
                                           #label="Quantitative data format")
 
     assay_conditions = forms.CharField(required=False,
-                                       label=description_markup%('',
+                                       label=description_markup%(help_dict['assay_conditions'],
                                                                  "Assay conditions"),
                                        #label="Assay conditions",
                                        widget=forms.Textarea)
     
     chip_method_notes = forms.CharField(required=False,
-                                        label=description_markup%('',
+                                        label=description_markup%(help_dict['chip_method_notes'],
                                                                   "ChIP method notes"),
                                         #label="ChIP Method notes",
                                         widget=forms.Textarea)

@@ -45,13 +45,15 @@ $(document).ready(function() {
     if ($('#id_3-is_chip_data').is(':checked')) {
 	$('#id_3-assay_conditions').parent().parent().show(defaultSpeed);
 	$('#id_3-chip_method_notes').parent().parent().show(defaultSpeed);
-	$('#id_3-chip_data_extra_field').parent().parent().show(defaultSpeed);
+	if($('#id_3-is_motif_associated').is(':checked'))
+	    $('#id_3-chip_data_extra_field').parent().parent().show(defaultSpeed);
     }
     $("#id_3-is_chip_data").on('change', function() {
 	if ($(this).is(":checked")) {
 	    $("#id_3-assay_conditions").parent().parent().show(defaultSpeed);
 	    $("#id_3-chip_method_notes").parent().parent().show(defaultSpeed);
-	    $('#id_3-chip_data_extra_field').parent().parent().show(defaultSpeed);
+	    if($('#id_3-is_motif_associated').is(':checked'))
+		$('#id_3-chip_data_extra_field').parent().parent().show(defaultSpeed);
 	} else {
 	    $("#id_3-assay_conditions").parent().parent().hide(defaultSpeed);
 	    $("#id_3-chip_method_notes").parent().parent().hide(defaultSpeed);
@@ -73,6 +75,26 @@ $(document).ready(function() {
 	}
     });
 
+    if ($('#id_3-is_motif_associated').not(':checked')) {
+	$('#id_3-chip_data_extra_field').parent().parent().hide(defaultSpeed);
+    }
+
+    if ($('#id_3-is_motif_associated').is(':checked')) {
+	if ($('#id_3-is_chip_data').is(':checked')) {
+	    $('#id_3-chip_data_extra_field').parent().parent().show(defaultSpeed);
+	}
+    }
+	    
+    $('#id_3-is_motif_associated').on('change', function() {
+	if ($(this).is(':checked')) {
+	    if ($('#id_3-is_chip_data').is(':checked')) {
+		$('#id_3-chip_data_extra_field').parent().parent().show(defaultSpeed);
+	    }
+	}
+	else {
+	    $('#id_3-chip_data_extra_field').parent().parent().hide(defaultSpeed);
+	}
+    });
 });
 
 
