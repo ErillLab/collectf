@@ -5,7 +5,8 @@ def browse_TF_and_species_selected(request, TF_id, species_id):
     species = models.Strain.objects.get(pk=species_id)
     curation_site_instances = models.Curation_SiteInstance.objects.filter(
         site_instance__genome__strain=species,
-        curation__TF=TF)
+        curation__TF=TF,
+        is_motif_associated=True) # get motif_associated ones for now.
     return get_sites_by_TF_and_species(request,TF,species,curation_site_instances)
 
 def browse_TF_and_species(request):
@@ -36,8 +37,10 @@ def browse_TF_and_species_post(request):
     q3 = techniques_JSON_to_Q(experimental_techniques_3)
 
     #  get curation objects
-    curation_site_instances = models.Curation_SiteInstance.objects.filter(curation__TF=TF,
-                                                                          site_instance__genome__strain=species)
+    curation_site_instances = models.Curation_SiteInstance.objects.filter(
+        curation__TF=TF,
+        site_instance__genome__strain=species,
+        is_motif_associated=True)
     # filter them by experimental techniques
     if boolean1 == 'and' and boolean2 == 'and':
         curation_site_instances = curation_site_instances.filter(q1).filter(q2).filter(q3)
