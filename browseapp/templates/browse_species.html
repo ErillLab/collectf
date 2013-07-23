@@ -4,8 +4,8 @@
 {% load utils %}
 
 <ul class="breadcrumb">
-  <li><a href="{% url browseapp.views.browse_by_species_main %}">Home</a><span class="divider">/</span></li>
-  <li><a href="{% url browseapp.views.browse_by_species_taxon taxon_name %}">{{ taxon_name }}</a><span class="divider">/</span></li>
+  <li><a href="{% url browseapp.browse_species.browse_by_species_main %}">Home</a><span class="divider">/</span></li>
+  <li><a href="{% url browseapp.browse_species.browse_by_species_taxon taxon_name %}">{{ taxon_name }}</a><span class="divider">/</span></li>
   <li class="active">{{ sp.name }} </li>
 </ul>
 

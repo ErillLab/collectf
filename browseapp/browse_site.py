@@ -1,14 +1,18 @@
+from django.contrib import messages
 from browse_base import *
+import django.views.defaults
+
 
 def browse_by_site(request, dbxref_id):
     """Handler for browsing site instances."""
-    site_instance_id = utils.dbxref2id(dbxref_id)
-    site_instance = models.SiteInstance.objects.get(site_id=site_instance_id)
-    # get curations related to this site instance
-    curations = models.Curation.objects.filter(site_instances=site_instance)
-    # get curation_site_instances related to this site instance (needed for regulation)
-    curation_site_instances = models.Curation_SiteInstance.objects.filter(site_instance=site_instance)
+    id = utils.dbxref2id(dbxref_id)
+    meta_site_instance = models.MetaSiteInstance.objects.get(pk=id)
     
+    # get curation_site_instance related to this metasiteinstance
+    curation_site_instances = models.Curation_SiteInstance.objects.filter(meta_site_instance=meta_site_instance).distinct()
+    # get curations
+    curation_ids = curation_site_instances.values_list('curation', flat=True)
+    curations = models.Curation.objects.filter(curation_id__in=curation_ids)
     # get regulations
     regulations = []
     for curation_site_instance in curation_site_instances:
@@ -23,9 +27,11 @@ def browse_by_site(request, dbxref_id):
                 
     return render(request,
                   "browse_site.html",
-                  {'site_instance': site_instance,
-                   'curations': curations,
-                   'regulations': regulations,
-                   'dbxref': utils.id2dbxref(site_instance.site_id)
+                  {
+                      'meta_site_instance': meta_site_instance,
+                      'curation_site_instances': curation_site_instances,
+                      'curations': curations,
+                      'regulations': regulations,
+                      'dbxref': utils.id2dbxref(meta_site_instance.pk)
                   },
                   context_instance=RequestContext(request))

@@ -7,10 +7,8 @@
 <div class="container">
 
   {% if site_curation_dict and site_regulation_dict %}
-
   {% load utils %}
   {% load gene_diagram %}
-
   <div class="row">
     <div class="span3" id="navparent">
       <ul class="nav nav-list bs-docs-sidenav affix-top" data-spy="affix">
@@ -24,7 +22,7 @@
 
     <div class="span9">
       <section class="spacer" id="overview">
-	<h1>Collection of binding sites for {{ TF.name }} transcription factor in {{ sp.name }}</h1>
+	<h1>Collection of binding sites for {{ TF.name }} transcription factor in {{ species.name }}</h1>
 
 	<section class="spacer "id="list_of_sites">
 	  <div class="grey">
@@ -146,9 +144,9 @@
 	  </div>
 
 	  <p>
-	    <form action="{% url browseapp.views.export_sites %}" method="POST">{% csrf_token %}
+	    <form action="{% url browseapp.browse_TF_and_species.export_sites %}" method="POST">{% csrf_token %}
 	      {% for site in site_curation_dict|get_keys %}
-	      <input type="hidden" name="site_id" value="{{ site.site_id }}" />
+	      <input type="hidden" name="site_id" value="{{ site.pk }}" />
 	      {% endfor %}
 	      <input type="submit" value="Download FASTA" class="btn btn-info btn-large" name="fasta">
 	      <input type="submit" value="Download CSV" class="btn btn-info btn-large" name="csv">

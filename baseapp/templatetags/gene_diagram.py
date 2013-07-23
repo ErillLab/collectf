@@ -62,6 +62,12 @@ def regulation_diagram(regulations, site_instance):
                                  arrowshaft_height=1.0,
                                  color=colors.green if reg.evidence_type=="exp_verified" else colors.grey)
     # draw binding site
+
+    # site_instance argument may be type of SiteInstance or MetaSiteInstance. If
+    # MetaSiteInstance, there is no strand, set to 1.
+    if not hasattr(site_instance, 'strand'):
+        site_instance.strand = 1
+
     feature = SeqFeature(FeatureLocation(site_instance.start, site_instance.end), strand=site_instance.strand)
     gds_features.add_feature(feature,
                              color=colors.red,

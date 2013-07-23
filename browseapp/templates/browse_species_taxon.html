@@ -3,7 +3,7 @@
 {% block content %}
 
 <ul class="breadcrumb">
-  <li><a href="{% url browseapp.views.browse_by_species_main %}">Home</a><span class="divider">/</span></li>
+  <li><a href="{% url browseapp.browse_species.browse_by_species_main %}">Home</a><span class="divider">/</span></li>
   <li class="active">{{ taxon_elm }}<span class="divider">/</span></li>
 </ul>
 
@@ -21,7 +21,7 @@
 <tbody>
   {% for sp in filtered_strains %}
   <tr>
-    <td><a href="{% url browseapp.views.browse_by_species sp.taxonomy_id %}">{{ sp.name }}</a></td>
+    <td><a href="{% url browseapp.browse_species.browse_by_species sp.taxonomy_id %}">{{ sp.name }}</a></td>
   </tr>
   {% endfor %}
 </tbody>

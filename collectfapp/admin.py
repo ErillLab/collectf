@@ -16,7 +16,7 @@ class CurationAdmin(admin.ModelAdmin):
     list_display = ('curation_id', 'TF_species', 'PMID', 'curator')
     list_filter = ('curator', 'NCBI_submission_ready', 'requires_revision')
     ordering = ('-curation_id',)
-    inlines = (CurationSiteInstanceInline,)
+    #inlines = (CurationSiteInstanceInline,)
 
 class CuratorAdmin(admin.ModelAdmin):
     def username(self, obj):
@@ -29,8 +29,15 @@ class CuratorAdmin(admin.ModelAdmin):
 
 class SiteInstanceAdmin(admin.ModelAdmin):
     list_display = ('site_id',)
-    list_filter = ('genome__genome_accession',)
+    #list_filter = ('genome__genome_accession',)
     ordering = ('-site_id', )
+
+class CurationSiteInstanceInline(admin.TabularInline):
+    model = Curation_SiteInstance
+    extra = 0
+    
+class MetaSiteInstanceAdmin(admin.ModelAdmin):
+    inlines = [CurationSiteInstanceInline,]
     
 class Curation_SiteInstanceAdmin(admin.ModelAdmin):
     list_display = ('id',)
@@ -73,6 +80,7 @@ class TFInstance(admin.ModelAdmin):
 admin.site.register(Curation, CurationAdmin)
 admin.site.register(Curator, CuratorAdmin)
 admin.site.register(SiteInstance, SiteInstanceAdmin)
+admin.site.register(MetaSiteInstance, MetaSiteInstanceAdmin)
 admin.site.register(Curation_SiteInstance, Curation_SiteInstanceAdmin)
 admin.site.register(Publication, PublicationAdmin)
 admin.site.register(ExperimentalTechnique, ExperimentalTechniqueAdmin)

@@ -7,7 +7,7 @@ body {
 textarea {
     font-family: monospace, Courier;
 }
-.sequence {
+.sequence, .fixed-width {
     font-family: monospace, Courier;
 }
 #footer {

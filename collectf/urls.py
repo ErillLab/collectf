@@ -12,6 +12,10 @@ import collectfapp.editcurationview as editcurationview
 
 import browseapp.views
 import browseapp.browse_main
+import browseapp.browse_species
+import browseapp.browse_TF
+import browseapp.browse_TF_and_species
+import browseapp.browse_all
 import dbstatsapp.views
 import ncbiapp.views
 
@@ -50,25 +54,25 @@ urlpatterns = patterns('',
     # success page
     url(r'^success/$', collectfapp.views.success),
     # view all curations
-    url(r'^view_all_curations/$', browseapp.views.view_all_curations),
+    url(r'^view_all_curations/$', browseapp.browse_all.view_all_curations),
     # view all publications
-    url(r'^view_all_publications/$', browseapp.views.view_all_publications),
+    url(r'^view_all_publications/$', browseapp.browse_all.view_all_publications),
     # browse
-    url(r'^browse/$', browseapp.views.browse),
+    url(r'^browse/$', browseapp.browse_TF_and_species.browse_TF_and_species),
     # browse by TF and species
-    url(r'^browse_TF_sp/(?P<TF_id>\d+)/(?P<species_id>\d+)/$', browseapp.views.browse_post_TF_sp),
+    url(r'^browse_TF_sp/(?P<TF_id>\d+)/(?P<species_id>\d+)/$', browseapp.browse_TF_and_species.browse_TF_and_species_selected),
     # browse by TF main
-    url(r'^browse_tf_main/$', browseapp.views.browse_by_TF_main),
+    url(r'^browse_tf_main/$', browseapp.browse_TF.browse_by_TF_main),
     # browse by TF family
-    url(r'^browse_tf_family/(?P<TF_family_id>\d+)$', browseapp.views.browse_by_TF_family),
+    url(r'^browse_tf_family/(?P<TF_family_id>\d+)$', browseapp.browse_TF.browse_by_TF_family),
     # browse by TF
-    url(r'^browse_tf/(?P<TF_id>\d+)$', browseapp.views.browse_by_TF),
+    url(r'^browse_tf/(?P<TF_id>\d+)$', browseapp.browse_TF.browse_by_TF),
     # browse by species main
-    url(r'^browse_sp_main/$', browseapp.views.browse_by_species_main),
+    url(r'^browse_sp_main/$', browseapp.browse_species.browse_by_species_main),
     # browse by taxon elms
-    url(r'^browse_sp_taxon/(?P<taxon_name>\w+)/$', browseapp.views.browse_by_species_taxon),
+    url(r'^browse_sp_taxon/(?P<taxon_name>\w+)/$', browseapp.browse_species.browse_by_species_taxon),
     # browse by species
-    url(r'^browse_sp/(?P<sp_tax_id>\d+)/$', browseapp.views.browse_by_species),
+    url(r'^browse_sp/(?P<sp_tax_id>\d+)/$', browseapp.browse_species.browse_by_species),
 
                        
     # browse curation
@@ -78,7 +82,7 @@ urlpatterns = patterns('',
     url(r'^EXPSITE_(?P<dbxref_id>\w+)$', browseapp.browse_main.browse_by_site),
            
     # export fasta/csv
-    url(r'^export_sites/$', browseapp.views.export_sites),
+    url(r'^export_sites/$', browseapp.browse_TF_and_species.export_sites),
     # database statistics
     url(r'^db_stats/$', dbstatsapp.views.curation_stats),
     # export tbl for ncbi submission

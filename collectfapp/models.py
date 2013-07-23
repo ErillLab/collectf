@@ -207,7 +207,7 @@ class Curation_SiteInstance(models.Model):
     # through model between Curation and SiteInstance models
     curation = models.ForeignKey("Curation", null=False)
     site_instance = models.ForeignKey("SiteInstance", null=False)
-    #meta_site_instance = models.ForeignKey("MetaSiteInstance")
+    meta_site_instance = models.ForeignKey("MetaSiteInstance")
     is_motif_associated = models.BooleanField(null=False) # is the site instance actual motif,
                                                  # or a (longer) sequence that
                                                  # contains the site somewhere
@@ -219,7 +219,33 @@ class Curation_SiteInstance(models.Model):
     quantitative_value = models.FloatField(null=True, blank=True)
 
     def __unicode__(self):
-        return u"reported: %s, matched: %s" % (self.site_instance, self.annotated_seq)
+        return u'[%d]' % self.pk
+        #return u"reported: %s, matched: %s" % (self.site_instance, self.annotated_seq)
+
+class MetaSiteInstance(models.Model):
+    genome = models.ForeignKey("Genome", null=False)
+    TF_instance = models.ForeignKey("TFInstance", null=False)
+    start = models.IntegerField(null=False)
+    end = models.IntegerField(null=False)
+
+    def get_seq(self):
+        return self.genome.sequence[self.start:self.end+1]
+    
+    def __unicode__(self):
+        return u'[%d]' % self.pk
+        return u"genome: %d, TF_instance: %s, loc:%d-%d" % (self.genome.genome_id,
+                                                            self.TF_instance.protein_accession,
+                                                            self.start,
+                                                            self.end)
+    def to_fasta(self):
+        desc = "%s [%d, %d]" % (self.genome.genome_accession, self.start, self.end)
+        return ">%s\n%s\n" % (desc, self.get_seq())
+
+    def to_csv(self):
+        fields = [self.genome.genome_accession, '%d' % self.start, '%d' % self.end, self.get_seq()]
+        return '\t'.join(fields)
+
+
 
 class Regulation(models.Model):
     EVIDENCE_TYPE = (("exp_verified", "experimentally verified"),
@@ -291,5 +317,3 @@ class Curation_ExternalDatabase(models.Model):
                                                   self.external_database.ext_database_name,
                                                   self.accession_number)
 
-
-    

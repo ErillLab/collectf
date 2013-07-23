@@ -22,7 +22,7 @@
 <tbody>
   {% for taxon_elm in taxon_names %}
   <tr>
-    <td><a href="{% url browseapp.views.browse_by_species_taxon taxon_elm %}">{{ taxon_elm }}</a></td>
+    <td><a href="{% url browseapp.browse_species.browse_by_species_taxon taxon_elm %}">{{ taxon_elm }}</a></td>
   </tr>
   {% endfor %}
 </tbody>

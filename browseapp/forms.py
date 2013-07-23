@@ -10,8 +10,8 @@ class BrowseForm(forms.Form):
                                      label="species",
                                      initial=0)
 
-    browse_motif_associated_sites = forms.BooleanField(required=False)
-    browse_not_motif_associated_sites = forms.BooleanField(required=False)
+    #browse_motif_associated_sites = forms.BooleanField(required=False)
+    #browse_not_motif_associated_sites = forms.BooleanField(required=False)
 
 
     

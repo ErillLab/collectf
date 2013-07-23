@@ -390,7 +390,6 @@ def FormAlignment(info):
     return aligned, idxAligned, strands        
 
 def LASAGNA(sites, SCOPE, seedIdx=-1, trim=False, ICThres=0.0, covThres=0.4):
-    print sites
     sizeThres = 1
     nSites = len(sites)
     lens = numpy.array([len(site) for site in sites])

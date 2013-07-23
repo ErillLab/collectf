@@ -5,7 +5,7 @@
 {% load TF_desc_htmlify %}
 
 <ul class="breadcrumb">
-  <li><a href="{% url browseapp.views.browse_by_TF_main %}">Home</a><span class="divider">/</span></li>
+  <li><a href="{% url browseapp.browse_TF.browse_by_TF_main %}">Home</a><span class="divider">/</span></li>
   <li class="active">{{ TF_family.name}}<span class="divider">/</span></li>
 </ul>
 
@@ -24,7 +24,7 @@
 <tbody>
   {% for TF in TFs %}
   <tr>
-    <td><a href="{% url browseapp.views.browse_by_TF TF.TF_id %}">{{ TF.name }}</a></td>
+    <td><a href="{% url browseapp.browse_TF.browse_by_TF TF.TF_id %}">{{ TF.name }}</a></td>
     <td>{{ TF.description|htmlify }}</td>
   </tr>
   {% endfor %}

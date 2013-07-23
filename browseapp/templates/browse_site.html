@@ -4,18 +4,13 @@
 
 <dl class="dl-horizontal">
   <dt>dbxref</dt>
-  <dd>{{ dbxref }}</dd>
-  <dt>sequence</dt>
-  <dd class="sequence">{% if site_instance.strand == 1 %} + {% else %} - {% endif %}
-    ({{ site_instance.start|add:"1" }}, {{ site_instance.end|add:"1" }}) {{ site_instance.seq }}</dd>
+  <dd class="fixed-width">{{ dbxref }}</dd>
   <dt>genome accession</dt>
-  <dd>{{ site_instance.genome.genome_accession }} ({{ site_instance.genome.strain.name }})</dd>
-
+  <dd>{{ meta_site_instance.genome.genome_accession }} ({{ meta_site_instance.genome.strain.name }})</dd>
 </dl>
 
 <hr />
 <h4>List of curations for this transcription factor binding site</h4>
-
 <table class="table table-striped">
   <thead>
     <tr>
@@ -48,7 +43,7 @@ for TF-site mediated regulation are displayed in green.
 
 {% load gene_diagram %}
 <div class="regulation-diagram">
-  {{ regulations|regulation_diagram:site_instance }}  
+  {{ regulations|regulation_diagram:meta_site_instance }}  
 </div>
 
 <ul>
