@@ -117,7 +117,7 @@ def get_org_name(genome_record):
     """Given genome record from NCBI db, get organism name"""
     return genome_record.annotations['organism']
 
-def get_org_taxon(genome_record):
+def get_org_taxon_depr(genome_record):
     """Given genome rec from NCBI db, get organism taxonomy id"""
     org = get_org_name(genome_record)
     org = org.replace('(', ' ')
@@ -126,6 +126,20 @@ def get_org_taxon(genome_record):
     rec = Entrez.read(handle)
     assert int(rec['Count']) == 1
     return rec['IdList'][0]
+
+def get_org_taxon(genome_record):
+    """Given genome record, find organism taxonomy id using Elink utility"""
+    try:
+        gi = genome_record.annotations['gi']
+        print 'gi', gi
+        r = Entrez.read(Entrez.elink(db='taxonomy', dbfrom='nuccore', id=gi, linkname='nuccore_taxonomy'))
+        print r
+        assert len(r) == 1
+        tax_id = r[0]['LinkSetDb'][0]['Link'][0]['Id']
+    except:
+        tax_id = None
+    return tax_id
+
 
 def get_taxon_info(tax_id):
     try:

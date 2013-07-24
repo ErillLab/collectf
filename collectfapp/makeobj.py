@@ -36,12 +36,12 @@ def make_pub(pubrec, cd):
                     curation_complete=False)
     return p
 
-def make_genome(genome_record):
+def make_genome(genome_record, strain_taxon):
     """Given genome record that is fetched from NCBI, create a models.Genome object"""
     gc = bioutils.GC(genome_record.seq)  # GC content
     # get or create strain if not in database
     org = bioutils.get_org_name(genome_record)           # organism name
-    strain_taxon = bioutils.get_org_taxon(genome_record)    # taxonomy id
+    #strain_taxon = bioutils.get_org_taxon(genome_record)    # taxonomy id
     strain, crt = Strain.objects.get_or_create(taxonomy_id=strain_taxon,
                                                defaults={'name':org})
     # create genome object

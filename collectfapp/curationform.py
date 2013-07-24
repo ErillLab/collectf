@@ -71,11 +71,15 @@ class GenomeForm(forms.Form):
             g = Genome.objects.get(genome_accession=genome_accession)
         except Genome.DoesNotExist: # try to retrieve from NCBI database
             genome_rec = bioutils.get_genome(genome_accession)
+            strain_taxon = bioutils.get_org_taxon(genome_rec)
             if not genome_rec:
                 msg = "Cannot fetch genome record from NCBI. Check accession number."
                 raise forms.ValidationError(msg)
+            if not strain_taxon:
+                msg = "Cannot fetch strain taxonomy information."
+                raise forms.ValidationError(msg)
             # create Genome object
-            make_genome(genome_rec)
+            make_genome(genome_rec, strain_taxon)
             # create all Genome objects for each gene on that genome
             make_all_genes(genome_rec)
         return genome_accession
