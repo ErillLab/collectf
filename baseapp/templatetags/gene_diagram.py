@@ -40,7 +40,7 @@ def site_match_diagram(site_match):
              fragments=1,
              start=min(map(lambda g: g.start, site_match.nearby_genes))-50,
              end=max(map(lambda g: g.end, site_match.nearby_genes))+50,
-             pagesize=(2*cm, 14*cm))
+             pagesize=(2*cm, 20*cm))
     return mark_safe(gdd.write_to_string('svg'))
                          
 @register.filter
@@ -78,5 +78,5 @@ def regulation_diagram(regulations, site_instance):
              fragments=1,
              start=min(map(lambda r: r.gene.start, regulations)) - 50,
              end = max(map(lambda r: r.gene.end, regulations)) + 50,
-             pagesize = (2*cm, 14*cm))
+             pagesize = (2*cm, 20*cm))
     return mark_safe(gdd.write_to_string('svg'))

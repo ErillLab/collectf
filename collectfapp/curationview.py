@@ -364,7 +364,7 @@ def site_report_process(wiz, form):
         for site_id, site in sites.items():
             # search that site in ChIP extra field
             for peak_id, peak_seq in chip_peaks.items():
-                if site in peak_seq:
+                if site in peak_seq or sitesearch.reverse_complement(site) in peak_seq:
                     site_quantitative_data[site_id] = quantitative_vals[peak_id]
                     break
             else:
