@@ -13,6 +13,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'STORAGE_ENGINE': 'MyISAM',
         'NAME': 'collectfdb_test',                      # Or path to database file if using sqlite3.
         'USER': 'sefa',                      # Not used with sqlite3.
         'PASSWORD': '46544654',                  # Not used with sqlite3.

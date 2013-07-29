@@ -259,3 +259,8 @@ def weblogo_uri(sequences):
     mime = "image/png"
     
     return ("data:" + mime + ';' + "base64," + encoded)
+
+
+def get_overlap(loca, locb):
+    """Given two regions, return the length of overlap of them"""
+    return max(0, min(loca[1], locb[1]) - max(loca[0], locb[0]))

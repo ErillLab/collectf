@@ -20,9 +20,25 @@ def get_all_curation_site_instances():
             csi.is_motif_associated,
             ]))
 
+def get_all_curations_with_chip():
+    all_curations = models.Curation.objects.filter(experimental_techniques__name__in=['ChIP-chip','ChIP-Seq','ChIP-PCR']).distinct()
+    print 'curation_id, PMID, used_techniques'
+    for curation in all_curations:
+        print curation.curation_id, '\t',
+        print curation.publication.pmid, '\t',
+        print map(str, curation.experimental_techniques.values_list('name', flat=True))
+
+def get_all_TF_instances_without_curation():
+    used_TF_instances = models.Curation.objects.values_list('TF_instance',flat=True).distinct()
+    not_used = models.TFInstance.objects.exclude(protein_accession__in=used_TF_instances)
+    for x in not_used:
+        print x.protein_accession,
+
+
         
 def run():
-    get_all_curation_site_instances()
-    print "Running misc.py"
+    #get_all_curation_site_instances()
+    #get_all_curations_with_chip()
+    get_all_TF_instances_without_curation()
     
     

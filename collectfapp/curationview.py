@@ -710,32 +710,6 @@ def site_match_done(wiz, curation, regulations):
                                           quantitative_value = quantitative_vals.get(sid, None))
         cs.save()
 
-        # for curation_site_instance create meta-site-instance (if it is motif-associated)
-        get_overlap = lambda a,b: max(0, min(a[1], b[1]) -  max(a[0], b[0]))
-        if is_motif_associated:
-            # try to find a meta-site-instances that overlaps with the site
-            loc_a = (cs.site_instance.start, cs.site_instance.end)
-            for ms in models.MetaSiteInstance.objects.filter(genome=genome, TF_instance=curation.TF_instance).iterator():
-                loc_b = (min(map(lambda s: s.site_instance.start, ms.curation_siteinstance_set.all())),
-                         max(map(lambda s: s.site_instance.end, ms.curation_siteinstance_set.all())))
-                if get_overlap(loc_a, loc_b) >= 0.75 * (loc_a[1]-loc_a[0]):
-                    cs.meta_site_instance = ms
-                    cs.save()
-                    ms.start = min(loc_a[0], loc_b[0])
-                    ms.end = max(loc_a[1], loc_b[1])
-                    ms.save()
-                    print 'found'
-                    break
-            else: # in case meta-site is not found
-                ms = models.MetaSiteInstance(genome=genome,
-                                             TF_instance=TF_instance,
-                                             start=cs.site_instance.start,
-                                             end=cs.site_instance.end)
-                ms.save()
-                cs.meta_site_instance = ms
-                cs.save()
-                print 'created new'
-
         # for site instance, add regulation information
         regulation_done(wiz,
                         regulations=regulations[sid],

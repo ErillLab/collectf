@@ -32,13 +32,7 @@ class SiteInstanceAdmin(admin.ModelAdmin):
     #list_filter = ('genome__genome_accession',)
     ordering = ('-site_id', )
 
-class CurationSiteInstanceInline(admin.TabularInline):
-    model = Curation_SiteInstance
-    extra = 0
-    
-class MetaSiteInstanceAdmin(admin.ModelAdmin):
-    inlines = [CurationSiteInstanceInline,]
-    
+
 class Curation_SiteInstanceAdmin(admin.ModelAdmin):
     list_display = ('id',)
     list_filter = ('is_motif_associated',)
@@ -80,7 +74,6 @@ class TFInstance(admin.ModelAdmin):
 admin.site.register(Curation, CurationAdmin)
 admin.site.register(Curator, CuratorAdmin)
 admin.site.register(SiteInstance, SiteInstanceAdmin)
-admin.site.register(MetaSiteInstance, MetaSiteInstanceAdmin)
 admin.site.register(Curation_SiteInstance, Curation_SiteInstanceAdmin)
 admin.site.register(Publication, PublicationAdmin)
 admin.site.register(ExperimentalTechnique, ExperimentalTechniqueAdmin)

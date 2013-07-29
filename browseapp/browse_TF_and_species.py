@@ -56,15 +56,15 @@ def browse_TF_and_species_post(request):
     return get_sites_by_TF_and_species(request, TF, species, curation_site_instances)
 
 def get_sites_by_TF_and_species(request, TF, species, curation_site_instances):
-    meta_site_curation_dict, meta_site_regulation_dict = group_curation_site_instances(curation_site_instances)
+    meta_sites, meta_site_curation_dict, meta_site_regulation_dict = group_curation_site_instances(curation_site_instances)
     # if there is no site, message
-    if not meta_site_curation_dict and not meta_site_regulation_dict:
+    if not meta_sites:
         msg = "No site found for transcription factor %s in the genome of %s." % (TF.name, species.name)
         messages.info(request, msg)
         return browse_TF_and_species_get(request)
 
     # Use LASAGNA to align sites    # use LASAGNA to align sites
-    aligned, idxAligned, strands = lasagna.LASAGNA(map(lambda s:s.seq.lower(), meta_site_curation_dict.keys()),0)
+    aligned, idxAligned, strands = lasagna.LASAGNA(map(lambda s:str(s[0].site_instance.seq).lower(), meta_sites.values()), 0)
     trimmed = lasagna.TrimAlignment(aligned) if len(aligned) > 1 else aligned
     print trimmed
     trimmed = [s.upper() for s in trimmed]
@@ -72,31 +72,53 @@ def get_sites_by_TF_and_species(request, TF, species, curation_site_instances):
     weblogo_data = bioutils.weblogo_uri(trimmed)
 
     result_dict = get_template_dict()
-    result_dict['site_curation_dict'] = meta_site_curation_dict
-    result_dict['site_regulation_dict'] = meta_site_regulation_dict
+    result_dict['meta_sites'] = meta_sites
+    result_dict['meta_site_curation_dict'] = meta_site_curation_dict
+    result_dict['meta_site_regulation_dict'] = meta_site_regulation_dict
     result_dict['TF'] = TF
     result_dict['species'] = species
     result_dict['weblogo_image_data'] = weblogo_data
     result_dict['aligned_sites']= trimmed
     return render(request, "browse_results.html", result_dict, context_instance=RequestContext(request))
 
+def overlap_site_meta_site(site_instance, meta_site_instance, overlap_th=0.8):
+    """Given a site instance (site_instance) and a list of site instances
+    (meta_site_instance), return whether site instance overlaps enough with any site
+    instance in the meta_site_instance."""
+    return any(bioutils.get_overlap((site_instance.start, site_instance.end),
+                                    (msi.start, msi.end)) for msi in meta_site_instance)
+
+    
 def group_curation_site_instances(curation_site_instances):
-    # Group curation_site_instance objects by meta_site_instance
-    meta_site_curation_dict = defaultdict(list)
-    meta_site_regulation_dict = defaultdict(list)
+    # Group curation_site_instance objects by meta site-instances
+    # group all curation_site_instances
+    meta_sites = dict()
     for csi in curation_site_instances:
-        ms = csi.meta_site_instance
-        # put sequence in the ms object
-        ms.seq = str(ms.get_seq())
-        meta_site_curation_dict[ms].append(csi.curation)
-        for regulation in csi.regulation_set.all():
-            # Check if regulated gene is already in the list (from another curation)
-            same_gene_reg = [r for r in meta_site_regulation_dict[ms] if r.gene == regulation.gene]
-            if same_gene_reg and same_gene_reg[0].evidence_type=='inferred':
-                same_gene_reg[0].evidence_type = regulation.evidence_type
-            else:
-                meta_site_regulation_dict[ms].append(regulation)
-    return meta_site_curation_dict, meta_site_regulation_dict
+        # search for a meta-site-instance
+        for i in meta_sites.keys():
+            if overlap_site_meta_site(csi.site_instance, [m.site_instance for m in meta_sites[i]]):
+                meta_sites[i].append(csi)
+                break
+        else:
+            meta_sites[len(meta_sites)+1] = [csi]
+    # 
+    meta_site_curation_dict = {}
+    meta_site_regulation_dict = {}
+
+    for ms_id in meta_sites:
+        meta_site_curation_dict[ms_id] = []
+        for csi in meta_sites[ms_id]:
+            meta_site_curation_dict[ms_id].append(csi.curation)
+            meta_site_regulation_dict[ms_id] = []
+            for reg in csi.regulation_set.all():
+                # check if regulated gene is already in the list (from another curation)
+                same_reg_gene = [r for r in meta_site_regulation_dict[ms_id] if r.gene==reg.gene]
+                if same_reg_gene and same_reg_gene.evidence_type=='inferred':
+                    same_reg_gene[0].evidence_type = reg.evidence_type
+                if not same_reg_gene:
+                    meta_site_regulation_dict[ms_id].append(reg)
+                    
+    return meta_sites, meta_site_curation_dict, meta_site_regulation_dict
 
 def get_template_dict():
     """Pass dictionary to the browse HTML template page."""

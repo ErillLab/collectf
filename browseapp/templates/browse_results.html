@@ -6,7 +6,7 @@
 
 <div class="container">
 
-  {% if site_curation_dict and site_regulation_dict %}
+  {% if meta_sites %}
   {% load utils %}
   {% load gene_diagram %}
   <div class="row">
@@ -19,6 +19,7 @@
 	<li><a href="#export_data">Export data <i class="icon-chevron-right"> </i></a></li>
       </ul>
     </div>
+
 
     <div class="span9">
       <section class="spacer" id="overview">
@@ -41,8 +42,8 @@
 	    <div class="tab-pane active" id="unaligned">
 	      <p>Sites are listed as curated.</p>
 	      <pre>
-		{% for site in site_curation_dict|get_keys %}
-		{{ site.seq }}{% endfor %}
+		{% for id,meta_site in meta_sites.items %}
+		{{ meta_site.0.site_instance.seq }}{% endfor %}
 	      </pre>
 	    </div>
 
@@ -94,11 +95,12 @@
 	      </tr>
 	    </thead>
 	    <tbody>
-	      {% for site in site_curation_dict|get_keys %}
+	      {% for ms_id, meta_site in meta_sites.items %}
+	      {# meta_site is a list of curation_site_instance objects #}
 	      <tr><td colspan="4"><hr /></td></tr>
 	      <tr>
-		<td colspan="3"><span class="sequence">{{ site.seq }}</span></td>
-		<td>{% for cur in site_curation_dict|get_item:site %}
+		<td colspan="3"><span class="sequence">{{ meta_site.0.site_instance.seq }}</span></td>
+		<td>{% for cur in meta_site_curation_dict|get_item:ms_id %}
 		  <a href="{% url browseapp.browse_main.browse_curation cur.curation_id %}">[{{cur.curation_id}}]</a>{% if not forloop.last %}, {% endif %}
 		  {% endfor %}
 		</td>
@@ -107,13 +109,17 @@
 	      <div>
 		<tr>
 		  <td colspan="4">
-		    <div class="regulation_diagram">{% with regs=site_regulation_dict|get_item:site %} {{ regs|regulation_diagram:site }} {% endwith %}</div>
+		    <div class="regulation_diagram">
+		      {% with regs=meta_site_regulation_dict|get_item:ms_id %}
+		       {{ regs|regulation_diagram:meta_site.0.site_instance }}
+		      {% endwith %}
+		    </div>
 		  </td>
 		</tr>
  	      </div>
 
 
-	      {% for reg in site_regulation_dict|get_item:site %}
+	      {% for reg in meta_site_regulation_dict|get_item:ms_id %}
 	      <tr>
 		<td></td>
 		<td>
@@ -131,7 +137,6 @@
 		<td></td>
 	      </tr>
 	      {% endfor %}
-
 	      {% endfor %}
 	    </tbody>
 	  </table>
@@ -145,8 +150,9 @@
 
 	  <p>
 	    <form action="{% url browseapp.browse_TF_and_species.export_sites %}" method="POST">{% csrf_token %}
-	      {% for site in site_curation_dict|get_keys %}
-	      <input type="hidden" name="site_id" value="{{ site.pk }}" />
+	      {% for ms_id, meta_site in meta_sites.items %}
+	      {# reporting first site instance from each meta_site -- for now #}
+	      <input type="hidden" name="site_id" value="{{ meta_site.0.pk }}" />
 	      {% endfor %}
 	      <input type="submit" value="Download FASTA" class="btn btn-info btn-large" name="fasta">
 	      <input type="submit" value="Download CSV" class="btn btn-info btn-large" name="csv">
