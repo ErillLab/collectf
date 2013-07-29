@@ -6,7 +6,8 @@
   <dt>dbxref</dt>
   <dd class="fixed-width">{{ dbxref }}</dd>
   <dt>genome accession</dt>
-  <dd>{{ meta_site_instance.genome.genome_accession }} ({{ meta_site_instance.genome.strain.name }})</dd>
+  <dd>{{ head_curation_site_instance.site_instance.genome.genome_accession }}
+    ({{ head_curation_site_instance.site_instance.genome.strain.name }})</dd>
 </dl>
 
 <hr />
@@ -43,7 +44,9 @@ for TF-site mediated regulation are displayed in green.
 
 {% load gene_diagram %}
 <div class="regulation-diagram">
-  {{ regulations|regulation_diagram:meta_site_instance }}  
+  {% with site=head_curation_site_instance.site_instance %}
+  {{ regulations|regulation_diagram:site }}  
+  {% endwith %}
 </div>
 
 <ul>

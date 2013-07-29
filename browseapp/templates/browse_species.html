@@ -28,7 +28,7 @@
 <tbody>
   {% for TF in TFs %}
   <tr>
-    <td><a href="{% url browseapp.views.browse_post_TF_sp TF.TF_id sp.taxonomy_id %}">{{ TF.name }}</a></td>
+    <td><a href="{% url browseapp.browse_TF_and_species.browse_TF_and_species_selected TF.TF_id sp.taxonomy_id %}">{{ TF.name }}</a></td>
     <td>{{ num_site_instances|get_item:TF.TF_id }}</td>
     <td>{{ num_curations|get_item:TF.TF_id }}</td>
   </tr>

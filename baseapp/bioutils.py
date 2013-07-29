@@ -265,9 +265,13 @@ def get_overlap(loca, locb):
     """Given two regions, return the length of overlap of them"""
     return max(0, min(loca[1], locb[1]) - max(loca[0], locb[0]))
 
-def overlap_site_meta_site(site_instance, meta_site_instance, overlap_th=0.8):
+def overlap_site_meta_site(curation_site_instance, meta_site_instance, overlap_th=0.8):
     """Given a site instance (site_instance) and a list of site instances
     (meta_site_instance), return whether site instance overlaps enough with any site
     instance in the meta_site_instance."""
-    return any(get_overlap((site_instance.start, site_instance.end),
-                           (msi.start, msi.end)) for msi in meta_site_instance)
+
+    def location(curation_site_instance):
+        return (curation_site_instance.site_instance.start,
+                curation_site_instance.site_instance.end)
+    
+    return any(get_overlap(location(curation_site_instance), location(ms)) for ms in meta_site_instance)

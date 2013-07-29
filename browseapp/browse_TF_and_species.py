@@ -89,7 +89,7 @@ def group_curation_site_instances(curation_site_instances):
     for csi in curation_site_instances:
         # search for a meta-site-instance
         for i in meta_sites.keys():
-            if bioutils.overlap_site_meta_site(csi.site_instance, [m.site_instance for m in meta_sites[i]]):
+            if bioutils.overlap_site_meta_site(csi, meta_sites[i]):
                 meta_sites[i].append(csi)
                 break
         else:
