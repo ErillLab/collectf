@@ -225,9 +225,6 @@ class Curation_SiteInstance(models.Model):
         return u'[%d]' % self.pk
         #return u"reported: %s, matched: %s" % (self.site_instance, self.annotated_seq)
 
-    def get_site_sequence(self):
-        return self.site_instance.seq
-
 class Regulation(models.Model):
     EVIDENCE_TYPE = (("exp_verified", "experimentally verified"),
                      ("inferred", "inferred"))

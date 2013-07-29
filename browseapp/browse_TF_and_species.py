@@ -81,13 +81,6 @@ def get_sites_by_TF_and_species(request, TF, species, curation_site_instances):
     result_dict['aligned_sites']= trimmed
     return render(request, "browse_results.html", result_dict, context_instance=RequestContext(request))
 
-def overlap_site_meta_site(site_instance, meta_site_instance, overlap_th=0.8):
-    """Given a site instance (site_instance) and a list of site instances
-    (meta_site_instance), return whether site instance overlaps enough with any site
-    instance in the meta_site_instance."""
-    return any(bioutils.get_overlap((site_instance.start, site_instance.end),
-                                    (msi.start, msi.end)) for msi in meta_site_instance)
-
     
 def group_curation_site_instances(curation_site_instances):
     # Group curation_site_instance objects by meta site-instances
@@ -96,7 +89,7 @@ def group_curation_site_instances(curation_site_instances):
     for csi in curation_site_instances:
         # search for a meta-site-instance
         for i in meta_sites.keys():
-            if overlap_site_meta_site(csi.site_instance, [m.site_instance for m in meta_sites[i]]):
+            if bioutils.overlap_site_meta_site(csi.site_instance, [m.site_instance for m in meta_sites[i]]):
                 meta_sites[i].append(csi)
                 break
         else:
