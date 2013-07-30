@@ -18,7 +18,6 @@ SiteMatch = namedtuple('SiteMatch', 'match nearby_genes')
 def parse_site_input(text):
     """Parse text of reported sites. It can be either in FASTA format, or plain
     list of site sequences"""
-    print 'text', text
     if text.strip().startswith('>'): # FASTA format
         l = SeqIO.parse(StringIO.StringIO(text), 'fasta')
         sites = [item.seq.tostring() for item in l]

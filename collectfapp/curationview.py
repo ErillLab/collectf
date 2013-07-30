@@ -145,11 +145,13 @@ def site_exact_match_get_form(wiz, form):
         # make the form field
         form.fields[sid] = forms.ChoiceField(label=label,
                                              choices=choices,
-                                             widget=forms.RadioSelect())
+                                             widget=forms.RadioSelect(attrs={'class': 'boxed'}))
+        
 
         if is_coordinate: # make the first option selected
             #form.fields[sid].widget.attrs['disabled']='disabled'
             form.fields[sid].initial = choices[0][0]
+            
     return form
 
 def site_soft_match_get_form(wiz, form):
@@ -163,11 +165,11 @@ def site_soft_match_get_form(wiz, form):
     exact_site_matches = sutils.sget(wiz.request.session, 'exact_site_matches')
     for sid, matches in soft_site_match_choices.items():
         label = pretty_print.site2label(sid, sites[sid])
-        choices = populate_match_choices(sites[sid], matches, is_exact=False)
+        choices = populate_match_choices(sites[sid], matches, is_exact=False, add_no_valid_opt=True)
         # make the form field
         form.fields[sid] = forms.ChoiceField(label=label,
                                              choices=choices,
-                                             widget=forms.RadioSelect())
+                                             widget=forms.RadioSelect(attrs={'class' :'boxed'}))
     return form
 
 def site_quantitative_data_get_form(wiz, form):
@@ -216,7 +218,7 @@ def site_regulation_get_form(wiz, form):
         form.fields[sid] = forms.MultipleChoiceField(label=label,
                                                      choices=choices,
                                                      required=False,
-                                                     widget=forms.CheckboxSelectMultiple,
+                                                     widget=forms.CheckboxSelectMultiple(attrs={'class':'boxed'}),
                                                      help_text=gene_diagram.site_match_diagram(match))
         
         # disable checkbox if publication is marked as not having expression data
