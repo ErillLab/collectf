@@ -101,7 +101,7 @@
 	      <tr>
 		<td colspan="3"><span class="sequence">{{ meta_site.0.site_instance.seq }}</span></td>
 		<td>{% for cur in meta_site_curation_dict|get_item:ms_id %}
-		  <a href="{% url browseapp.browse_main.browse_curation cur.curation_id %}">[{{cur.curation_id}}]</a>{% if not forloop.last %}, {% endif %}
+		  <a href="{% url browseapp.browse_curation.browse_curation cur.curation_id %}">[{{cur.curation_id}}]</a>{% if not forloop.last %}, {% endif %}
 		  {% endfor %}
 		</td>
 	      </tr>

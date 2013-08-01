@@ -146,6 +146,8 @@ class Taxonomy(models.Model):
     parent = models.ForeignKey('self', null=True)
     def __unicode__(self):
         return '[%s] %s (%s)' % (str(self.taxonomy_id), self.name, self.rank)
+    class Meta:
+        verbose_name_plural = 'taxonomies'
 
     def get_order(self):
         order = None

@@ -24,7 +24,7 @@
   <tbody>
     {% for curation in curations %}
     <tr>
-      <td><a href="{% url browseapp.browse_main.browse_curation curation.curation_id %}">{{ curation.curation_id }}</a></td>
+      <td><a href="{% url browseapp.browse_curation.browse_curation curation.curation_id %}">{{ curation.curation_id }}</a></td>
       <td>{{ curation.TF_instance.protein_accession }} ({{ curation.TF.name }})</td>
       <td><a href="http://www.ncbi.nlm.nih.gov/pubmed/?term={{ curation.publication.pmid }}">{{ curation.publication.pmid }}</a></td>
       <td>
