@@ -10,12 +10,12 @@ import collectfapp.pubview as pubview
 import collectfapp.curationview as curationview
 import collectfapp.editcurationview as editcurationview
 
-import browseapp.views
-import browseapp.browse_main
 import browseapp.browse_species
 import browseapp.browse_TF
 import browseapp.browse_TF_and_species
 import browseapp.browse_all
+import browseapp.browse_site
+import browseapp.browse_curation
 import dbstatsapp.views
 import ncbiapp.views
 
@@ -76,10 +76,10 @@ urlpatterns = patterns('',
 
                        
     # browse curation
-    url(r'^browse_curation/(?P<cid>\d+)/$', browseapp.browse_main.browse_curation),
+    url(r'^browse_curation/(?P<cid>\d+)/$', browseapp.browse_curation.browse_curation),
     # browse site
-    url(r'^expsite_(?P<dbxref_id>\w+)$', browseapp.browse_main.browse_by_site),
-    url(r'^EXPSITE_(?P<dbxref_id>\w+)$', browseapp.browse_main.browse_by_site),
+    url(r'^expsite_(?P<dbxref_id>\w+)$', browseapp.browse_site.browse_by_site),
+    url(r'^EXPSITE_(?P<dbxref_id>\w+)$', browseapp.browse_site.browse_by_site),
            
     # export fasta/csv
     url(r'^export_sites/$', browseapp.browse_TF_and_species.export_sites),

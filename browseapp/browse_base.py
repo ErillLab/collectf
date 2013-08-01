@@ -8,6 +8,6 @@ from django.contrib import messages
 from django.db.models import Q
 from baseapp import utils
 from baseapp import bioutils
+from baseapp import lasagna
 from collections import defaultdict
 import json
-import lasagna

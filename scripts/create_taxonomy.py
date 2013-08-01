@@ -58,6 +58,6 @@ def create_taxonomy_all():
         create_taxonomy(genome)
         
 def run():
-    #create_taxonomy_all()
-    genome = models.Genome.objects.get(genome_accession='NC_020286.1')
-    create_taxonomy(genome)
+    create_taxonomy_all()
+    #genome = models.Genome.objects.get(genome_accession='NC_020286.1')
+    #create_taxonomy(genome)
