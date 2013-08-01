@@ -138,7 +138,7 @@ def get_template_dict():
     species = models.Taxonomy.objects.filter(pk__in=species_ids)
     
     return dict(TFs=models.TF.objects.all().order_by('name'),
-                species=models.Taxonomy.objects.all().order_by('name'),
+                species=species.order_by('name'),
                 binding_techniques=binding_techniques,
                 expression_techniques=expression_techniques,
                 insilico_techniques=insilico_techniques)

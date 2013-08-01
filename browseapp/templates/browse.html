@@ -32,7 +32,7 @@
 	<div class="controls">
 	  <select name="species" id="id_species" class="select2" style="width:50%">
 	    {% for sp in species %}
-	    <option value="{{ sp.taxonomy_id }}">{{ sp }}</option>
+	    <option value="{{ sp.pk }}">{{ sp.name }}</option>
 	    {% endfor %}
 	  </select>
 	</div>
@@ -108,30 +108,14 @@
 	  </div>
 	</div>
       </div>
-      
-      <!--
-	  <div id="form_others">
-	    <div class="page-header">
-	      <h3>4) Other</h3>
-	      <div class="controls">
-		<label class="checkbox">
-		  <input type="checkbox" id="browse_motif_associated_sites">Browse motif associated sites.
-		</label>
-		<label class="checkbox">
-		  <input type="checkbox" id="browse_not_motif_associated_sites">Browse not motif associated sites (e.g. ChIP-seq)
-		</label>
-	      </div>
-       -->
-      
-  </div>
 
-  <div id="form_submit">
-    <div class="page-header">
-      <h3>5) Submit form</h3>
-      <input class="btn btn-large btn-block btn-info" type="submit" value="submit" />
-    </div>
-  </div>
-  </form>
+      <div id="form_submit">
+	<div class="page-header">
+	  <h3>4) Submit form</h3>
+	  <input class="btn btn-large btn-block btn-info" type="submit" value="submit" />
+	</div>
+      </div>
+    </form>
 
 
   <div class="row spacer"></div>
@@ -144,85 +128,86 @@
 
 
 <script type="text/javascript">
-    {% load utils %}
+  {% load utils %}
 
-// data
+  // data
 
-var binding_techniques = [
+  var binding_techniques = [
+  {% for subcategory in binding_techniques|get_keys %}
+  {
+  "key": "{{ subcategory }}",
+  "values": [{% for technique in binding_techniques|get_item:subcategory|sort_by:'name' %} {"key": "{{ technique.name }}"}, {% endfor %}]
+  },
+  {% endfor %}
+  ];
 
-    {% for subcategory in binding_techniques|get_keys %}
-    {
-	"key": "{{ subcategory }}",
-	"values": [{% for technique in binding_techniques|get_item:subcategory|sort_by:'name' %} {"key": "{{ technique.name }}"}, {% endfor %}]
-    },
-    {% endfor %}
-];
-var expression_techniques = [
-    {% for subcategory in expression_techniques|get_keys %}
-    {
-	"key": "{{ subcategory}}",
-	"values": [{% for technique in expression_techniques|get_item:subcategory|sort_by:'name' %} {"key": "{{ technique.name }}"}, {% endfor %}]
-    },
-    {% endfor %}
-];
-var insilico_techniques = [
-    {% for subcategory in insilico_techniques|get_keys %}
-    {
-	"key": "{{ subcategory }}",
-	"values": [{% for technique in insilico_techniques|get_item:subcategory|sort_by:'name' %} {"key": "{{ technique.name }}"}, {% endfor %}]
-    },
-    {% endfor %}
-];
+  var expression_techniques = [
+  {% for subcategory in expression_techniques|get_keys %}
+  {
+  "key": "{{ subcategory}}",
+  "values": [{% for technique in expression_techniques|get_item:subcategory|sort_by:'name' %} {"key": "{{ technique.name }}"}, {% endfor %}]
+  },
+  {% endfor %}
+  ];
 
-$('.techniques1.listTree').listTree(binding_techniques, {'startCollapsed': true, 'selected': []});
-$('.techniques2.listTree').listTree(expression_techniques, {'startCollapsed': true,'selected': [] });
-$('.techniques3.listTree').listTree(insilico_techniques, {'startCollapsed': true, 'selected': []});
+  var insilico_techniques = [
+  {% for subcategory in insilico_techniques|get_keys %}
+  {
+  "key": "{{ subcategory }}",
+  "values": [{% for technique in insilico_techniques|get_item:subcategory|sort_by:'name' %} {"key": "{{ technique.name }}"}, {% endfor %}]
+  },
+  {% endfor %}
+  ];
+
+  $('.techniques1.listTree').listTree(binding_techniques, {'startCollapsed': true, 'selected': []});
+  $('.techniques2.listTree').listTree(expression_techniques, {'startCollapsed': true,'selected': [] });
+  $('.techniques3.listTree').listTree(insilico_techniques, {'startCollapsed': true, 'selected': []});
 
 
-function bind_selectors(select_picker, list_tree)
-{
-    // bind select_picker and list_tree, so when select_picker changes, so does list_tree
-    $(document).on('change', select_picker, function() {
-	var new_val = $(select_picker).val();
-	switch(new_val) {
-	case 'binding':
-	    $(list_tree).listTree('update', binding_techniques, {'startCollapsed': true, 'selected': []});
-	    break;
-	case 'expression':
-	    $(list_tree).listTree('update', expression_techniques, {'startCollapsed': true, 'selected': []});
-	    break;
-	case 'insilico':
-	    $(list_tree).listTree('update', insilico_techniques, {'startCollapsed': true, 'selected': []});
-	    break;
-	}
-    });
-}
+  function bind_selectors(select_picker, list_tree)
+  {
+  // bind select_picker and list_tree, so when select_picker changes, so does list_tree
+  $(document).on('change', select_picker, function() {
+  var new_val = $(select_picker).val();
+  switch(new_val) {
+  case 'binding':
+  $(list_tree).listTree('update', binding_techniques, {'startCollapsed': true, 'selected': []});
+  break;
+  case 'expression':
+  $(list_tree).listTree('update', expression_techniques, {'startCollapsed': true, 'selected': []});
+  break;
+  case 'insilico':
+  $(list_tree).listTree('update', insilico_techniques, {'startCollapsed': true, 'selected': []});
+  break;
+  }
+  });
+  }
 
-function bind_togglers(toggle_a, list_tree) {
-    $(document).on('change', toggle_a, function() {
-	if($(toggle_a).is(":checked"))
-	    $(list_tree).listTree('selectAll');
-	else
-	    $(list_tree).listTree('deselectAll');
-	return false;
-    });
-}
+  function bind_togglers(toggle_a, list_tree) {
+  $(document).on('change', toggle_a, function() {
+  if($(toggle_a).is(":checked"))
+  $(list_tree).listTree('selectAll');
+  else
+  $(list_tree).listTree('deselectAll');
+  return false;
+  });
+  }
 
-bind_selectors('#selectpicker1', '.techniques1.listTree');
-bind_selectors('#selectpicker2', '.techniques2.listTree');
-bind_selectors('#selectpicker3', '.techniques3.listTree');
-bind_togglers('#select_all_tech1', '.techniques1.listTree');
-bind_togglers('#select_all_tech2', '.techniques2.listTree');
-bind_togglers('#select_all_tech3', '.techniques3.listTree');
+  bind_selectors('#selectpicker1', '.techniques1.listTree');
+  bind_selectors('#selectpicker2', '.techniques2.listTree');
+  bind_selectors('#selectpicker3', '.techniques3.listTree');
+  bind_togglers('#select_all_tech1', '.techniques1.listTree');
+  bind_togglers('#select_all_tech2', '.techniques2.listTree');
+  bind_togglers('#select_all_tech3', '.techniques3.listTree');
 
-$('#browse_form').on('click', '.btn', function(e) {
-    $('#selectionJSON1').val(JSON.stringify($('.techniques1.listTree').data('listTree').selected));
-    $('#selectionJSON2').val(JSON.stringify($('.techniques2.listTree').data('listTree').selected));
-    $('#selectionJSON3').val(JSON.stringify($('.techniques3.listTree').data('listTree').selected));
-});
+  $('#browse_form').on('click', '.btn', function(e) {
+  $('#selectionJSON1').val(JSON.stringify($('.techniques1.listTree').data('listTree').selected));
+  $('#selectionJSON2').val(JSON.stringify($('.techniques2.listTree').data('listTree').selected));
+  $('#selectionJSON3').val(JSON.stringify($('.techniques3.listTree').data('listTree').selected));
+  });
 
-// selectpicker initialize
-$('.select2').select2();
+  // selectpicker initialize
+  $('.select2').select2();
 
 </script>
 
