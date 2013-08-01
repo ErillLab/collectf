@@ -116,7 +116,7 @@ def export_tbl_view(request):
     readme_str = generate_readme_string()
 
     # create a zip file
-    filename = 'testing'
+    filename = genome.genome_accession.split('.')[0]
     in_memory = StringIO()
     zip = ZipFile(in_memory, 'a')
     zip.writestr(filename+'.tbl', tbl_str)
