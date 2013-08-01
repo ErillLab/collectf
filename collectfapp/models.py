@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes import generic
 
 # Create your models here.
 class Curation(models.Model):
@@ -25,8 +27,7 @@ class Curation(models.Model):
     site_species = models.CharField(max_length=500) # species of reported sites
     confidence = models.BooleanField()              # is curation confident?
     NCBI_submission_ready = models.BooleanField()   # is ready to submit to NCBI?
-    requires_revision = models.CharField(max_length=20, choices=REVISION_REASONS,
-                                         null=True, blank=True)
+    requires_revision = models.CharField(max_length=20, choices=REVISION_REASONS, null=True, blank=True)
     experimental_process = models.TextField(null=True, blank=True)
     forms_complex = models.BooleanField()           # does TF forms complex
     complex_notes = models.TextField(null=True, blank=True) # if forms complex,
@@ -53,11 +54,12 @@ class Curation(models.Model):
     quantitative_data_format = models.CharField(max_length=500,null=True, blank=True)
 
     def __unicode__(self):
-        return u'%s - %s - %s, %s, %s' % (self.curation_id, self.TF.name,
-                                                    self.publication.title,
-                                                      self.publication.authors,
-                                                      self.publication.publication_date)
-    
+        return u'%s - %s - %s, %s, %s' % (self.curation_id,
+                                          self.TF.name,
+                                          self.publication.title,
+                                          self.publication.authors,
+                                          self.publication.publication_date)
+
 class Curator(models.Model):
     curator_id = models.AutoField(primary_key=True)
     user = models.OneToOneField(User) # extend Django's user model
@@ -109,11 +111,10 @@ class Gene(models.Model):
     strand = models.IntegerField(choices=STRAND)
     locus_tag = models.CharField(max_length=20)
     def __unicode__(self):
-        return '%s (%s - %s)' % (self.gene_id, self.name, self.genome.strain.name)
+        return '%s (%s-%s)' % (self.gene_id, self.name, self.genome.genome_accession)
 
 class Genome(models.Model):
     GENOME_TYPE = (("chromosome", "chromosome"), ("plasmid", "plasmid"))
-
     genome_id = models.AutoField(primary_key=True)
 
     """from S.Lott@stackoverflow: The formal primary key should always be a surrogate
@@ -123,22 +124,37 @@ class Genome(models.Model):
     truly a natural key that can be taken as primary. It isn't primary. Only
     surrogates can be primary.]"""
     genome_accession = models.CharField(max_length=20, unique=True)
-
-    #genome_accession = models.CharField(max_length=20, primary_key=True)
-    #genome_type = models.CharField(max_length=20, choices=GENOME_TYPE)
-    sequence = models.TextField()
+    sequence = models.TextField(editable=False)
     GC_content = models.FloatField()
-    strain = models.ForeignKey("Strain")
-
+    gi = models.CharField(max_length=50, null=False)
+    chromosome = models.CharField(max_length=10, null=False)
+    organism = models.CharField(max_length=500, null=False)
+    taxonomy = models.ForeignKey('Taxonomy')
+    
     def __unicode__(self):
-        return u'%s (%s)' % (self.genome_accession, self.strain.name)
+        return self.genome_accession + ' ' + self.organism
 
-class Strain(models.Model):
-    taxonomy_id = models.CharField(max_length=200, primary_key=True)
+class Taxonomy(models.Model):
+    taxonomy_id = models.CharField(max_length=20, unique=True)
+    rank = models.CharField(max_length=20, choices=(('phylum', 'phylum'),
+                                                    ('class', 'class'),
+                                                    ('order', 'order'),
+                                                    ('family', 'family'),
+                                                    ('genus', 'genus'),
+                                                    ('species', 'species')), null=False)
     name = models.CharField(max_length=100)
-
+    parent = models.ForeignKey('self', null=True)
     def __unicode__(self):
-        return self.name
+        return '[%s] %s (%s)' % (str(self.taxonomy_id), self.name, self.rank)
+
+    def get_order(self):
+        order = None
+        x = self
+        while (x.rank != 'order' and x.parent):
+            x = x.parent
+        if x.rank=='order':
+            return x
+            
 
 class TF(models.Model):
     TF_id = models.AutoField(primary_key=True)
@@ -216,10 +232,8 @@ class Curation_SiteInstance(models.Model):
     # quantitative value
     quantitative_value = models.FloatField(null=True, blank=True)
 
-    # NCBI submission related fields
-    is_obsolete = models.BooleanField(null=False, default=False, blank=True)
-    is_ncbi_xref = models.BooleanField(null=False, default=False, blank=True)
-    
+    # NCBI submission related
+    ncbi_submission = models.ForeignKey("NCBISubmission", null=True)
 
     def __unicode__(self):
         return u'[%d]' % self.pk
@@ -267,7 +281,7 @@ class ExperimentalTechniqueCategory(models.Model):
         return u'[%d] %s' % (self.category_id, self.name)
     
     class Meta:
-        verbose_name_plural = "experimental_technique_categories"
+        verbose_name_plural = "experimental technique categories"
 
 class ChipInfo(models.Model):
     chip_info_id = models.AutoField(primary_key=True)
@@ -275,8 +289,7 @@ class ChipInfo(models.Model):
     method_notes = models.CharField(max_length=2000)
 
     def __unicode__(self):
-        return u'[%d] %s' % (self.chip_info_id,
-                             self.assay_conditions[:10])
+        return u'[%d] PMID: %s' % (self.chip_info_id, self.curation_set.all()[0].publication.pmid)
 
 class ExternalDatabase(models.Model):
     ext_database_id = models.AutoField(primary_key=True)
@@ -294,3 +307,10 @@ class Curation_ExternalDatabase(models.Model):
         return u'curation: %d - xref: %s [%s]' % (self.curation.curation_id,
                                                   self.external_database.ext_database_name,
                                                   self.accession_number)
+class NCBISubmission(models.Model):
+    submission_time = models.DateField(auto_now_add=True)
+    is_obsolete = models.BooleanField(null=False, default=False, blank=True)
+    why_obsolete = models.TextField(null=False) # explain why this site became obsolete.
+
+    class Meta:
+        verbose_name = 'NCBI Submission'

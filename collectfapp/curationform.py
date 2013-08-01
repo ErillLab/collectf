@@ -140,7 +140,7 @@ class GenomeForm(forms.Form):
         if not genome:
             msg = u"Invalid genome accession number"
             self._errors[field] = self.error_class([msg])
-        return genome.strain.name
+        return genome.organism
 
 
 class TechniquesForm(forms.Form):

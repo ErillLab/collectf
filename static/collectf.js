@@ -28,8 +28,6 @@ $(document).ready(function() {
 	placement: 'top',
 	html: 'true',
     });
-    
-    
 
     // scroll page down a little bit
     //window.addEventListener("hashchange", function() { scrollBy(0, -50); });
@@ -45,6 +43,7 @@ $(document).ready(function() {
     if ($('#id_3-is_chip_data').is(':checked')) {
 	$('#id_3-assay_conditions').parent().parent().show(defaultSpeed);
 	$('#id_3-chip_method_notes').parent().parent().show(defaultSpeed);
+	$('#id_3-has_quantitative_data').attr('checked', true);
 	if($('#id_3-is_motif_associated').is(':checked'))
 	    $('#id_3-chip_data_extra_field').parent().parent().show(defaultSpeed);
     }
@@ -52,6 +51,7 @@ $(document).ready(function() {
 	if ($(this).is(":checked")) {
 	    $("#id_3-assay_conditions").parent().parent().show(defaultSpeed);
 	    $("#id_3-chip_method_notes").parent().parent().show(defaultSpeed);
+	    $('#id_3-has_quantitative_data').attr('checked', true);
 	    if($('#id_3-is_motif_associated').is(':checked'))
 		$('#id_3-chip_data_extra_field').parent().parent().show(defaultSpeed);
 	} else {

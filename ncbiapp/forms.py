@@ -7,5 +7,5 @@ class ExportForm(forms.Form):
                                 initial=0)
 
     genomes = forms.ModelChoiceField(queryset=models.Genome.objects.all(),
-                                     label="species",
+                                     label="genomes",
                                      initial=0)

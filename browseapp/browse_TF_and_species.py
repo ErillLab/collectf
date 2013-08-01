@@ -2,9 +2,9 @@ from browse_base import *
 
 def browse_TF_and_species_selected(request, TF_id, species_id):
     TF = models.TF.objects.get(TF_id=TF_id)
-    species = models.Strain.objects.get(pk=species_id)
+    species = models.Taxonomy.objects.get(pk=species_id)
     curation_site_instances = models.Curation_SiteInstance.objects.filter(
-        site_instance__genome__strain=species,
+        site_instance__genome__taxonomy=species,
         curation__TF=TF,
         is_motif_associated=True) # get motif_associated ones for now.
     return get_sites_by_TF_and_species(request,TF,species,curation_site_instances)
@@ -23,7 +23,7 @@ def browse_TF_and_species_post(request):
     experimental techniques, return to the user."""
     
     TF = models.TF.objects.get(TF_id=request.POST['TF'])
-    species = models.Strain.objects.get(pk=request.POST['species'])
+    species = models.Taxonomy.objects.get(pk=request.POST['species'])
     experimental_techniques_1 = request.POST['tech1']
     experimental_techniques_2 = request.POST['tech2']
     experimental_techniques_3 = request.POST['tech3']
@@ -39,7 +39,7 @@ def browse_TF_and_species_post(request):
     #  get curation objects
     curation_site_instances = models.Curation_SiteInstance.objects.filter(
         curation__TF=TF,
-        site_instance__genome__strain=species,
+        site_instance__genome__taxonomy=species,
         is_motif_associated=True)
     # filter them by experimental techniques
     if boolean1 == 'and' and boolean2 == 'and':
@@ -133,9 +133,12 @@ def get_template_dict():
     binding_techniques = dict((x,y) for (x,y) in binding_techniques.items() if y)
     expression_techniques = dict((x,y) for (x,y) in expression_techniques.items() if y)
     insilico_techniques = dict((x,y) for (x,y) in insilico_techniques.items() if y)
+
+    species_ids = models.Genome.objects.values_list('taxonomy', flat=True).distinct()
+    species = models.Taxonomy.objects.filter(pk__in=species_ids)
     
     return dict(TFs=models.TF.objects.all().order_by('name'),
-                species=models.Strain.objects.all().order_by('name'),
+                species=models.Taxonomy.objects.all().order_by('name'),
                 binding_techniques=binding_techniques,
                 expression_techniques=expression_techniques,
                 insilico_techniques=insilico_techniques)

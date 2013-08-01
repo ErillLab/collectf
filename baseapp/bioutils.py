@@ -84,7 +84,6 @@ def get_gene_annotation(id_list):
     assert runtime_error == 0
     return records
 
-
 def get_genes(genome_rec):
     """Get list of all genes"""
     genes = [] # return list of genes
@@ -131,15 +130,12 @@ def get_org_taxon(genome_record):
     """Given genome record, find organism taxonomy id using Elink utility"""
     try:
         gi = genome_record.annotations['gi']
-        print 'gi', gi
         r = Entrez.read(Entrez.elink(db='taxonomy', dbfrom='nuccore', id=gi, linkname='nuccore_taxonomy'))
-        print r
         assert len(r) == 1
         tax_id = r[0]['LinkSetDb'][0]['Link'][0]['Id']
     except:
         tax_id = None
     return tax_id
-
 
 def get_taxon_info(tax_id):
     try:

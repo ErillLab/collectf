@@ -35,15 +35,15 @@ def browse_by_TF(request, TF_id):
     TF = models.TF.objects.get(TF_id=TF_id)
     # fetch species that have curation data on this TF
     csi = models.Curation_SiteInstance.objects.filter(curation__TF=TF)
-    species_ids = csi.values_list('site_instance__genome__strain', flat=True).distinct()
-    species = models.Strain.objects.filter(taxonomy_id__in=species_ids).order_by('name')
+    species_ids = csi.values_list('site_instance__genome__taxonomy', flat=True).distinct()
+    species = models.Taxonomy.objects.filter(pk__in=species_ids).order_by('name')
 
     num_site_instances = {} # dictionary of num_site_instances by species_id
     num_curations = {}      # dictionary of num_curations by species_id
     # get number of sites and curations for each species
     for sp in species:
         # get filtered curation_site_instances
-        filtered_csi = csi.filter(site_instance__genome__strain=sp)
+        filtered_csi = csi.filter(site_instance__genome__taxonomy=sp)
         num_site_instances[sp.taxonomy_id] = filtered_csi.values_list('site_instance', flat=True).distinct().count()
         num_curations[sp.taxonomy_id] = filtered_csi.values_list('curation', flat=True).distinct().count()
 

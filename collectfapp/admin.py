@@ -32,7 +32,6 @@ class SiteInstanceAdmin(admin.ModelAdmin):
     #list_filter = ('genome__genome_accession',)
     ordering = ('-site_id', )
 
-
 class Curation_SiteInstanceAdmin(admin.ModelAdmin):
     list_display = ('id',)
     list_filter = ('is_motif_associated',)
@@ -52,9 +51,7 @@ class GeneAdmin(admin.ModelAdmin):
     list_filter = ('genome__genome_accession',)
 
 class GenomeAdmin(admin.ModelAdmin):
-    def strain_name(self, obj):
-        return obj.strain.name
-    list_display = ('genome_accession', 'strain_name')
+    list_display = ('genome_accession', 'organism')
 
 class TFFamilyAdmin(admin.ModelAdmin):
     list_display = ('name',)

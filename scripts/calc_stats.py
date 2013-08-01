@@ -8,7 +8,8 @@ def curation_stats():
     species in the database.
     """
     all_TFs = models.TF.objects.all()
-    all_species = models.Strain.objects.all()
+    all_species_ids = models.Genome.objects.values_list('taxonomy', flat=True).distinct()
+    all_species = models.Taxonomy.objects.filter(pk__in=all_species_ids)
 
     num_curations_by_TF_species = {}
     num_sites_by_TF_species = {}
@@ -19,7 +20,7 @@ def curation_stats():
         for sp in all_species:
             # get curation_site_instance objects
             csi = models.Curation_SiteInstance.objects.filter(
-                site_instance__genome__strain=sp,
+                site_instance__genome__taxonomy=sp,
                 curation__TF=TF)
             num_sites = csi.values_list('site_instance', flat=True).distinct().count()
             num_curations = csi.values_list('curation', flat=True).distinct().count()

@@ -11,15 +11,9 @@
   </div>
 </div>
 
-
   <h2>{{ form_title }} </h2>
   <p>{{ form_description }}</p>
   <legend></legend>
-
-
-
-
-
 
 <form method="post" action="" class="form-horizontal well">  {% csrf_token %}
 
@@ -42,37 +36,6 @@
     </div>
   </div>
 </form>
-    
-<!--
-<form class="form" action="" method="post">{% csrf_token %}
 
-  {{ wizard.management_form }}
-
-  <p class="form-step">Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}</p>
-
-  <div class="form-title">{{ form_title }}</div>
-  <div class="form-description">{{ form_description|linebreaks }}</div>
-
-  {# Include the visible fields #}
-  {% for field in wizard.form %}
-  {% if field.is_hidden %}
-    {{ field }}
-  {% else %}
-    <div class="field">
-      <div class="field-label"> {{ field.label_tag }}</div>
-      <div class="field-field"> {{ field }}</div>
-      <div class="field-error"> {{ field.errors }}</div>
-    </div>
-  {% endif %}
-  {% endfor %}
-    
-  <div class="form-wizard-navigation">
-    {% if wizard.steps.prev %}
-    <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">prev step</button>
-    {% endif %}
-    <input type="submit" value="next step"/>
-  </div>
-</form>
--->
 {% endblock %}
 

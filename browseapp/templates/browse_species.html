@@ -5,7 +5,7 @@
 
 <ul class="breadcrumb">
   <li><a href="{% url browseapp.browse_species.browse_by_species_main %}">Home</a><span class="divider">/</span></li>
-  <li><a href="{% url browseapp.browse_species.browse_by_species_taxon taxon_name %}">{{ taxon_name }}</a><span class="divider">/</span></li>
+  <li><a href="{% url browseapp.browse_species.browse_by_species_taxon parent.pk %}">{{ parent.name }}</a><span class="divider">/</span></li>
   <li class="active">{{ sp.name }} </li>
 </ul>
 
@@ -28,7 +28,7 @@
 <tbody>
   {% for TF in TFs %}
   <tr>
-    <td><a href="{% url browseapp.browse_TF_and_species.browse_TF_and_species_selected TF.TF_id sp.taxonomy_id %}">{{ TF.name }}</a></td>
+    <td><a href="{% url browseapp.browse_TF_and_species.browse_TF_and_species_selected TF.TF_id sp.pk %}">{{ TF.name }}</a></td>
     <td>{{ num_site_instances|get_item:TF.TF_id }}</td>
     <td>{{ num_curations|get_item:TF.TF_id }}</td>
   </tr>

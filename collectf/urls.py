@@ -70,7 +70,7 @@ urlpatterns = patterns('',
     # browse by species main
     url(r'^browse_sp_main/$', browseapp.browse_species.browse_by_species_main),
     # browse by taxon elms
-    url(r'^browse_sp_taxon/(?P<taxon_name>\w+)/$', browseapp.browse_species.browse_by_species_taxon),
+    url(r'^browse_sp_taxon/(?P<tax_id>\d+)/$', browseapp.browse_species.browse_by_species_taxon),
     # browse by species
     url(r'^browse_sp/(?P<sp_tax_id>\d+)/$', browseapp.browse_species.browse_by_species),
 

@@ -332,10 +332,6 @@ def site_report_process(wiz, form):
         sutils.sput(wiz.request.session, 'site_match_choices', site_match_choices)
         sutils.sput(wiz.request.session, 'sites', sites)
         sutils.sput(wiz.request.session, 'site_quantitative_data', site_quantitative_data)
-        sutils.sput(wiz.request.session, 'soft_site_matches', {})
-        sutils.sput(wiz.request.session, 'not_matched_sites', [])
-        sutils.sput(wiz.request.session, 'exact_site_matches', {})
-        sutils.sput(wiz.request.session, 'soft_site_match_choices', {})
 
 
     def process_helper_chip_assoc():
@@ -492,7 +488,14 @@ def site_report_process(wiz, form):
         process_helper_chip_assoc()
 
     print 'process_begin'
-    
+
+    sutils.sput(wiz.request.session, 'sites', {})
+    sutils.sput(wiz.request.session, 'exact_site_matches', {})
+    sutils.sput(wiz.request.session, 'soft_site_matches', {})
+    sutils.sput(wiz.request.session, 'not_matched_sites', [])
+    sutils.sput(wiz.request.session, 'site_quantitative_data', {})
+    sutils.sput(wiz.request.session, 'soft_site_match_choices', {})
+
     is_motif_associated = form.cleaned_data.get('is_motif_associated')
     is_chip_data = form.cleaned_data.get('is_chip_data')
     is_coordinate = form.cleaned_data.get('is_coordinate')
@@ -510,6 +513,8 @@ def site_report_process(wiz, form):
     call_func_str = 'site_report_process_helper_%d()' % int(call_func_id,2)
     print 'process_func', call_func_str
     eval(call_func_str)
+
+
 
     # store booleans
     sutils.sput(wiz.request.session, 'is_motif_associated', is_motif_associated)
