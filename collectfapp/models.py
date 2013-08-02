@@ -51,7 +51,7 @@ class Curation(models.Model):
 
     # ChIP link (NULL if site instance is not curated as ChIP data)
     chip_info = models.ForeignKey("ChipInfo", null=True, blank=True)
-    quantitative_data_format = models.CharField(max_length=500,null=True, blank=True)
+    quantitative_data_format = models.TextField(null=True, blank=True)
 
     def __unicode__(self):
         return u'%s - %s - %s, %s, %s' % (self.curation_id,
@@ -287,8 +287,8 @@ class ExperimentalTechniqueCategory(models.Model):
 
 class ChipInfo(models.Model):
     chip_info_id = models.AutoField(primary_key=True)
-    assay_conditions = models.CharField(max_length=500)
-    method_notes = models.CharField(max_length=2000)
+    assay_conditions = models.TextField()
+    method_notes = models.TextField()
 
     def __unicode__(self):
         return u'[%d] PMID: %s' % (self.chip_info_id, self.curation_set.all()[0].publication.pmid)
