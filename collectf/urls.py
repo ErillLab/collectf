@@ -16,6 +16,7 @@ import browseapp.browse_TF_and_species
 import browseapp.browse_all
 import browseapp.browse_site
 import browseapp.browse_curation
+import browseapp.json_response
 import dbstatsapp.views
 import ncbiapp.views
 
@@ -86,7 +87,11 @@ urlpatterns = patterns('',
     # database statistics
     url(r'^db_stats/$', dbstatsapp.views.curation_stats),
     # export tbl for ncbi submission
-    url(r'^export_ncbi/$', ncbiapp.views.export_tbl_view)
+    url(r'^export_ncbi/$', ncbiapp.views.export_tbl_view),
+
+    # JSON requests
+    url(r'^get_genomes/$', browseapp.json_response.get_genomes),
+    url(r'^get_TF_instances/$', browseapp.json_response.get_TF_instances),
 
                        
 )

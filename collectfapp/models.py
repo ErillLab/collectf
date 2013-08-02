@@ -235,7 +235,7 @@ class Curation_SiteInstance(models.Model):
     quantitative_value = models.FloatField(null=True, blank=True)
 
     # NCBI submission related
-    ncbi_submission = models.ForeignKey("NCBISubmission", null=True)
+    ncbi_submission = models.ForeignKey("NCBISubmission", null=True, blank=True)
 
     def __unicode__(self):
         return u'[%d]' % self.pk

@@ -36,6 +36,7 @@ class GenomeForm(forms.Form):
 
     genome_accession = forms.CharField(label="Genome NCBI accession number",
                                        help_text=help_dict['genome_accession'])
+    
 
     site_species_same = forms.BooleanField(required=False,
                                            label="""This is the exact same

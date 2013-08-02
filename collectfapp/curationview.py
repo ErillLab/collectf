@@ -75,7 +75,7 @@ def genome_get_form(wiz, form):
         the previous curation of the paper. They may differ in this curation, so it is
         best to check that they are correct before proceeding to the next step."""
         
-        messages.warning(wiz.request, mark_safe(msg))        
+        messages.warning(wiz.request, mark_safe(msg))
 
     return form
 
@@ -145,7 +145,7 @@ def site_exact_match_get_form(wiz, form):
         # make the form field
         form.fields[sid] = forms.ChoiceField(label=label,
                                              choices=choices,
-                                             widget=forms.RadioSelect(attrs={'class': 'boxed'}))
+                                             widget=forms.RadioSelect())
         
 
         if is_coordinate: # make the first option selected
@@ -169,7 +169,7 @@ def site_soft_match_get_form(wiz, form):
         # make the form field
         form.fields[sid] = forms.ChoiceField(label=label,
                                              choices=choices,
-                                             widget=forms.RadioSelect(attrs={'class' :'boxed'}))
+                                             widget=forms.RadioSelect())
     return form
 
 def site_quantitative_data_get_form(wiz, form):
@@ -218,7 +218,7 @@ def site_regulation_get_form(wiz, form):
         form.fields[sid] = forms.MultipleChoiceField(label=label,
                                                      choices=choices,
                                                      required=False,
-                                                     widget=forms.CheckboxSelectMultiple(attrs={'class':'boxed'}),
+                                                     widget=forms.CheckboxSelectMultiple(),
                                                      help_text=gene_diagram.site_match_diagram(match))
         
         # disable checkbox if publication is marked as not having expression data

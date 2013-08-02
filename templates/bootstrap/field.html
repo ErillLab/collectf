@@ -14,7 +14,7 @@
   {% endif %}
 
   
-  <div class="controls {% for attr,val in field.field.widget.attrs.items %}{{ val }}{% endfor %}">
+  <div class="controls">
     
     {% if field|css_class == "checkboxselectmultiple" %}
     {% include "bootstrap/_field_errors_block.html" %}

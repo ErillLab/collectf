@@ -16,7 +16,7 @@ class CurationAdmin(admin.ModelAdmin):
     list_display = ('curation_id', 'TF_species', 'PMID', 'curator')
     list_filter = ('curator', 'NCBI_submission_ready', 'requires_revision')
     ordering = ('-curation_id',)
-    #inlines = (CurationSiteInstanceInline,)
+    inlines = (CurationSiteInstanceInline,)
 
 class CuratorAdmin(admin.ModelAdmin):
     def username(self, obj):
