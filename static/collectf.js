@@ -16,7 +16,26 @@ $(document).ready(function() {
 	html: 'true',
     });
 
+    // for all textarea fields, provide a file upload option
+    $('textarea').each(function() {
+	$('<input type="file">').insertAfter($(this))
+	    .change(function() {
+		textarea = $(this).prev();
+		var file = $(this).get(0).files[0];
+		console.log(file);
+		var reader = new FileReader();
+		reader.readAsText(file);
+		reader.onload = function() {
+		    textarea.val(reader.result);
+		}
+		reader.onerror = function(evt) {
+		    textarea.val("error reading file.");
+		}
+	    }); 
+    });
 
+    
+    // FORM STEP 1
     if($("#id_1-TF_species_same").length > 0) {
 	$("#id_1-TF_species_same").click(function(){
 	    $("#id_1-TF_species")[0].disabled = this.checked;
@@ -65,6 +84,7 @@ $(document).ready(function() {
     });
 
 
+    // FORM STEP 3
     // scroll page down a little bit
 
     defaultSpeed = 200;
@@ -134,6 +154,8 @@ $(document).ready(function() {
 	    $('#id_3-chip_data_extra_field').parent().parent().hide(defaultSpeed);
 	}
     });
+
+    // FORM STEP 4-5-7
 
     $('div')
 	.filter(function() {
