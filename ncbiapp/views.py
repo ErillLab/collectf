@@ -12,7 +12,7 @@ from forms import ExportForm
 from baseapp import utils
 from baseapp import bioutils
 
-def generate_tbl_string(curation_site_instances):
+def generate_tbl_string(curation_site_instances, test_export):
     tbl_str = ""
     # Create meta-sites
     meta_sites = dict()
@@ -36,10 +36,11 @@ def generate_tbl_string(curation_site_instances):
         # pick a site to report its id as dbxref.
         ncbi_sites = [csi for csi in meta_site if csi.ncbi_submission]
         if not ncbi_sites: # pick first site as ncbi_xref
-            n = models.NCBISubmission(is_obsolete=False, why_obsolete="")
-            n.save()
-            meta_site[0].ncbi_submission = n
-            meta_site[0].save()
+            if not test_export:
+                n = models.NCBISubmission(is_obsolete=False, why_obsolete="")
+                n.save()
+                meta_site[0].ncbi_submission = n
+                meta_site[0].save()
             ncbi_sites.append(meta_site[0])
         ncbi_site = ncbi_sites[0]
         tbl_str += ('%d\t%d\tprotein_bind' % (ncbi_site.site_instance.start, ncbi_site.site_instance.end) + '\n')
@@ -94,6 +95,7 @@ def export_tbl_view(request):
     form.is_valid()
     TF_instance = form.cleaned_data['TF_instances']
     genome = form.cleaned_data['genomes']
+    test_export = form.cleaned_data['is_test_export']
 
     # get all curation_site_instances
     curation_site_instances = models.Curation_SiteInstance.objects.filter(
@@ -111,7 +113,7 @@ def export_tbl_view(request):
         msg = "No curation found for this TF and genome."
         return render(request, 'ncbi_export.html', {'form':form}, context_instance=RequestContext(request))
 
-    tbl_str = generate_tbl_string(curation_site_instances)
+    tbl_str = generate_tbl_string(curation_site_instances, test_export)
     src_str = generate_src_string(curation_site_instances)
     readme_str = generate_readme_string()
 

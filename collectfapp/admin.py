@@ -33,7 +33,7 @@ class SiteInstanceAdmin(admin.ModelAdmin):
     ordering = ('-site_id', )
 
 class Curation_SiteInstanceAdmin(admin.ModelAdmin):
-    list_display = ('id',)
+    list_display = ('id', )
     list_filter = ('is_motif_associated',)
     ordering = ('-id',)
 
@@ -67,6 +67,10 @@ class TFInstance(admin.ModelAdmin):
     list_filter = ('')
     ordering = ('name')
 
+class NCBISubmissionAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'submission_time')
+    list_filter = ('is_obsolete', )
+
 # register edited models
 admin.site.register(Curation, CurationAdmin)
 admin.site.register(Curator, CuratorAdmin)
@@ -78,7 +82,7 @@ admin.site.register(Gene, GeneAdmin)
 admin.site.register(Genome, GenomeAdmin)
 admin.site.register(TFFamily, TFFamilyAdmin)
 admin.site.register(TF, TFAdmin)
-
+admin.site.register(NCBISubmission, NCBISubmissionAdmin)
 
 # register rest of models
 app = get_app("collectfapp")
