@@ -17,7 +17,7 @@ $(document).ready(function() {
     });
 
     // for all textarea fields, provide a file upload option
-    $('textarea').each(function() {
+    $('#id_3-sites, #id_3-chip_data_extra_field').each(function() {
 	$('<input type="file">').insertAfter($(this))
 	    .change(function() {
 		textarea = $(this).prev();
