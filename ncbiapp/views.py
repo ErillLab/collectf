@@ -47,7 +47,7 @@ def generate_tbl_string(curation_site_instances, test_export):
         ncbi_site = ncbi_sites[0]
         tbl_str += ('%d\t%d\tprotein_bind' % (ncbi_site.site_instance.start, ncbi_site.site_instance.end) + '\n')
         tbl_str += ('\t\t\tbound_moiety\t%s\n' % ncbi_site.curation.TF.name)
-        tbl_str += ('\t\t\tnote\tTranscription factor binding site\n')
+        tbl_str += ('\t\t\tnote\tTranscription factor binding site for %s\n' % ncbi_site.curation.TF_instance.name)
         # write experimental evidences
         experiments = {}
         for exp in models.ExperimentalTechnique.objects.filter(preset_function__in=['binding', 'expression']):
@@ -55,6 +55,7 @@ def generate_tbl_string(curation_site_instances, test_export):
             experiments[exp] = list(set([csi.curation.publication.pmid for csi in filtered_csis]))
         for exp,pmids in experiments.items():
             if not pmids: continue
+            tbl_str += ('\t\t\texperiment\t%s [PMID: %s]\n' % (exp.name, ', '.join(pmids)))
         # write regulation note
         evidence4regulation = set([reg.gene.locus_tag for csi in meta_site
                                    for reg in csi.regulation_set.all()
