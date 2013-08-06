@@ -2,6 +2,7 @@
 from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import render
 from django.shortcuts import render_to_response
+from django.contrib import messages
 from django.template import RequestContext
 from django.http import HttpResponse
 import models
@@ -32,15 +33,16 @@ def generate_tbl_string(curation_site_instances, test_export):
                  'TF': curation_site_instances[0].curation.TF.name,
                  'TF_accession': curation_site_instances[0].curation.TF_instance.protein_accession})
     # write each protein_bind feature
+    genome = curation_site_instances[0].site_instance.genome.genome_accession
     for ms_id, meta_site in meta_sites.items():
         # pick a site to report its id as dbxref.
-        ncbi_sites = [csi for csi in meta_site if csi.ncbi_submission]
+        ncbi_sites = [csi for csi in meta_site if models.NCBISubmission.objects.filter(genome_submitted_to=genome,
+                                                                                       curation_site_instance=csi)]
+                                                                                       
         if not ncbi_sites: # pick first site as ncbi_xref
             if not test_export:
-                n = models.NCBISubmission(is_obsolete=False, why_obsolete="")
+                n = models.NCBISubmission(genome_submitted_to=genome, curation_site_instance=meta_site[0])
                 n.save()
-                meta_site[0].ncbi_submission = n
-                meta_site[0].save()
             ncbi_sites.append(meta_site[0])
         ncbi_site = ncbi_sites[0]
         tbl_str += ('%d\t%d\tprotein_bind' % (ncbi_site.site_instance.start, ncbi_site.site_instance.end) + '\n')
@@ -103,14 +105,17 @@ def export_tbl_view(request):
         curation__TF_instance=TF_instance,
         curation__NCBI_submission_ready=True,
         is_motif_associated=True,
-        curation__experimental_techniques__preset_function__in=['binding', 'expression'])
+        is_obsolete=False,
+        curation__experimental_techniques__preset_function__in=['binding', 'expression']).order_by('site_instance__start')
 
     if len(set(csi.curation.TF for csi in curation_site_instances)) > 1:
         msg = "Inconsistent TF-TF_instance links. This TF_instance is linked to more than one TF."
+        messages.add_message(request, messages.ERROR, msg)
         return render(request, 'ncbi_export.html', {'form':form}, context_instance=RequestContext(request))
 
     if len(curation_site_instances) == 0:
         msg = "No curation found for this TF and genome."
+        messages.add_message(request, messages.WARNING, msg)
         return render(request, 'ncbi_export.html', {'form':form}, context_instance=RequestContext(request))
 
     tbl_str = generate_tbl_string(curation_site_instances, test_export)

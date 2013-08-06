@@ -32,7 +32,8 @@ class Curation(models.Model):
     forms_complex = models.BooleanField()           # does TF forms complex
     complex_notes = models.TextField(null=True, blank=True) # if forms complex,
     notes = models.TextField(blank=True)
-    last_modified = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True)
+    last_modified = models.DateTimeField(auto_now=True)
 
     # Same TF can be both activator and repressor for different
     # situations. Similarly, same TF protein can bind DNA both as monomer and
@@ -235,7 +236,9 @@ class Curation_SiteInstance(models.Model):
     quantitative_value = models.FloatField(null=True, blank=True)
 
     # NCBI submission related
-    ncbi_submission = models.ForeignKey("NCBISubmission", null=True, blank=True)
+    is_obsolete = models.BooleanField(null=False, default=False, blank=True)
+    why_obsolete = models.TextField(null=True, blank=True) # explain why this site became obsolete.
+
 
     def __unicode__(self):
         return u'[%d]' % self.pk
@@ -310,9 +313,8 @@ class Curation_ExternalDatabase(models.Model):
                                                   self.external_database.ext_database_name,
                                                   self.accession_number)
 class NCBISubmission(models.Model):
-    submission_time = models.DateField(auto_now_add=True)
-    is_obsolete = models.BooleanField(null=False, default=False, blank=True)
-    why_obsolete = models.TextField(null=False) # explain why this site became obsolete.
-
+    submission_time = models.DateTimeField(auto_now_add=True)
+    genome_submitted_to = models.CharField(max_length=50)
+    curation_site_instance = models.ForeignKey('Curation_SiteInstance')
     class Meta:
         verbose_name = 'NCBI Submission'
