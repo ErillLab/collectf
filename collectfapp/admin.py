@@ -68,8 +68,7 @@ class TFInstance(admin.ModelAdmin):
     ordering = ('name')
 
 class NCBISubmissionAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'submission_time')
-    list_filter = ('is_obsolete', )
+    list_display = ('pk', 'submission_time', 'curation_site_instance')
 
 # register edited models
 admin.site.register(Curation, CurationAdmin)

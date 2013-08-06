@@ -22,6 +22,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.formtools.wizard.views import SessionWizardView
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
+from django.contrib import messages
 from curationform import *
 import models
 import sutils
@@ -29,7 +30,7 @@ import sitesearch
 import views
 
 from django.utils.safestring import mark_safe
-from django.contrib import messages
+
 from baseapp.templatetags import gene_diagram
 from baseapp.templatetags import publication_tags
 from baseapp.templatetags import pretty_print
