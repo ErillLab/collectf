@@ -2,6 +2,8 @@
 
 from models import *
 import bioutils
+from Bio import Entrez
+from Bio import SeqIO
 
 def citation(pubrec):
     """Create citation string from publication record"""
@@ -64,10 +66,10 @@ def create_taxonomy(genome_record):
     assert len(lineage) >= 1
     p = None
     for item in lineage:
-        p,_ = models.Taxonomy.objects.get_or_create(rank=item['Rank'],
-                                                    taxonomy_id=item['TaxId'],
-                                                    name=item['ScientificName'],
-                                                    parent=p)
+        p,_ = Taxonomy.objects.get_or_create(rank=item['Rank'],
+                                             taxonomy_id=item['TaxId'],
+                                             name=item['ScientificName'],
+                                             parent=p)
     return p
 
 def make_genome(genome_record, strain_taxon):
@@ -85,7 +87,7 @@ def make_genome(genome_record, strain_taxon):
                gi=genome_record.annotations['gi'],
                organism=genome_record.annotations['organism'],
                chromosome=chromosome,
-               taxonomy=tax)
+               taxonomy=p)
     g.save()
 
 def make_all_genes(genome_record):
