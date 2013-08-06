@@ -77,7 +77,7 @@ def genome_get_form(wiz, form):
         best to check that they are correct before proceeding to the next step."""
         
         messages.warning(wiz.request, mark_safe(msg))
-
+        
     return form
 
 def techniques_get_form(wiz, form):
@@ -91,7 +91,6 @@ def techniques_get_form(wiz, form):
     c = sutils.sget(wiz.request.session, 'previously_curated_paper')
     # if selected paper is previously curated, prepopulate experimental techniques
     if c:
-        print c.curation_id
         form.fields['techniques'].initial = [str(t.technique_id) for t in c.experimental_techniques.all()]
         form.fields['experimental_process'].initial = c.experimental_process
         try:
@@ -103,15 +102,32 @@ def techniques_get_form(wiz, form):
         form.fields['forms_complex'].initial = c.forms_complex
         form.fields['complex_notes'].initial = c.complex_notes
 
-        # delete session data, if user change any field and then come back,
-        # store users last entered data, instead of populated data.
-        sutils.sput(wiz.request.session, "previously_curated_paper", None)
-
     return form
 
 def site_report_get_form(wiz, form):
-    #msg = "hello site report form"
-    #messages.info(wiz.request, msg)
+    c = sutils.sget(wiz.request.session, 'previously_curated_paper')
+    # if paper is previously curated, prepopulate fields
+    if c:
+        # pick any curation_site_instance object for this curation
+        try:
+            curation_site_instance = models.Curation_SiteInstance.objects.filter(curation=c).all()[:1].get()
+            form.fields['is_motif_associated'].initial = curation_site_instance.is_motif_associated
+            form.fields['has_quantitative_data'].initial = curation_site_instance.quantitative_value
+        except:
+            pass
+        
+        if c.chip_info:
+            form.fields['is_chip_data'].initial = True
+            form.fields['assay_conditions'].initial = c.chip_info.assay_conditions
+            form.fields['chip_method_notes'].initial = c.chip_info.method_notes
+
+
+        form.fields['quantitative_data_format'].initial = c.quantitative_data_format
+        
+        # delete session data, if user change any field and then come back,
+        # store users last entered data, instead of populated data.
+        sutils.sput(wiz.request.session, "previously_curated_paper", None)
+        
     return form
 
 # helper function for site_exact_match_form and site_soft_match_forms
