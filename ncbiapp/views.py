@@ -45,7 +45,11 @@ def generate_tbl_string(curation_site_instances, test_export):
                 n.save()
             ncbi_sites.append(meta_site[0])
         ncbi_site = ncbi_sites[0]
-        tbl_str += ('%d\t%d\tprotein_bind' % (ncbi_site.site_instance.start, ncbi_site.site_instance.end) + '\n')
+        start, end = ncbi_site.site_instance.start+1, ncbi_site.site_instance.end+1
+        if ncbi_site.site_instance.strand == -1:
+            start, end = end, start
+
+        tbl_str += ('%d\t%d\tprotein_bind' % (start,end) + '\n')
         tbl_str += ('\t\t\tbound_moiety\t%s\n' % ncbi_site.curation.TF.name)
         tbl_str += ('\t\t\tnote\tTranscription factor binding site for %s\n' % ncbi_site.curation.TF_instance.name)
         # write experimental evidences
