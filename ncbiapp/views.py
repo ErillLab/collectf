@@ -83,9 +83,8 @@ def generate_src_string(curation_site_instances):
 
 def generate_readme_string():
     readme_str = ""
-    readme_str += "Create a submission template at http://www.ncbi.nlm.nih.gov/WebSub/template.cgi\n"
     readme_str += "Gneome file (.fsa) and feature table (.tbl) must have the same filename prefix\n"
-    readme_str += "Run: ./tbl2asn -p. -t <template_file> -i <genome FASTA file> -V vbr\n"
+    readme_str += "Run: ./tbl2asn -p. -t CollecTF_template.sbt -i <genome FASTA file> -V vbr\n"
     return readme_str
 
 @user_passes_test(lambda u: u.is_staff)
@@ -133,6 +132,7 @@ def export_tbl_view(request):
     zip = ZipFile(in_memory, 'a')
     zip.writestr(filename+'.tbl', tbl_str)
     zip.writestr(filename+'.src', src_str)
+    zip.writestr("CollecTF_template.sbt", COLLECTF_TEMPLATE_SBT)
     zip.writestr("README.txt", readme_str)
     zip.close()
     response = HttpResponse(content_type='application/zip')
@@ -142,3 +142,82 @@ def export_tbl_view(request):
     return response
 
 
+COLLECTF_TEMPLATE_SBT = '''
+Submit-block ::= {
+  contact {
+    contact {
+      name name {
+        last "Erill",
+        first "Ivan"
+      },
+      affil std {
+        affil "University of Maryland Baltimore County",
+        div "Biological Sciences",
+        city "Baltimore",
+        sub "Maryland",
+        country "United States",
+        street "1000 Hilltop Circle",
+        email "erill@umbc.edu",
+        fax "001-410-455-3875",
+        phone "001-410-455-2470",
+        postal-code "21250"
+      }
+    }
+  },
+  cit {
+    authors {
+      names std {
+        {
+          name name {
+            last "Erill",
+            first "Ivan",
+            initials "I.",
+            suffix ""
+          }
+        }
+      },
+      affil std {
+        affil "University of Maryland Baltimore County",
+        div "Biological Sciences",
+        city "Baltimore",
+        sub "Maryland",
+        country "United States",
+        street "1000 Hilltop Circle",
+        postal-code "21250"
+      }
+    }
+  },
+  subtype new
+}
+
+Seqdesc ::= pub {
+  pub {
+    gen {
+      cit "unpublished",
+      authors {
+        names std {
+          {
+            name name {
+              last "Erill",
+              first "Ivan",
+              initials "I.",
+              suffix ""
+            }
+          }
+        },
+        affil std {
+          affil "University of Maryland Baltimore County",
+          div "Biological Sciences",
+          city "Baltimore",
+          sub "Maryland",
+          country "United States",
+          street "1000 Hilltop Circle",
+          postal-code "21250"
+        }
+      },
+      title "CollecTF database submission"
+    }
+  }
+}
+
+'''
