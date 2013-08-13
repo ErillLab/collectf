@@ -2,6 +2,28 @@
 
 {% block content %}
 {% load utils %}
+
+<div class="boxed">
+<h3>CollecTF metadata</h3>
+<ul>
+  <li>Number of TFs: {{ num_TFs }}</li>
+  <li>Number of species: {{ num_species }}</li>
+  <li>Number of curations: {{ num_curations }}</li>
+  <li>Number of binding sites: {{ num_sites }}</li>
+  <li>Number of publications: {{ num_publications }} ({{pub_completed}}% completed)</li>
+</ul>
+</div>
+
+<div class="boxed">
+<h3>Number of curations by TF and species</h3>
+<div id="num_curations_div" style="position: relative;"></div>
+</div>
+
+<div class="boxed">
+<h3>Number of reported sites by TF and species</h3>
+<div id="num_sites_div"></div>
+</div>
+
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <script type="text/javascript">
 
@@ -47,21 +69,4 @@ function drawChart2() {
 }
  
 </script>
-
-<h2>CollecTF metadata</h2>
-
-<ul>
-  <li>Number of TFs: {{ num_TFs }}</li>
-  <li>Number of species: {{ num_species }}</li>
-  <li>Number of curations: {{ num_curations }}</li>
-  <li>Number of binding sites: {{ num_sites }}</li>
-  <li>Number of publications: {{ num_publications }} ({{pub_completed}}% completed)</li>
-</ul>
-
-<h2>Number of curations by TF and species</h2>
-<div id="num_curations_div" style="position: relative;"></div>
-
-<h2>Number of reported sites by TF and species</h2>
-<div id="num_sites_div"></div>
-</div>
 {% endblock %}

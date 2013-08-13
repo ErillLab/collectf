@@ -1,0 +1,37 @@
+<script>
+$(function() {
+    $('.node a').on('click', function(){
+	$(this).parent().next().toggle(defaultspeed=200);
+	if ($(this).parent().hasClass('expandable')) {
+	    $(this).parent().children('i').toggleClass('icon-angle-down');
+	    $(this).parent().children('i').toggleClass('icon-angle-right');
+	}
+    });
+    $('.node').each(function() {
+	if ($(this).hasClass('expandable')) {
+	    $(this).next().hide();
+	    $(this).children('i').addClass('icon-angle-right');
+	}
+	 
+    });
+});
+</script>
+
+<style>
+    ul {
+    font-family: Consolas, "Liberation Mono", Courier, monospace;
+    font-size: 14px;
+    }
+    .node {
+	display: inline;
+    }
+
+    li  ul  li{
+    padding-left:20px;
+    }
+
+    ul i {
+    width: 1em;
+    display: inline-block;
+    }
+</style>

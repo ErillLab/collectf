@@ -30,10 +30,13 @@
     <ul class="unstyled">
       <!--
       <li><i class="icon-ok"></i> <a class="" href="">Browse by taxonomy</a></li>
-      -->
       <li><i class="icon-ok"></i> <a class="" href="{% url browseapp.browse_TF.browse_by_TF_main %}">Browse by TF family</a></li>
       <li><i class="icon-ok"></i> <a class="" href="{% url browseapp.browse_species.browse_by_species_main %}">Browse by taxonomy</a></li>
+      -->
       <li><i class="icon-ok"></i> <a class="" href="{% url browseapp.browse_TF_and_species.browse_TF_and_species %}">Search binding sites by TF and species</a></li>
+      <li><i class="icon-ok"></i> <a class="" href="{% url browseapp.browse_front.browse_TF %}">Browse by TF family</a></li>
+      <li><i class="icon-ok"></i> <a class="" href="{% url browseapp.browse_front.browse_tax %}">Browse by taxonomy</a></li>
+      <li><i class="icon-ok"></i> <a class="" href="{% url browseapp.browse_front.browse_techniques %}">Browse by experimental techniques</a></li>
     </ul>
     <p></p>
 
@@ -52,8 +55,8 @@
     <h3><i class="icon-bar-chart"></i> Database statistics</h3>
 
     <ul class="unstyled">
-      <li><i class="icon-ok"></i>  <a class="" href="{% url browseapp.browse_all.view_all_publications %}">View all publications</a></li>
-      <li><i class="icon-ok"></i> <a class="" href="{% url browseapp.browse_all.view_all_curations %}">View all curations</a></li>
+      <li><i class="icon-ok"></i>  <a class="" href="{% url browseapp.view_all.view_all_publications %}">View all publications</a></li>
+      <li><i class="icon-ok"></i> <a class="" href="{% url browseapp.view_all.view_all_curations %}">View all curations</a></li>
       <li><i class="icon-ok"></i> <a class="" href="{% url dbstatsapp.views.curation_stats %}">Curation statistics</a></li>
     </ul>
   </div>
@@ -62,7 +65,7 @@
 <!-- Modal -->
 <!--
 <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-header">
+  <div class="modal-header">yu
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
     <h3 id="myModalLabel">Previous curations</h3>
   </div>
@@ -71,7 +74,7 @@
       {% for c in curations %}
       <tr>
 	<th>{{ c }}</th>
-	<th><div class="btn-group"><a class="btn" href="{% url browseapp.browse_curation.browse_curation cid=c.curation_id %}">view</a>
+	<th><div class="btn-group"><a class="btn" href="{% url browseapp.view_curation.view_curation cid=c.curation_id %}">view</a>
 	    <a class="btn" href="{% url collectfapp.editcurationview.edit_curation cid=c.curation_id %}">edit</a>
 	  </div>
 	</th>

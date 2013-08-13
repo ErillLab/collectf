@@ -25,7 +25,7 @@
   <td><span title="{% with pub=curation.publication %}{{ pub.title }}, {{ pub.authors }} {% endwith %}">
       {{ curation.publication.pmid }}</span></td>
   <td>{{ curation.curator.user.username }}</td>
-  <td>    <a href="{% url browseapp.browse_curation.browse_curation curation.curation_id %}">view</a></td>
+  <td>    <a href="{% url browseapp.view_curation.view_curation curation.curation_id %}">view</a></td>
 
 </tr>
 {% endfor %}

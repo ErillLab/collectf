@@ -182,9 +182,25 @@ def to_fasta(seqs):
     str = ""
     for i,inst in enumerate(seqs):
         str = str + ">instance%d\n"%i + inst + "\n"
-    return str   
+    return str
 
-def weblogo(sequences, format="PNG"):
+def weblogo(sequences):
+    # if all sequences don't have the same length, apply LASAGNA
+    # use LASAGNA to align sites
+    aligned, idxAligned, strands = lasagna.LASAGNA(map(lambda s: str(s.lower()), sequences), 0)
+    trimmed = lasagna.TrimAlignment(aligned) if len(aligned) > 1 else aligned
+    trimmed = [s.upper() for s in trimmed]
+    
+    assert all(len(seq) == len(trimmed[0]) for seq in trimmed), "sequences do not have the same length"
+
+    al = to_fasta(trimmed)
+    from subprocess import Popen, PIPE, STDOUT
+    p = Popen(['weblogo', '-F', 'png', '-s', 'LARGE', '-c', 'classic', '--errorbars', 'YES'], stdout=PIPE, stdin=PIPE, stderr=PIPE)
+    stdout_data, stderr_data = p.communicate(input=al)
+    print stderr_data
+    return stdout_data
+    
+def weblogo_depr(sequences, format="PNG"):
     """
     uses the Berkeley weblogo service to download and save a weblogo of itself
     
@@ -259,7 +275,13 @@ def weblogo_uri(sequences):
 
 def get_overlap(loca, locb):
     """Given two regions, return the length of overlap of them"""
-    return max(0, min(loca[1], locb[1]) - max(loca[0], locb[0]))
+    overlap_len = max(0, min(loca[1], locb[1]) - max(loca[0], locb[0]))
+    return float(overlap_len) / (loca[1]-loca[0]+1)
+
+def overlap_test(loca, locb):
+    overlap_a = get_overlap(loca, locb)
+    overlap_b = get_overlap(locb, loca)
+    return (overlap_a + overlap_b) / 2.0 >= 0.75
 
 def overlap_site_meta_site(curation_site_instance, meta_site_instance, overlap_th=0.8):
     """Given a site instance (site_instance) and a list of site instances
@@ -270,4 +292,4 @@ def overlap_site_meta_site(curation_site_instance, meta_site_instance, overlap_t
         return (curation_site_instance.site_instance.start,
                 curation_site_instance.site_instance.end)
     
-    return any(get_overlap(location(curation_site_instance), location(ms)) for ms in meta_site_instance)
+    return any(overlap_test(location(curation_site_instance), location(ms)) for ms in meta_site_instance)

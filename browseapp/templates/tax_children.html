@@ -1,0 +1,16 @@
+
+{% load children_tag %}
+
+<ul class="unstyled">
+{% for child in children %}
+<li>
+
+  <div class="node {% if child|has_children %} expandable {% endif %}">
+    <i class=""></i>
+    <a href="" onclick="getReportLinksSpecies({{ child.pk }}, '{{ child.name }}'); return false;">{{ child.name }}</a>    
+  </div>
+  {% children_tag child %}
+</li>
+{% endfor %}
+</ul>
+

@@ -9,10 +9,10 @@
     <link href="{% static "bootstrap/css/docs.css" %}" rel="stylesheet" media="screen">
     <link href="{% static "bootstrap-listTree.css" %}" rel="stylesheet" type="text/css">
     <link href="{% static "select2.css" %}" rel="stylesheet">
+    <link href="{% static "bootstrap-switch.css" %}" rel="stylesheet">
     <link href="{% static "collectf.css" %}" rel="stylesheet">
-  </head>
-
-  <body>
+    
+    
 
     <script src="http://code.jquery.com/jquery-latest.js"></script>
     <script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
@@ -21,8 +21,14 @@
     <script src="{% static "underscore-min.js" %}"></script>
     <script src="{% static "bootstrap-listTree.js" %}"></script>
     <script src="{% static "select2.min.js" %}"></script>
+    <script src="{% static "bootstrap-switch.min.js" %}"></script>
     <script src="{% static "collectf.js" %}"></script>
+    <script src="{% static "jquery.blockUI.js" %}"></script>
+    
+    {% block extra_head_content %}{% endblock %}
+  </head>
 
+  <body>
 
     <div id="wrap">
       <!-- header -->
@@ -103,6 +109,8 @@
       </div>
     </div>
 
+
+    
   </body>
 </html>
 

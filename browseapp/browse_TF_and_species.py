@@ -1,14 +1,86 @@
 from browse_base import *
+import Queue
+import sys
+import time
 
-def browse_TF_and_species_selected(request, TF_id, species_id):
-    TF = models.TF.objects.get(TF_id=TF_id)
-    species = models.Taxonomy.objects.get(pk=species_id)
-    curation_site_instances = models.Curation_SiteInstance.objects.filter(
-        site_instance__genome__taxonomy=species,
-        curation__TF=TF,
-        is_motif_associated=True) # get motif_associated ones for now.
-    return get_sites_by_TF_and_species(request,TF,species,curation_site_instances)
+def get_TFs(TF_families):
+    """given list of families, return TFs that belong to these families"""
+    return models.TF.objects.filter(family__in=TF_families)
 
+def get_species(taxons):
+    """ Given list of taxonomy elments, return all species that are children of any
+    elm in taxons
+    """
+    species = []
+    # get all leaves
+    Q = Queue.Queue()
+    [Q.put(t) for t in taxons]
+    while not Q.empty():
+        t = Q.get()
+        children = t.taxonomy_set.all()
+        if children:
+            [Q.put(child) for child in children]
+        else: # leave
+            species.append(t)
+    return species
+
+def browse_TF_and_species_selected(request, TF_param, TF_ids, species_param, species_ids, integrate_non_motif=False):
+    """Given a list of TF/TF families and species/other taxonomy levels, return query result"""
+    # get TFs
+    TF_ids = TF_ids.split(',')
+    if TF_param == 'TF':
+        TFs = models.TF.objects.filter(TF_id__in=TF_ids)
+    elif TF_param == 'TF_family':
+        TF_families = models.TFFamily.objects.filter(TF_family_id__in=TF_ids)
+        TFs = get_TFs(TF_families)
+    # get Species
+    species_ids = species_ids.split(',')
+    if species_param=='species':
+        species = models.Taxonomy.objects.filter(pk__in=species_ids)
+    elif species_param=='taxons':
+        taxons = models.Taxonomy.objects.filter(pk__in=species_ids)
+        species = get_species(taxons)
+            
+    assert species and TFs
+    # at this point we have
+    # - TFs (list of TF objects)
+    # - species (list of Taxonomy objects of rank='species')
+
+    # better to get all in one query (assuming most combinations return empty)
+    csis = models.Curation_SiteInstance.objects.filter(site_instance__genome__taxonomy__in=species,
+                                                       curation__TF__in=TFs,
+                                                       is_motif_associated=True)
+    get_tf = lambda csi: csi.curation.TF
+    get_sp = lambda csi: csi.site_instance.genome.taxonomy
+    # this takes to much time
+    reports = []
+    for TF in TFs:
+        for sp in species:
+            fcsis = csis.filter(site_instance__genome__taxonomy=sp, curation__TF=TF)
+            if fcsis:
+                reports.append(get_sites_by_TF_and_species(TF, sp, fcsis))
+
+    reports.sort(lambda x,y: cmp(x['TF'].name, y['TF'].name))
+    #create ensemble report
+    ensemble_meta_sites = []
+    for report in reports:
+        ensemble_meta_sites.extend(report['meta_sites'].values())
+    # lasagna alignment for ensemble
+    aligned, idxAligned, strands = lasagna.LASAGNA(map(lambda s:str(s[0].site_instance.seq).lower(), ensemble_meta_sites), 0)
+    trimmed = lasagna.TrimAlignment(aligned) if len(aligned) > 1 else aligned
+    trimmed = [s.upper() for s in trimmed]
+    # create weblogo for the list of sites
+    weblogo_data = bioutils.weblogo_uri(trimmed)
+    
+    ensemble_report = {'meta_sites': ensemble_meta_sites,
+                       'aligned_sites': trimmed,
+                       'weblogo_image_data': weblogo_data}
+
+
+    return render(request, 'view_report.html',
+                  {'reports': reports, 'ensemble_report': ensemble_report},
+                  context_instance=RequestContext(request))
+    
 def browse_TF_and_species(request):
     return browse_TF_and_species_get(request) if not request.POST else browse_TF_and_species_post(request)
 
@@ -53,39 +125,59 @@ def browse_TF_and_species_post(request):
         curation_site_instances = curation_site_instances.filter(q1 | q2 | q3)
     else:
         assert False, "shouldn't be here, query"
-    return get_sites_by_TF_and_species(request, TF, species, curation_site_instances)
+    return get_sites_by_TF_and_species(TF, species, curation_site_instances)
 
-def get_sites_by_TF_and_species(request, TF, species, curation_site_instances):
-    meta_sites, meta_site_curation_dict, meta_site_regulation_dict = group_curation_site_instances(curation_site_instances)
-    # if there is no site, message
-    if not meta_sites:
-        msg = "No site found for transcription factor %s in the genome of %s." % (TF.name, species.name)
-        messages.info(request, msg)
-        return browse_TF_and_species_get(request)
+def get_sites_by_TF_and_species(TF, species, curation_site_instances):
+    print 'get_sites_by_TF_and_sp:', TF.name, species.name, len(curation_site_instances),
+    sys.stdout.flush()
+    start = time.time()
 
+    if not curation_site_instances: return None
+    (meta_sites,
+     meta_site_curation_dict,
+     meta_site_regulation_dict,
+     meta_site_technique_dict) = group_curation_site_instances(curation_site_instances)
+    print (time.time()-start)
+
+    
+    print 'lasagna:',
+    sys.stdout.flush()
+    start = time.time()
     # Use LASAGNA to align sites    # use LASAGNA to align sites
     aligned, idxAligned, strands = lasagna.LASAGNA(map(lambda s:str(s[0].site_instance.seq).lower(), meta_sites.values()), 0)
     trimmed = lasagna.TrimAlignment(aligned) if len(aligned) > 1 else aligned
-    print trimmed
     trimmed = [s.upper() for s in trimmed]
+    print (time.time()-start)
+    
     # create weblogo for the list of sites
+    print 'weblogo:',
+    sys.stdout.flush()
+    start = time.time()
+    
     weblogo_data = bioutils.weblogo_uri(trimmed)
-
-    result_dict = get_template_dict()
-    result_dict['meta_sites'] = meta_sites
-    result_dict['meta_site_curation_dict'] = meta_site_curation_dict
-    result_dict['meta_site_regulation_dict'] = meta_site_regulation_dict
-    result_dict['TF'] = TF
-    result_dict['species'] = species
-    result_dict['weblogo_image_data'] = weblogo_data
-    result_dict['aligned_sites']= trimmed
-    return render(request, "browse_results.html", result_dict, context_instance=RequestContext(request))
-
+    print str(time.time()-start)
+    
+    return {
+        'meta_sites': meta_sites,
+        'meta_site_curation_dict': meta_site_curation_dict,
+        'meta_site_regulation_dict': meta_site_regulation_dict,
+        'meta_site_technique_dict': meta_site_technique_dict,
+        'TF': TF,
+        'TF_name': TF.name,
+        'species_name': species.name,
+        'weblogo_image_data': weblogo_data,
+        'aligned_sites': trimmed
+    }
     
 def group_curation_site_instances(curation_site_instances):
     # Group curation_site_instance objects by meta site-instances
     # group all curation_site_instances
+
     meta_sites = dict()
+    meta_site_curation_dict = {}
+    meta_site_regulation_dict = {}
+    meta_site_technique_dict = {}
+
     for csi in curation_site_instances:
         # search for a meta-site-instance
         for i in meta_sites.keys():
@@ -94,14 +186,14 @@ def group_curation_site_instances(curation_site_instances):
                 break
         else:
             meta_sites[len(meta_sites)+1] = [csi]
-    # 
-    meta_site_curation_dict = {}
-    meta_site_regulation_dict = {}
+
+    # group curations, regulations and techniques for each meta-site
 
     for ms_id in meta_sites:
-        meta_site_curation_dict[ms_id] = []
+        meta_site_curation_dict[ms_id] = (csi.curation for csi in meta_sites[ms_id])
+        meta_site_technique_dict[ms_id] = []
         for csi in meta_sites[ms_id]:
-            meta_site_curation_dict[ms_id].append(csi.curation)
+            meta_site_technique_dict[ms_id].extend([t for t in csi.curation.experimental_techniques.filter(preset_function__in=['binding', 'expression'])])
             meta_site_regulation_dict[ms_id] = []
             for reg in csi.regulation_set.all():
                 # check if regulated gene is already in the list (from another curation)
@@ -110,8 +202,13 @@ def group_curation_site_instances(curation_site_instances):
                     same_reg_gene[0].evidence_type = reg.evidence_type
                 if not same_reg_gene:
                     meta_site_regulation_dict[ms_id].append(reg)
-                    
-    return meta_sites, meta_site_curation_dict, meta_site_regulation_dict
+                    meta_site_curation_dict[ms_id] = list(set(meta_site_curation_dict[ms_id]))
+                    meta_site_technique_dict[ms_id] = list(set(meta_site_technique_dict[ms_id]))
+    return (meta_sites,
+            meta_site_curation_dict,
+            meta_site_regulation_dict,
+            meta_site_technique_dict)
+
 
 def get_template_dict():
     """Pass dictionary to the browse HTML template page."""

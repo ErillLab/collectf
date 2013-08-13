@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row-fluid">
+
+<div class="span4">
+<div class="boxed">
+{% include "tax_children.html" %}
+</div>
+</div>
+
+<div class="span7" id="browse">
+<div id="intro" class="boxed">
+<p>Description goes here.</p>
+</div>
+</div>
+
+</div>
+
+{% include "tree_view.html" %}
+{% load static from staticfiles %}
+<script src="{% static "browse.js" %}"></script>
+
+{% endblock %}
+

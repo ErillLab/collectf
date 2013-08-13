@@ -4,3 +4,6 @@
 [submodule "static/font-awesome"]
 	path = static/font-awesome
 	url = git://github.com/FortAwesome/Font-Awesome.git
+[submodule "static/jquery-treeview"]
+	path = static/jquery-treeview
+	url = git://github.com/jzaefferer/jquery-treeview

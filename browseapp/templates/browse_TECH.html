@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% load utils %}
+
+<div class="row">
+
+<div class="span4">
+<div class="boxed">
+<ul id="tree" class="unstyled">
+<!-- binding -->
+<li>
+
+  <div class="node expandable">
+    <i class=""></i>
+    <a href="" onclick="getReportLinksTechniques('binding', 0); return false;">Detection of Binding</a></div>
+  <ul class="unstyled">
+    {% for category_id in binding_techniques|get_keys %}
+    <li>
+      <div class="node expandable">
+	{% with x=categories|get_item:category_id %}
+
+	<i class=""></i>
+	<a href="" onclick="getReportLinksTechniques('binding_category', {{ x.category_id }} ); return false;">{{ x.name }}</a>
+	{% endwith %}
+      </div>
+      <ul class="unstyled">
+	{% for technique in binding_techniques|get_item:category_id %}
+	<li>
+
+	  <div class="node">
+	    <i class=""></i>
+
+	    <a href="" onclick="getReportLinksTechniques('technique', {{ technique.technique_id}}); return false;">	    {{ technique.name }}</a></div>
+	</li>
+	{% endfor %}
+      </ul>
+    </li>
+    {% endfor %}
+  </ul>
+</li>
+
+<!-- expression -->
+<li>
+
+  <div class="node expandable">
+    <i class=""></i>
+    <a href="" onclick="getReportLinksTechniques('expression', 0); return false;">Assessment of Expression</a></div>
+  <ul class="unstyled">
+    {% for category_id in expression_techniques|get_keys %}
+    <li>
+
+      <div class="node expandable">
+	{% with x=categories|get_item:category_id %}
+	<i class=""></i>
+
+	<a href="" onclick="getReportLinksTechniques('expression_category', {{ x.category_id }} ); return false;">{{ x.name }}</a>
+	{% endwith %}
+      </div>
+      <ul class="unstyled">
+	{% for technique in expression_techniques|get_item:category_id %}
+	<li>
+	  <i class=""></i>
+	  <div class="node">
+	    {{ technique.name }}
+	    <a href="" onclick="getReportLinksTechniques('technique', {{ technique.technique_id }}); return false;">[view]</a></div>
+	</li>
+	{% endfor %}
+      </ul>
+    </li>
+    {% endfor %}
+  </ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div class="span7" id="browse">
+  <div id="intro" class="boxed">
+    <p>Description goes here.</p>
+  </div>
+</div>
+
+{% include "tree_view.html" %}
+{% load static from staticfiles %}
+<script src="{% static "browse.js" %}"></script>
+
+{% endblock %}

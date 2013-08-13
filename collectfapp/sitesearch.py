@@ -144,7 +144,11 @@ def match_all_exact_coordinates_only(genome, genes, coordinates):
     for cid, coor in enumerate(coordinates):
         start = int(coor[0])
         end = int(coor[1])
-        match = Match(seq=genome.sequence[start-1:end-1], start=start, end=end, strand=1)
+        if start <= end:
+            match = Match(seq=genome.sequence[start-1:end], start=start-1, end=end-1, strand=1)
+        else:
+            match = Match(seq=reverse_complement(genome.sequence[end-1:start]), start=end-1, end=start-1, strand=-1)
+            
         nearby_genes = locate_nearby_genes(genes, match)
         sites[cid] = match.seq
         site_matches[cid] = {}

@@ -10,8 +10,10 @@ import os
 from StringIO import StringIO
 from zipfile import ZipFile
 from forms import ExportForm
-from baseapp import utils
+from baseapp.templatetags import dbxref_utils
 from baseapp import bioutils
+from Bio import Entrez
+Entrez.email='sefakilic@gmail.com'
 
 def generate_tbl_string(curation_site_instances, test_export):
     tbl_str = ""
@@ -81,6 +83,14 @@ def generate_src_string(curation_site_instances):
                  'chromosome': curation_site_instances[0].site_instance.genome.chromosome})
     return str(src_str)
 
+def download_full_tbl(genome_accession):
+    h = Entrez.efetch(db='nuccore', id=genome_accession, rettype='ft', retmode='text')
+    return h.read()
+
+def download_full_fasta(genome_accession):
+    h = Entrez.efetch(db='nuccore', id=genome_accession, rettype='fasta', retmode='text')
+    return h.read()
+
 def generate_readme_string():
     readme_str = ""
     readme_str += "Gneome file (.fsa) and feature table (.tbl) must have the same filename prefix\n"
@@ -122,18 +132,25 @@ def export_tbl_view(request):
         messages.add_message(request, messages.WARNING, msg)
         return render(request, 'ncbi_export.html', {'form':form}, context_instance=RequestContext(request))
 
-    tbl_str = generate_tbl_string(curation_site_instances, test_export)
+    collectf_tbl_str = generate_tbl_string(curation_site_instances, test_export)
+    orig_tbl_str = download_full_tbl(genome.genome_accession)
+    concat_tbl_str = orig_tbl_str + '\n' + collectf_tbl_str
+    fasta_str = download_full_fasta(genome.genome_accession)
     src_str = generate_src_string(curation_site_instances)
-    readme_str = generate_readme_string()
+    #readme_str = generate_readme_string()
+    command_str = "./tbl2asn -p. -t CollecTF_template.sbt -i %s.fsa -V vbr\n" % str(genome.genome_accession.replace('.','_'))
 
     # create a zip file
-    filename = genome.genome_accession.split('.')[0]
+    filename = genome.genome_accession.replace('.', '_')    
     in_memory = StringIO()
     zip = ZipFile(in_memory, 'a')
-    zip.writestr(filename+'.tbl', tbl_str)
+    zip.writestr(filename+'_original'+'.tbl', orig_tbl_str)
+    zip.writestr(filename+'_collectf'+'.tbl', collectf_tbl_str)
+    zip.writestr(filename+'_concat'+'.tbl', concat_tbl_str)
+    zip.writestr(filename+'.fsa', fasta_str)
     zip.writestr(filename+'.src', src_str)
     zip.writestr("CollecTF_template.sbt", COLLECTF_TEMPLATE_SBT)
-    zip.writestr("README.txt", readme_str)
+    zip.writestr("command.txt", command_str)
     zip.close()
     response = HttpResponse(content_type='application/zip')
     response['Content-Disposition'] = 'attachment;filename=tbl_export.zip'

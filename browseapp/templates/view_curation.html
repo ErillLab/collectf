@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% load publication_tags %}
+{% block content %}
+
+
+<div class="boxed">
+<h3>Curation Information</h3>
+<dl class="dl-horizontal">
+  <dt>Publication</dt>
+  <dd>
+      {% with pub=curation.publication %}
+      {{ pub.title }};{{ pub.authors }};{{ pub.journal }} {{pub.publication_date}};
+      {{pub.volume}}({{pub.issue}}):{{pub.pages}}
+      {% endwith %}
+      <a href="http://www.ncbi.nlm.nih.gov/pubmed/?term={{ curation.publication.pmid }}">[{{ curation.publication.pmid }}]</a>
+  </dd>
+
+  <dt>TF</dt>
+  <dd>{{ curation.TF.name }} <a href="http://www.ncbi.nlm.nih.gov/genome/?term={{ curation.TF_instance.protein_accession }}">
+      [{{ curation.TF_instance.protein_accession }}] </a></dd>
+
+  <dt>Reported TF sp.</dt>
+  <dd>{{ curation.TF_species|default:"-" }}</dd>
+  
+  <dt>Reported site sp.</dt>
+  <dd>{% with site=curation.site_instances.all|first %}{{ site.genome.organism|default:"-" }}{% endwith %}</dd>
+
+  <dt>TF structure</dt>
+  <dd>{{ curation.TF_structure|default:"not specified" }}</dd>
+  
+  <dt>TF type</dt>
+  <dd>{{ curation.TF_type|default:"not specified" }} </dd>
+
+  <dt>Created by</dt>
+  <dd>{{ curation.curator }}</dd>
+  
+  <dt>Curation notes</dt>
+  <dd>{{ curation.notes|default:"-" }}</dd>
+</dl>
+</div>
+
+<div class="boxed">
+<h3>Experimental Process</h3>
+
+<dl class="dl-horizontal">
+
+  <dt>Used techniques</dt>
+  <dd>{% for exp_technique in curation.experimental_techniques.all %}
+    <span data-toggle="tooltip" title="{{ exp_technique.description }}">
+      {{ exp_technique.name }}
+    </span>
+      {% if not forloop.last %},{% endif %}
+    {% endfor %}
+  </dd>
+
+  <dt>Experimental process</dt>
+  <dd>{{ curation.experimental_process|default:"-" }}</dd>
+
+  {% if curation.forms_complex %}
+  <dt>TF complex</dt>
+  <dd>The paper reports that TF forms complex with other proteins for binding with reported sites.</dd>
+  {% endif %}
+
+  {% if curation.chip_info %}
+  <dt>ChIP assay conditions</dt>
+  <dd>{{ curation.chip_info.assay_conditions }}</dd>
+  <dt>ChIP notes</dt>
+  <dd>{{ curation.chip_info.method_notes }}</dd>
+  {% endif %}
+
+</div>
+
+<div class="boxed">
+  <h3>Transcription Factor Binding Sites</h3>
+  <ul class="nav nav-tabs" id="sites_tab">
+    <li><a href="#reported" data-toggle="tab">As reported in the paper</a></li>
+    <li class="active"><a href="#curated">As curated</a></li>
+    {% if curation.quantitative_data_format %}
+    <li><a href="#quantitative_data">Site-specific quantitative values</a></li>
+    {% endif %}
+  </ul>
+
+  <div class="tab-content">
+    <div class="tab-pane" id="reported">
+      <pre>
+{% for csi in curation.curation_siteinstance_set.all %}{{ csi.annotated_seq }}
+{% endfor %}</pre>
+    </div>
+    <div class="tab-pane active" id="curated">
+      <pre>
+{% for csi in curation.curation_siteinstance_set.all %}{{ csi.site_instance.seq }}
+{% endfor %}</pre>
+    </div>
+    {% if curation.quantitative_data_format %}
+    <div class="tab-pane" id="quantitative_data">
+      <p><b>Quantitative data format:</b> {{ curation.quantitative_data_format }}</p>
+      <pre>
+{% for csi in curation.curation_siteinstance_set.all %}{{ csi.site_instance.seq }} {{ csi.quantitative_value }}
+{% endfor %}
+      </pre>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="boxed">
+  <h4>Gene Regulation</h4>
+  <p>Regulated genes for each binding site are displayed below. Genes that are reported
+  for TF-site mediated regulation are displayed in <span style="color:green">green</span>.
+  </p>
+  
+  {% load gene_diagram %}
+  <table class="table table-striped table-bordered">
+    <thead>
+      <th>Site sequence</th>
+      <th>Regulated genes</th>
+      <th>Gene diagram</th>
+    </thead>
+    <tbody>
+    {% with curation_site_instances=curation.curation_siteinstance_set.all %}
+    {% for cs in curation_site_instances %}
+    <tr>
+      <td><span class="sequence">{{ cs.site_instance.seq }}</span></td>
+      <td>
+	{% for regulation in cs.regulation_set.all %}
+	{% if regulation.evidence_type == "exp_verified" %}
+	<a href="http://www.ncbi.nlm.nih.gov/gene/{{ regulation.gene.gene_accession }}">{{ regulation.gene.name }}</a>{% if not forloop.last %},{% endif %}{% endif %}
+	{% endfor %}
+      </td>
+      <td><div>{{ cs.regulation_set.all|regulation_diagram:cs.site_instance }}</div></td>
+    </tr>
+    {% endfor %}
+    {% endwith %}
+    </tbody>
+  </table>
+</div>
+
+
+
+</section>
+
+ <script type="text/javascript">
+    $(document).ready(function() {
+    $("#sites_tab a").click(function (e) {
+    e.preventDefault();
+    $(this).tab('show');
+    });
+    });
+ </script>
+
+
+{% endblock %}
+
+

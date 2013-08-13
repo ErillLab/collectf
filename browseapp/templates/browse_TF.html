@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% load TF_desc_htmlify %}
+
+<div class="row">
+
+<div class="span3 boxed">
+<ul id="tree" class="unstyled">
+{% for fam in TF_families %}
+<li>  
+  <div class="node {% if fam.tf_set.all %}expandable{% endif %}">
+    <i class=""></i>
+    <a href="" onclick="getReportLinksTF('TF_family', {{ fam.TF_family_id }}); return false;">{{ fam.name }}</a>
+  </div>
+  
+  <ul class="unstyled">
+    {% for TF in fam.tf_set.all %}
+    <li>
+      <div class="node">
+	<i class=""></i>
+      	<a href="" onclick="getReportLinksTF('TF', {{ TF.TF_id }}); return false;">{{ TF.name }}</a>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+</li>
+{% endfor %}
+</ul>
+</div>
+
+
+<div id="browse" class="span8">
+<div id="intro" class="boxed">
+  <p>Description here.</p>
+</div>
+</div>
+
+{% include "tree_view.html" %}
+{% load static from staticfiles %}
+<script src="{% static "browse.js" %}"></script>
+
+{% endblock %}

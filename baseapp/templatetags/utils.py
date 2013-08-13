@@ -19,3 +19,8 @@ def sort_by(queryset, order):
 def my_add(sa, sb):
     # built-in add templatetag doesn't concat number and string
     return str(sa)+str(sb)
+
+@register.filter
+def defer_field(queryset, field):
+    """Ignore field when retrieving object"""
+    return queryset.defer(field)

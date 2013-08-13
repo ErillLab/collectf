@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% load bootstrap_tags %}
+{% load static %}
+{% load utils %}
+{% load gene_diagram %}
+{% load dbxref_utils %}
+
+{% block content %}
+
+<div class="container">
+
+  {% if reports %}
+
+  <div>
+    <ul class="nav nav-pills">
+      <li class="active"><a href="#split_view" data-toggle="tab">Split view</a></li>
+      <li><a href="#ensemble_view" data-toggle="tab">Ensemble view</a></li>
+      <li class="dropdown">
+	<a href="#" data-toggle="dropdown" class="dropdown-toggle">Non-motif-associated sites <b class="caret"></b></a>
+	<ul class="dropdown-menu">
+	  <li><a href="#integrate_non_motif" data-toggle="tab">Integrate non-motif-associated sites</a></li>
+	  <li><a href="#report_non_motif" data-toggle="tab">Report non-motif-associated sites</a></li>
+	</ul>
+      </li>
+      <li><a href="#export" data-toggle="tab">Export data</a></li>
+    </ul>
+  </div>
+
+  <div class="tab-content">
+    <div class="tab-pane active", id="split_view">
+      {% for report in reports %}
+
+      <div class="boxed">
+	<h3>{{ report.TF_name }} binding site collection of <i>{{ report.species_name }}</i></h3>
+	{% with sp_name=report.species_name|slugify  TF_name=report.TF_name|slugify %}
+	<ul class="nav nav-tabs" id="sites_tab">
+	  <li><a href="#{{TF_name}}_{{sp_name}}_unaligned" data-toggle="tab">Binding sites</a></li>
+	  <li><a href="#{{TF_name}}_{{sp_name}}_aligned" data-toggle="tab">Aligned binding sites</a></li>
+	  <li class="active"><a href="#{{TF_name}}_{{sp_name}}_weblogo" data-toggle="tab">Sequence logo</a></li>
+	  <li><a href="#{{TF_name}}_{{sp_name}}_detail" data-toggle="tab">Detailed view</a></li>
+	</ul>
+
+
+	<div class="tab-content">
+	  <div class="tab-pane" id="{{TF_name}}_{{sp_name}}_unaligned">
+	    <p>Sites are listed as curated.</p>
+	    <pre>
+	      {% for id,meta_site in report.meta_sites.items %}
+	      {{ meta_site.0.site_instance.seq }}{% endfor %}
+	    </pre>
+	  </div>
+	  <div class="tab-pane" id="{{TF_name}}_{{sp_name}}_aligned">
+	    <p>Sites are listed after the alignment process. For alignment of
+	      variable-length binding
+	      sites, <a href="http://www.biomedcentral.com/1471-2105/14/108/">LASAGNA</a>
+	      is used.
+	    </p>
+	    <pre>
+	      {% for site in report.aligned_sites %}
+	      {{ site }} {% endfor %}
+	    </pre>
+	  </div>
+	  <div class="tab-pane active" id="{{TF_name}}_{{sp_name}}_weblogo">
+	    <p>To generate the weblogo, aligned binding sites are used.</p>
+	    <img src="{{ report.weblogo_image_data }}">
+	  </div>
+	  <div class="tab-pane" id="{{TF_name}}_{{sp_name}}_detail">
+	    <p>For the selected transcription
+	      factor and species, the list of curated binding sites in the database are displayed
+	      below. The binding site is displayed as red bar. Genes that are reported to be
+	      regulated by TF are colored with green. </p>
+	    
+	    <table class="table table-bordered">
+	      <thead>
+		<tr>
+		  <th>Site sequence</th>
+		  <th>Experimental techniques</th>
+		  <th>Gene regulation [<a href="" id="regulation_diagram_switch"><small>Toggle diagrams</small></a>]</th>
+		  <th>Curations</th>
+		</tr>
+	      </thead>
+	      <tbody>
+
+		{% for ms_id, meta_site in report.meta_sites.items %}
+		{# meta_site is a list of curation_site_instance objects #}
+		<tr>
+		  <td><a href="{% url browseapp.view_site.browse_by_site meta_site.0.pk|id2dbxref_hex_only %}"><span class="sequence">{{ meta_site.0.site_instance.seq }}</span></a></td>
+		  
+		  <td>
+		    {% for tech in report.meta_site_technique_dict|get_item:ms_id %}
+		    {{ tech.name }}{% if not forloop.last %},{% endif %}
+		    {% endfor %}
+		  </td>
+		  
+		  <td>
+		    {% for reg in report.meta_site_regulation_dict|get_item:ms_id %}
+		    <a href="http://www.ncbi.nlm.nih.gov/gene/{{ reg.gene.gene_accession }}">
+		      <span {% if reg.evidence_type == "exp_verified" %} class="exp_verified_reg" {% endif %}>
+			{{reg.gene.name}} [{{ reg.gene.locus_tag }}]</span></a>{% if not forloop.last %},{% endif %}
+		    {% endfor %}
+		    <div class="regulation_diagram">
+		      {% with regs=report.meta_site_regulation_dict|get_item:ms_id %}
+		      {{ regs|regulation_diagram:meta_site.0.site_instance }}
+		      {% endwith %}
+		    </div>
+
+		  </td>
+
+		  <td>{% for cur in report.meta_site_curation_dict|get_item:ms_id %}
+		    <a href="{% url browseapp.view_curation.view_curation cur.curation_id %}">[{{cur.curation_id}}]</a>{% if not forloop.last %}, {% endif %}
+		    {% endfor %}
+		  </td>
+		</tr>
+		{% endfor %}
+
+	      </tbody>
+	    </table>
+	  </div>
+	</div>
+	{% endwith %}
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="tab-pane" id="ensemble_view">
+      <h3>Ensemble view</h3>
+      <p>All binding sites in split view are combined and a sequence logo is
+	generated. Note that it may contain binding site sequences from different
+	transcription factors and different species. To see individiual sequence logos
+	and curation details go to split view.</p>
+      <div class="boxed">
+	<ul class="nav nav-tabs" id="sites_tab">
+	  <li><a href="#ensemble_view_unaligned" data-toggle="tab">Binding sites</a></li>
+	  <li><a href="#ensemble_view_aligned" data-toggle="tab">Aligned binding sites</a></li>
+	  <li class="active"><a href="#ensemble_view_weblogo" data-toggle="tab">Sequence logo</a></li>
+	</ul>
+
+	<div class="tab-content">
+	  <div class="tab-pane" id="ensemble_view_unaligned">
+	    <p>Sites are listed as curated.</p>
+	    <pre>
+	      {% for meta_site in ensemble_report.meta_sites %}
+	      >{{ meta_site.0.curation.TF.name }}_{#{{ meta_site.0.site_instance.genome|defer_field:"sequence".organism|slugify }}#}
+	      {{ meta_site.0.site_instance.seq }}{% endfor %}
+	    </pre>
+	  </div>
+	  <div class="tab-pane" id="ensemble_view_aligned">
+	    <p>Sites are listed after the alignment process. For alignment of
+	      variable-length binding
+	      sites, <a href="http://www.biomedcentral.com/1471-2105/14/108/">LASAGNA</a>
+	      is used.
+	    </p>
+	    <pre>
+	      {% for site in ensemble_report.aligned_sites %}
+	      {{ site }} {% endfor %}
+	    </pre>
+	  </div>
+	  <div class="tab-pane active" id="ensemble_view_weblogo">
+	    <p>To generate the weblogo, aligned binding sites are used.</p>
+	    <img src="{{ ensemble_report.weblogo_image_data }}">
+	  </div>
+	</div>
+      </div>
+    </div>
+    
+    <div class="tab-pane" id="integrate_non_motif">
+      <p class="boxed">Integrate non motif: not yet.</p>
+    </div>
+
+    <div class="tab-pane" id="report_non_motif">
+      <p class="boxed">Report non-motif: not yet</p>
+    </div>
+
+    <div class="tab-pane" id="export">
+      <div class="boxed">
+	<p>coming soon</p>
+	<!--
+	<p>Export the list of binding sites in csv or fasta formats.</p>
+	<form action="{% url browseapp.browse_TF_and_species.export_sites %}" method="POST">{% csrf_token %}
+	  {% for ms_id, meta_site in meta_sites.items %}
+	  {# reporting first site instance from each meta_site -- for now #}
+	  <input type="hidden" name="site_id" value="{{ meta_site.0.pk }}" />
+	  {% endfor %}
+	  <input type="submit" value="Download FASTA" class="btn btn-info btn-large" name="fasta">
+	  <input type="submit" value="Download CSV" class="btn btn-info btn-large" name="csv">
+	</form>
+	-->
+      </div>
+    </div>
+
+  </div>
+
+
+  {% endif %}
+</div>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+  // regulation diagram hide/show
+  $("#regulation_diagram_switch").on('click', function() {
+  $(".regulation_diagram").toggle();
+  console.log('hihi');
+  return false;
+  });
+  });
+</script>
+
+
+
+</div>
+
+{% endblock %}
