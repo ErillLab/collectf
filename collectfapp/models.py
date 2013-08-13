@@ -47,7 +47,7 @@ class Curation(models.Model):
     publication = models.ForeignKey("Publication")
     TF = models.ForeignKey("TF", null=True)
     TF_instance = models.ForeignKey("TFInstance")
-    experimental_techniques = models.ManyToManyField("ExperimentalTechnique")
+    experimental_techniques = models.ManyToManyField("ExperimentalTechnique", related_name='curation')
     site_instances = models.ManyToManyField("SiteInstance", through="Curation_SiteInstance")
 
     # ChIP link (NULL if site instance is not curated as ChIP data)

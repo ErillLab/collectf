@@ -24,7 +24,7 @@ def get_species(taxons):
             species.append(t)
     return species
 
-def browse_TF_and_species_selected(request, TF_param, TF_ids, species_param, species_ids, integrate_non_motif=False):
+def browse_TF_and_species_selected(request, TF_param, TF_ids, species_param, species_ids):
     """Given a list of TF/TF families and species/other taxonomy levels, return query result"""
     # get TFs
     TF_ids = TF_ids.split(',')
@@ -52,15 +52,14 @@ def browse_TF_and_species_selected(request, TF_param, TF_ids, species_param, spe
                                                        is_motif_associated=True)
     get_tf = lambda csi: csi.curation.TF
     get_sp = lambda csi: csi.site_instance.genome.taxonomy
-    # this takes to much time
     reports = []
     for TF in TFs:
         for sp in species:
             fcsis = csis.filter(site_instance__genome__taxonomy=sp, curation__TF=TF)
             if fcsis:
                 reports.append(get_sites_by_TF_and_species(TF, sp, fcsis))
-
     reports.sort(lambda x,y: cmp(x['TF'].name, y['TF'].name))
+    
     #create ensemble report
     ensemble_meta_sites = []
     for report in reports:
@@ -93,7 +92,6 @@ def browse_TF_and_species_post(request):
     """Process form to get selected TF, species and experimental techniques. Retrieve
     binding sites for selected TF and species from database, filter them by
     experimental techniques, return to the user."""
-    
     TF = models.TF.objects.get(TF_id=request.POST['TF'])
     species = models.Taxonomy.objects.get(pk=request.POST['species'])
     experimental_techniques_1 = request.POST['tech1']
@@ -128,34 +126,33 @@ def browse_TF_and_species_post(request):
     return get_sites_by_TF_and_species(TF, species, curation_site_instances)
 
 def get_sites_by_TF_and_species(TF, species, curation_site_instances):
-    print 'get_sites_by_TF_and_sp:', TF.name, species.name, len(curation_site_instances),
-    sys.stdout.flush()
-    start = time.time()
+    #print 'get_sites_by_TF_and_sp:', TF.name, species.name, len(curation_site_instances),
+    #sys.stdout.flush()
+    #start = time.time()
 
     if not curation_site_instances: return None
     (meta_sites,
      meta_site_curation_dict,
      meta_site_regulation_dict,
      meta_site_technique_dict) = group_curation_site_instances(curation_site_instances)
-    print (time.time()-start)
-
+    #print (time.time()-start)
     
-    print 'lasagna:',
-    sys.stdout.flush()
-    start = time.time()
+    #print 'lasagna:',
+    #sys.stdout.flush()
+    #start = time.time()
     # Use LASAGNA to align sites    # use LASAGNA to align sites
     aligned, idxAligned, strands = lasagna.LASAGNA(map(lambda s:str(s[0].site_instance.seq).lower(), meta_sites.values()), 0)
     trimmed = lasagna.TrimAlignment(aligned) if len(aligned) > 1 else aligned
     trimmed = [s.upper() for s in trimmed]
-    print (time.time()-start)
+    #print (time.time()-start)
     
     # create weblogo for the list of sites
-    print 'weblogo:',
-    sys.stdout.flush()
-    start = time.time()
+    #print 'weblogo:',
+    #sys.stdout.flush()
+    #start = time.time()
     
     weblogo_data = bioutils.weblogo_uri(trimmed)
-    print str(time.time()-start)
+    #print str(time.time()-start)
     
     return {
         'meta_sites': meta_sites,
@@ -187,23 +184,28 @@ def group_curation_site_instances(curation_site_instances):
         else:
             meta_sites[len(meta_sites)+1] = [csi]
 
-    # group curations, regulations and techniques for each meta-site
 
+
+    # group curations, regulations and techniques for each meta-site
     for ms_id in meta_sites:
-        meta_site_curation_dict[ms_id] = (csi.curation for csi in meta_sites[ms_id])
-        meta_site_technique_dict[ms_id] = []
-        for csi in meta_sites[ms_id]:
-            meta_site_technique_dict[ms_id].extend([t for t in csi.curation.experimental_techniques.filter(preset_function__in=['binding', 'expression'])])
-            meta_site_regulation_dict[ms_id] = []
-            for reg in csi.regulation_set.all():
-                # check if regulated gene is already in the list (from another curation)
-                same_reg_gene = [r for r in meta_site_regulation_dict[ms_id] if r.gene==reg.gene]
-                if same_reg_gene and same_reg_gene.evidence_type=='inferred':
-                    same_reg_gene[0].evidence_type = reg.evidence_type
-                if not same_reg_gene:
-                    meta_site_regulation_dict[ms_id].append(reg)
-                    meta_site_curation_dict[ms_id] = list(set(meta_site_curation_dict[ms_id]))
-                    meta_site_technique_dict[ms_id] = list(set(meta_site_technique_dict[ms_id]))
+        meta_site_curation_dict[ms_id] = [csi.curation for csi in meta_sites[ms_id]]
+        meta_site_technique_dict[ms_id] = models.ExperimentalTechnique.objects.filter(preset_function__in=['binding', 'expression'],
+                                                                                      curation__in=meta_site_curation_dict[ms_id])
+
+        regs =  models.Regulation.objects.filter(curation_site_instance__in=meta_sites[ms_id]).distinct()
+        regs_exp_verified = regs.filter(evidence_type="exp_verified")
+        genes_exp_verified = regs_exp_verified.values_list('gene', flat=True)
+        regs_inferred = regs.filter(evidence_type="inferred")
+        genes_inferred = regs_inferred.values_list('gene', flat=True)
+
+        meta_site_regulation_dict[ms_id] = list(regs_exp_verified.all())
+        for g,r in zip(genes_inferred, regs_inferred):
+            if g not in genes_exp_verified:
+                meta_site_regulation_dict[ms_id].append(r)
+        
+        meta_site_curation_dict[ms_id] = list(set(meta_site_curation_dict[ms_id]))
+        meta_site_technique_dict[ms_id] = list(set(meta_site_technique_dict[ms_id]))
+            
     return (meta_sites,
             meta_site_curation_dict,
             meta_site_regulation_dict,
