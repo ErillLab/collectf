@@ -30,7 +30,6 @@
 
 	  <div class="node">
 	    <i class=""></i>
-
 	    <a href="" onclick="getReportLinksTechniques('technique', {{ technique.technique_id}}); return false;">	    {{ technique.name }}</a></div>
 	</li>
 	{% endfor %}
@@ -49,21 +48,21 @@
   <ul class="unstyled">
     {% for category_id in expression_techniques|get_keys %}
     <li>
-
       <div class="node expandable">
 	{% with x=categories|get_item:category_id %}
 	<i class=""></i>
-
 	<a href="" onclick="getReportLinksTechniques('expression_category', {{ x.category_id }} ); return false;">{{ x.name }}</a>
 	{% endwith %}
       </div>
       <ul class="unstyled">
 	{% for technique in expression_techniques|get_item:category_id %}
+
 	<li>
-	  <i class=""></i>
+
 	  <div class="node">
-	    {{ technique.name }}
-	    <a href="" onclick="getReportLinksTechniques('technique', {{ technique.technique_id }}); return false;">[view]</a></div>
+	    <i class=""></i>
+
+	    <a href="" onclick="getReportLinksTechniques('technique', {{ technique.technique_id }}); return false;">{{ technique.name }}</a></div>
 	</li>
 	{% endfor %}
       </ul>

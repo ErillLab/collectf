@@ -59,8 +59,9 @@ def browse_TF_all_reports_json(request, t, id):
     
 def browse_tax(request):
     all_species_ids = models.Curation_SiteInstance.objects.values_list('site_instance__genome__taxonomy__pk', flat=True).distinct()
-    all_species = models.Taxonomy.objects.filter(pk__in=all_species_ids)
+    all_species = models.Taxonomy.objects
     # get all phylums
+    """
     roots = set()
     for sp in all_species:
         while sp.parent:
@@ -68,9 +69,12 @@ def browse_tax(request):
         roots.add(sp)
 
     roots = sorted(list(roots), key=lambda x: x.name)
-
+    """
+    taxonomy = {
+        'phyla': all_species.filter(rank='phylum')
+    }
     return render_to_response('browse_SP.html',
-                              {'children': roots},
+                              {'taxonomy': taxonomy},
                               context_instance=RequestContext(request))
     
 def browse_tax_all_reports_json(request, id):

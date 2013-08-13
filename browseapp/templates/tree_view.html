@@ -1,6 +1,6 @@
 <script>
 $(function() {
-    $('.node a').on('click', function(){
+    $('.node > a').on('click', function(){
 	$(this).parent().next().toggle(defaultspeed=200);
 	if ($(this).parent().hasClass('expandable')) {
 	    $(this).parent().children('i').toggleClass('icon-angle-down');
@@ -23,7 +23,7 @@ $(function() {
     font-size: 14px;
     }
     .node {
-	display: inline;
+
     }
 
     li  ul  li{
