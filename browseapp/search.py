@@ -81,6 +81,9 @@ def search_post(request):
 
 def render_search_results(request, csis, non_motif_csis):
     template = search_results(csis, non_motif_csis)
+    all_reports = template['reports']
+    template['view_all_csis'] = [csi_pk for report in all_reports for csi_pk in report['csi_list']]
+    template['view_all_ncsis'] = [ncsi_pk for report in all_reports for ncsi_pk in report['non_motif_csis']]
     return render(request, "search_results.html", template, context_instance=RequestContext(request))
 
 def search_results(csis, non_motif_csis):

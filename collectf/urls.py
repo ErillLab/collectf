@@ -69,11 +69,11 @@ urlpatterns = patterns('',
      
     # browse by taxonomy
     url(r'^browse_front_TF/$', browseapp.browse_front.browse_TF),
-    url(r'^browse_TF_all_reports_json/(?P<t>\w+)/(?P<id>\d+)/$', browseapp.browse_front.browse_TF_all_reports_json),
+    url(r'^browse_TF_all_reports_ajax/(?P<t>\w+)/(?P<id>\d+)/$', browseapp.browse_front.browse_TF_all_reports_ajax),
     url(r'^browse_front_tax/$', browseapp.browse_front.browse_tax),                   
-    url(r'^browse_tax_all_reports_json/(?P<id>\d+)/$', browseapp.browse_front.browse_tax_all_reports_json),
+    url(r'^browse_tax_all_reports_ajax/(?P<id>\d+)/$', browseapp.browse_front.browse_tax_all_reports_ajax),
     url(r'^browse_front_tech/$', browseapp.browse_front.browse_techniques),
-    url(r'^browse_techniques_all_reports_json/(?P<type>\w+)/(?P<id>\d+)/$', browseapp.browse_front.browse_techniques_all_reports_json),
+    url(r'^browse_techniques_all_reports_ajax/(?P<type>\w+)/(?P<id>\d+)/$', browseapp.browse_front.browse_techniques_all_reports_ajax),
     # view curation
     url(r'^view_curation/(?P<cid>\d+)/$', browseapp.view_curation.view_curation),
     # browse site

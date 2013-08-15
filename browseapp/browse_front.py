@@ -12,7 +12,7 @@ def browse_TF(request):
                               {'TF_families': TF_families},
                               context_instance=RequestContext(request))
 
-def browse_TF_all_reports_json(request, t, id):
+def browse_TF_all_reports_ajax(request, t, id):
     # Return links to all reports
     # type can be TF or TF_family
     if t=='TF':
@@ -29,7 +29,6 @@ def browse_TF_all_reports_json(request, t, id):
     non_motif_csis = models.Curation_SiteInstance.objects.filter(curation__TF__in=TFs, is_motif_associated=False)
     all_reports = search_results(motif_csis, non_motif_csis)['reports']
 
-    assert len(all_reports) > 0
     assert TF_name
     return render_to_response("browse_tab.html",
                               {'title': TF_name,
@@ -50,7 +49,7 @@ def browse_tax(request):
                               {'taxonomy': taxonomy},
                               context_instance=RequestContext(request))
     
-def browse_tax_all_reports_json(request, id):
+def browse_tax_all_reports_ajax(request, id):
     all_sp = []
     Q = Queue.Queue()
     Q.put(models.Taxonomy.objects.get(pk=id))
@@ -67,7 +66,7 @@ def browse_tax_all_reports_json(request, id):
     non_motif_csis = models.Curation_SiteInstance.objects.filter(site_instance__genome__taxonomy__in=all_sp, is_motif_associated=False)
     all_reports = search_results(motif_csis, non_motif_csis)['reports']
 
-    assert len(all_reports) > 0
+
     return render_to_response("browse_tab.html",
                               {'title': models.Taxonomy.objects.get(pk=id).name,
                                'description': 'No description here.',
@@ -100,7 +99,7 @@ def browse_techniques(request):
                               context_instance=RequestContext(request))
     
 
-def browse_techniques_all_reports_json(request, type, id):
+def browse_techniques_all_reports_ajax(request, type, id):
     techniques = None
     if type in ['binding', 'expression']:
         techniques = models.ExperimentalTechnique.objects.filter(preset_function=type)
@@ -132,7 +131,6 @@ def browse_techniques_all_reports_json(request, type, id):
     non_motif_csis = models.Curation_SiteInstance.objects.filter(curation__experimental_techniques__in=techniques, is_motif_associated=False)
     all_reports = search_results(motif_csis, non_motif_csis)['reports']
 
-    assert len(all_reports) > 0
     return render_to_response("browse_tab.html",
                               {'title': title,
                                'description': 'desc',

@@ -45,7 +45,7 @@ function getReportLinksTF(type, id) {
     $.blockUI({message: block_message});
     $.ajax({
 	type: "GET",
-	url: '/browse_TF_all_reports_json/'+type+'/'+id,
+	url: '/browse_TF_all_reports_ajax/'+type+'/'+id,
 	success: function(data) {
 	    $("#browse").html(data);
 	}
