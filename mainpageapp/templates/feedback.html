@@ -1,3 +1,18 @@
 
+{% extends "main_page_base.html" %}
 
-<p>About us here</p>
+{% block right_frame %}
+
+<p>
+Have comments, suggestions. Is there anything new or different that you would like to
+see on CollecTF? We are all ears to ways of improving CollecTF. Please give us your
+<a href="{% url mainpageapp.views.feedback %}">feedback</a>.
+</p>
+
+<p>
+CollecTF is committed to maintaining the highest quality standards on the accuracy of
+reported information. If you spot an error in reported TF-binding sites, definitions
+or evidence for experimental support, please <a href="{% url mainpageapp.views.feedback %}">let us know</a>.
+</p>
+
+{% endblock %}

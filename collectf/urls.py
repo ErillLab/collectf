@@ -21,6 +21,7 @@ import browseapp.browse_front
 import browseapp.export
 import dbstatsapp.views
 import ncbiapp.views
+import baseapp.views
 
 import mainpageapp.views
 
@@ -97,8 +98,11 @@ urlpatterns = patterns('',
     url(r'^get_genomes/$', browseapp.json_response.get_genomes),
     url(r'^get_TF_instances/$', browseapp.json_response.get_TF_instances),
 
+    url(r'^get_weblogo', baseapp.views.get_weblogo),
+
                        
     # main page handlers
+    url(r'^main_page_greet/$', mainpageapp.views.greet),
     url(r'^main_page_about/$', mainpageapp.views.about),
     url(r'^main_page_browse/$', mainpageapp.views.browse),
     url(r'^main_page_search/$', mainpageapp.views.search),
@@ -106,6 +110,8 @@ urlpatterns = patterns('',
     url(r'^main_page_feedback/$', mainpageapp.views.feedback),
     url(r'^main_page_stats/$', mainpageapp.views.stats),
     url(r'^main_page_cite/$', mainpageapp.views.cite),
+    url(r'^main_page_links/$', mainpageapp.views.links),
+    url(r'^main_page_ack/$', mainpageapp.views.acknowledgements),
                        
                        
 )

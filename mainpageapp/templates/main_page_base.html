@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="span2 boxed">
+    <ul class="unstyled">
+      <li><a href="{% url mainpageapp.views.about %}">About</a></li>
+      <li><a href="{% url mainpageapp.views.browse %}">Browse</a></li>
+      <li><a href="{% url mainpageapp.views.search %}">Search</a></li>
+      <li><a href="{% url mainpageapp.views.contribute %}">Contribute</a></li>
+      <li><a href="{% url mainpageapp.views.stats %}">Stats</a></li>
+      <li><a href="{% url mainpageapp.views.links %}">Links</a></li>
+      <li><a href="{% url mainpageapp.views.feedback %}">Feedback</a></li>
+      <li><a href="{% url mainpageapp.views.cite %}">Cite</a></li>
+      <li><a href="{% url mainpageapp.views.acknowledgements %}">Acknowledgements</a></li>
+    </ul>
+</div>
+
+<div class="span8 boxed">
+{% block right_frame %}
+{% endblock %}
+</div>
+
+
+
+{% endblock %}

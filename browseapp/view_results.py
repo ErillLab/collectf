@@ -48,7 +48,8 @@ def view_results(request):
     trimmed = lasagna.TrimAlignment(aligned) if len(aligned) > 1 else aligned
     trimmed = [s.upper() for s in trimmed]
     # create weblogo for the list of sites
-    weblogo_data = bioutils.weblogo_uri(trimmed)
+    #weblogo_data = bioutils.weblogo_uri(trimmed)
+    weblogo_data='x' 
     
     ensemble_report = {'meta_sites': ensemble_meta_sites,
                        'aligned_sites': trimmed,
@@ -68,19 +69,21 @@ def get_sites_by_TF_and_species(curation_site_instances, non_motif_curation_site
     (meta_sites,
      meta_site_curation_dict,
      meta_site_regulation_dict,
-     meta_site_technique_dict) = group_curation_site_instances(curation_site_instances, non_motif_curation_site_instances)
+     meta_site_technique_dict,
+     meta_site_genome_accession_dict) = group_curation_site_instances(curation_site_instances, non_motif_curation_site_instances)
     # Use LASAGNA to align sites    # use LASAGNA to align sites
     aligned, idxAligned, strands = lasagna.LASAGNA(map(lambda s:str(s[0].site_instance.seq).lower(), meta_sites.values()), 0)
     trimmed = lasagna.TrimAlignment(aligned) if len(aligned) > 1 else aligned
     trimmed = [s.upper() for s in trimmed]
-    weblogo_data = bioutils.weblogo_uri(trimmed)
+    #weblogo_data = bioutils.weblogo_uri(trimmed)
+    weblogo_data = 'x'
 
-    assert all(x.site_instance.genome==meta_site[0].site_instance.genome for meta_site in meta_sites.values() for x in meta_site)
-    assert all(x.curation.TF_instance==meta_site[0].curation.TF_instance for meta_site in meta_sites.values() for x in meta_site)
+    #assert all(x.site_instance.genome==meta_site[0].site_instance.genome for meta_site in meta_sites.values() for x in meta_site)
+    #assert all(x.curation.TF_instance==meta_site[0].curation.TF_instance for meta_site in meta_sites.values() for x in meta_site)
     
     return {
         'meta_sites': meta_sites,
-        'meta_site_genome_accession_dict': dict((k, meta_sites[k][0].site_instance.genome.genome_accession) for k in meta_sites),
+        'meta_site_genome_accession_dict': {}, #dict((k, meta_sites[k][0].site_instance.genome.genome_accession) for k in meta_sites),
         'meta_site_protein_accession_dict': dict((k, meta_sites[k][0].curation.TF_instance.protein_accession) for k in meta_sites),
         'meta_site_curation_dict': meta_site_curation_dict,
         'meta_site_regulation_dict': meta_site_regulation_dict,
@@ -97,25 +100,38 @@ def group_curation_site_instances(curation_site_instances, non_motif_curation_si
     meta_site_curation_dict = {}
     meta_site_regulation_dict = {}
     meta_site_technique_dict = {}
+    meta_sites_genome_ids = dict()
     
     # group all curation_site_instances into meta-sites    
-    for csi in curation_site_instances:
+    for csi in curation_site_instances.iterator():
+        #print type(csi)
         # search for a meta-site-instance
+        genome_id = models.Curation_SiteInstance.objects.filter(pk=csi.pk).values_list('site_instance__genome__genome_id', flat=True)
+        assert len(genome_id) == 1
+        genome_id = int(genome_id[0])
+        
         for i in meta_sites.keys():
             # if they belong to the same genome and locations overlap
-            if (csi.site_instance.genome == meta_sites[i][0].site_instance.genome and
+            if (genome_id == meta_sites_genome_ids[i] and
+                #csi.site_instance.genome.genome_id == meta_sites[i][0].site_instance.genome.genome_id and
                 csi.curation.TF_instance == meta_sites[i][0].curation.TF_instance and
                 bioutils.overlap_site_meta_site(csi, meta_sites[i])):
                 meta_sites[i].append(csi)
                 break
         else:
-            meta_sites[len(meta_sites)+1] = [csi]
+            index=len(meta_sites)+1
+            meta_sites[index] = [csi]
+            meta_sites_genome_ids[index]=genome_id
     # integrate non-motif-associated-curation-site-instances
     if non_motif_curation_site_instances:
-        for ncsi in non_motif_curation_site_instances:
+        for ncsi in non_motif_curation_site_instances.iterator():
+            genome_id = models.Curation_SiteInstance.objects.filter(pk=ncsi.pk).values_list('site_instance__genome__genome_id', flat=True)
+            assert len(genome_id) == 1
+            genome_id = int(genome_id[0])
             for i in meta_sites.keys():
                 # if they belong to the same genome and locations overlap
-                if (ncsi.site_instance.genome == meta_sites[i][0].site_instance.genome and
+                if (genome_id == meta_sites_genome_ids[i] and
+                    #ncsi.site_instance.genome == meta_sites[i][0].site_instance.genome and
                     ncsi.curation.TF_instance == meta_sites[i][0].curation.TF_instance and
                     bioutils.overlap_non_motif_site_meta_site(ncsi, meta_sites[i])):
                     meta_sites[i].append(ncsi)
@@ -150,4 +166,5 @@ def group_curation_site_instances(curation_site_instances, non_motif_curation_si
     return (meta_sites,
             meta_site_curation_dict,
             meta_site_regulation_dict,
-            meta_site_technique_dict)
+            meta_site_technique_dict,
+            meta_sites_genome_ids)

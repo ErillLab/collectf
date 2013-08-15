@@ -23,7 +23,7 @@ def home(request):
         template_file = "choose.html"
 
     else:
-        template_file = "main_page_visitor.html"
+        template_file = "greet.html"
         
     return render_to_response(template_file, template_vals,
                               context_instance = RequestContext(request))

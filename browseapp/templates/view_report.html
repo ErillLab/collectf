@@ -81,7 +81,11 @@
 	  </div>
 	  <div class="tab-pane active" id="{{TF_name}}_{{sp_name}}_weblogo">
 	    <p>To generate the weblogo, aligned binding sites are used.</p>
-	    <img src="{{ report.weblogo_image_data }}">
+	    <!-- <img src="{{ report.weblogo_image_data }}"> -->
+	    <div class="">
+	      <img src="" class="weblogo_img" id="{{TF_name}}_{{sp_name}}_weblogo" site_data={% for site in report.aligned_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}>
+	  </div>
+
 	  </div>
 	  <div class="tab-pane" id="{{TF_name}}_{{sp_name}}_detail">
 	    <p>For the selected transcription
@@ -172,7 +176,6 @@
 	    <p>Sites are listed as curated.</p>
 	    <pre>
 	      {% for meta_site in ensemble_report.meta_sites %}
-	      >{{ meta_site.0.curation.TF.name }}_{#{{ meta_site.0.site_instance.genome|defer_field:"sequence".organism|slugify }}#}
 	      {{ meta_site.0.site_instance.seq }}{% endfor %}
 	    </pre>
 	  </div>
@@ -189,7 +192,9 @@
 	  </div>
 	  <div class="tab-pane active" id="ensemble_view_weblogo">
 	    <p>To generate the weblogo, aligned binding sites are used.</p>
-	    <img src="{{ ensemble_report.weblogo_image_data }}">
+	    <div class="">
+	      <img src="" class="weblogo_img" id="{{TF_name}}_{{sp_name}}_weblogo" site_data={% for site in ensemble_report.aligned_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}>
+	    </div>
 	  </div>
 	</div>
       </div>
@@ -259,12 +264,33 @@ function showCol(columnClass){
     });
     $('li#'+columnClass).remove();
 }
+
 $(document).ready(function() {
     // regulation diagram hide/show
     $("#regulation_diagram_switch").on('click', function() {
 	$(".regulation_diagram").toggle();
 	console.log('hihi');
 	return false;
+    })
+
+    $('.weblogo_img').each(function() {
+	var img = $(this);
+        img.parent().block({message: 'Loading sequence logo'});
+	var site_data = $(this).attr('site_data');
+	$.ajax({
+	    type: "POST",
+	    url: "{% url baseapp.views.get_weblogo %}",
+	    data: {
+		sites: site_data,
+		csrfmiddlewaretoken:'{{csrf_token}}', 
+	    },
+	    success: function(data) {
+		//console.log(img);
+		img.attr('src', data);
+                img.parent().unblock();
+	    },
+	});
+	console.log('x');
     });
 
 // hide 'genome' and 'TF' columns in the table

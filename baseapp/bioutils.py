@@ -281,8 +281,6 @@ def get_overlap(loca, locb):
 def overlap_test(loca, locb):
     overlap_a = get_overlap(loca, locb)
     overlap_b = get_overlap(locb, loca)
-    if (overlap_a + overlap_b) / 2.0 >= 0.75:
-        print loca, locb, overlap_a, overlap_b
     return (overlap_a + overlap_b) / 2.0 >= 0.75
 
 def location(curation_site_instance):
@@ -298,7 +296,7 @@ def overlap_site_meta_site(curation_site_instance, meta_site_instance):
 
 def overlap_test_2(loca, locb):
     # assuming loca is the larger (non-motif-associated)
-    print loca, locb
+
     overlap = get_overlap(loca, locb)
     return overlap >= (locb[1]-locb[0])
 

@@ -31,7 +31,8 @@ def browse_by_site(request, dbxref_id):
     alignment = None
     if len(curation_site_instances) > 1:
         aligned, idxAligned, strands = lasagna.LASAGNA(map(lambda csi:str(csi.site_instance.seq).lower(), curation_site_instances), 0)
-        alignment = lasagna.TrimAlignment(aligned) if len(aligned) > 1 else aligned
+        #alignment = lasagna.TrimAlignment(aligned) if len(aligned) > 1 else aligned
+        alignment = aligned
         alignment = [s.upper() for s in alignment]
 
     

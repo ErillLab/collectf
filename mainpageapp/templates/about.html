@@ -1,3 +1,6 @@
+{% extends "main_page_base.html" %}
+
+{% block right_frame %}
 
 <p>CollecTF, a play on words using the French collectif [collective] and the acronym
 for transcription factor [TF], is a database of transcription factor binding sites
@@ -17,14 +20,15 @@ information.</p>
   </li>
 
   <li>
-    The CollecTF curation model combines direct author submissions and in-house curation. If you have data to submit, please do contribute [XXXLINK] it!
+    The CollecTF curation model combines direct author submissions and in-house
+    curation. If you have data to submit, please do <a href="{% url mainpageapp.views.contribute %}">contribute</a> it!
   </li>
 
   <li>
     Reported binding sites are mapped to NCBI RefSeq complete genome records to
     provide genomic context and the experimental process is detailed during
-    curation. Curation records are open for inspection. Please, let us know [XXXLINK]
-    if you spot an error.
+    curation. Curation records are open for inspection. Please, <a href="{% url mainpageapp.views.feedback %}">
+      let us know</a> if you spot an error.
   </li>
 
   <li>
@@ -45,3 +49,4 @@ information.</p>
   </li>
 </ul>
 
+{% endblock %}
