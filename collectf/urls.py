@@ -10,16 +10,19 @@ import collectfapp.pubview as pubview
 import collectfapp.curationview as curationview
 import collectfapp.editcurationview as editcurationview
 
-import browseapp.browse_species
-import browseapp.browse_TF
 import browseapp.browse_TF_and_species
+import browseapp.search
+import browseapp.view_results
 import browseapp.view_all
 import browseapp.view_site
 import browseapp.view_curation
 import browseapp.json_response
 import browseapp.browse_front
+import browseapp.export
 import dbstatsapp.views
 import ncbiapp.views
+
+import mainpageapp.views
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -59,23 +62,11 @@ urlpatterns = patterns('',
     url(r'^view_all_curations/$', browseapp.view_all.view_all_curations),
     # view all publications
     url(r'^view_all_publications/$', browseapp.view_all.view_all_publications),
-    # browse
-    url(r'^browse/$', browseapp.browse_TF_and_species.browse_TF_and_species),
-    # browse by TF and species
-    url(r'^browse_TF_sp/(?P<TF_id>\d+)/(?P<species_id>\d+)/$', browseapp.browse_TF_and_species.browse_TF_and_species_selected),
-    # browse by TF main
-    url(r'^browse_tf_main/$', browseapp.browse_TF.browse_by_TF_main),
-    # browse by TF family
-    url(r'^browse_tf_family/(?P<TF_family_id>\d+)$', browseapp.browse_TF.browse_by_TF_family),
-    # browse by TF
-    url(r'^browse_tf/(?P<TF_id>\d+)$', browseapp.browse_TF.browse_by_TF),
-    # browse by species main
-    url(r'^browse_sp_main/$', browseapp.browse_species.browse_by_species_main),
-    # browse by taxon elms
-    url(r'^browse_sp_taxon/(?P<tax_id>\d+)/$', browseapp.browse_species.browse_by_species_taxon),
-    # browse by species
-    url(r'^browse_sp/(?P<sp_tax_id>\d+)/$', browseapp.browse_species.browse_by_species),
-
+    # search
+    url(r'^search/$', browseapp.search.search),
+    # view results
+    url(r'^view_results/$', browseapp.view_results.view_results),
+     
     # browse by taxonomy
     url(r'^browse_front_TF/$', browseapp.browse_front.browse_TF),
     url(r'^browse_TF_all_reports_json/(?P<t>\w+)/(?P<id>\d+)/$', browseapp.browse_front.browse_TF_all_reports_json),
@@ -91,9 +82,12 @@ urlpatterns = patterns('',
     # view report
     url(r'^view_report/(?P<TF_param>\w+)/(?P<TF_ids>[\w,]+)/(?P<species_param>\w+)/(?P<species_ids>[\w,]+)/$',
         browseapp.browse_TF_and_species.browse_TF_and_species_selected),
+    # view report (integrate non-motif-associated sites)
+    url(r'^view_report_w_non_motif/(?P<TF_param>\w+)/(?P<TF_ids>[\w,]+)/(?P<species_param>\w+)/(?P<species_ids>[\w,]+)/$',
+        browseapp.browse_TF_and_species.browse_TF_and_species_selected_non_motif),
            
     # export fasta/csv
-    url(r'^export_sites/$', browseapp.browse_TF_and_species.export_sites),
+    url(r'^export_sites/$', browseapp.export.export_sites),
     # database statistics
     url(r'^db_stats/$', dbstatsapp.views.curation_stats),
     # export tbl for ncbi submission
@@ -103,6 +97,16 @@ urlpatterns = patterns('',
     url(r'^get_genomes/$', browseapp.json_response.get_genomes),
     url(r'^get_TF_instances/$', browseapp.json_response.get_TF_instances),
 
+                       
+    # main page handlers
+    url(r'^main_page_about/$', mainpageapp.views.about),
+    url(r'^main_page_browse/$', mainpageapp.views.browse),
+    url(r'^main_page_search/$', mainpageapp.views.search),
+    url(r'^main_page_contribute/$', mainpageapp.views.contribute),
+    url(r'^main_page_feedback/$', mainpageapp.views.feedback),
+    url(r'^main_page_stats/$', mainpageapp.views.stats),
+    url(r'^main_page_cite/$', mainpageapp.views.cite),
+                       
                        
 )
 

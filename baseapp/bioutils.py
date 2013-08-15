@@ -281,15 +281,27 @@ def get_overlap(loca, locb):
 def overlap_test(loca, locb):
     overlap_a = get_overlap(loca, locb)
     overlap_b = get_overlap(locb, loca)
+    if (overlap_a + overlap_b) / 2.0 >= 0.75:
+        print loca, locb, overlap_a, overlap_b
     return (overlap_a + overlap_b) / 2.0 >= 0.75
 
-def overlap_site_meta_site(curation_site_instance, meta_site_instance, overlap_th=0.8):
+def location(curation_site_instance):
+    return (curation_site_instance.site_instance.start,
+            curation_site_instance.site_instance.end)
+    
+def overlap_site_meta_site(curation_site_instance, meta_site_instance):
     """Given a site instance (site_instance) and a list of site instances
     (meta_site_instance), return whether site instance overlaps enough with any site
     instance in the meta_site_instance."""
-
-    def location(curation_site_instance):
-        return (curation_site_instance.site_instance.start,
-                curation_site_instance.site_instance.end)
-    
     return any(overlap_test(location(curation_site_instance), location(ms)) for ms in meta_site_instance)
+
+
+def overlap_test_2(loca, locb):
+    # assuming loca is the larger (non-motif-associated)
+    print loca, locb
+    overlap = get_overlap(loca, locb)
+    return overlap >= (locb[1]-locb[0])
+
+def overlap_non_motif_site_meta_site(non_motif_curation_site_instance, meta_site_instance):
+    """Given a NON-MOTIF-ASSOCIATE site instance and a list of site instances (meta-site-instance)"""
+    return any(overlap_test_2(location(non_motif_curation_site_instance), location(ms)) for ms in meta_site_instance if ms.is_motif_associated)

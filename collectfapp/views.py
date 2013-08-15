@@ -20,8 +20,12 @@ def home(request):
         template_vals["user"] = request.user
         template_vals["curator"] = curator
         template_vals["curations"] = curations
+        template_file = "choose.html"
+
+    else:
+        template_file = "main_page_visitor.html"
         
-    return render_to_response("choose.html", template_vals,
+    return render_to_response(template_file, template_vals,
                               context_instance = RequestContext(request))
 
 @login_required

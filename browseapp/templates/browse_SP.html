@@ -74,8 +74,58 @@
 </div>
 
 {% include "tree_view.html" %}
-{% load static from staticfiles %}
-<script src="{% static "browse.js" %}"></script>
+
+<script>
+function getReportLinksSpecies(id) {
+    // retrieve list of reports
+    $(document).ajaxStop($.unblockUI); // unblock when ajax activity stops
+    $.blockUI({message: block_message});
+    $.ajax({
+	type: "GET",
+	url: '/browse_tax_all_reports_json/' + id,
+	success: function(data) {
+	    $("#browse").html(data);
+            get_wiki($("#browse #description h4").text());
+	}
+    });
+}
+
+function get_wiki(name) {
+    // given title, return first paragraph of wikipedia article
+console.log(name);
+    $.ajax({
+	url: 'http://en.wikipedia.org/w/api.php',
+	data: {
+	    action: 'parse',
+	    //titles: name,
+	    page: name,
+	    format: 'json',
+	    prop: 'text',
+	},
+	dataType:'jsonp',
+	success: function(data) {
+	    var wikiHTML = data.parse.text["*"];
+	    var wikiDOM = $("<document>"+wikiHTML+"</document>");
+	    var first_p = $(wikiDOM.children('p').get(0));
+
+	    first_p.find('sup').remove();
+	    first_p.find('a').each(function() {
+		$(this)
+		    .attr('href', 'http://en.wikipedia.org'+$(this).attr('href'))
+		    .attr('target','wikipedia');
+	    });
+            console.log($(first_p));
+	    
+	    var desc = $('#description');
+            desc.text('');
+            desc.append('<h4>' + name + '</h4>');
+	    desc.append(first_p)
+		.append("<a href='http://en.wikipedia.org/wiki/"+name+"' target='wikipedia'>Read more on Wikipedia</a>");
+	}
+    });
+}
+</script>
+
 
 {% endblock %}
 

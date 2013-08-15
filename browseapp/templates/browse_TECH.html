@@ -81,7 +81,20 @@
 </div>
 
 {% include "tree_view.html" %}
-{% load static from staticfiles %}
-<script src="{% static "browse.js" %}"></script>
+
+<script>
+function getReportLinksTechniques(type, id) {
+    // retrieve list of reports
+    $(document).ajaxStop($.unblockUI); // unblock when ajax activity stops
+    $.blockUI({message: block_message});
+    $.ajax({
+	type: "GET",
+	url: '/browse_techniques_all_reports_json/'+type+'/'+id,
+	success: function(data) {
+	    $("#browse").html(data);
+	}
+    });
+}
+</script>
 
 {% endblock %}

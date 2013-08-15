@@ -21,8 +21,18 @@ def browse_by_site(request, dbxref_id):
         is_motif_associated=True).all()
 
     # get all curation_site_instances that overlap with the queried site
-    curation_site_instances = [csi for csi in all_curation_site_instances
-                               if bioutils.overlap_site_meta_site(curation_site_instance, [csi])]
+    curation_site_instances = [curation_site_instance]
+    for csi in all_curation_site_instances:
+        if csi==curation_site_instance: continue
+        if bioutils.overlap_site_meta_site(csi, curation_site_instances):
+            curation_site_instances.append(csi)
+
+
+    alignment = None
+    if len(curation_site_instances) > 1:
+        aligned, idxAligned, strands = lasagna.LASAGNA(map(lambda csi:str(csi.site_instance.seq).lower(), curation_site_instances), 0)
+        alignment = lasagna.TrimAlignment(aligned) if len(aligned) > 1 else aligned
+        alignment = [s.upper() for s in alignment]
 
     
     # get curations
@@ -30,8 +40,8 @@ def browse_by_site(request, dbxref_id):
     curations = models.Curation.objects.filter(curation_id__in=curation_ids)
     # get regulations
     regulations = []
-    for curation_site_instance in curation_site_instances:
-        for reg in curation_site_instance.regulation_set.all():
+    for csi in curation_site_instances:
+        for reg in csi.regulation_set.all():
             for r in regulations: # check if the same gene is already in the list
                 if r.gene == reg.gene:
                     if r.evidence_type=='inferred' and reg.evidence_type=='exp_verified':
@@ -46,6 +56,7 @@ def browse_by_site(request, dbxref_id):
                       'head_csi': curation_site_instance,
                       'csis': curation_site_instances,
                       'regulations': regulations,
-                      'dbxref': dbxref_utils.id2dbxref(curation_site_instance.pk)
+                      'dbxref': dbxref_utils.id2dbxref(curation_site_instance.pk),
+                      'alignment': alignment,
                   },
                   context_instance=RequestContext(request))

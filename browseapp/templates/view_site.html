@@ -35,6 +35,7 @@
   <thead>
     <tr>
       <th>Binding site</th>
+      <th>Location</th>
       <th>Publication</th>
       <th>Experimental techniques used</th>
       <th>Curation</th>
@@ -44,7 +45,8 @@
     {% for csi in csis %}
     <tr>
       <td><span class="sequence">{{ csi.site_instance.seq }}</span></td>
-      <td><a href="http://www.ncbi.nlm.nih.gov/pubmed/?term={{ curation.publication.pmid }}">{{ csi.curation.publication.pmid }}</a></td>
+      <td><span class="fixed-width">{% if csi.site_instance.strand == 1%}+{% else %}-{% endif %}[{{ csi.site_instance.start|add:1 }},{{ csi.site_instance.end|add:1 }}]</span></td>
+      <td><a href="http://www.ncbi.nlm.nih.gov/pubmed/?term={{ csi.curation.publication.pmid }}">{{ csi.curation.publication.pmid }}</a></td>
       <td>
 	{% for tech in csi.curation.experimental_techniques.all %}
 	{{ tech.name }}{% if not forloop.last %}, {% endif %}
@@ -55,6 +57,14 @@
     {% endfor %}
   </tbody>
 </table>
+
+{% if alignment %}
+<h3>Multiple Sequence Alignment</h3>
+<pre>
+{% for al in alignment %}{{ al }}
+{% endfor %}</pre>
+{% endif %}
+
 </section>
 
 <section id="regulation_diagram">

@@ -28,12 +28,8 @@
     <h3><i class="icon-beaker"></i> Browse database</h3>
 
     <ul class="unstyled">
-      <!--
-      <li><i class="icon-ok"></i> <a class="" href="">Browse by taxonomy</a></li>
-      <li><i class="icon-ok"></i> <a class="" href="{% url browseapp.browse_TF.browse_by_TF_main %}">Browse by TF family</a></li>
-      <li><i class="icon-ok"></i> <a class="" href="{% url browseapp.browse_species.browse_by_species_main %}">Browse by taxonomy</a></li>
-      -->
-      <li><i class="icon-ok"></i> <a class="" href="{% url browseapp.browse_TF_and_species.browse_TF_and_species %}">Search binding sites by TF and species</a></li>
+
+      <li><i class="icon-ok"></i> <a class="" href="{% url browseapp.search.search %}">Search binding sites by TF and species</a></li>
       <li><i class="icon-ok"></i> <a class="" href="{% url browseapp.browse_front.browse_TF %}">Browse by TF family</a></li>
       <li><i class="icon-ok"></i> <a class="" href="{% url browseapp.browse_front.browse_tax %}">Browse by taxonomy</a></li>
       <li><i class="icon-ok"></i> <a class="" href="{% url browseapp.browse_front.browse_techniques %}">Browse by experimental techniques</a></li>

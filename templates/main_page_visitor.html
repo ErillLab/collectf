@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<div class="row">
+  
+  <div class="span3 boxed">
+    <ul>
+      <li><a class="left_link" id="about" href="#">About</a></li>
+      <li><a class="left_link" id="browse" href="#">Browse</a></li>
+      <li><a class="left_link" id="search" href="#">Search</a></li>
+      <li><a class="left_link" id="contribute" href="#">Contribute</a></li>
+      <li><a class="left_link" id="feedback" href="#">Feedback</a></li>
+      <li><a class="left_link" id="stats" href="#">Stats</a></li>
+      <li><a class="left_link" id="cite" href="#">Cite</a></li>
+    </ul>
+  </div>
+
+  <div class="span7 boxed">
+    <div class="right_frame"></div>
+  </div>
+  
+</div>
+
+<script>
+  $('.left_link').on('click', function() {
+
+  urls = {
+      about: '{% url mainpageapp.views.about %}',
+      browse: '{% url mainpageapp.views.browse %}',
+      search: '{% url mainpageapp.views.search %}',
+      contribute: '{% url mainpageapp.views.contribute %}',
+      feedback: '{% url mainpageapp.views.feedback %}',
+      stats: '{% url mainpageapp.views.stats %}',
+      cite: '{% url mainpageapp.views.cite %}',
+
+
+  }
+  
+  $.ajax({
+      type: "GET",
+      url: urls[$(this).attr('id')],
+      success: function(data) {
+	  $('.right_frame').html(data);
+      }
+  });
+      
+
+   
+
+  });
+</script>
+
+{% endblock %}
