@@ -2,28 +2,29 @@
 
 {% block content %}
 
-<p><a href="{% url browseapp.search.search %}">New search</a></p>
+<div class="container">
+  <a href="{% url browseapp.search.search %}" class="btn btn-primary"><i class="icon-double-angle-left"></i> Try a new search!</a>
 
 {% if reports %}
 
-{% if view_all_csis %} 
-{# put view_all link #}
-<a class="block_before_load" href="#" onclick="$('#view_all').submit(); return false;">View all</a>
-<form style="display:inline;" method="post" action="{% url browseapp.view_results.view_results %}" id="view_all" action="">
-  {% csrf_token %}
-  <input type="hidden" name="motif_csi_list" value="{% for csi_pk in view_all_csis %}{{ csi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}">
-  <input type="hidden" name="non_motif_csi_list" value="{% for ncsi_pk in view_all_ncsis %}{{ ncsi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}">
-</form>
 
 {% endif %}
 
-<div class="container">
-  <div id="report_table" class="boxed">
+<div id="report_table" class="boxed">
     <table class="table table-condensed table-striped">
       <thead>
 	<th>TF</th>
 	<th>Species</th>
-	<th>Report</th>
+	<th>Report
+{% if view_all_csis %} 
+{# put view_all link #}
+	  <a class="block_before_load" href="#" onclick="$('#view_all').submit(); return false;"><small>View all</small></a>
+	  <form style="display:inline;" method="post" action="{% url browseapp.view_results.view_results %}" id="view_all" action="">
+	    {% csrf_token %}
+	    <input type="hidden" name="motif_csi_list" value="{% for csi_pk in view_all_csis %}{{ csi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}">
+	    <input type="hidden" name="non_motif_csi_list" value="{% for ncsi_pk in view_all_ncsis %}{{ ncsi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}">
+	  </form>
+	</th>
       </thead>
       <tbody>
 	{% for report in reports %}

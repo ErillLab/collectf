@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<dl class="">
+{% for t in techs %}
+<dt>
+{{ t.name }}
+</dt>
+<dd>{{ t.description }}
+</dd>
+<hr />
+{% endfor %}
+</dl>
+
+{% endblock %}

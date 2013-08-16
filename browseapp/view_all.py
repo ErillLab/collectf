@@ -14,7 +14,7 @@ def view_all_curations(request):
                               {"curations": all_curations},
                               context_instance=RequestContext(request))
 
-@login_required
+
 def view_all_publications(request):
     """Handler function to see all publications in the database.
     This is for internal use, to see all publications in the database."""

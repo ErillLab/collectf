@@ -34,31 +34,42 @@
       <div class="navbar navbar-fixed-top">
 	<div class="navbar-inner">
 	  <div class="container-fluid">
-	    <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-            </a>
-            <a class="brand" href="{% url collectfapp.views.home %}">collecTF</a>
+            
 	    <div class="nav-collapse collapse">
-              <p class="navbar-text">
-		<span class="pull-left">
-		  {% if user.is_superuser %}
-		  | 
-		  <a href="{% url admin:index %}" class="navbar-link">Admin page </a> |
-		  <a href="{% url ncbiapp.views.export_tbl_view %}" class="navbar-link">.tbl export</a> |
-		  {% endif %}
-		</span>
-		<span class="pull-right">
+	      <ul class="nav">
+		<a class="brand" href="{% url collectfapp.views.home %}">collecTF</a>
+		<li class="divider-vertical"></li>
+		<li class="dropdown">
+		  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Menu <b class="caret"></b></a>
+		  <ul class="dropdown-menu">
+		    <li><a href="{% url mainpageapp.views.about %}">About</a></li>
+		    <li><a href="{% url mainpageapp.views.browse %}">Browse</a></li>
+		    <li><a href="{% url mainpageapp.views.search %}">Search</a></li>
+		    <li><a href="{% url mainpageapp.views.contribute %}">Contribute</a></li>
+		    <li><a href="{% url mainpageapp.views.stats %}">Stats</a></li>
+		    <li><a href="{% url mainpageapp.views.links %}">Links</a></li>
+		    <li><a href="{% url mainpageapp.views.feedback %}">Feedback</a></li>
+		    <li><a href="{% url mainpageapp.views.cite %}">Cite</a></li>
+		    <li><a href="{% url mainpageapp.views.acknowledgements %}">Acknowledgements</a></li>
+		    {% if user.is_superuser %}
+		    <li><a href="{% url admin:index %}" class="navbar-link">Admin page</a></li>
+		    {% endif %}
+		  </ul>
+	      </ul>
+
+	      <ul class="nav pull-right">
 
 		{% if user.is_authenticated %}
-		logged in as {{user.username}} &nbsp; | &nbsp; 
-		<a href="{% url collectfapp.signupview.logout %}" class="navbar-link"> logout</a>
+		<li class="navbar-text">logged in as {{user.username}}</li>
+		<li class="divider-vertical"></li>
+		<li><a href="{% url collectfapp.signupview.logout %}" class="navbar-link">Logout</a></li>
 		{% else %}
-		<a class="navbar-link" href="{% url collectfapp.signupview.login %}">login</a>
+		<li><a class="navbar-link" href="{% url mainpageapp.views.register_request %}">Register</a></li>
+		<li class="divider-vertical"></li>
+		<li><a class="navbar-link" href="{% url collectfapp.signupview.login %}">Login</a></li>
 		{% endif %}
-		</span>
-              </p>
+	      </ul>
+
             </div><!--/.nav-collapse -->
 	  </div>
 	</div>
@@ -85,7 +96,7 @@
       <div class="container-fluid">
 	<div class="row-fluid">
 	  <div class="span9">
-	    <p>Please send comments to sefa1@umbc.edu. For help, visit
+	    <p>Please send comments to collectfdb@umbc.edu. For help, visit
 	      <a href="http://erilllab.biosci.umbc.edu/wiki/index.php5/CollecTF">
 		CollecTF wiki</a>.
 	    </p>

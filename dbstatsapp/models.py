@@ -1,1 +1,1 @@
-from baseapp.models import *
+from collectfapp.models import *

@@ -4,101 +4,157 @@
 {% block content %}
 
 <div class="container">
+<p class="alert alert-info">Search in CollecTF is fully customizable. Just select a taxonomic
+unit (e.g. the Vibrio genus), a transcription factor family or instance (e.g. LexA)
+and the set of experimental techniques that reported sites should be backed by and
+click Search.
+</p>
   <form id="search_form" method="POST" action="{% url browseapp.search.search %}">
     {% csrf_token %}
+
+    <h3>1. Select transcription factor(s)</h3>
     
     <div class="row">
-      <h4>Select transcription factor(s)</h4>
-      <div id="tf_tree" class="boxed">
+      <div class="boxed span3" style="display:inline-block;">
+	
+	<input type="text" class="search_input input-block-level search-query" id="tf_tree_search" placeholder="search">
+	<br/><br/>
+	<label class="checkbox">
+	  <a href="#" id="tf_tree_toggle" class="toggle_link pull-right"><small>expand/collapse</small></a>
+          <input type="checkbox" class="select_box" id="tf_tree_select"> Select all
+
+	</label>
+
+	<div id="tf_tree" class="tf_tree" style="margin-left:-1em;">
+	</div>
       </div>
     </div>
+
+    <hr />
     
+    <h3>2. Select species</h3>
     <div class="row">
-      <h4>Select species</h4>
-      <div id="species_tree" class="boxed"> 
-      </div>
-    </div>
 
-    <div>
-    <div class="row">
-      <h4>Select experimental techniques</h4>
-      <div class="span3">
-	<select name="main_category1" id="cat1" class="category">
-	  <option value="binding" selected="selected">Binding</option>
-	  <option value="expression">Expression</option>
-	  <option value="insilico">In-silico</option>
-	</select>
-      </div>
-
-      <div class="span1">
-	<select name="boolean1" class="span1">
-	  <option value="and">and</option>
-	  <option value="or" selected="selected">or</option>
-	</select>
-      </div>
-
-      <div class="span3">
-	<select name="main_category2" id="cat2" class="category">
-	  <option value="binding">Binding</option>
-	  <option value="expression"  selected="selected">Expression</option>
-	  <option value="insilico">In-silico</option>
-	</select>
-      </div>
-
-      <div class="span1">
-	<select name="boolean2" class="span1">
-	  <option value="and">and</option>
-	  <option value="or" selected="selected">or</option>
-	</select>
-      </div>
-
-      <div class="span3">
-	<select name="main_category3" id="cat3" class="category">
-	  <option value="binding" >Binding</option>
-	  <option value="expression">Expression</option>
-	  <option value="insilico" selected="selected">In-silico</option>
-	</select>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="span3">
-	<div  class="cat1 binding boxed" data-tree-input-name="cat_input_1" style="display:block;">
-	</div>
-	<div  class="cat1 expression boxed" data-tree-input-name="cat_input_1" style="display:none;">
-	</div>
-	<div  class="cat1 insilico boxed" data-tree-input-name="cat_input_1" style="display:none;">
-	</div>
-      </div>
-
-      <div class="span1">
-      </div>
-
-      <div class="span3">
-	<div  class="cat2 binding boxed" data-tree-input-name="cat_input_2" style="display:none;"> 
-	</div>
-	<div  class="cat2 expression boxed" data-tree-input-name="cat_input_2" style="display:block;">
-	</div>
-	<div  class="cat2 insilico boxed" data-tree-input-name="cat_input_2" style="display:none;">
-	</div>
-
-      </div>
-      <div class="span1">
-      </div>
-
-      <div class="span3">
-	<div  class="cat3 binding boxed" data-tree-input-name="cat_input_3" style="display:none;">
-	</div>
-	<div  class="cat3 expression boxed" data-tree-input-name="cat_input_3" style="display:none;">
-	</div>
-	<div  class="cat3 insilico boxed" data-tree-input-name="cat_input_3" style="display:block;">
+      <div class="boxed span3" style="display:inline-block;">
+	<input type="text" class="search_input input-block-level search-query" id="species_tree_search" placeholder="search">
+	<br/><br/>
+	<label class="checkbox">
+	  <a href="#" id="species_tree_toggle" class="toggle_link pull-right"><small>expand/collapse</small></a>
+          <input type="checkbox" class="select_box" id="species_tree_select"> Select all
+	</label>
+	<div id="species_tree" class="species_tree" style="margin-left:-1em;">
 	</div>
       </div>
     </div>
     
-    <div class="row">
-    <input class="btn btn-primary" type="submit" value="submit" />
-    </div>
+    <hr />
+	<h3>3. Select experimental techniques</h3>
+      <div class="row">
+
+	<div class="span3">
+	  <select name="main_category1" id="cat1" class="category">
+	    <option value="binding" selected="selected">Binding</option>
+	    <option value="expression">Expression</option>
+	    <option value="insilico">In-silico</option>
+	  </select>
+	</div>
+
+	<div class="span1">
+	  <select name="boolean1" class="span1">
+	    <option value="and">and</option>
+	    <option value="or" selected="selected">or</option>
+	  </select>
+	</div>
+
+	<div class="span3">
+	  <select name="main_category2" id="cat2" class="category">
+	    <option value="binding">Binding</option>
+	    <option value="expression"  selected="selected">Expression</option>
+	    <option value="insilico">In-silico</option>
+	  </select>
+	</div>
+
+	<div class="span1">
+	  <select name="boolean2" class="span1">
+	    <option value="and">and</option>
+	    <option value="or" selected="selected">or</option>
+	  </select>
+	</div>
+
+	<div class="span3">
+	  <select name="main_category3" id="cat3" class="category">
+	    <option value="binding" >Binding</option>
+	    <option value="expression">Expression</option>
+	    <option value="insilico" selected="selected">In-silico</option>
+	  </select>
+	</div>
+      </div>
+
+      <div class="row">
+	
+	<div class="span3" style="display:inline-block;">
+	  <div class="boxed">
+	    <input type="text" class="search_input input-block-level search-query" id="cat1_search" placeholder="search">
+	    <br/><br/>
+	    <label class="checkbox">
+	      <a href="#" id="cat1_toggle" class="toggle_link pull-right"><small>expand/collapse</small></a>
+              <input type="checkbox" class="select_box" id="cat1_select"> Select all
+	    </label>
+	    
+	    <div  class="cat1 binding" data-tree-input-name="cat_input_1" style="display:block; margin-left:-2em; font-size:12px;">
+	    </div>
+	    <div  class="cat1 expression " data-tree-input-name="cat_input_1" style="display:none; margin-left:-2em; font-size:12px;">
+	    </div>
+	    <div  class="cat1 insilico " data-tree-input-name="cat_input_1" style="display:none; margin-left:-2em; font-size:12px;">
+	    </div>
+	  </div>
+	</div>
+
+	
+	<div class="span1">
+	</div>
+
+	<div class="span3" style="display:inline-block;">
+	  <div class="boxed">
+	    <input type="text" class="search_input input-block-level search-query" id="cat2_search" placeholder="search">
+	    <br/><br/>
+	    <label class="checkbox">
+	      <a href="#" id="cat2_toggle" class="toggle_link pull-right"><small>expand/collapse</small></a>
+              <input type="checkbox" class="select_box" id="cat2_select"> Select all
+	    </label>
+	    <div  class="cat2 binding " data-tree-input-name="cat_input_2" style="display:none;  margin-left:-2em;  font-size:12px;" > 
+	    </div>
+	    <div  class="cat2 expression " data-tree-input-name="cat_input_2" style="display:block; margin-left:-2em;  font-size:12px;">
+	    </div>
+	    <div  class="cat2 insilico " data-tree-input-name="cat_input_2" style="display:none; margin-left:-2em;  font-size:12px;">
+	    </div>
+	  </div>
+	</div>
+
+	<div class="span1">
+	</div>
+
+	<div class="span3" style="display:inline-block;">
+	  <div class="boxed">
+	    <input type="text" class="search_input input-block-level search-query" id="cat3_search" placeholder="search">
+	    <br/><br/>
+	    <label class="checkbox">
+	      <a href="#" id="cat3_toggle" class="toggle_link pull-right"><small>expand/collapse</small></a>
+              <input type="checkbox" class="select_box" id="cat3_select"> Select all
+	    </label>
+	    <div  class="cat3 binding " data-tree-input-name="cat_input_3" style="display:none; margin-left:-2em; font-size:12px;">
+	    </div>
+	    <div  class="cat3 expression " data-tree-input-name="cat_input_3" style="display:none; margin-left:-2em; font-size:12px;">
+	    </div>
+	    <div  class="cat3 insilico " data-tree-input-name="cat_input_3" style="display:block; margin-left:-2em; font-size:12px;">
+	    </div>
+	  </div>
+	</div>
+      </div>
+      <hr />
+      <div class="row">
+	<input class="btn btn-primary btn-block btn-large" type="submit" value="Search" />
+      </div>
     </div>
   </form>
 </div>
@@ -238,6 +294,7 @@ $('#tf_tree').tree({
     values: tf_data,
     type: 'checkbox',
     input: {name: 'tf_input'},
+    toggleLI: true,
 });
 $('#tf_tree').tree('collapseAll');
 
@@ -245,6 +302,7 @@ $('#species_tree').tree({
     values: species_data,
     type: 'checkbox',
     input: {name: 'species_input'},
+    toggleLI: true,
 });
 $('#species_tree').tree('collapseAll');
 
@@ -296,6 +354,34 @@ $('input[type=submit]').on('click', function() {
     });
 })
 
+$('.search_input').on('keyup', function() {
+    console.log($(this).val());
+    var x = $(this).attr('id').replace('_search','');
+    $('.'+x+':visible').tree('search', $(this).val());
+    if($(this).val()=='')
+	$('.'+x+':visible').tree('collapseAll');
+    return false;
+});
+
+$('.select_box').change(function(ev) {
+    var x = $(this).attr('id').replace('_select','');
+    if ($(this).prop('checked') == true)
+	$('.'+x+':visible').tree('selectAll');
+    else
+	$('.'+x+':visible').tree('unselectAll');
+
+    return false;
+});
+
+$('.toggle_link').on('click', function() {
+    var x = $(this).attr('id').replace('_toggle','');
+    $('.'+x+':visible').tree('toggleAll');
+    return false;
+});
+
 </script>
 
 {% endblock %}
+
+
+

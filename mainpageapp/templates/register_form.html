@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+
+<form class="form-horizontal" action="{% url mainpageapp.views.register_request %}" method="post">{% csrf_token %}
+  <div class="control-group">
+    <label class="control-label" for="username">
+      Username
+    </label>
+    <div class="controls">
+      <input type="text" id="username" name="username" required>
+    </div>
+  </div>
+
+<div class="control-group">
+    <label class="control-label" for="first_name">
+      First name
+    </label>
+    <div class="controls">
+      <input type="text" id="first_name" name="first_name" required>
+    </div>
+  </div>
+
+<div class="control-group">
+    <label class="control-label" for="last_name">
+      Last name
+    </label>
+    <div class="controls">
+      <input type="text" id="last_name" name="last_name" required>
+    </div>
+  </div>
+
+<div class="control-group">
+    <label class="control-label" for="username">
+      Email address
+    </label>
+    <div class="controls">
+      <input type="email" name="email" required>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <div class="controls">
+      <button type="submit" class="btn">Submit</button>
+    </div>
+  </div>
+</form>
+    
+{% endblock %}
+
+

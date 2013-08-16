@@ -5,13 +5,13 @@
 <p>Check out the latest stats on CollecTF</p>
 
 <ul>
-  <li> <a href="#">CollecTF global statistics</a></li>
-  <li> <a href="#">Site statistics</a></li>
-  <li> <a href="#">Publications</a></li>
-  <li> <a href="#">Curations</a></li>
-  <li> <a href="#">Curators roster</a></li>
-  <li> <a href="#">Experimental techniques list</a></li>
-  <li> <a href="#">CSV file templates</a></li>
+  <li> <a href="{% url dbstatsapp.views.curation_stats %}#global">CollecTF global statistics</a></li>
+  <li> <a href="{% url dbstatsapp.views.curation_stats %}#site">Site statistics</a></li>
+  <li> <a href="{% url dbstatsapp.views.curation_stats %}#curations">Curations</a></li>
+  <li> <a href="{% url browseapp.view_all.view_all_publications %}">Publications</a></li>
+  <li> <a href="{% url dbstatsapp.views.curator_roster %}">Curators roster</a></li>
+  <li> <a href="{% url dbstatsapp.views.experimental_techniques %}">Experimental techniques list</a></li>
+<!--  <li> <a href="#">CSV file templates</a></li> -->
 </ul>
 
 {% endblock %}

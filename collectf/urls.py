@@ -41,13 +41,17 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     # registration
     # registration is not allowed, admin creates new accounts.
-    # url(r'^accounts/register/$', signupview.register),
+    url(r'^accounts/register/$', mainpageapp.views.register_request),
     # login
     url(r'^accounts/login/$', signupview.login),
     # logout
     url(r'^accounts/logout/$', signupview.logout),
     # main page
     url(r'^$', collectfapp.views.home),
+
+    # external pubmed submission
+    url(r'^ext_pubmed_submission', collectfapp.views.pub_external_submission),
+                       
     # pubmed publication submission
     url(r'^pubmed_submission/$', pubview.pubmed_submission),
     # nonpubmed publication submission
@@ -91,6 +95,8 @@ urlpatterns = patterns('',
     url(r'^export_sites/$', browseapp.export.export_sites),
     # database statistics
     url(r'^db_stats/$', dbstatsapp.views.curation_stats),
+    url(r'^curator_roster/$', dbstatsapp.views.curator_roster),
+    url(r'^exp_tech_list/$', dbstatsapp.views.experimental_techniques),
     # export tbl for ncbi submission
     url(r'^export_ncbi/$', ncbiapp.views.export_tbl_view),
 
@@ -112,6 +118,7 @@ urlpatterns = patterns('',
     url(r'^main_page_cite/$', mainpageapp.views.cite),
     url(r'^main_page_links/$', mainpageapp.views.links),
     url(r'^main_page_ack/$', mainpageapp.views.acknowledgements),
+    url(r'^feedback_send_email/$', mainpageapp.views.feedback_send_email),
                        
                        
 )

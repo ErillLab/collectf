@@ -6,13 +6,54 @@
 <p>
 Have comments, suggestions. Is there anything new or different that you would like to
 see on CollecTF? We are all ears to ways of improving CollecTF. Please give us your
-<a href="{% url mainpageapp.views.feedback %}">feedback</a>.
+feedback.
 </p>
 
 <p>
 CollecTF is committed to maintaining the highest quality standards on the accuracy of
 reported information. If you spot an error in reported TF-binding sites, definitions
-or evidence for experimental support, please <a href="{% url mainpageapp.views.feedback %}">let us know</a>.
+or evidence for experimental support, please let us know.
 </p>
 
+<p>To contact us, you can either use the form below or send an email to collectfdb@umbc.edu</p>
+
+    <form class="form-horizontal boxed" id="feedback" action="{% url mainpageapp.views.feedback_send_email %}" method="POST">{% csrf_token %}
+      <div class="control-group">
+	<label class="control-label" for="form_email">
+	  Your email address
+	</label>
+	<div class="controls">
+	  <input type="email" id="form_email" name="email" required>
+	</div>
+      </div>
+      
+      <div class="control-group">
+	<label class="control-label" for="form_feedback_type">
+	  Type
+	</label>
+	<div class="controls">
+	  <select id="form_feedback_type" name="type">
+	    <option>Error/bug</option>
+	    <option>Feature request</option>
+	    <option>Comment</option>
+	  </select>
+	</div>
+      </div>
+      
+      <div class="control-group">
+	<label class="control-label" for="form_comment">
+	  Comment
+	</label>
+	<div class="controls">
+	  <textarea type="text" id="form_comment" rows="10" name="comment" required></textarea>
+	</div>
+      </div>
+      
+      <div class="control-group">
+	<div class="controls">
+	  <button type="submit" class="btn">Submit</button>
+	</div>
+      </div>
+    </form>
+    
 {% endblock %}

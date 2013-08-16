@@ -6,10 +6,10 @@
 
 <ul>
 <li>
-  <p>Suggest a article for curation.</p>
+  <p>Suggest an article for curation.</p>
   <p>Know of a peer-reviewed publication describing experimentally-validated
-  bacterial TF-binding sites that is not yet on our to-do list [XXXLINK:StatPubs]?
-  Please let us know! [XXXLINK:Submit_paper_form]
+    bacterial TF-binding sites that is not yet on <a href="{% url browseapp.view_all.view_all_publications %}">our to-do list</a>,
+    Please let us know! <a href="{% url collectfapp.views.pub_external_submission %}">Submit a publication for curation.</a>
   </p>
 </li>
 
@@ -19,7 +19,7 @@
   </p>
   <p>
     Are you the author of a publication with experimental data on bacterial
-    TF-binding sites that is not already in our database [XXXLINK:StatPubs]? Please
+    TF-binding sites that is not already in <a href="{% url browseapp.view_all.view_all_publications %}">our database</a>? Please
     take a moment to submit your data and maximize its visibility and accessibility
     through NCBI RefSeq complete genome records.
   </p>
@@ -27,14 +27,14 @@
     For your convenience, you may:
     <ul>
       <li>
-	Submit data [XXXLINK] using our online submission system. Please check the
-	accompanying Submission guide [XXXLINK] before submitting. You must be
-	registered as an external user [XXXLINK] to submit.
+	<a href="{% url collectfapp.curationview.curation %}">Submit data</a> using our online submission system. Please check the
+	accompanying <a href="https://dl.dropboxusercontent.com/u/3418484/CollecTF_submission_guide.pdf">submission guide</a> before submitting. You must be
+	<a href="{% url mainpageapp.views.register_request %}">registered as an external user</a> to submit.
       </li>
       <li>
-	Submit data [XXXLINK] in table format. Please check the Data submission guide
-	[XXXLINK] before submitting. You must be registered as an external user
-	[XXXLINK] to submit.
+	<a href="{% url collectfapp.curationview.curation %}">Submit data</a> in table format. Please check the
+	<a href="https://dl.dropboxusercontent.com/u/3418484/CollecTF_data_submission_guide.pdf">data submission guide</a>
+	before submitting. You must be <a href="{% url mainpageapp.views.register_request %}">registered as an external user</a> to submit.
       </li>
       <li>
 	Submitted records will be assessed by CollecTF staff and incorporated into
@@ -45,10 +45,10 @@
 
 <li>
   <p>
-Become a curator Interested in TF-binding sites? Intrigued by the intricacies of
+Become a curator interested in TF-binding sites? Intrigued by the intricacies of
 database curation? CollecTF is open to everyone willing and able to read primary
-scientific literature and extract relevant content. Please contact us [XXXLINK:email]
-if you want to become a member of the CollecTF team [XXXLINK:StatCurator roster].
+scientific literature and extract relevant content. Please <a href="{% url mainpageapp.views.feedback %}">contact us</a> if you want to become a member
+of <a href="{% url dbstatsapp.views.curator_roster %}">the CollecTF team</a>.
   </p>
 </li>
 </ul>

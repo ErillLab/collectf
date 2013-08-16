@@ -3,40 +3,52 @@
 {% block content %}
 {% load utils %}
 
-
-<ul class="nav nav-tabs">
-  <li class="active"><a href="#global" data-toggle="tab">Global statistics</a></li>
-  <li><a href="#curation" data-toggle="tab">Curation statistics</a></li>
-  <li><a href="#site" data-toggle="tab">Site statistics</a></li>
+<ul class="nav nav-pills">
+  <li class=""><a href="#global" class="nav-li" id="global">Global statistics</a></li>
+  <li><a href="#curation" class="nav-li" id="curation">Curation statistics</a></li>
+  <li><a href="#site" class="nav-li" id="site">Site statistics</a></li>
 </ul>
 
-<div class="tab-content span12">
-  <div class="tab-pane active" id="global">
-    <h3>CollecTF metadata</h3>
-    <ul>
-      <li>Number of TFs: {{ num_TFs }}</li>
-      <li>Number of species: {{ num_species }}</li>
-      <li>Number of curations: {{ num_curations }}</li>
-      <li>Number of binding sites: {{ num_sites }}</li>
-      <li>Number of publications: {{ num_publications }} ({{pub_completed}}% completed)</li>
-    </ul>
-  </div>
-  
-  <div class="tab-pane" id="curation">
-    <div id="num_curations_div" class="span11"></div>
-  </div>
-  
-  <div class="tab-pane" id="site">
-    <div id="num_sites_div" class="span12"></div>
-  </div>
+<div class="span5 content global" style="display:none;">
+  <table class="table table-condensed table-striped">
+    <tbody>
+      <tr>
+	<td>Number of TFs</td>
+	<td>{{ num_TFs }}</td>
+      </tr>
+      <tr>
+	<td>Number of species</td>
+	<td>{{ num_species }}</td>
+      </tr>
+      <tr>
+	<td>Number of curations</td>
+	<td>{{ num_curations }}</td>
+      </tr>
+      <tr>
+	<td>Number of binding sites</td>
+	<td> {{ num_sites }}</td>
+      </tr>
+      <tr>
+	<td>Number of publications</td>
+	<td>{{ num_publications }} ({{pub_completed}}% completed)</td>
+      </tr>
+    </tbody>
+    </table>
 </div>
-</script>
+  </div>
+
+<div id="num_curations_div" class="content curation" ></div>
+<div id="num_sites_div" class="content site"></div>
+
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
 <script type="text/javascript">
 
 google.load("visualization", "1", {packages:["corechart"]});
-google.setOnLoadCallback(drawChart);
-google.setOnLoadCallback(drawChart2);
-function drawChart() {
+//google.setOnLoadCallback(drawChart1);
+//google.setOnLoadCallback(drawChart2);
+
+function drawChart1() {
     var data = google.visualization.arrayToDataTable([
 	['species', {% for tf in TFs %} '{{ tf }}', {% endfor %}],
 	{% for sp in species %}
@@ -47,12 +59,13 @@ function drawChart() {
         title: 'CollecTF curation number by TF and species',
         vAxis: {title: 'Species'},
 	hAxis: {title: 'Number of curations'},
-	//height: 1500, 
         chartArea: {height:"90%"},
+        height: 1500,
 	isStacked: true,
     };
     var chart = new google.visualization.BarChart(document.getElementById('num_curations_div'));
     chart.draw(data, options);
+    $('#num_curations_div').hide();
 }
 
 function drawChart2() {
@@ -66,13 +79,37 @@ function drawChart2() {
 	title: 'CollecTF reported TFBS by TF and species',
 	vAxis: {title: 'Species'},
 	hAxis: {title: 'Number of sites'},
-	//height: 1500, width: 
         chartArea: {height:"90%"},
 	isStacked: true,
+        height: 1500
     };
     var chart = new google.visualization.BarChart(document.getElementById('num_sites_div'));
     chart.draw(data, options);
+    $("#num_sites_div").hide();
 }
- 
 </script>
+
+<script>
+    $('.nav-li').on('click', function() {
+	$('.content').hide();
+	$('.nav-li').parent().removeClass('active');
+	$('.' + $(this).attr('id')).show();
+	$(this).parent().addClass('active');
+	$('html, body').animate({scrollTop: '0px'}, 300);
+    });
+
+$(document).ready(function() {
+    drawChart1();
+    drawChart2();
+
+    var a = $('a[href="' + window.location.hash + '"]');
+    $('.content').hide();
+    $('.'+a.attr('id')).show();
+    a.parent().addClass('active');
+    $('html, body').animate({scrollTop: '0px'}, 0);
+});
+
+</script>
+
+
 {% endblock %}

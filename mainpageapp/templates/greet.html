@@ -2,6 +2,64 @@
 
 {% block right_frame %}
 
-wellcome
+<p> CollecTF is a database of transcription factor binding sites (TFBS) in the
+Bacteria domain. It aims at becoming a reference, highly-accessed database by relying
+on its ability to customize navigation and data extraction, its relevance to the
+community, the quality and detail of the stored data and the up-to-date nature of the
+stored information.</p>
+
+<hr />
+
+<p class="lead">A record from CollecTF
+
+  <a class="block_before_load" href="#" onclick="$('#view_all').submit(); return false;"><small>View all</small></a></p>
+
+<form style="display:inline;" method="post" action="{% url browseapp.view_results.view_results %}" id="view_all" action="">
+  {% csrf_token %}
+  <input type="hidden" name="motif_csi_list" value="{% for csi_pk in random_rec.view_all_csis %}{{ csi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}">
+  <input type="hidden" name="non_motif_csi_list" value="{% for ncsi_pk in random_rec.view_all_ncsis %}{{ ncsi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}">
+</form>
+
+<div class="">
+<dl class="dl-horizontal">
+  <dt>Transcription factor</dt>
+  <dd>{{ random_rec.TF_name }}</dd>
+
+  <dt>Protein record @NCBI</dt>
+  <dd><a href="http://www.ncbi.nlm.nih.gov/protein/?term={{ random_rec.TF_accession }}">{{ random_rec.TF_accession }}</a></dd>
+  <dt>Species</dt>
+  <dd>{{ random_rec.organism }}</dd>
+  <dt>Genome record @NCBI</dt>
+  <dd><a href="http://www.ncbi.nlm.nih.gov/nuccore/?term={{ random_rec.genome_accession }}">{{ random_rec.genome_accession }}</a></dd>
+</dl>
+<div class="pull-right">
+  <img src="" class="weblogo_img" id="ex_weblogo" site_data={% for site in random_rec.aligned_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}>
+</div>
+</div>
+
+<script>
+
+$(document).ready(function() {
+    $('.weblogo_img').each(function() {
+	var img = $(this);
+        img.parent().block({message: 'Loading sequence logo'});
+	var site_data = $(this).attr('site_data');
+	$.ajax({
+	    type: "POST",
+	    url: "{% url baseapp.views.get_weblogo %}",
+	    data: {
+		sites: site_data,
+		csrfmiddlewaretoken:'{{csrf_token}}', 
+	    },
+	    success: function(data) {
+		//console.log(img);
+		img.attr('src', data);
+                img.parent().unblock();
+	    },
+	});
+    });
+
+});
+</script>
 
 {% endblock %}

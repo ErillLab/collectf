@@ -2,22 +2,27 @@
 
 !function( $ ) {
 
-	$("<style type='text/css'> .tree-node{ display:inline-block; width:16px; margin-right:4px; text-align: right;cursor: pointer;} " + 
+	$("<style type='text/css'> .tree-node{ display:inline-block; width:1em; margin-right:0.5em; text-align: right;cursor: pointer;} " + 
 	 ".tree-node-label{ display:inline-block; text-align: left;} </style>").appendTo("head");
 
-	var Node = function(element, options){
+	var Node = function (element, options){
 		this.element = $(element);
 
 		// If the node has a subroot / children
 		this.subroot = this.element.children('ul').root(options);
 
 		// Value of the leaf node: if any
+		this.text = this.element.clone().children('ul').remove().end().text();
 		if(this.subroot === undefined)
-			this.value = this.element.attr('input-value') || this.element.clone().children().remove().end().text() ;
+			this.value = this.element.attr('input-value') || this.text ;
 
 
 		// State of the current node
 		this.state = $.fn.node.State.UNCHECKED;
+
+		// Setup animation speed
+		this.animation = this.element.data('tree-animation') || options.animation;
+
 
 		// Type of node (checkbox? radio )
 		this.type = options.type;
@@ -95,12 +100,21 @@
 	Node.prototype = {
 		constructor: Node,
 
-
+		isSubrootVisible: function(){
+			var visible = false;
+			if(this.subroot != null){
+				this.subroot.each(function(){
+					if($(this).data('root').element.is(":visible"))
+						visible = true;
+				});
+			}
+			return visible;
+		},
 
 		switch: function(){
 			if(this.subroot != null){
 				this.subroot.each(function(){
-					$(this).data('root').switch();
+					$(this).data('root').switch(this.animation);
 				});
 				this.icon.find('i').eq(0).toggleClass('icon-caret-right');
 				this.icon.find('i').eq(0).toggleClass('icon-caret-down');
@@ -139,21 +153,21 @@
 			if(state == $.fn.node.State.CHECKED){
 				this.state = $.fn.node.State.CHECKED;
 				this.input.prop('checked', true);
-				this.input.removeAttr("indeterminate");
+				this.input.prop('indeterminate', false);
 				if(this.custom)
 					this.customElement.html(this.custom.checked);
 			}
 			if(state == $.fn.node.State.UNCHECKED){
 				this.state = $.fn.node.State.UNCHECKED;
 				this.input.removeAttr('checked');
-				this.input.removeAttr("indeterminate");
+				this.input.prop('indeterminate', false);
 				if(this.custom)
 					this.customElement.html(this.custom.unchecked);
 			}
 			if(state == $.fn.node.State.INDETERMINED){
 				this.state = $.fn.node.State.INDETERMINED;
 				this.input.removeAttr('checked');
-				this.input.prop("indeterminate", true);
+				this.input.prop('indeterminate', true);
 				if(this.custom)
 					this.customElement.html(this.custom.indetermined);
 
@@ -215,10 +229,12 @@
 					parent.propagate();
 
 				var inputs = this.element.find('input[value]');
-				var a = $.map(inputs, function(val, i){
-				 	if($(val).prop('checked'))
-				 		return true;
 
+				
+
+				var a = $.map(inputs, function(val, i){
+				 	if($(val).prop('checked') === true)
+				 		return true;
 				});
 
 				if(a.length == inputs.length)
@@ -228,7 +244,6 @@
 				else
 					this.update($.fn.node.State.INDETERMINED);
 
-
 			}
 			else{
 				this.update(state);
@@ -236,6 +251,8 @@
 				if(this.subroot){
 					this.subroot.children('li').each(function(){
 						$(this).data('node').propagate(state);	
+
+
 					});
 				}
 
@@ -246,6 +263,45 @@
 		click: function(ev){
 			ev.stopPropagation();
 			this.switch();	
+		},
+
+		search: function(str){
+			var searchResult = false;
+
+			if(str == "")
+				searchResult = true;
+
+			if(this.text.toLowerCase().indexOf(str.toLowerCase()) != -1)
+				searchResult = true;
+
+
+			if(this.subroot){
+				this.subroot.children('li').each(function(){
+					if($(this).data('node').search(str))	
+						searchResult = true;
+				});
+			}
+
+			if(searchResult){
+				this.element.show(this.animation);
+				if(this.subroot){
+					this.subroot.each(function(){
+						$(this).data('root').expandAll();
+					});
+				}
+			}
+			else{
+				this.element.hide(this.animation);
+				if(this.subroot){
+					this.subroot.each(function(){
+						$(this).data('root').collapseAll();
+					});
+				}
+
+			}
+				
+			return searchResult;
+
 		}
 
 	};
@@ -304,8 +360,20 @@
 		expand: function(){
 			this.element.show(this.animation);
 		},
+		toggleAll: function(){
+			var isVisible = false;
+			if(this.nodes){
+				$.each(this.nodes,function(){
+					if($(this).data('node').isSubrootVisible())
+						isVisible = true;
+				});
+			}
+			if(isVisible)
+				this.collapseAll();
+			else
+				this.expandAll();
+		},
 		collapseAll: function(){
-			
 			if(this.nodes){
 				$.each(this.nodes,function(){
 					$(this).data('node').collapse(true);
@@ -331,6 +399,18 @@
 				$.each(this.nodes,function(){
 					$(this).data('node').uncheck();
 				});
+			}
+		},
+		search: function(str){
+			//console.log(str);
+			this.expandAll(0);
+			if(this.nodes){
+				var searchResult = false;
+				$.each(this.nodes,function(){
+					if($(this).data('node').search(str))
+						searchResult = true;
+				});
+				return searchResult;
 			}
 		}
 	}

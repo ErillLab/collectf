@@ -69,7 +69,7 @@ def browse_tax_all_reports_ajax(request, id):
 
     return render_to_response("browse_tab.html",
                               {'title': models.Taxonomy.objects.get(pk=id).name,
-                               'description': 'No description here.',
+                               'description': '',
                                'reports': all_reports},
                               context_instance=RequestContext(request))
 
@@ -133,7 +133,7 @@ def browse_techniques_all_reports_ajax(request, type, id):
 
     return render_to_response("browse_tab.html",
                               {'title': title,
-                               'description': 'desc',
+                               'description': desc,
                                'reports': all_reports},
                               context_instance=RequestContext(request))
         
