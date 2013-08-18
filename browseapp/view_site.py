@@ -1,8 +1,7 @@
 from django.contrib import messages
 from browse_base import *
 import django.views.defaults
-from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
+
 import collectfapp.views
 
 def browse_by_site(request, dbxref_id):

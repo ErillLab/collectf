@@ -85,19 +85,6 @@ out to techniq</p>
 
 {% include "tree_view.html" %}
 
-<script>
-function getReportLinksTechniques(type, id) {
-    // retrieve list of reports
-    $(document).ajaxStop($.unblockUI); // unblock when ajax activity stops
-    $.blockUI({message: block_message});
-    $.ajax({
-	type: "GET",
-	url: '/browse_techniques_all_reports_ajax/'+type+'/'+id,
-	success: function(data) {
-	    $("#browse").html(data);
-	}
-    });
-}
-</script>
+
 
 {% endblock %}

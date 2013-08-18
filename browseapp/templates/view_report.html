@@ -269,7 +269,6 @@ $(document).ready(function() {
     // regulation diagram hide/show
     $("#regulation_diagram_switch").on('click', function() {
 	$(".regulation_diagram").toggle();
-	console.log('hihi');
 	return false;
     })
 
@@ -285,12 +284,10 @@ $(document).ready(function() {
 		csrfmiddlewaretoken:'{{csrf_token}}', 
 	    },
 	    success: function(data) {
-		//console.log(img);
 		img.attr('src', data);
                 img.parent().unblock();
 	    },
 	});
-	console.log('x');
     });
 
 // hide 'genome' and 'TF' columns in the table

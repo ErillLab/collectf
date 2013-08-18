@@ -1,8 +1,14 @@
 from browse_base import *
-
+from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
+import collectfapp.views 
 
 def view_results(request):
-    assert request.POST, 'no GET handler for this function'
+    #assert request.POST, '
+    if not request.POST:
+        #no GET handler for this function
+        return HttpResponseRedirect(reverse(collectfapp.views.home))
+        
     print 'view_results'
     csi_list = request.POST['motif_csi_list'].strip().split(',')
     non_motif_csi_list = None

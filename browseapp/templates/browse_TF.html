@@ -41,20 +41,6 @@
 </div>
 
 {% include "tree_view.html" %}
-<script>
-function getReportLinksTF(type, id) {
-    // Given string type (TF_family|TF) and id of the object, perform ajax to
-    // retrieve list of reports
-    $(document).ajaxStop($.unblockUI); // unblock when ajax activity stops
-    $.blockUI({message: block_message});
-    $.ajax({
-	type: "GET",
-	url: '/browse_TF_all_reports_ajax/'+type+'/'+id,
-	success: function(data) {
-	    $("#browse").html(data);
-	}
-    });
-}
-</script>
+
 
 {% endblock %}

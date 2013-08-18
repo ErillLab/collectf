@@ -1,3 +1,5 @@
+/* global $, jQuery */
+
 $(document).ready(function() {
     // onclick
 

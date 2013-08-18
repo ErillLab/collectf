@@ -355,7 +355,7 @@ $('input[type=submit]').on('click', function() {
 })
 
 $('.search_input').on('keyup', function() {
-    console.log($(this).val());
+    //console.log($(this).val());
     var x = $(this).attr('id').replace('_search','');
     $('.'+x+':visible').tree('search', $(this).val());
     if($(this).val()=='')
