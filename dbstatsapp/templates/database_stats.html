@@ -50,9 +50,9 @@ google.load("visualization", "1", {packages:["corechart"]});
 
 function drawChart1() {
     var data = google.visualization.arrayToDataTable([
-	['species', {% for tf in TFs %} '{{ tf }}', {% endfor %}],
+	['species', {% for tf in TFs %} '{{ tf }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
 	{% for sp in species %}
-	['{{ sp }}', {% for tf in TFs %} {{ num_curations_by_TF_species|get_item:tf|get_item:sp }}, {% endfor %}],
+	['{{ sp }}', {% for tf in TFs %} {{ num_curations_by_TF_species|get_item:tf|get_item:sp }}{% if not forloop.last %}, {% endif %}{% endfor %}]{% if not forloop.last %}, {% endif %}
 	{% endfor %}
     ]);
     var options = {
@@ -70,9 +70,9 @@ function drawChart1() {
 
 function drawChart2() {
     var data = google.visualization.arrayToDataTable([
-	['species', {% for tf in TFs %} '{{ tf }}', {% endfor %}],
+	['species', {% for tf in TFs %} '{{ tf }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
 	{% for sp in species %}
-	['{{ sp }}', {% for tf in TFs %} {{ num_sites_by_TF_species|get_item:tf|get_item:sp }}, {% endfor %}],
+	['{{ sp }}', {% for tf in TFs %} {{ num_sites_by_TF_species|get_item:tf|get_item:sp }}{% if not forloop.last %}, {% endif %}{% endfor %}]{% if not forloop.last %}, {% endif %}
 	{% endfor %}
     ]);
     var options = {
