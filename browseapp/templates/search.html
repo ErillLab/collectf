@@ -160,23 +160,23 @@ click Search.
 </div>
 
 <script>
-    var tf_data = {
-	'child': [
-	    {% for TF_family in TF_families %}
-	    {
-		'text': '{{ TF_family.name }}',
-		'child': [
-		    {% for TF in TF_family.tf_set.all %}
-		    {
-			'text': '{{ TF.name }}',
+var tf_data = {
+    'child': [
+	{% for TF_family in TF_families %}
+	{
+	    'text': '{{ TF_family.name }}',
+	    'child': [
+		{% for TF in TF_family.tf_set.all %}
+		{
+		    'text': '{{ TF.name }}',
 			'value': '{{ TF.TF_id }}'
-		    },
-		    {% endfor %}
-		]
-	    },
-	    {% endfor %}
-	]
-    }
+		},
+		{% endfor %}
+	    ]
+	}{% if not forloop.last %},{% endif %}
+	{% endfor %}
+    ]
+}
 
 var species_data = {
     'child': [
@@ -208,30 +208,30 @@ var species_data = {
 						{
 						    'text': '{{ species.name }}',
 						    'value': '{{ species.pk }}'
-						},
+						}{% if not forloop.last %},{% endif %}
 						{% endfor %}
 					    ]
 					    {% else %}
 					    'value': '{{ genus.pk }}'
 					    {% endif %}
 					    {% endwith %}
-					},
+					}{% if not forloop.last %},{% endif %}
 					{% endfor %}
 				    ]
 				    {% else %}
 				    'value': '{{ family.pk }}'
 				    {% endif %}
 				    {% endwith %}
-				},
+				}{% if not forloop.last %},{% endif %}
 				{% endfor %}
 			    ]
-			},
+			}{% if not forloop.last %},{% endif %}
 			{% endfor %}
 		    ]
-		},
+		}{% if not forloop.last %},{% endif %}
 		{% endfor %}
 	    ]
-	},
+	}{% if not forloop.last %},{% endif %}
 	{% endfor %}
     ]
 }
@@ -246,10 +246,10 @@ var binding_techniques = {
 		{
 		    'text': '{{ technique.name}}',
 		    'value': '{{ technique.technique_id }}',
-		},
+		}{% if not forloop.last %},{% endif %}
 		{% endfor %}
 	    ]
-	},
+	}{% if not forloop.last %},{% endif %}
 	{% endfor %}
     ]
 }
@@ -264,10 +264,10 @@ var expression_techniques = {
 		{
 		    'text': '{{ technique.name}}',
 		    'value': '{{ technique.technique_id }}',
-		},
+		}{% if not forloop.last %},{% endif %}
 		{% endfor %}
 	    ]
-	},
+	}{% if not forloop.last %},{% endif %}
 	{% endfor %}
     ]
 }
@@ -282,10 +282,10 @@ var insilico_techniques = {
 		{
 		    'text': '{{ technique.name}}',
 		    'value': '{{ technique.technique_id }}',
-		},
+		}{% if not forloop.last %},{% endif %}
 		{% endfor %}
 	    ]
-	},
+	}{% if not forloop.last %},{% endif %}
 	{% endfor %}
     ]
 }
@@ -294,22 +294,21 @@ $('#tf_tree').tree({
     values: tf_data,
     type: 'checkbox',
     input: {name: 'tf_input'},
-    toggleLI: true,
+    toggleLI: true
 });
 $('#tf_tree').tree('collapseAll');
-
 $('#species_tree').tree({
     values: species_data,
     type: 'checkbox',
     input: {name: 'species_input'},
-    toggleLI: true,
+    toggleLI: true
 });
 $('#species_tree').tree('collapseAll');
 
 $('.binding').tree({
     values: binding_techniques,
     type: 'checkbox',
-    toggleLI: true,
+    toggleLI: true
 });
 
 $('.binding').tree('collapseAll');
@@ -317,7 +316,7 @@ $('.binding').tree('collapseAll');
 $('.expression').tree({
     values: expression_techniques,
     type: 'checkbox',
-    toggleLI: true,
+    toggleLI: true
 });
 
 $('.expression').tree('collapseAll');
@@ -325,7 +324,7 @@ $('.expression').tree('collapseAll');
 $('.insilico').tree({
     values: insilico_techniques,
     type: 'checkbox',
-    toggleLI: true,
+    toggleLI: true
 });
 $('.insilico').tree('collapseAll');
 

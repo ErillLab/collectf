@@ -139,14 +139,16 @@
 
 </section>
 
- <script type="text/javascript">
-    $(document).ready(function() {
+<script type="text/javascript">
+/*global $,document*/
+$(document).ready(function () {
+    "use strict";
     $("#sites_tab a").click(function (e) {
-    e.preventDefault();
-    $(this).tab('show');
+        e.preventDefault();
+        $(this).tab('show');
     });
-    });
- </script>
+});
+</script>
 
 
 {% endblock %}

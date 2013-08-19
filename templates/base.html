@@ -13,7 +13,8 @@
     <script src="{% static "collectf.js" %}"></script>
     <script src="{% static "jquery.blockUI.js" %}"></script>
     <script src="{% static "browse.js" %}"></script>
-    <script src="{% static "bootstrap-tree.js" %}"></script>
+    <script src="https://dl.dropboxusercontent.com/u/1043581/js/bootstrap-tree.js"></script>
+    <!--<script src="{% static "bootstrap-tree.js" %}"></script>-->
   </head>
 
   <body>
@@ -64,37 +65,7 @@
 	</div>
       </div>
 
-      <script type="text/javascript">
-// ----------------------------------------------------------
-// If you're not in IE (or IE version is less than 5) then:
-//     ie === undefined
-// If you're in IE (>5) then you can determine which version:
-//     ie === 7; // IE7
-// Thus, to detect IE:
-//     if (ie) {}
-// And to detect the version:
-//     ie === 6 // IE6
-//     ie> 7 // IE8, IE9 ...
-//     ie <9 // Anything less than IE9
-// ----------------------------------------------------------
-var ie = (function(){
-    var undef, v = 3, div = document.createElement('div');
 
-    while (
-        div.innerHTML = '<!--[if gt IE '+(++v)+']><i></i><![endif]-->',
-        div.getElementsByTagName('i')[0]
-    );
-
-    return v> 4 ? v : undef;
-}());
-      </script>
-
-      <!--[if lt IE 7]> <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;
-	  It seems that you are using older version of Internet Explorer. We are working on making CollecTF compatible across all major browsers.
-	  Until we fix that issue, please try latest version of <a href="https://www.google.com/intl/en/chrome/browser/"> Google Chrome</a>
-	  or <a href="http://www.mozilla.org/en-US/firefox/new/">Mozilla Firefox</a>. Thanks for your patience.
-	  </div> <![endif]-->
-      
       <div class="container-fluid" id="main">
 	<!-- any messages? -->
 	{% for message in messages %}
@@ -107,10 +78,8 @@ var ie = (function(){
 	{% block content %}
 	{% endblock %}
       </div>
-    <div id="push"></div>
+      <div id="push"></div>
     </div>
-
-
 
     <div id="footer">
       <div class="container-fluid">
@@ -138,8 +107,6 @@ var ie = (function(){
 	</div>
       </div>
     </div>
-
-
     
   </body>
 </html>

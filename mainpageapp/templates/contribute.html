@@ -2,32 +2,27 @@
 
 {% block right_frame %}
 
-<p>CollecTF welcomes and encourages contributions</p>
+<h3>Contributing to CollecTF</h3>
+<p>CollecTF welcomes and encourages contributions.</p>
 
+<h4><a href="{% url collectfapp.views.pub_external_submission %}">Suggest an article for curation.</a></h4>
+
+<p>Know of a peer-reviewed publication describing experimentally-validated
+  bacterial TF-binding sites that is not yet on <a href="{% url browseapp.view_all.view_all_publications %}">our to-do list</a>,
+  Please let us know!
+</p>
+
+<h4><a href="{% url collectfapp.curationview.curation %}">Submit data</a></h4>
+<p>
+  Are you the author of a publication with experimental data on bacterial
+  TF-binding sites that is not already in <a href="{% url browseapp.view_all.view_all_publications %}">our database</a>? Please
+  take a moment to submit your data and maximize its visibility and accessibility
+  through NCBI RefSeq complete genome records.
+</p>
+  
 <ul>
-<li>
-  <p>Suggest an article for curation.</p>
-  <p>Know of a peer-reviewed publication describing experimentally-validated
-    bacterial TF-binding sites that is not yet on <a href="{% url browseapp.view_all.view_all_publications %}">our to-do list</a>,
-    Please let us know! <a href="{% url collectfapp.views.pub_external_submission %}">Submit a publication for curation.</a>
-  </p>
-</li>
-
-<li>
-  <p>
-    Submit data
-  </p>
-  <p>
-    Are you the author of a publication with experimental data on bacterial
-    TF-binding sites that is not already in <a href="{% url browseapp.view_all.view_all_publications %}">our database</a>? Please
-    take a moment to submit your data and maximize its visibility and accessibility
-    through NCBI RefSeq complete genome records.
-  </p>
-  <p>
-    For your convenience, you may:
-    <ul>
       <li>
-	<a href="{% url collectfapp.curationview.curation %}">Submit data</a> using our online submission system. Please check the
+	Submit data</a> using our online submission system. Please check the
 	accompanying <a href="https://dl.dropboxusercontent.com/u/3418484/CollecTF_submission_guide.pdf">submission guide</a> before submitting. You must be
 	<a href="{% url mainpageapp.views.register_request %}">registered as an external user</a> to submit.
       </li>
