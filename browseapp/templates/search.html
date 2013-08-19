@@ -4,11 +4,20 @@
 {% block content %}
 
 <div class="container">
-<p class="alert alert-info">Search in CollecTF is fully customizable. Just select a taxonomic
+<div class="alert alert-info">
+<p>Search in CollecTF is fully customizable. Just select a taxonomic
 unit (e.g. the Vibrio genus), a transcription factor family or instance (e.g. LexA)
 and the set of experimental techniques that reported sites should be backed by and
 click Search.
 </p>
+<hr />
+<p>
+<span class="muted">CollecTF generates search and browse reports on the fly to provide maximum up-to-date
+information. This includes real-time alignment and logo generation. Reports for large
+taxonomical families or multiple TFs make take some time. Please be patient!
+</span>
+</p>
+</div>
   <form id="search_form" method="POST" action="{% url browseapp.search.search %}">
     {% csrf_token %}
 
@@ -169,8 +178,8 @@ var tf_data = {
 		{% for TF in TF_family.tf_set.all %}
 		{
 		    'text': '{{ TF.name }}',
-			'value': '{{ TF.TF_id }}'
-		},
+                    'value': '{{ TF.TF_id }}'
+		}{% if not forloop.end %},{% endif %}
 		{% endfor %}
 	    ]
 	}{% if not forloop.last %},{% endif %}
@@ -245,7 +254,7 @@ var binding_techniques = {
 		{% for technique in binding_techniques|get_item:subcategory %}
 		{
 		    'text': '{{ technique.name}}',
-		    'value': '{{ technique.technique_id }}',
+		    'value': '{{ technique.technique_id }}'
 		}{% if not forloop.last %},{% endif %}
 		{% endfor %}
 	    ]
@@ -263,7 +272,7 @@ var expression_techniques = {
 		{% for technique in expression_techniques|get_item:subcategory %}
 		{
 		    'text': '{{ technique.name}}',
-		    'value': '{{ technique.technique_id }}',
+		    'value': '{{ technique.technique_id }}'
 		}{% if not forloop.last %},{% endif %}
 		{% endfor %}
 	    ]
@@ -281,7 +290,7 @@ var insilico_techniques = {
 		{% for technique in insilico_techniques|get_item:subcategory %}
 		{
 		    'text': '{{ technique.name}}',
-		    'value': '{{ technique.technique_id }}',
+		    'value': '{{ technique.technique_id }}'
 		}{% if not forloop.last %},{% endif %}
 		{% endfor %}
 	    ]

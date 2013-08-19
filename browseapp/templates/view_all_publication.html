@@ -15,8 +15,10 @@ anyone yet.
   <th>Title</th>
   <th>TF</th>
   <th>Species</th>
+  <!--
   <th>Promoter data?</th>
   <th>Expression data?</th>
+  -->
 </tr>
 
 </thead>
@@ -28,8 +30,10 @@ anyone yet.
   <td>{{ publication.title }}</td>
   <td>{{ publication.reported_TF }}</td>
   <td>{{ publication.reported_species }}</td>
+  <!--
   <td><i class="{% if publication.contains_promoter_data %} icon-ok {% else %} icon-remove {% endif %}"></td>
   <td><i class="{% if publication.contains_expression_data %} icon-ok {% else %} icon-remove {% endif %}"></td>
+  -->
 </tr>
 {% endfor %}
 </tbody>

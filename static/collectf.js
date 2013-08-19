@@ -9,14 +9,14 @@ $(document).ready(function () {
         selector: '[data-toggle="popover"]',
         trigger: 'hover',
         placement: 'right',
-        html: 'true',
+        html: 'true'
     });
 
     $('body').tooltip({
         selector: '[data-toggle="tooltip"]',
         trigger: 'hover',
         placement: 'top',
-        html: 'true',
+        html: 'true'
     });
 
     // for all textarea fields, provide a file upload option

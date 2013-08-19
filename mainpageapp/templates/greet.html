@@ -42,7 +42,7 @@ stored information.</p>
 </tbody>
 </table>
 
-<div class="pull-right">
+<div>
   <img src="" class="weblogo_img" id="ex_weblogo" site_data={% for site in random_rec.aligned_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}>
 </div>
 </div>
@@ -62,7 +62,6 @@ $(document).ready(function() {
 		csrfmiddlewaretoken:'{{csrf_token}}', 
 	    },
 	    success: function(data) {
-		//console.log(img);
 		img.attr('src', data);
                 img.parent().unblock();
 	    },
