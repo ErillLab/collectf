@@ -10,6 +10,8 @@ import collectfapp.views
 from baseapp import bioutils
 from baseapp import lasagna
 from django.core.mail import send_mail
+import datetime
+import logging
 
 def about(request):
     template_file = "about.html"
@@ -83,10 +85,16 @@ def acknowledgements(request):
     return render_to_response(template_file, {}, context_instance = RequestContext(request))
 
 
+def log_IP(request):
+    logger = logging.getLogger(__name__)
+    logger.info('\t'.join(map(str, [datetime.datetime.now(),
+                                    request.META['REMOTE_ADDR'],
+                                    request.META['REMOTE_HOST']])))
+               
 def greet(request):
     """Handler for main page right frame"""
+    log_IP(request)
     template_file = "greet.html"
-    print 'x'
     random_rec = get_random_motif()
     return render_to_response(template_file,
                               {

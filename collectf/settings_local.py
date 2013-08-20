@@ -1,5 +1,6 @@
 # Django settings for collectf project.
 import os
+import logging
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -164,7 +165,12 @@ LOGGING = {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
-        }
+        },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(os.path.dirname(os.path.dirname(__file__)), 'access.log'),
+            }
     },
     'loggers': {
         'django.request': {
@@ -172,6 +178,10 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
+        'mainpageapp.views': {
+            'level': 'INFO',
+            'handlers': ['file']
+        }
     }
 }
 

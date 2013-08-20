@@ -48,7 +48,7 @@ def generate_tbl_string(curation_site_instances, test_export):
             ncbi_sites.append(meta_site[0])
         ncbi_site = ncbi_sites[0]
         start, end = ncbi_site.site_instance.start+1, ncbi_site.site_instance.end+1
-        if ncbi_site.site_instance.strand == -1:
+        if ncbi_site.site_instance.strand == -1: 
             start, end = end, start
 
         tbl_str += ('%d\t%d\tprotein_bind' % (start,end) + '\n')
@@ -69,7 +69,7 @@ def generate_tbl_string(curation_site_instances, test_export):
         if evidence4regulation:
             tbl_str += ('\t\t\tnote\tEvidence of regulation for: %s\n' % (', '.join(evidence4regulation)))
         # write dbxref
-        tbl_str += ('\t\t\tdb_xref\t%s\n' % utils.id2dbxref(int(meta_site[0].pk)))
+        tbl_str += ('\t\t\tdb_xref\t%s\n' % dbxref_utils.id2dbxref(int(meta_site[0].pk)))
 
     return str(tbl_str)
 
@@ -91,10 +91,14 @@ def download_full_fasta(genome_accession):
     h = Entrez.efetch(db='nuccore', id=genome_accession, rettype='fasta', retmode='text')
     return h.read()
 
+def download_genome_asn(genome_accession):
+    h = Entrez.efetch(db='nuccore', id=genome_accession, rettype='null', retmode='text')
+    return h.read()
+
 def generate_readme_string():
     readme_str = ""
-    readme_str += "Gneome file (.fsa) and feature table (.tbl) must have the same filename prefix\n"
-    readme_str += "Run: ./tbl2asn -p. -t CollecTF_template.sbt -i <genome FASTA file> -V vbr\n"
+    readme_str += "Download the genome (in .asn format) using eutils tools."
+    readme_str += "Run: ./tbl2asn -p . -x .asn -R -Vbr"
     return readme_str
 
 @user_passes_test(lambda u: u.is_staff)
@@ -120,7 +124,7 @@ def export_tbl_view(request):
         curation__NCBI_submission_ready=True,
         is_motif_associated=True,
         is_obsolete=False,
-        curation__experimental_techniques__preset_function__in=['binding', 'expression']).order_by('site_instance__start')
+        curation__experimental_techniques__preset_function='binding').order_by('site_instance__start')
 
     if len(set(csi.curation.TF for csi in curation_site_instances)) > 1:
         msg = "Inconsistent TF-TF_instance links. This TF_instance is linked to more than one TF."
@@ -133,24 +137,25 @@ def export_tbl_view(request):
         return render(request, 'ncbi_export.html', {'form':form}, context_instance=RequestContext(request))
 
     collectf_tbl_str = generate_tbl_string(curation_site_instances, test_export)
-    orig_tbl_str = download_full_tbl(genome.genome_accession)
-    concat_tbl_str = orig_tbl_str + '\n' + collectf_tbl_str
-    fasta_str = download_full_fasta(genome.genome_accession)
-    src_str = generate_src_string(curation_site_instances)
-    #readme_str = generate_readme_string()
-    command_str = "./tbl2asn -p. -t CollecTF_template.sbt -i %s.fsa -V vbr\n" % str(genome.genome_accession.replace('.','_'))
+    #orig_tbl_str = download_full_tbl(genome.genome_accession)
+    #concat_tbl_str = orig_tbl_str + '\n' + collectf_tbl_str
+    #fasta_str = download_full_fasta(genome.genome_accession)
+    genome_asn_str = download_genome_asn(genome.genome_accession)
+    #src_str = generate_src_string(curation_site_instances)
+    readme_str = generate_readme_string()
 
     # create a zip file
     filename = genome.genome_accession.replace('.', '_')    
     in_memory = StringIO()
     zip = ZipFile(in_memory, 'a')
-    zip.writestr(filename+'_original'+'.tbl', orig_tbl_str)
-    zip.writestr(filename+'_collectf'+'.tbl', collectf_tbl_str)
-    zip.writestr(filename+'_concat'+'.tbl', concat_tbl_str)
-    zip.writestr(filename+'.fsa', fasta_str)
-    zip.writestr(filename+'.src', src_str)
+    #zip.writestr(filename+'_original'+'.tbl', orig_tbl_str)
+    zip.writestr(filename+'.tbl', collectf_tbl_str)
+    #zip.writestr(filename+'_concat'+'.tbl', concat_tbl_str)
+    #zip.writestr(filename+'.fsa', fasta_str)
+    zip.writestr(filename+'.asn', genome_asn_str)
+    #zip.writestr(filename+'.src', src_str)
     zip.writestr("CollecTF_template.sbt", COLLECTF_TEMPLATE_SBT)
-    zip.writestr("command.txt", command_str)
+    zip.writestr("command.txt", readme_str)
     zip.close()
     response = HttpResponse(content_type='application/zip')
     response['Content-Disposition'] = 'attachment;filename=tbl_export.zip'

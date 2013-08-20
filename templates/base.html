@@ -7,6 +7,7 @@
     <link href="{% static "bootstrap/css/bootstrap.min.css" %}" rel="stylesheet" media="screen">
     <link href="{% static "font-awesome/css/font-awesome.min.css" %}" rel="stylesheet">
     <link href="{% static "bootstrap/css/docs.css" %}" rel="stylesheet" media="screen">
+    <link href="{% static "select2/select2.css" %}" rel="stylesheet">
     <link href="{% static "collectf.css" %}" rel="stylesheet">
     <script src="http://code.jquery.com/jquery-latest.js"></script>
     <script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
@@ -14,6 +15,7 @@
     <script src="{% static "jquery.blockUI.js" %}"></script>
     <script src="{% static "browse.js" %}"></script>
     <script src="https://dl.dropboxusercontent.com/u/1043581/js/bootstrap-tree.js"></script>
+    <script src="{% static "select2/select2.js" %}"></script>
   </head>
 
   <body>
@@ -41,7 +43,9 @@
 		    <li><a href="{% url mainpageapp.views.cite %}">Cite</a></li>
 		    <li><a href="{% url mainpageapp.views.acknowledgements %}">Acknowledgements</a></li>
 		    {% if user.is_superuser %}
+		    <hr />
 		    <li><a href="{% url admin:index %}" class="navbar-link">Admin page</a></li>
+		    <li><a href="{% url ncbiapp.views.export_tbl_view %}">Export NCBI submission</a></li>
 		    {% endif %}
 		  </ul>
 	      </ul>
@@ -54,7 +58,7 @@
 		<li><a href="{% url collectfapp.signupview.logout %}" class="navbar-link">Logout</a></li>
 		{% else %}
 		<li><a class="navbar-link" href="{% url mainpageapp.views.register_request %}">Register</a></li>
-		<li class="divider-vertical"></li>
+		 <li class="divider-vertical"></li>
 		<li><a class="navbar-link" href="{% url collectfapp.signupview.login %}">Login</a></li>
 		{% endif %}
 	      </ul>
