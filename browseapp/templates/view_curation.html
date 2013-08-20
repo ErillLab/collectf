@@ -32,7 +32,7 @@
   <dd>{{ curation.TF_type|default:"not specified" }} </dd>
 
   <dt>Created by</dt>
-  <dd>{{ curation.curator }}</dd>
+  <dd>{{ curation.curator.user.first_name }} {{ curation.curator.user.last_name }}</dd>
   
   <dt>Curation notes</dt>
   <dd>{{ curation.notes|default:"-" }}</dd>

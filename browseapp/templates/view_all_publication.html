@@ -26,7 +26,7 @@ anyone yet.
 <tbody data-provides="rowlink">
 {% for publication in publications %}
 <tr class="{% if publication.curation_complete %} success {% else %} {% if publication.assigned_to %} warning {% else %} error {% endif %} {% endif %}">
-  <td>{{ publication.pmid }}</td>
+  <td><a href="http://www.ncbi.nlm.nih.gov/pubmed/?term={{ publication.pmid }}">{{ publication.pmid }}</a></td>
   <td>{{ publication.title }}</td>
   <td>{{ publication.reported_TF }}</td>
   <td>{{ publication.reported_species }}</td>
