@@ -144,7 +144,7 @@ def export_tbl_view(request):
     readme_str = generate_readme_string()
 
     # create a zip file
-    filename = genome.genome_accession.replace('.', '_')    
+    filename = genome.genome_accession.replace('.', '_') + '_' + TF_instance.protein_accession
     in_memory = StringIO()
     zip = ZipFile(in_memory, 'a')
     #zip.writestr(filename+'_original'+'.tbl', orig_tbl_str)
@@ -157,7 +157,7 @@ def export_tbl_view(request):
     zip.writestr("command.txt", readme_str)
     zip.close()
     response = HttpResponse(content_type='application/zip')
-    response['Content-Disposition'] = 'attachment;filename=tbl_export.zip'
+    response['Content-Disposition'] = 'attachment;filename=%s.zip' % filename
     in_memory.seek(0)
     response.write(in_memory.read())
     return response
