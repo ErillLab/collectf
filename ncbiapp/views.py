@@ -97,7 +97,6 @@ def download_genome_asn(genome_accession):
 
 def generate_readme_string():
     readme_str = ""
-    readme_str += "Download the genome (in .asn format) using eutils tools."
     readme_str += "Run: ./tbl2asn -p . -x .asn -R -Vbr"
     return readme_str
 
