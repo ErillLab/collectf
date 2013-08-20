@@ -88,8 +88,7 @@ def acknowledgements(request):
 def log_IP(request):
     logger = logging.getLogger(__name__)
     logger.info('\t'.join(map(str, [datetime.datetime.now(),
-                                    request.META['REMOTE_ADDR'],
-                                    request.META['REMOTE_HOST']])))
+                                    request.META['REMOTE_ADDR']))))
                
 def greet(request):
     """Handler for main page right frame"""

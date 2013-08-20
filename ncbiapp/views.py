@@ -97,7 +97,7 @@ def download_genome_asn(genome_accession):
 
 def generate_readme_string():
     readme_str = ""
-    readme_str += "Run: ./tbl2asn -p . -x .asn -R -Vbr"
+    readme_str += "Run: ./tbl2asn -p . -x .asn -R -Vvbr" + '\n'
     return readme_str
 
 @user_passes_test(lambda u: u.is_staff)
