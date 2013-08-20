@@ -4,7 +4,7 @@
 from browse_base import *
 
 
-@login_required
+
 def view_all_curations(request):
     """Handler function to see all curations at once.
     This function renders the page with the list of

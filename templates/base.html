@@ -14,16 +14,10 @@
     <script src="{% static "jquery.blockUI.js" %}"></script>
     <script src="{% static "browse.js" %}"></script>
     <script src="https://dl.dropboxusercontent.com/u/1043581/js/bootstrap-tree.js"></script>
-    <!--<script src="{% static "bootstrap-tree.js" %}"></script>-->
   </head>
 
   <body>
-    <!--[if lte IE 7]>
-        <div class="alert alert-error">
-          It seems that your browser is Internet Explorer 7 or lower. To browse CollecTF without any problem,
-          please upgrade to a newer version or other web browser.
-        </div>
-    <![endif]-->
+   
     <div id="wrap">
       <!-- header -->
       <div class="navbar navbar-fixed-top">
@@ -72,6 +66,16 @@
 
 
       <div class="container-fluid" id="main">
+         <!--[if lte IE 7]>
+        <div class="alert alert-error">
+          It seems that your are running an old version of Internet Explorer (version
+          7 or lower), or running it in Compatibility mode. To access the full
+          functionality of CollecTF with Internet Explorer, please disable the
+          compatibility mode or upgrade to a more recent version of Internet
+          Explorer.
+        </div>
+        <![endif]-->
+
 	<!-- any messages? -->
 	{% for message in messages %}
 	<div class="alert alert-block alert-{{message.tags}}">
@@ -90,11 +94,13 @@
       <div class="container-fluid">
 	<div class="row-fluid">
 	  <div class="span9">
-	    <p>Please send comments to collectfdb@umbc.edu. For help, visit
-	      <a href="http://erilllab.biosci.umbc.edu/wiki/index.php5/CollecTF">
-		CollecTF wiki</a>.
+	    <p>Please send comments to <a href="mailto:collectfdb@umbc.edu">collectfdb@umbc.edu</a>.
 	    </p>
 	    <hr />
+          </div>
+        </div>
+        <div class="row-fluid">
+          <div class="span9">
 	    <p class="muted">
 	      <small>
 		This material is based upon work supported by the National Science Foundation under Grant Number MCB-1158056.
@@ -103,7 +109,7 @@
 		Science Foundation.</small></p>
 	  </div>
 
-	  <div class="span3">
+	  <div class="span2">
 	    <p class="text-right">
 	      {% load static from staticfiles %}
 	      <a href="http://compbio.umbc.edu"><img src="{% static "lablogo.png" %}"></a>

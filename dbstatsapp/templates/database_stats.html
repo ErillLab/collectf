@@ -3,10 +3,21 @@
 {% block content %}
 {% load utils %}
 
+<!--[if lt IE 9]>
+<div class="alert alert-error">
+  We are sorry. Currently, CollecTF database visual statistics are not available for
+  Internet Explorer versions below version 9.  To access the full functionality of
+  CollecTF statistics with Internet Explorer, please upgrade to a more recent version
+  of Internet Explorer.
+</div>
+<script>var dont_run_js=true;</script>
+<![endif]-->
+
 <ul class="nav nav-pills">
   <li class=""><a href="#global" class="nav-li" id="global">Global statistics</a></li>
   <li><a href="#curations" class="nav-li" id="curations">Curation statistics</a></li>
   <li><a href="#site" class="nav-li" id="site">Site statistics</a></li>
+  <li><a href="{% url mainpageapp.views.stats %}">Other statistics</a></li>
 </ul>
 
 <div class="span5 content global" style="display:none;">
@@ -45,8 +56,6 @@
 <script type="text/javascript">
 
 google.load("visualization", "1", {packages:["corechart"]});
-//google.setOnLoadCallback(drawChart1);
-//google.setOnLoadCallback(drawChart2);
 
 function drawChart1() {
     var data = google.visualization.arrayToDataTable([
@@ -61,7 +70,7 @@ function drawChart1() {
 	hAxis: {title: 'Number of curations'},
         chartArea: {height:"90%"},
         height: 1500,
-	isStacked: true,
+	isStacked: true
     };
     var chart = new google.visualization.BarChart(document.getElementById('num_curations_div'));
     chart.draw(data, options);
@@ -99,14 +108,15 @@ function drawChart2() {
     });
 
 $(document).ready(function() {
+    if (typeof dont_run_js === 'undefined') {
     drawChart1();
     drawChart2();
-
     var a = $('a[href="' + window.location.hash + '"]');
     $('.content').hide();
     $('.'+a.attr('id')).show();
     a.parent().addClass('active');
-    $('html, body').animate({scrollTop: '0px'}, 0);
+    $('html, body').animate({scrollTop: '0px'}, 300);
+    }
 });
 
 </script>
