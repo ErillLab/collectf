@@ -4,9 +4,11 @@
 
 <div class="container">
   
-  <a href="{% url browseapp.search.search %}" class="btn btn-primary"><i class="icon-double-angle-left"></i> Try a new search!</a>
+  <p><a href="{% url browseapp.search.search %}" class="btn btn-primary"><i class="icon-double-angle-left"></i> Try a new search!</a></p>
 
   {% if reports %}
+  
+  <p><a class="block_before_load" href="#" onclick="$('#view_all').submit(); return false;">Combined report</a></p>
 
   <div id="report_table" class="boxed">
     <table class="table table-condensed table-striped">
@@ -14,7 +16,7 @@
         <th>TF</th>
         <th>Species</th>
         <th>Report
-	  <a class="block_before_load" href="#" onclick="$('#view_all').submit(); return false;"><small>View all</small></a>
+
 	  <form style="display:inline;" method="post" action="{% url browseapp.view_results.view_results %}" id="view_all" action="">
 	    {% csrf_token %}
 	    <input type="hidden" name="motif_csi_list" value="{% for csi_pk in view_all_csis %}{{ csi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}">
