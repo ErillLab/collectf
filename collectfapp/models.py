@@ -61,6 +61,19 @@ class Curation(models.Model):
                                           self.publication.authors,
                                           self.publication.publication_date)
 
+    def _get_display(self, key, list):
+        d = dict(list)
+        if key in d: return d[key]
+        return None
+    
+    def TF_function_verbose(self):
+        return self._get_display(self.TF_function, self.TF_FUNCTION)
+
+    def TF_type_verbose(self):
+        return self._get_display(self.TF_type, self.TF_TYPE)
+        
+    
+
 class Curator(models.Model):
     curator_id = models.AutoField(primary_key=True)
     user = models.OneToOneField(User) # extend Django's user model

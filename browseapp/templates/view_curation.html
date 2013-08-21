@@ -25,11 +25,11 @@
   <dt>Reported site sp.</dt>
   <dd>{% with site=curation.site_instances.all|first %}{{ site.genome.organism|default:"-" }}{% endwith %}</dd>
 
-  <dt>TF structure</dt>
-  <dd>{{ curation.TF_structure|default:"not specified" }}</dd>
+  <dt>TF function</dt>
+  <dd>{{ curation.TF_function_verbose|default:"not specified" }}</dd>
   
   <dt>TF type</dt>
-  <dd>{{ curation.TF_type|default:"not specified" }} </dd>
+  <dd>{{ curation.TF_type_verbose|default:"not specified" }} </dd>
 
   <dt>Created by</dt>
   <dd>{{ curation.curator.user.first_name }} {{ curation.curator.user.last_name }}</dd>
