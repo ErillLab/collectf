@@ -7,6 +7,7 @@ def export_sites(request):
     if 'fasta' in request.POST: export_format = 'fasta'
     elif 'tsv'in request.POST: export_format = 'tsv'
     elif 'tsv-raw' in request.POST: export_format='tsv_raw'
+    elif 'arff' in request.POST: export_format='arff'
     assert export_format
 
     # given the list of curation-site-instance objects,
@@ -24,8 +25,10 @@ def export_sites(request):
     elif export_format=="tsv_raw":
         response['Content-Disposition'] = 'attachment;filename=collectf_export.tsv'
         response.write(export_tsv_raw(meta_sites))
+    elif export_format=='arff':
+        response['Content-Disposition'] = 'attachment;filename=collectf_export.arff'
+        response.write(export_arff(meta_sites))
     return response
-
 
 
 def export_base(meta_sites):
@@ -125,6 +128,30 @@ def export_tsv_raw(meta_sites):
     return '\n'.join(tsv_lines)
                                     
 
+def export_arff(meta_sites):
+    arff_lines = []
+    # comments
+    arff_lines.append('@RELATION "CollecTF export"')
+    arff_lines.append('@ATTRIBUTE TF_name STRING')
+    arff_lines.append('@ATTRIBUTE Protein_accession STRING')
+    arff_lines.append('@ATTRIBUTE Genome_accession STRING')
+    arff_lines.append('@ATTRIBUTE Genome_organism STRING')
+    arff_lines.append('@ATTRIBUTE TF_binding_site_start NUMERIC')
+    arff_lines.append('@ATTRIBUTE TF_binding_site_end NUMERIC')
+    arff_lines.append('@ATTRIBUTE TF_binding_site_strand NUMERIC')
+    arff_lines.append('@ATTRIBUTE TF_binding_site_sequence STRING')
 
-
+    arff_lines.append('@DATA')
+    
+    rows = export_base(meta_sites)
+    for i,row in enumerate(rows):
+        arff_lines.append(','.join([row['curation__TF__name'],
+                                    row['curation__TF_instance__protein_accession'],
+                                    row['site_instance__genome__genome_accession'],
+                                    '"' + row['site_instance__genome__organism'] + '"',
+                                    str(row['start_pos']),
+                                    str(row['end_pos']),
+                                    str(row['strand']),
+                                    row['seq']]))
+    return '\n'.join(arff_lines)
 
