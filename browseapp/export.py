@@ -73,6 +73,7 @@ tsv_header = tsv_sep.join(['TF',
                            'site_strand',
                            'sequence',
                            'experimental_evidence',
+                           'regulated genes (locus_tags)'
                            ])
 
 def export_tsv(meta_sites):
@@ -84,6 +85,8 @@ def export_tsv(meta_sites):
         csis = meta_sites[i]
         experimental_evidence = [csi.curation.experimental_techniques.all() for csi in csis.all()]
         pmids = [csi.curation.publication.pmid for csi in csis.all()]
+        regulated_genes = models.Regulation.objects.filter(evidence_type="exp_verified")\
+                          .filter(curation_site_instance__in=csis)
         line = tsv_sep.join(map(str, [row['curation__TF__name'],
                                  row['curation__TF_instance__protein_accession'],
                                  row['site_instance__genome__genome_accession'],
@@ -93,6 +96,7 @@ def export_tsv(meta_sites):
                                  row['strand'],
                                  row['seq'],
                                  ' | '.join((','.join(t.name for t in evidence) + '[PMID:%s]' % pmid) for evidence,pmid in zip(experimental_evidence, pmids)),
+                                 ','.join(reg.gene.locus_tag for reg in regulated_genes),
                                  ]))
         tsv_lines.append(line)
     return '\n'.join(tsv_lines)
@@ -114,6 +118,8 @@ def export_tsv_raw(meta_sites):
                                           csi.site_instance.strand,
                                           csi.site_instance.seq,
                                           ','.join(t.name for t in csi.curation.experimental_techniques.all()) + '[PMID:%s]' % csi.curation.publication.pmid,
+                                          ','.join(r.gene.locus_tag for r in models.Regulation.objects.filter(evidence_type="exp_verified")\
+                                                                                                      .filter(curation_site_instance=csi)),
                                           ]))
             tsv_lines.append(line)
     return '\n'.join(tsv_lines)
