@@ -34,6 +34,7 @@ from django.utils.safestring import mark_safe
 from baseapp.templatetags import gene_diagram
 from baseapp.templatetags import publication_tags
 from baseapp.templatetags import pretty_print
+import browseapp.view_curation
 
 # curation get form functions
 # get_form constructs the form for a given step
@@ -531,8 +532,6 @@ def site_report_process(wiz, form):
     print 'process_func', call_func_str
     eval(call_func_str)
 
-
-
     # store booleans
     sutils.sput(wiz.request.session, 'is_motif_associated', is_motif_associated)
     sutils.sput(wiz.request.session, 'is_chip_data', is_chip_data)
@@ -918,6 +917,8 @@ class CurationWizard(SessionWizardView):
 
 
         curation.save()
+        
+        
 
         is_chip_data = sutils.sget(self.request.session, 'is_chip_data')
         has_quantitative_data = sutils.sget(self.request.session, 'has_quantitative_data')
@@ -978,10 +979,7 @@ class CurationWizard(SessionWizardView):
         sutils.clear(self.request.session)
         
         messages.success(self.request, "Curation was successfully submitted.")
-        return HttpResponseRedirect(reverse(views.home))
-
-
-
+        return HttpResponseRedirect(reverse(browseapp.view_curation.view_curation, kwargs={'cid':curation.curation_id}))
 
 # curation handler
 
