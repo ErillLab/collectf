@@ -1,31 +1,14 @@
 /*global $, jQuery, document, FileReader*/
 "use strict";
 
-$(document).ready(function () {
-    // onclick
-
-    // twitter bootstrap popover
-    $('body').popover({
-        selector: '[data-toggle="popover"]',
-        trigger: 'hover',
-        placement: 'right',
-        html: 'true'
-    });
-
-    $('body').tooltip({
-        selector: '[data-toggle="tooltip"]',
-        trigger: 'hover',
-        placement: 'top',
-        html: 'true'
-    });
-
-    // for all textarea fields, provide a file upload option
+function textAreaUpload() {
+    // for site textarea fields, put an "upload file" button
     $('#id_3-sites, #id_3-chip_data_extra_field').each(function () {
         $('<input type="file">').insertAfter($(this))
             .change(function () {
                 var textarea = $(this).prev(),
-                    file = $(this).get(0).files[0],
-                    reader = new FileReader();
+                file = $(this).get(0).files[0],
+                reader = new FileReader();
                 reader.readAsText(file);
                 reader.onload = function () {
                     textarea.val(reader.result);
@@ -35,8 +18,9 @@ $(document).ready(function () {
                 };
             });
     });
+}
 
-    // FORM STEP 1
+function formStep1() {
     if ($("#id_1-TF_species_same").length > 0) {
         $("#id_1-TF_species_same").click(function () {
             $("#id_1-TF_species")[0].disabled = this.checked;
@@ -51,7 +35,7 @@ $(document).ready(function () {
     $('#id_1-genome_accession').attr('autocomplete', 'off');
     $('#id_1-genome_accession').typeahead({
         'source': function (query, process) {
-            $.getJSON('/get_genomes', function (data) {
+            $.getJSON('/collectf/get_genomes', function (data) {
                 var arr = $.map(data, function (n, i) {
                     return n['genome_accession'] + ' - ' + n['organism'];
                 });
@@ -67,7 +51,7 @@ $(document).ready(function () {
     $('#id_1-TF_accession').attr('autocomplete', 'off');
     $('#id_1-TF_accession').typeahead({
         'source': function (query, process) {
-            $.getJSON('/get_TF_instances', function (data) {
+            $.getJSON('/collectf/get_TF_instances', function (data) {
                 var arr = $.map(data, function (n, i) {
                     return n['protein_accession'] + ' - ' + n['description'];
                 });
@@ -79,11 +63,9 @@ $(document).ready(function () {
         },
         'items': 20,
     });
+}
 
-
-    // FORM STEP 3
-    // scroll page down a little bit
-
+function formStep3() {
     var defaultSpeed = 200;
 
     // JS for reported sites step of curation form.
@@ -152,9 +134,9 @@ $(document).ready(function () {
             $('#id_3-chip_data_extra_field').parent().parent().hide(defaultSpeed);
         }
     });
+}
 
-    // FORM STEP 4-5-7
-
+function putBoxes() {
     $('div')
         .filter(function () {
             return this.id.match('div_id_4-');
@@ -172,6 +154,39 @@ $(document).ready(function () {
             return this.id.match('div_id_7-');
         })
         .find('.controls').addClass('boxed');
+}
+
+$(document).ready(function () {
+    // onclick
+
+    // twitter bootstrap popover
+    $('body').popover({
+        selector: '[data-toggle="popover"]',
+        trigger: 'hover',
+        placement: 'right',
+        html: 'true'
+    });
+
+    $('body').tooltip({
+        selector: '[data-toggle="tooltip"]',
+        trigger: 'hover',
+        placement: 'top',
+        html: 'true'
+    });
+
+    // for all textarea fields, provide a file upload option
+    textAreaUpload();
+
+    // FORM STEP 1
+    formStep1();
+
+    // FORM STEP 3
+    formStep3();
+
+    // FORM STEP 4-5-7
+
+    putBoxes();
+
 
 
 });
