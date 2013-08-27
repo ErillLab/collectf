@@ -362,32 +362,45 @@ def site_report_process(wiz, form):
         # make sure quantitative values exist.
         assert form.cleaned_data['has_quantitative_data'], "has_quantitative_data error"
         # First, check whether <sites> field in sequence or coordinate format.
+        with_quantitative = False # if site field contain quantitative values (instead of extra-chip field)
+        site_lines = re.split('[\r\n]+', form.cleaned_data['sites'])
         if form.cleaned_data['is_coordinate']:
-            process_helper_coordinates(with_quantitative=False)
+            if len(site_lines[0].split()) == 3:
+                with_quantitative = True
+            process_helper_coordinates(with_quantitative=with_quantitative)
+            
         else:
-            process_helper_sites_only()
-
-        # process chip-extra-field
-        coords = form.cleaned_data['chip_data_extra_field'].strip()
-        coords = [re.split('[\t ]+', line) for line in re.split('[\r\n]+', coords)]
-        # this is just to get sequences for coordinates in Chip_data_extra_field
-        chip_peaks,_,quantitative_vals = sitesearch.match_all_exact_coordinates_only(genome, genes, coords)
-        
-        assert not sutils.sget(wiz.request.session, 'site_quantitative_data')
-        # Now, associate quantitative_data (peak_intensity values) with site instances
-        sites = sutils.sget(wiz.request.session, 'sites')
-        site_quantitative_data = {}
-        for site_id, site in sites.items():
-            # search that site in ChIP extra field
-            for peak_id, peak_seq in chip_peaks.items():
-                if site in peak_seq or sitesearch.reverse_complement(site) in peak_seq:
-                    site_quantitative_data[site_id] = quantitative_vals[peak_id]
-                    break
+            if len(site_lines[0].split()) == 2:
+                with_quantitative = True
+            if with_quantitative:
+                process_helper_sites_with_quantitative_data()
             else:
-                site_quantitative_data[site_id] = None
-                
-        assert len(site_quantitative_data) == len(sites)
-        sutils.sput(wiz.request.session, 'site_quantitative_data', site_quantitative_data)
+                process_helper_sites_only()
+
+        # if quantitative values in chip_extra_field, process it here
+        if not with_quantitative:
+            # process chip-extra-field
+            coords = form.cleaned_data['chip_data_extra_field'].strip()
+            coords = [re.split('[\t ]+', line) for line in re.split('[\r\n]+', coords)]
+            # this is just to get sequences for coordinates in Chip_data_extra_field
+            chip_peaks,_,quantitative_vals = sitesearch.match_all_exact_coordinates_only(genome, genes, coords)
+
+            assert not sutils.sget(wiz.request.session, 'site_quantitative_data')
+            # Now, associate quantitative_data (peak_intensity values) with site instances
+            sites = sutils.sget(wiz.request.session, 'sites')
+            site_quantitative_data = {}
+            for site_id, site in sites.items():
+                # search that site in ChIP extra field
+                for peak_id, peak_seq in chip_peaks.items():
+                    if site in peak_seq or sitesearch.reverse_complement(site) in peak_seq:
+                        site_quantitative_data[site_id] = quantitative_vals[peak_id]
+                        break
+                else:
+                    site_quantitative_data[site_id] = None
+
+            assert len(site_quantitative_data) == len(sites)
+            sutils.sput(wiz.request.session, 'site_quantitative_data', site_quantitative_data)
+
         sutils.sput(wiz.request.session, 'soft_site_matches', {})
         sutils.sput(wiz.request.session, 'not_matched_sites', [])
         sutils.sput(wiz.request.session, 'soft_site_match_choices', {})

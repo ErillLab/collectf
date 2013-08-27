@@ -481,10 +481,20 @@ class SiteReportForm(forms.Form):
         # is_chip_data
         # has_quantitative_data
         # NOT is_coordinate
-        self.verify_only_sites(cleaned_data)
-        # extra check on ChIP extra field.
-        # Always coordinates and quantitative data are expected here.
-        self.verify_chip_data_extra_field(cleaned_data)
+
+         # There are two options:
+        
+        # 1) Site field contains only sites and chip extra field contains coordinates
+        # and quantitative data associated with each site.
+        # 2) Site field contains both sites and quantitative data
+        sites = re.split('[\r\n]+', cleaned_data['sites'].strip())
+        if sites and len(sites[0].strip().split()) == 1: # site field contains only sequences
+            self.verify_only_sites(cleaned_data)
+            # extra check on ChIP extra field.
+            # Always coordinates and quantitative data are expected here.
+            self.verify_chip_data_extra_field(cleaned_data)
+        else: # which means that site field has both sequences and quantitative values
+            self.verify_only_sites_and_values(cleaned_data)
         return cleaned_data
 
     def clean_helper_15(self, cleaned_data):
@@ -492,10 +502,19 @@ class SiteReportForm(forms.Form):
         # is_chip_data
         # has_quantitative_data
         # is_coordinate
-        self.verify_only_coordinates(cleaned_data)
-        # extra check on ChIP extra field.
-        # Always coordinates and quantitative data are expected here.
-        self.verify_chip_data_extra_field(cleaned_data)
+
+        # There are two options:
+
+        # 1) Site field contains both sites (coordinates) and quantitative data.
+        # 2) Site field contains coordinates only and quantitative data is in extra-chip field
+        sites = re.split('[\r\n]+', cleaned_data['sites'].strip())
+        if sites and len(sites[0].strip().split()) == 2: # site field contains only coordinates
+            self.verify_only_coordinates(cleaned_data)
+            # extra check on ChIP extra field.
+            # Always coordinates and quantitative data are expected here.
+            self.verify_chip_data_extra_field(cleaned_data)
+        else:
+            self.verify_only_coordinates_and_values(cleaned_data)
         return cleaned_data
 
     def clean(self):
