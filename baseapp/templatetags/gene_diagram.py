@@ -22,7 +22,7 @@ def site_match_diagram(site_match):
         gds_features.add_feature(feature,
                                  name=gene.name,
                                  label=True,
-                                 label_size=14,
+                                 label_size=10,
                                  label_angle= 0 if gene.strand==1 else 180,
                                  label_position='middle',
                                  sigil='ARROW',
@@ -34,13 +34,13 @@ def site_match_diagram(site_match):
     gds_features.add_feature(feature,
                              color=colors.red,
                              name='site',
-                             label=True,
+                             label=False,
                              label_size=12)
     gdd.draw(format='linear',
              fragments=1,
              start=min(map(lambda g: g.start, site_match.nearby_genes))-50,
              end=max(map(lambda g: g.end, site_match.nearby_genes))+50,
-             pagesize=(2*cm, 20*cm))
+             pagesize=(3*cm, 20*cm))
     return mark_safe(gdd.write_to_string('svg'))
                          
 @register.filter
@@ -55,7 +55,7 @@ def regulation_diagram(regulations, site_instance):
         gds_features.add_feature(feature,
                                  name=reg.gene.name,
                                  label=True,
-                                 label_size=12,
+                                 label_size=10,
                                  label_angle=0 if reg.gene.strand==1 else 180,
                                  label_position='middle',
                                  sigil="ARROW",

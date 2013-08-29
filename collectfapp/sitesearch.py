@@ -101,6 +101,32 @@ def dist(a, b):
     return max(a.start, b.start) - min(a.end, b.end)
 
 def locate_nearby_genes(genes, site_loc, dist_th=150):
+    # make sure all genes are sorted by start position
+    assert all(ga.start <= gb.start for ga,gb in zip(genes, genes[1:]))
+    # For operon prediction, move left/right until two adjacent genes are not close enough.
+    nearby_genes = []
+    left_genes = filter(lambda g: g.start <= site_loc.start, genes)
+    ngi, nearest_gene = min(enumerate(left_genes), key=lambda x: dist(x[1], site_loc))
+    nearby_genes.append(nearest_gene)
+    lhs_index = ngi
+    while (lhs_index>0 and
+           genes[lhs_index-1].strand == -1 and
+           dist(genes[lhs_index], genes[lhs_index-1]) < dist_th):
+        nearby_genes.append(genes[lhs_index-1])
+        lhs_index -= 1
+    # do the same thing for right hand side
+    right_genes = filter(lambda g: g.start > site_loc.start, genes)
+    ngi, nearest_gene = min(enumerate(right_genes), key=lambda x: dist(x[1], site_loc))
+    nearby_genes.append(nearest_gene)
+    rhs_index = ngi
+    while (rhs_index < len(genes)-1 and
+           genes[rhs_index+1].strand == 1 and
+           dist(genes[rhs_index], genes[rhs_index+1]) < dist_th):
+        nearby_genes.append(genes[rhs_index+1])
+        rhs_index += 1
+    return nearby_genes
+
+def locate_nearby_genes_depr(genes, site_loc, dist_th=150):
     """Given the list of models.Gene objects, locate genes close to the
     site_loc. Return list of nearby genes."""
     # make sure all genes are sorted by start position
@@ -127,6 +153,7 @@ def locate_nearby_genes(genes, site_loc, dist_th=150):
     while lhs_index>0 and dist(genes[lhs_index-1], genes[lhs_index]) < dist_th:
         nearby_genes.append(genes[lhs_index-1])
         lhs_index -= 1
+        
     # to the right
     if rhs_index < len(genes):
         nearby_genes.append(genes[rhs_index])
