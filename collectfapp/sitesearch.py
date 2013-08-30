@@ -103,27 +103,37 @@ def dist(a, b):
 def locate_nearby_genes(genes, site_loc, dist_th=150):
     # make sure all genes are sorted by start position
     assert all(ga.start <= gb.start for ga,gb in zip(genes, genes[1:]))
-    # For operon prediction, move left/right until two adjacent genes are not close enough.
-    nearby_genes = []
-    left_genes = filter(lambda g: g.start <= site_loc.start, genes)
-    ngi, nearest_gene = min(enumerate(left_genes), key=lambda x: dist(x[1], site_loc))
-    nearby_genes.append(nearest_gene)
-    lhs_index = ngi
-    while (lhs_index>0 and
-           genes[lhs_index-1].strand == -1 and
-           dist(genes[lhs_index], genes[lhs_index-1]) < dist_th):
-        nearby_genes.append(genes[lhs_index-1])
-        lhs_index -= 1
-    # do the same thing for right hand side
-    right_genes = filter(lambda g: g.start > site_loc.start, genes)
-    ngi, nearest_gene = min(enumerate(right_genes), key=lambda x: dist(x[1], site_loc))
-    nearby_genes.append(nearest_gene)
-    rhs_index = ngi
-    while (rhs_index < len(genes)-1 and
-           genes[rhs_index+1].strand == 1 and
-           dist(genes[rhs_index], genes[rhs_index+1]) < dist_th):
-        nearby_genes.append(genes[rhs_index+1])
-        rhs_index += 1
+    left_genes = filter(lambda g: g.end < site_loc.start, genes)
+    right_genes = filter(lambda g: g.start > site_loc.end, genes)
+
+    # genes overlap with site
+    nearby_genes = genes[len(left_genes):len(genes)-len(right_genes)]
+    #nearby_genes = [g for g in genes.all() if g not in left_genes and g not in right_genes]
+    # left
+    if left_genes:
+        ngi, nearby_gene = min(enumerate(left_genes), key=lambda x: dist(x[1], site_loc))
+        if nearby_gene.strand == -1:
+            nearby_genes.append(nearby_gene)
+            while (ngi > 0 and
+                   left_genes[ngi-1].strand==-1 and
+                   dist(left_genes[ngi-1], left_genes[ngi]) < dist_th):
+                nearby_genes.append(left_genes[ngi-1])
+                ngi -= 1
+    # right
+    if right_genes:
+        ngi, nearby_gene = min(enumerate(right_genes), key=lambda x: dist(x[1], site_loc))
+        if nearby_gene.strand == 1:
+            nearby_genes.append(nearby_gene)
+            while (ngi < len(right_genes)-1 and
+                   right_genes[ngi+1].strand == 1 and
+                   dist(right_genes[ngi], right_genes[ngi+1]) < dist_th):
+                nearby_genes.append(right_genes[ngi+1])
+                ngi += 1
+
+    if not nearby_genes:
+        # if there is no site nearby, just add the nearest one
+        nearby_genes.append(min(genes, key=lambda x: dist(x, site_loc)))
+
     return nearby_genes
 
 def locate_nearby_genes_depr(genes, site_loc, dist_th=150):
@@ -135,7 +145,7 @@ def locate_nearby_genes_depr(genes, site_loc, dist_th=150):
     nearby_genes = []
     # Instead of checking every gene, perform binary search to find nearby ones.
     low, high = 0, len(genes)
-    intersect = False  # one of genes and site_loc intersects?
+    intersect = False  # one of genes and site_loc intersect?s
     while low < high and not intersect:
         mid = (low + high) // 2
         if site_loc.start > genes[mid].end:
