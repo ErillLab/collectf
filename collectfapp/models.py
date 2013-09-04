@@ -9,6 +9,7 @@ class Curation(models.Model):
     REVISION_REASONS = (("genome_not_available", "No comparable genome in NCBI"),
                         ("in_progress", "Matching genome still in progress"),
                         ("TF_not_available", "No comparable TF protein sequence in NCBI"),
+                        ("external_submission", "External submission"),
                         ("other", "other reason (specify in notes)"),)    #other reasons
     
     TF_FUNCTION = (("ACT", "activator"),
@@ -77,6 +78,7 @@ class Curation(models.Model):
 class Curator(models.Model):
     curator_id = models.AutoField(primary_key=True)
     user = models.OneToOneField(User) # extend Django's user model
+    is_staff = models.BooleanField(default=False, blank=True)
 
     def __unicode__(self):
         return u'%s' % self.user

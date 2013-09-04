@@ -1,5 +1,4 @@
 """
-
 Handler class for curation process.
 
 From Django docs:
@@ -30,7 +29,6 @@ import sitesearch
 import views
 
 from django.utils.safestring import mark_safe
-
 from baseapp.templatetags import gene_diagram
 from baseapp.templatetags import publication_tags
 from baseapp.templatetags import pretty_print
@@ -54,7 +52,6 @@ def publication_get_form(wiz, form):
     
 def genome_get_form(wiz, form):
     """Genome, TF, TF_family, tf instance, .. selection form"""
-
     c = sutils.sget(wiz.request.session, "previously_curated_paper")
     # If selected publication is the one most recently curated, the related curation
     # should be in object c. Otherwise, c = None.  If so, populate "Genome and TF
@@ -246,6 +243,14 @@ def site_regulation_get_form(wiz, form):
 
 def curation_review_get_form(wiz, form):
     """Get curation review form"""
+    curator = models.Curator.objects.get(user=wiz.request.user)
+    # if user is external, hide some fields
+    if not curator.is_staff:
+        form.fields['revision_reasons'].initial = 'external_submission'
+        form.fields['revision_reasons'].widget = forms.HiddenInput()
+        form.fields['NCBI_submission_ready'].initial = False
+        form.fields['NCBI_submission_ready'].widget = forms.HiddenInput()
+        
     return form
 
 # curation process step functions
