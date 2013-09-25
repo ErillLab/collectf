@@ -89,7 +89,7 @@ def get_sites_by_TF_and_species(curation_site_instances, non_motif_curation_site
     
     return {
         'meta_sites': meta_sites,
-        'meta_site_genome_accession_dict': {}, #dict((k, meta_sites[k][0].site_instance.genome.genome_accession) for k in meta_sites),
+        'meta_site_genome_accession_dict': dict((k, meta_sites[k][0].site_instance.genome.genome_accession) for k in meta_sites),
         'meta_site_protein_accession_dict': dict((k, meta_sites[k][0].curation.TF_instance.protein_accession) for k in meta_sites),
         'meta_site_curation_dict': meta_site_curation_dict,
         'meta_site_regulation_dict': meta_site_regulation_dict,

@@ -5,6 +5,9 @@ from django.contrib.contenttypes import generic
 
 # Create your models here.
 class Curation(models.Model):
+    """
+    Curation table.
+    """
     # choices
     REVISION_REASONS = (("genome_not_available", "No comparable genome in NCBI"),
                         ("in_progress", "Matching genome still in progress"),
@@ -76,6 +79,9 @@ class Curation(models.Model):
     
 
 class Curator(models.Model):
+    """
+    Curator table. Each curator entry is linked to Django user object
+    """
     curator_id = models.AutoField(primary_key=True)
     user = models.OneToOneField(User) # extend Django's user model
     is_staff = models.BooleanField(default=False, blank=True)
@@ -84,6 +90,8 @@ class Curator(models.Model):
         return u'%s' % self.user
 
 class Publication(models.Model):
+    """
+    """
     PUBLICATION_TYPE = (("pubmed", "Pubmed article"),
                         ("nonpubmed", "Non-pubmed article"),
                         ("nonpublished", "Non-published data"))
@@ -114,6 +122,8 @@ class Publication(models.Model):
                 self.reported_species, self.assigned_to)
 
 class Gene(models.Model):
+    """
+    """
     # choices
     STRAND = ((1, "Top strand"), (-1, "Bottom strand"))
     # fields
@@ -130,6 +140,8 @@ class Gene(models.Model):
         return '%s (%s-%s)' % (self.gene_id, self.name, self.genome.genome_accession)
 
 class Genome(models.Model):
+    """
+    """
     GENOME_TYPE = (("chromosome", "chromosome"), ("plasmid", "plasmid"))
     genome_id = models.AutoField(primary_key=True)
 
@@ -151,6 +163,8 @@ class Genome(models.Model):
         return self.genome_accession + ' ' + self.organism
 
 class Taxonomy(models.Model):
+    """
+    """
     taxonomy_id = models.CharField(max_length=20, unique=True)
     rank = models.CharField(max_length=20, choices=(('phylum', 'phylum'),
                                                     ('class', 'class'),
@@ -175,6 +189,8 @@ class Taxonomy(models.Model):
             
 
 class TF(models.Model):
+    """
+    """
     TF_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
     family = models.ForeignKey("TFFamily")
@@ -187,6 +203,7 @@ class TF(models.Model):
         verbose_name_plural = "TFs"
 
 class TFFamily(models.Model):
+    
     TF_family_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
     description = models.TextField()

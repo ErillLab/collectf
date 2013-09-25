@@ -53,7 +53,10 @@ def locate_site(genome_seq, site_seq):
     return matches
 
 def soft_locate_site_strand(genome_seq, strand, site_seq, mismatch_th):
-    """Soft seatch on one strand only"""
+    """
+	Soft seatch on one strand only. Return all matches that are upto <mismatch_th>
+	away from site seq.
+	"""
     # first find all sequences on genome that are similar enough
     search_seq = site_seq if strand==1 else reverse_complement(site_seq)
     pattern = regex.compile('(%s){1<=s<=%d}' % (search_seq, mismatch_th))
@@ -66,11 +69,12 @@ def soft_locate_site_strand(genome_seq, strand, site_seq, mismatch_th):
     return matches
 
 def soft_locate_site(genome_seq, site_seq, mismatch_th=2, motif=None):
-    """SOFT search for site in genome sequence.
-    Since, PSSM search over whole genome is _very_ expensive,
-    - find all sequences on the genome such that they are at most mismatch_th far.
-    - run PSSM over those sequences and sort them by score.
-    In future Pat's suffix array module may be used."""
+    """
+	Soft search for site in genome sequence.  Since, PSSM search over whole genome is
+	very expensive, (1) find all sequences on the genome such that they are at most
+	mismatch_th far.  (2) run PSSM over those sequences and sort them by score.
+	"""
+	
     matches = soft_locate_site_strand(genome_seq, 1, site_seq, mismatch_th) + \
               soft_locate_site_strand(genome_seq, -1, site_seq, mismatch_th)
     # sort matches based on PWM
