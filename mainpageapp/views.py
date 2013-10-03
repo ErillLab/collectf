@@ -25,6 +25,10 @@ def search(request):
     template_file = "main_search.html"
     return render_to_response(template_file, {}, context_instance = RequestContext(request))
 
+def compare_motifs(request):
+    template_file = "compare_motifs.html"
+    return render_to_response(template_file, {}, context_instance = RequestContext(request))
+
 def contribute(request):
     template_file = "contribute.html"
     return render_to_response(template_file, {}, context_instance = RequestContext(request))

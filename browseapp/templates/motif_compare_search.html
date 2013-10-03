@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+
+<form method="post" action=""> {% csrf_token %}
+
+{# include search fields here #}
+{% include "search_form_fields.html" %}
+
+{{ wizard.management_form }}
+<div class="control-group">
+  <div class="controls">
+    {% if wizard.steps.prev %}
+    <button class="btn" name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">prev step</button>
+    {% endif %}
+    <input class="btn" type="submit" value="next step"/>
+  </div>
+</div>
+</form>
+</div>
+
+{# don't forget to populate search fields with taxonomy, TF list and experimental techniques #}
+<script>
+{% include "search_template.js" %}
+</script>
+
+{% endblock %}

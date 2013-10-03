@@ -12,6 +12,7 @@ import collectfapp.editcurationview as editcurationview
 
 import browseapp.browse_TF_and_species
 import browseapp.search
+import browseapp.compare_motifs
 import browseapp.view_results
 import browseapp.view_all
 import browseapp.view_site
@@ -51,7 +52,6 @@ urlpatterns = patterns('',
 
     # external pubmed submission
     url(r'^ext_pubmed_submission', collectfapp.views.pub_external_submission),
-                       
     # pubmed publication submission
     url(r'^pubmed_submission/$', pubview.pubmed_submission),
     # nonpubmed publication submission
@@ -69,6 +69,10 @@ urlpatterns = patterns('',
     url(r'^view_all_publications/$', browseapp.view_all.view_all_publications),
     # search
     url(r'^search/$', browseapp.search.search),
+
+    # motif comparison
+    url(r'^compare_motifs/$', browseapp.compare_motifs.MotifComparisonWizard.as_view(browseapp.compare_motifs.FORMS), name="compare_motifs"),
+                       
     # view results
     url(r'^view_results/$', browseapp.view_results.view_results),
      
@@ -103,7 +107,6 @@ urlpatterns = patterns('',
     # JSON requests
     url(r'^get_genomes/$', browseapp.json_response.get_genomes),
     url(r'^get_TF_instances/$', browseapp.json_response.get_TF_instances),
-
     url(r'^get_weblogo', baseapp.views.get_weblogo),
 
                        
@@ -112,6 +115,7 @@ urlpatterns = patterns('',
     url(r'^main_page_about/$', mainpageapp.views.about),
     url(r'^main_page_browse/$', mainpageapp.views.browse),
     url(r'^main_page_search/$', mainpageapp.views.search),
+    url(r'^main_page_compare_motifs/$', mainpageapp.views.compare_motifs),
     url(r'^main_page_contribute/$', mainpageapp.views.contribute),
     url(r'^main_page_feedback/$', mainpageapp.views.feedback),
     url(r'^main_page_stats/$', mainpageapp.views.stats),

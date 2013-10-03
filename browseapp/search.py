@@ -9,7 +9,8 @@ def search(request):
     """Handler for search by TF/species."""
     return search_get(request) if not request.POST else search_post(request)
 
-def search_get(request):
+def search_get_template():
+    # return the template for search html
     binding, expression, insilico = get_techniques()
     template = {
         'TF_families': models.TFFamily.objects.all().order_by('name'),
@@ -18,9 +19,12 @@ def search_get(request):
         'expression_techniques': expression,
         'insilico_techniques': insilico,
     }
-        
+    return template
+
+def search_get(request, template_file="search_main.html"):
+    template = search_get_template()
     return render(request,
-                  "search.html",
+                  template_file,
                   template,
                   context_instance=RequestContext(request))
 
