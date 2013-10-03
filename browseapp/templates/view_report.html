@@ -217,7 +217,7 @@
 	  <input type="hidden" name="site_id" value="{% for csi in meta_site %}{{ csi.pk }}{% if not forloop.last %}|{% endif %}{% endfor %}">
 	  {% endfor %}
 	  {% endfor %}
-	  <ul>
+	  <ul class="">
 	    <li><input type="submit" value="Download FASTA" class="btn btn-link" name="fasta">
 	      <p>
 		Download data in FASTA format. 
@@ -240,6 +240,14 @@
 	      <input type="submit" value="Download ARFF" class="btn btn-link" name="arff">
 	      <p>Download data in Attribute-Relation File Format (ARFF).</p>
 	    </li>
+        <li>
+          <input type="submit" value="Download PSFM" class="btn btn-link" name="PSFM">
+          <p>Download Position-Specific-Frequency-Matrix of the motif.</p>
+        </li>
+        <li>
+          <input type="submit" value="Download PSSM" class="btn btn-link" name="PSSM">
+          <p>Download Position-Specific-Scoring-Matrix of the motif.</p>
+        </li>
 	  </ul>
 	</form>
 

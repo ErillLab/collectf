@@ -1,6 +1,8 @@
 from Bio import Entrez
 from Bio import SeqIO
 from Bio.Seq import Seq
+from Bio import Motif
+from Bio.Alphabet import IUPAC
 from Bio.SeqUtils import GC
 import time
 import os
@@ -303,3 +305,15 @@ def overlap_test_2(loca, locb):
 def overlap_non_motif_site_meta_site(non_motif_curation_site_instance, meta_site_instance):
     """Given a NON-MOTIF-ASSOCIATE site instance and a list of site instances (meta-site-instance)"""
     return any(overlap_test_2(location(non_motif_curation_site_instance), location(ms)) for ms in meta_site_instance if ms.is_motif_associated)
+
+
+def create_motif(seqs):
+    """Create motif from sequences"""
+    m = Motif.Motif(alphabet=IUPAC.unambiguous_dna)
+    for seq in seqs:
+        try:
+            m.add_instance(Seq(seq, m.alphabet))
+        except:
+            print "Diff motif size length?"
+            return None
+    return m

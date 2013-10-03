@@ -4,30 +4,42 @@ def export_sites(request):
     """Given a list of sites, report FASTA/CSV file
     containing sites for particular TF and species"""
 
-    if 'fasta' in request.POST: export_format = 'fasta'
-    elif 'tsv'in request.POST: export_format = 'tsv'
-    elif 'tsv-raw' in request.POST: export_format='tsv_raw'
-    elif 'arff' in request.POST: export_format='arff'
-    assert export_format
-
+    export_options = ['fasta', 'tsv', 'tsv-raw', 'arff', 'PSFM', 'PSSM']
+    ext = {
+        'fasta': 'fas',
+        'tsv': 'tsv',
+        'tsv-raw': 'tsv',
+        'arff': 'arff',
+        'PSSM': 'mat',
+        'PSFM': 'mat'
+    }
+    func = {
+        'fasta': export_fasta,
+        'tsv': export_tsv,
+        'tsv-raw': export_tsv_raw,
+        'arff': export_arff,
+        'PSFM': export_PSFM,
+        'PSSM': export_PSSM,
+    }
+                          
+    for opt in export_options:
+        if opt in request.POST:
+            export_format = opt
+            break
+    else: assert False, "invalid export option"
+    
     # given the list of curation-site-instance objects,
     curation_site_id_groups = request.POST.getlist('site_id')
 
-    meta_sites = [models.Curation_SiteInstance.objects.filter(pk__in=id_group.split('|')) for id_group in curation_site_id_groups]
+    meta_sites = [models.Curation_SiteInstance.objects.filter(pk__in=id_group.split('|'))
+                  for id_group in curation_site_id_groups]
     
     response = HttpResponse(content_type='application/download')
-    if export_format=="fasta":
-        response['Content-Disposition'] = 'attachment;filename=collectf_export.fas'
-        response.write(export_fasta(meta_sites))
-    elif export_format=="tsv":
-        response['Content-Disposition'] = 'attachment;filename=collectf_export.tsv'
-        response.write(export_tsv(meta_sites))
-    elif export_format=="tsv_raw":
-        response['Content-Disposition'] = 'attachment;filename=collectf_export.tsv'
-        response.write(export_tsv_raw(meta_sites))
-    elif export_format=='arff':
-        response['Content-Disposition'] = 'attachment;filename=collectf_export.arff'
-        response.write(export_arff(meta_sites))
+
+    # call corresponding export function
+    response["Content-Disposition"] = \
+            "attachment;filename=collectf-export-%s.%s" % (export_format, ext[export_format])
+    response.write(func[export_format](meta_sites))
     return response
 
 
@@ -38,7 +50,6 @@ def export_base(meta_sites):
                                   'curation__TF_instance__protein_accession',
                                   'site_instance__genome__genome_accession',
                                   'site_instance__genome__organism').distinct()
-        
         assert len(values)==1
         values = values[0]
         values['start_pos'] = meta_site[0].site_instance.start+1
@@ -47,7 +58,6 @@ def export_base(meta_sites):
         values['seq'] = meta_site[0].site_instance.seq
         rows.append(values)
     return rows
-    
     
 def export_fasta(meta_sites):
     fasta_str = ""
@@ -98,7 +108,8 @@ def export_tsv(meta_sites):
                                  row['end_pos'],
                                  row['strand'],
                                  row['seq'],
-                                 ' | '.join((','.join(t.name for t in evidence) + '[PMID:%s]' % pmid) for evidence,pmid in zip(experimental_evidence, pmids)),
+                                 ' | '.join((','.join(t.name for t in evidence) + '[PMID:%s]' % pmid)
+                                            for evidence,pmid in zip(experimental_evidence, pmids)),
                                  ','.join(reg.gene.locus_tag for reg in regulated_genes),
                                  ]))
         tsv_lines.append(line)
@@ -120,7 +131,8 @@ def export_tsv_raw(meta_sites):
                                           csi.site_instance.end,
                                           csi.site_instance.strand,
                                           csi.site_instance.seq,
-                                          ','.join(t.name for t in csi.curation.experimental_techniques.all()) + '[PMID:%s]' % csi.curation.publication.pmid,
+                                          ','.join(t.name for t in csi.curation.experimental_techniques.all()) + \
+                                                                       '[PMID:%s]' % csi.curation.publication.pmid,
                                           ','.join(r.gene.locus_tag for r in models.Regulation.objects.filter(evidence_type="exp_verified")\
                                                                                                       .filter(curation_site_instance=csi)),
                                           ]))
@@ -154,4 +166,33 @@ def export_arff(meta_sites):
                                     str(row['strand']),
                                     row['seq']]))
     return '\n'.join(arff_lines)
+
+def export_matrix(meta_sites, type):
+    """
+    Export PSFM/PSSM
+    """
+    rows = export_base(meta_sites)
+    sites = [row['seq'] for row in rows]
+    motif = bioutils.create_motif(sites)
+    matrix = motif.pwm() if type=="PSFM" else motif.log_odds()
+    matrix_rows = []
+    for letter in "ACTG":
+        matrix_rows.append('\t'.join(str(matrix[i][letter]) for i in xrange(motif.length)))
+    return '\n'.join(matrix_rows)
+
+def export_PSFM(meta_sites):
+    """
+    Export Position-Specific-Frequency-Matrix
+    """
+    return export_matrix(meta_sites, "PSFM")
+
+
+def export_PSSM(meta_sites):
+    """
+    Export Position-Specific-Scoring-Matrix of the motif.
+    """
+    return export_matrix(meta_sites, "PSSM")
+
+    
+    
 

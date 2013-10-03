@@ -95,7 +95,7 @@ urlpatterns = patterns('',
     url(r'^view_report_w_non_motif/(?P<TF_param>\w+)/(?P<TF_ids>[\w,]+)/(?P<species_param>\w+)/(?P<species_ids>[\w,]+)/$',
         browseapp.browse_TF_and_species.browse_TF_and_species_selected_non_motif),
            
-    # export fasta/csv
+    # export fasta/tsv/arff/PSFM/PSSM
     url(r'^export_sites/$', browseapp.export.export_sites),
     # database statistics
     url(r'^db_stats/$', dbstatsapp.views.curation_stats),
