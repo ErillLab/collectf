@@ -2,6 +2,7 @@ from browse_base import *
 from django import forms
 from django.contrib.formtools.wizard.views import CookieWizardView
 import search
+import view_results
 
 
 class MotifComparisonForm(forms.Form):
@@ -57,6 +58,23 @@ class MotifComparisonWizard(CookieWizardView):
         if self.steps.current == "search_results":
             c.update({"motif_a": self.request.session["motif_a"],
                       "motif_b": self.request.session["motif_b"]})
+
+        if self.steps.current == "comparison_results":
+            motif_a_csi_list = self.request.session["motif_a"]["view_all_csis"]
+            motif_a_ncsi_list = self.request.session["motif_a"]["view_all_ncsis"]
+            motif_b_csi_list = self.request.session["motif_b"]["view_all_csis"]
+            motif_b_ncsi_list = self.request.session["motif_b"]["view_all_ncsis"]
+            motif_a_data = view_results.prepare_results(motif_a_csi_list, motif_a_ncsi_list)
+            motif_b_data = view_results.prepare_results(motif_b_csi_list, motif_b_ncsi_list)
+            # put list of TF and species names in template
+            get_TF_name = lambda reports: list(set(map(lambda rep: rep["TF_name"], reports)))
+            get_sp_name = lambda reports: list(set(map(lambda rep: rep["species_name"], reports)))
+            motif_a_data["TFs"] = get_TF_name(self.request.session["motif_a"]["reports"])
+            motif_b_data["TFs"] = get_TF_name(self.request.session["motif_b"]["reports"])
+            motif_a_data["species"] = get_sp_name(self.request.session["motif_a"]["reports"])
+            motif_b_data["species"] = get_sp_name(self.request.session["motif_b"]["reports"])
+            c.update({"motif_a": motif_a_data,
+                      "motif_b": motif_b_data})
 
         return c
 

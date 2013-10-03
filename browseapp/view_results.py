@@ -1,31 +1,22 @@
 from browse_base import *
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
-import collectfapp.views 
+import collectfapp.views
 
-def view_results(request):
-    #assert request.POST, '
-    if not request.POST:
-        #no GET handler for this function
-        return HttpResponseRedirect(reverse(collectfapp.views.home))
-        
-    print 'view_results'
-    csi_list = request.POST['motif_csi_list'].strip().split(',')
-    non_motif_csi_list = None
-
-    if request.POST['non_motif_csi_list']:
-        non_motif_csi_list = request.POST['non_motif_csi_list'].strip().split(',')
-        
-    integrate_non_motif = bool('integrate_non_motif' in request.POST)
-
-    csis = models.Curation_SiteInstance.objects.filter(pk__in=csi_list)
+def prepare_results(motif_csi_list, non_motif_csi_list, integrate_non_motif=False):
+    """
+    Given lists of motif-associated and non-motif-associated curation site
+    instanaces, pass them to the view results function.
+    """
+    # get curation_site_instances
+    csis = models.Curation_SiteInstance.objects.filter(pk__in=motif_csi_list)
+    # get non-motif-associated curation-site-instances
     # if non_motif_csi_list is empty filter doesn't work!
-    
     if integrate_non_motif and non_motif_csi_list:
         non_motif_csis = models.Curation_SiteInstance.objects.filter(pk__in=non_motif_csi_list)
     else:
         non_motif_csis = models.Curation_SiteInstance.objects.none()
-    
+    # get data associated with curation-site-instances
     values = csis.values('curation__TF','site_instance__genome__taxonomy').distinct()
 
     # create all reports
@@ -61,13 +52,29 @@ def view_results(request):
                        'aligned_sites': trimmed,
                        'weblogo_image_data': weblogo_data}
 
-    return render(request, 'view_report.html',
-                  {
-                      'reports': reports,
-                      'ensemble_report': ensemble_report,
-                      'motif_csi_list': request.POST['motif_csi_list'],
-                      'non_motif_csi_list': request.POST['non_motif_csi_list'],
-                  },
+    return {'reports': reports,
+            'ensemble_report': ensemble_report,
+            'motif_csi_list': motif_csi_list,
+            'non_motif_csi_list': non_motif_csi_list}
+    
+def view_results(request):
+    #assert request.POST, '
+    if not request.POST:
+        #no GET handler for this function
+        return HttpResponseRedirect(reverse(collectfapp.views.home))
+        
+    csi_list = request.POST['motif_csi_list'].strip().split(',')
+    non_motif_csi_list = None
+
+    if request.POST['non_motif_csi_list']:
+        non_motif_csi_list = request.POST['non_motif_csi_list'].strip().split(',')
+        
+    integrate_non_motif = bool('integrate_non_motif' in request.POST)
+    
+    template = prepare_results(csi_list, non_motif_csi_list, integrate_non_motif)
+    return render(request,
+                  'view_report.html',
+                  template,
                   context_instance=RequestContext(request))
 
 def get_sites_by_TF_and_species(curation_site_instances, non_motif_curation_site_instances):
@@ -89,7 +96,7 @@ def get_sites_by_TF_and_species(curation_site_instances, non_motif_curation_site
     
     return {
         'meta_sites': meta_sites,
-        'meta_site_genome_accession_dict': dict((k, meta_sites[k][0].site_instance.genome.genome_accession) for k in meta_sites),
+        'meta_site_genome_accession_dict': {}, #dict((k, meta_sites[k][0].site_instance.genome.genome_accession) for k in meta_sites),
         'meta_site_protein_accession_dict': dict((k, meta_sites[k][0].curation.TF_instance.protein_accession) for k in meta_sites),
         'meta_site_curation_dict': meta_site_curation_dict,
         'meta_site_regulation_dict': meta_site_regulation_dict,

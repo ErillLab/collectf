@@ -66,7 +66,7 @@ def browse_tax_all_reports_ajax(request, id):
 
     motif_csis = models.Curation_SiteInstance.objects.filter(site_instance__genome__taxonomy__in=all_sp, is_motif_associated=True)
     non_motif_csis = models.Curation_SiteInstance.objects.filter(site_instance__genome__taxonomy__in=all_sp, is_motif_associated=False)
-    all_reports = search_results(motif_csis, non_motif_csis)['reports']
+    all_reports = group_search_results(motif_csis, non_motif_csis)['reports']
 
 
     return render_to_response("browse_tab.html",

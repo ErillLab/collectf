@@ -103,7 +103,7 @@ def search_post(request):
     curation_site_instances from database using `search_post_helper` function and
     render the results.
     """
-    motif_csis, non_motif_csis = search_post_helper(requests)
+    motif_csis, non_motif_csis = search_post_helper(request)
     return render_search_results(request, motif_csis, non_motif_csis)
 
 def render_search_results(request, csis, non_motif_csis):

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+  <div class="progress progress-info progress-striped">
+    <div class="bar" style="width:{% widthratio wizard.steps.step1 wizard.steps.count 100%}%">
+      Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}
+    </div>
+  </div>
+  
+  <div class="alert alert-info">
+
+    <h3>{{ form_title }}</h3>
+    <p>{{ form_description }}</p>
+
+  </div>
+  
+  {% block form %}
+
+  {% endblock %}
+  
+</div>
+
+{% endblock %}
