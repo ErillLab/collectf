@@ -6,10 +6,15 @@ from browse_TF_and_species import browse_TF_and_species_selected
 from browse_TF_and_species import browse_TF_and_species_selected_non_motif
 
 def search(request):
-    """Handler for search by TF/species."""
+    """
+    Handler for search by TF/species
+    """
     return search_get(request) if not request.POST else search_post(request)
 
 def search_get_template():
+    """
+    Return the template for search get handler.
+    """
     # return the template for search html
     binding, expression, insilico = get_techniques()
     template = {
@@ -22,13 +27,22 @@ def search_get_template():
     return template
 
 def search_get(request, template_file="search_main.html"):
+    """
+    Handler for search GET requests. Render the HTML with populated tree-view of
+    species/TF/technique checkboxes.
+    """
     template = search_get_template()
     return render(request,
                   template_file,
                   template,
                   context_instance=RequestContext(request))
 
-def search_post(request):
+def search_post_helper(request):
+    """
+    This method all the work. Given the request, it gets TF_input, species_input and
+    techniques_inputs and filter all curation_site_instances in the database by those
+    three paramater.
+    """
     TF_input = request.POST.getlist('tf_input')
     species_input = request.POST.getlist('species_input')
     cat_input_1 = request.POST.getlist('cat_input_1')
@@ -81,16 +95,33 @@ def search_post(request):
     else:
         assert False, 'shouldnt be here, unhandled case'
 
-    return render_search_results(request, csis, non_motif_csis)
+    return csis, non_motif_csis
+
+def search_post(request):
+    """
+    Handler for search post requests. Given request, gets the motif and non-motif
+    curation_site_instances from database using `search_post_helper` function and
+    render the results.
+    """
+    motif_csis, non_motif_csis = search_post_helper(requests)
+    return render_search_results(request, motif_csis, non_motif_csis)
 
 def render_search_results(request, csis, non_motif_csis):
-    template = search_results(csis, non_motif_csis)
-    all_reports = template['reports']
-    template['view_all_csis'] = [csi_pk for report in all_reports for csi_pk in report['csi_list']]
-    template['view_all_ncsis'] = [ncsi_pk for report in all_reports for ncsi_pk in report['non_motif_csis']]
-    return render(request, "search_results.html", template, context_instance=RequestContext(request))
+    """
+    Given collection of motif-associated and non-motif-associated site instances,
+    group them by calling `group_search_results` and render the html.
+    """
+    template = group_search_results(csis, non_motif_csis)
+    return render(request,
+                  "search_results.html",
+                  template,
+                  context_instance=RequestContext(request))
 
-def search_results(csis, non_motif_csis):
+def group_search_results(csis, non_motif_csis):
+    """
+    Given a collection of motif-associated and non-motif-associated site instances,
+    group them by species/TF instance and return a big dictionary of results.
+    """
     values = csis.values('curation__TF', 'site_instance__genome__taxonomy')\
              .distinct()\
              .order_by('curation__TF__name', 'site_instance__genome__taxonomy__name')
@@ -103,7 +134,8 @@ def search_results(csis, non_motif_csis):
         species = models.Taxonomy.objects.get(pk=species_id)
         filtered_csis = csis.filter(curation__TF=TF, site_instance__genome__taxonomy=species)
         # use non-motif sites only if there is motif-associated data
-        filtered_non_motif_csis = non_motif_csis.filter(curation__TF=TF, site_instance__genome__taxonomy=species)
+        filtered_non_motif_csis = non_motif_csis.filter(curation__TF=TF,
+                                                        site_instance__genome__taxonomy=species)
         if filtered_csis:
             all_reports.append({
                 'TF_name': TF.name,
@@ -112,7 +144,13 @@ def search_results(csis, non_motif_csis):
                 'non_motif_csis': [ncsi.pk for ncsi in filtered_non_motif_csis.iterator()]
             })
 
-    return {'reports': all_reports}
+    # put combined motif_csi and non_motif_csi objects too
+    all_csis = [csi_pk for report in all_reports for csi_pk in report['csi_list']]
+    all_ncsis = [ncsi_pk for report in all_reports for ncsi_pk in report['non_motif_csis']]
+    return {'reports': all_reports,
+            'view_all_csis': all_csis,
+            'view_all_ncsis': all_ncsis}
+            
     
 def technique_list_to_Q(techniques):
     # prepare filters
@@ -122,6 +160,9 @@ def technique_list_to_Q(techniques):
     return q
 
 def get_techniques():
+    """
+    Get all techniques in database and group them by type (binding/expression/in-silico).
+    """
     binding_techniques = {}
     expression_techniques = {}
     insilico_techniques = {}

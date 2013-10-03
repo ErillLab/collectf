@@ -4,7 +4,7 @@ from django.forms.models import model_to_dict
 from django.core.urlresolvers import reverse
 from browse_TF_and_species import browse_TF_and_species_selected
 import Queue
-from search import search_results
+from search import group_search_results
 
 def browse_TF(request):
     TF_families = models.TFFamily.objects.all().order_by('name')
@@ -25,9 +25,11 @@ def browse_TF_all_reports_ajax(request, t, id):
         desc = TF_family.description
         TF_name = TF_family.name
         
-    motif_csis = models.Curation_SiteInstance.objects.filter(curation__TF__in=TFs, is_motif_associated=True)
-    non_motif_csis = models.Curation_SiteInstance.objects.filter(curation__TF__in=TFs, is_motif_associated=False)
-    all_reports = search_results(motif_csis, non_motif_csis)['reports']
+    motif_csis = models.Curation_SiteInstance.objects.filter(curation__TF__in=TFs,
+                                                             is_motif_associated=True)
+    non_motif_csis = models.Curation_SiteInstance.objects.filter(curation__TF__in=TFs,
+                                                                 is_motif_associated=False)
+    all_reports = group_search_results(motif_csis, non_motif_csis)['reports']
 
     assert TF_name
     return render_to_response("browse_tab.html",

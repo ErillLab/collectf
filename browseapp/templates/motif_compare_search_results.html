@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+  Almost there..
+
+  <h2>{{ form_title }}</h2>
+
+  <p>{{ form_description }}</p>
+
+  <ul class="nav nav-tabs">
+    <li class="active"><a href="#first_motif_search" data-toggle="tab">First motif search results</a></li>
+    <li><a href="#second_motif_search" data-toggle="tab">Second motif search results</a></li>
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane active" id="first_motif_search">
+      <table class="table table-condensed table-striped">
+        <thead>
+          <th>TF</th>
+          <th>Species</th>
+          <th>Report
+            
+	        <form style="display:inline;" method="post" action="{% url browseapp.view_results.view_results %}" id="view_all" action="">
+	          {% csrf_token %}
+	          <input type="hidden" name="motif_csi_list" value="{% for csi_pk in motif_a.view_all_csis %}{{ csi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}">
+	          <input type="hidden" name="non_motif_csi_list" value="{% for ncsi_pk in motif_a.view_all_ncsis %}{{ ncsi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}">
+	        </form>
+          </th>
+        </thead>
+        <tbody>
+          {% for report in motif_a.reports %}
+          <tr>
+            <td>{{ report.TF_name }}</td>
+	        <td>{{ report.species_name }}</td>
+	        {% with form_id=report.TF_name|slugify|add:'_'|add:report.species_name|slugify %}
+	        <td><a href="#" onclick="$('#{{ form_id }}').submit();">view</a>
+	          <form action="{% url browseapp.view_results.view_results %}" method="post" style="display:inline;" id={{ form_id }}>{% csrf_token %}
+	            <input type="hidden" name="motif_csi_list" value="{% for csi_pk in report.csi_list %}{{ csi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}"/>
+	            <input type="hidden" name="non_motif_csi_list" value="{% for ncsi_pk in report.non_motif_csi_list %}{{ ncsi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}"/>
+	          </form>
+	        </td>
+	        {% endwith %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+
+    <div class="tab-pane" id="second_motif_search">
+      <table class="table table-condensed table-striped">
+        <thead>
+          <th>TF</th>
+          <th>Species</th>
+          <th>Report
+            
+	        <form style="display:inline;" method="post" action="{% url browseapp.view_results.view_results %}" id="view_all" action="">
+	          {% csrf_token %}
+	          <input type="hidden" name="motif_csi_list" value="{% for csi_pk in motif_b.view_all_csis %}{{ csi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}">
+	          <input type="hidden" name="non_motif_csi_list" value="{% for ncsi_pk in motif_b.view_all_ncsis %}{{ ncsi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}">
+	        </form>
+          </th>
+        </thead>
+        <tbody>
+          {% for report in motif_b.reports %}
+          <tr>
+            <td>{{ report.TF_name }}</td>
+	        <td>{{ report.species_name }}</td>
+	        {% with form_id=report.TF_name|slugify|add:'_'|add:report.species_name|slugify %}
+	        <td><a href="#" onclick="$('#{{ form_id }}').submit();">view</a>
+	          <form action="{% url browseapp.view_results.view_results %}" method="post" style="display:inline;" id={{ form_id }}>{% csrf_token %}
+	            <input type="hidden" name="motif_csi_list" value="{% for csi_pk in report.csi_list %}{{ csi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}"/>
+	            <input type="hidden" name="non_motif_csi_list" value="{% for ncsi_pk in report.non_motif_csi_list %}{{ ncsi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}"/>
+	          </form>
+	        </td>
+	        {% endwith %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <form method="post" action=""> {% csrf_token %}
+
+    {# prev/next buttons #}
+    {{ wizard.management_form }}
+    <div class="control-group">
+      <div class="controls">
+        {% if wizard.steps.prev %}
+        <button class="btn" name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">prev step</button>
+        {% endif %}
+        <input class="btn" type="submit" value="next step"/>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+{% endblock %}
