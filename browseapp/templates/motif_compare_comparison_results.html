@@ -42,32 +42,12 @@
 
 <div class="boxed">
   <ul class="nav nav-tabs">
-    <li><a href="#weblogo" data-toggle="tab">Sequence logos</a></li>
+    <li class="active"><a href="#similarity" data-toggle="tab">Motif similarity</a></li>
     <li><a href="#unaligned" data-toggle="tab">Unaligned binding sites</a></li>
     <li><a href="#aligned" data-toggle="tab">Aligned binding sites</a></li>
-    <li class="active"><a href="#similarity" data-toggle="tab">Motif similarity</a></li>
   </ul>
 
   <div class="tab-content">
-    <!-- WEBLOGO COMPARISON -->
-    <div class="tab-pane" id="weblogo">
-      <div class="row-fluid">
-        <div class="span6">
-          <div class="boxed">
-	    <img src=""
-                 class="weblogo_img"
-                 site_data={% for site in motif_a.ensemble_report.aligned_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}>
-          </div>
-        </div>
-        <div class="span6">
-          <div class="boxed">
-            <img src=""
-                 class="weblogo_img"
-                 site_data={% for site in motif_b.ensemble_report.aligned_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}>
-          </div>      
-        </div>
-      </div>
-    </div>
     <!-- UNALIGNED BINDING SITES COMPARISON -->
     <div class="tab-pane" id="unaligned">
       <div class="row-fluid">
@@ -195,7 +175,7 @@ function motifSimilarityAJAX(el, fun) {
     // request motif similarity for two motifs
     // el is the element that the function is called
     // fun is the function to be used for motif similarity measurement
-    $(el).parent().block({message: 'Loading'});
+    $(el).parent().block({message: '<h2>Loading.<br/><i class="icon-spinner icon-spin"></i></h2>'});
     $.ajax({
         type: "POST",
         url: "{% url motif_sim_measure %}",
@@ -215,7 +195,7 @@ function motifSimilarityAJAX(el, fun) {
 $(document).ready(function() {
     $('.weblogo_img').each(function() {
         var img = $(this);
-        img.parent().block({message: 'Loading sequence logo'});
+        img.parent().block({message: '<h2>Loading.<br/><i class="icon-spinner icon-spin"></i></h2>'});
         var site_data = $(this).attr('site_data');
         $.ajax({
             type: "POST",

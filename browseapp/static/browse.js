@@ -9,7 +9,6 @@ if (!window.console.log) {
 
 function get_wiki(name) {
     // given title, return first paragraph of wikipedia article
-    //console.log(name);
     $.ajax({
         url: 'http://en.wikipedia.org/w/api.php',
         data: {
@@ -90,7 +89,6 @@ $(document).ready(function () {
     var block_message = '<h1>Please wait.<br/><i class="icon-spinner icon-spin"></i></h1>';
     $(document).on('click', 'a.block_before_load', function (ev) {
         ev.preventDefault();
-        //console.log($(this).attr('href'));
         $.blockUI({message: block_message});
         window.location = $(this).attr('href');
     });

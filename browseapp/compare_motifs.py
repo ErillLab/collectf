@@ -17,17 +17,17 @@ class MotifComparisonForm(forms.Form):
 
 FORMS = [("motif_a", MotifComparisonForm),
          ("motif_b", MotifComparisonForm),
-         ("search_results", MotifComparisonForm),
+         #("search_results", MotifComparisonForm),
          ("comparison_results", MotifComparisonForm)]
 
 TEMPLATES = {"motif_a": "motif_compare_search.html",
              "motif_b": "motif_compare_search.html",
-             "search_results": "motif_compare_search_results.html",
+             #"search_results": "motif_compare_search_results.html",
              "comparison_results": "motif_compare_comparison_results.html"}
 
 FORM_TITLES = {"motif_a": "Search for the first motif.",
                "motif_b": "Search for the second motif.",
-               "search_results": "Search results are ready for comparison",
+               #"search_results": "Search results are ready for comparison",
                "comparison_results": "Motif comparison results"}
 FORM_DESCRIPTIONS = {
     "motif_a": """Search in CollecTF is fully customizable. Just select a taxonomic
@@ -40,7 +40,7 @@ FORM_DESCRIPTIONS = {
                instance (e.g. LexA) and the set of experimental techniques that
                reported sites should be backed by and proceed.""",
     
-    "search_results": "",
+    #"search_results": "",
 
     "comparison_results": "",
     }
@@ -50,8 +50,10 @@ class MotifComparisonWizard(CookieWizardView):
         return [TEMPLATES[self.steps.current]]
 
     def get_context_data(self, form, **kwargs):
-        # update context to include search form in the first two steps of motif
-        # comparison
+        """
+        Update context to include search form in the first two steps of motif
+        comparison.
+        """
         c = super(MotifComparisonWizard, self).get_context_data(form=form, **kwargs)
         # Update title and description
         c["form_title"] = FORM_TITLES[self.steps.current]
@@ -82,28 +84,15 @@ class MotifComparisonWizard(CookieWizardView):
             motif_b_data["TFs"] = get_TF_name(self.request.session["motif_b"]["reports"])
             motif_a_data["species"] = get_sp_name(self.request.session["motif_a"]["reports"])
             motif_b_data["species"] = get_sp_name(self.request.session["motif_b"]["reports"])
-
-            #sites_a = motif_a_data["ensemble_report"]["aligned_sites"]
-            #sites_b = motif_b_data["ensemble_report"]["aligned_sites"]
-
-            #motif_a_vs_motif_a = levenshtein_motifs(sites_a, sites_a)
-            #motif_a_vs_motif_b = levenshtein_motifs(sites_a, sites_b)
-            #motif_b_vs_motif_b = levenshtein_motifs(sites_b, sites_b)
-            
             c.update({"motif_a": motif_a_data,
                       "motif_b": motif_b_data,
-                      #"levenshtein_boxplot": boxplot([motif_a_vs_motif_a, motif_a_vs_motif_b, motif_b_vs_motif_b]),
-                      #"levenshtein_hist": hist([motif_a_vs_motif_a, motif_a_vs_motif_b, motif_b_vs_motif_b]),
-                      #"euclidean_hist": motif_sim_test(sites_a, sites_b, euclidean_distance),
-                      #"euclidean_sc": euclidean_distance(sites_a, sites_b),
-                      #"kl_hist": motif_sim_test(sites_a, sites_b, kullback_leibler_divergence),
-                      #"kl_sc": kullback_leibler_divergence(sites_a, sites_b),
                       })
 
         return c
 
     def process_step(self, form):
-        """Process data after each step.
+        """
+        Process data after each step.
         Used to perform searches for both motifs before comparison step
         """
         if self.steps.current in ["motif_a", "motif_b"]: # if one of the motif search steps
@@ -120,10 +109,84 @@ class MotifComparisonWizard(CookieWizardView):
         return render_to_response("success.html")
 
 def motif_sim_measure(request):
-    return render_to_response("motif_similarity_ajax.html", {}, context_instance=RequestContext(request))
+    """
+    AJAX handler for motif similarity measurements.
+    Request has the similarity function and two motifs (comma seperated strings).
+    Reponse returns HTML which is embedded into the main comparison page.
+    """
+    fun = euclidean_distance # TODO 
+    request.POST['fun']
+    sites_a = request.POST['sites_a'].split(',')
+    sites_b = request.POST['sites_b'].split(',')
+    fig = motif_sim_test(sites_a, sites_b, fun)
+    return render_to_response("motif_similarity_ajax.html",
+                              {'plot': fig,
+                               'fun': fun,
+                               'sc': fun(sites_a, sites_b)},
+                              context_instance=RequestContext(request))
 
-# borrowed from Pat's util lib
+def motif_sim_test(ma, mb, fnc):
+    """Given two motifs and a similarity function, perform the permutation tests and
+    return the histogram"""
+    permuted_dists = permutation_test(ma, mb, fnc)
+    true_dist = fnc(ma, mb)
+    plt.hist(permuted_dists, bins=30, normed=1, color='c')
+    plt.axvline(true_dist, linestyle='dashed', linewidth=2, color='b')
+    return fig2img(plt.gcf())
+
+
+def fig2img(fig):
+    """Given matplotlib plot return data URI."""
+    imgdata = StringIO.StringIO()
+    fig.savefig(imgdata, format='png')
+    plt.clf()
+    imgdata.seek(0) # rewind the data
+    return "data:image/png;base64,%s" % b64encode(imgdata.buf)
+
+def boxplot(d):
+    """Generate boxplot and return it as data URI."""
+    plt.boxplot(d)
+    plt.xticks(range(1,4), [r'$M_a$ vs $M_a$', r'$M_a$ vs $M_b$', r'$M_b$ vs $M_b$'])
+    return fig2img(plt.gcf())
+
+def hist(d):
+    """Generate histogram of data array d and return it as data URI."""
+    plt.hist(d, bins=15, normed=1,
+             label=[r'$M_a$ vs $M_a$', r'$M_a$ vs $M_b$', r'$M_b$ vs $M_b$'])
+    plt.legend()
+    return fig2img(plt.gcf())
+
+def sample(n,xs,replace=True):
+    """Sample n objects from the list xs"""
+    if replace:
+        return [random.choice(xs) for i in range(n)]
+    else:
+        ys = list(xs[:])
+        samp = []
+        for i in range(n):
+            y = random.choice(ys)
+            samp.append(y)
+            ys.remove(y)
+        return samp
+
+def permute_motif(motif):
+    """Permute columns of the binding motif"""
+    motif = motif[:]
+    l = len(motif[0])
+    p = sample(l, range(l), replace=False)
+    for i,site in enumerate(motif):
+        motif[i] = "".join(site[p[j]] for j in p)
+    return motif
+
+def permutation_test(motif_a, motif_b, dist_fun, n=100):
+    """Permute columns of two motifs and measure the similarity/distance with the
+    specified function. Do this for n times and return the list of scores."""
+    dists = [dist_fun(permute_motif(motif_a), permute_motif(motif_b))
+             for i in xrange(n)]
+    return dists
+
 def levenshtein(seq1, seq2):
+    """Levenshtein distance between two sequences."""
     oneago = None
     thisrow = range(1, len(seq2) + 1) + [0]
     for x in xrange(len(seq1)):
@@ -143,61 +206,10 @@ def levenshtein_motifs(motif_a, motif_b):
     """
     dists = [float(levenshtein(seqa, seqb)) / (len(seqa) * len(seqb))
             for seqa in motif_a for seqb in motif_b]
-    #dists = [random.random() for i in xrange(50)]
-    return dists
-
-def fig2img(fig):
-    imgdata = StringIO.StringIO()
-    fig.savefig(imgdata, format='png')
-    plt.clf()
-    imgdata.seek(0) # rewind the data
-    return "data:image/png;base64,%s" % b64encode(imgdata.buf)
-
-def boxplot(d):
-    """
-    Return image as data URI.
-    """
-    plt.boxplot(d)
-    plt.xticks(range(1,4), [r'$M_a$ vs $M_a$', r'$M_a$ vs $M_b$', r'$M_b$ vs $M_b$'])
-    return fig2img(plt.gcf())
-
-def hist(d):
-    """
-    Return histogram as data URI
-    """
-    plt.hist(d,
-             bins=15,
-             normed=1,
-             label=[r'$M_a$ vs $M_a$', r'$M_a$ vs $M_b$', r'$M_b$ vs $M_b$'])
-    plt.legend()
-    return fig2img(plt.gcf())
-
-def sample(n,xs,replace=True):
-    if replace:
-        return [random.choice(xs) for i in range(n)]
-    else:
-        ys = list(xs[:])
-        samp = []
-        for i in range(n):
-            y = random.choice(ys)
-            samp.append(y)
-            ys.remove(y)
-        return samp
-
-def permute_motif(motif):
-    motif = motif[:]
-    l = len(motif[0])
-    p = sample(l, range(l), replace=False)
-    for i,site in enumerate(motif):
-        motif[i] = "".join(site[p[j]] for j in p)
-    return motif
-
-def permutation_test(motif_a, motif_b, dist_fun, n=100):
-    dists = [dist_fun(permute_motif(motif_a), permute_motif(motif_b))
-             for i in xrange(n)]
     return dists
 
 def euclidean_distance(sites_a, sites_b):
+    """Euclidean distance between two sets of sites"""
     ma = bioutils.create_motif(sites_a)
     mb = bioutils.create_motif(sites_b)
     def ed(cola, colb):
@@ -205,6 +217,7 @@ def euclidean_distance(sites_a, sites_b):
     return sum(ed(cola, colb) for (cola,colb) in zip(ma.pwm(), mb.pwm()))
 
 def kullback_leibler_divergence(sites_a, sites_b):
+    """Kullback-Leibler divergence between two sets of sites"""
     def safe_log2(x):
         return math.log(x,2) if x != 0 else 0.0
 
@@ -214,12 +227,5 @@ def kullback_leibler_divergence(sites_a, sites_b):
 
     ma = bioutils.create_motif(sites_a)
     mb = bioutils.create_motif(sites_b)
-    
     return sum(kl(cola, colb) for (cola,colb) in zip(ma.pwm(), mb.pwm()))
 
-def motif_sim_test(ma, mb, fnc):
-    permuted_dists = permutation_test(ma, mb, fnc)
-    true_dist = fnc(ma, mb)
-    plt.hist(permuted_dists, bins=30, normed=1, color='c')
-    plt.axvline(true_dist, linestyle='dashed', linewidth=2, color='b')
-    return fig2img(plt.gcf())

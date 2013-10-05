@@ -84,7 +84,7 @@
 	    <!-- <img src="{{ report.weblogo_image_data }}"> -->
 	    <div class="">
 	      <img src="" class="weblogo_img" id="{{TF_name}}_{{sp_name}}_weblogo" site_data={% for site in report.aligned_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}>
-	  </div>
+	    </div>
 
 	  </div>
 	  <div class="tab-pane" id="{{TF_name}}_{{sp_name}}_detail">
@@ -93,7 +93,7 @@
 	      below. The binding site is displayed as red bar. Genes that are reported to be
 	      regulated by TF are colored with green. </p>
 	    
-     <ul id="hiddenCols"></ul>
+            <ul id="hiddenCols"></ul>
 	    <table class="table table-bordered">
 	      <thead>
 		<tr>
@@ -141,7 +141,7 @@
 
 		  <td>{% for cur in report.meta_site_curation_dict|get_item:ms_id %}
 		    <span class="fixed-width">
-		    <a href="{% url browseapp.view_curation.view_curation cur.curation_id %}">[{{cur.curation_id}}]</a>{% if not forloop.last %}, {% endif %}
+		      <a href="{% url browseapp.view_curation.view_curation cur.curation_id %}">[{{cur.curation_id}}]</a>{% if not forloop.last %}, {% endif %}
 		    </span>
 		    {% endfor %}
 		  </td>
@@ -229,25 +229,25 @@
 		Download data in TSV (tab-separated-value) format. For each binding
 		site, all sources of evidence (i.e. experimental techniques and
 		publication information) are combined into one record.
-	    </p>
+	      </p>
 	    </li>
 	    <li>
 	      <input type="submit" value="Download spreadsheet (TSV, raw)" class="btn btn-link" name="tsv-raw">
 	      <p>Download raw data in TSV format. All reported sites are exported
-	      individually.</p>
+	        individually.</p>
 	    </li>
 	    <li>
 	      <input type="submit" value="Download ARFF" class="btn btn-link" name="arff">
 	      <p>Download data in Attribute-Relation File Format (ARFF).</p>
 	    </li>
-        <li>
-          <input type="submit" value="Download PSFM" class="btn btn-link" name="PSFM">
-          <p>Download Position-Specific-Frequency-Matrix of the motif.</p>
-        </li>
-        <li>
-          <input type="submit" value="Download PSSM" class="btn btn-link" name="PSSM">
-          <p>Download Position-Specific-Scoring-Matrix of the motif.</p>
-        </li>
+            <li>
+              <input type="submit" value="Download PSFM" class="btn btn-link" name="PSFM">
+              <p>Download Position-Specific-Frequency-Matrix of the motif.</p>
+            </li>
+            <li>
+              <input type="submit" value="Download PSSM" class="btn btn-link" name="PSSM">
+              <p>Download Position-Specific-Scoring-Matrix of the motif.</p>
+            </li>
 	  </ul>
 	</form>
 
@@ -286,7 +286,7 @@ $(document).ready(function() {
 
     $('.weblogo_img').each(function() {
 	var img = $(this);
-        img.parent().block({message: 'Loading sequence logo'});
+        img.parent().block({message: '<i class="icon-spinner icon-spin"></i>'});
 	var site_data = $(this).attr('site_data');
 	$.ajax({
 	    type: "POST",
@@ -302,15 +302,11 @@ $(document).ready(function() {
 	});
     });
 
-// hide 'genome' and 'TF' columns in the table
-hideCol('genome');
-hideCol('TF');
+    // hide 'genome' and 'TF' columns in the table
+    hideCol('genome');
+    hideCol('TF');
 
 });
 </script>
-
-
-
-</div>
 
 {% endblock %}
