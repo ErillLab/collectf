@@ -174,6 +174,7 @@ def export_matrix(meta_sites, type):
     rows = export_base(meta_sites)
     sites = [row['seq'] for row in rows]
     motif = bioutils.create_motif(sites)
+    # todo backgrounds
     matrix = motif.pwm() if type=="PSFM" else motif.log_odds()
     matrix_rows = []
     for letter in "ACTG":

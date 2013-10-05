@@ -2,16 +2,17 @@
 {% extends "motif_compare_base.html" %}
 
 {% block form %}
+{% load webdesign %}
 
 <p>
-  <b>1st motif</b> - 
+  <b>1st motif ($M_a$)</b> - 
   <span class="text-info">{{ motif_a.TFs|join:", " }}</span> transcription factor binding sites from organisms
-    <span class="text-info"><i>{{ motif_a.species|join:", "}}</i></span>
-    <small><a href="#" onclick="$('#view_all_motif_a').submit(); return false;"><u>[detailed view]</u></a></small>
+  <span class="text-info"><i>{{ motif_a.species|join:", "}}</i></span>
+  <small><a href="#" onclick="$('#view_all_motif_a').submit(); return false;"><u>[detailed view]</u></a></small>
 </p>
 
 <p>
-  <b>2nd motif</b> -
+  <b>2nd motif ($M_b$)</b> -
   <span class="text-info">{{ motif_b.TFs|join:", " }}</span> transcription factor binding sites from organisms
   <span class="text-info"><i>{{ motif_b.species|join:", "}}</i></span>
   <small><a href="#" onclick="$('#view_all_motif_b').submit(); return false;"><u>[detailed view]</u></a></small>
@@ -39,114 +40,198 @@
          value="{% for ncsi_pk in motif_b.non_motif_csi_list %}{{ ncsi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}">
 </form>
 
+<div class="boxed">
+  <ul class="nav nav-tabs">
+    <li><a href="#weblogo" data-toggle="tab">Sequence logos</a></li>
+    <li><a href="#unaligned" data-toggle="tab">Unaligned binding sites</a></li>
+    <li><a href="#aligned" data-toggle="tab">Aligned binding sites</a></li>
+    <li class="active"><a href="#similarity" data-toggle="tab">Motif similarity</a></li>
+  </ul>
 
-<ul class="nav nav-tabs">
-  <li class="active"><a href="#weblogo" data-toggle="tab">Sequence logos</a></li>
-  <li><a href="#unaligned" data-toggle="tab">Unaligned binding sites</a></li>
-  <li><a href="#aligned" data-toggle="tab">Aligned binding sites</a></li>
-  <li><a href="#similarity" data-toggle="tab">Motif similarity</a></li>
-</ul>
+  <div class="tab-content">
+    <!-- WEBLOGO COMPARISON -->
+    <div class="tab-pane" id="weblogo">
+      <div class="row-fluid">
+        <div class="span6">
+          <div class="boxed">
+	    <img src=""
+                 class="weblogo_img"
+                 site_data={% for site in motif_a.ensemble_report.aligned_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}>
+          </div>
+        </div>
+        <div class="span6">
+          <div class="boxed">
+            <img src=""
+                 class="weblogo_img"
+                 site_data={% for site in motif_b.ensemble_report.aligned_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}>
+          </div>      
+        </div>
+      </div>
+    </div>
+    <!-- UNALIGNED BINDING SITES COMPARISON -->
+    <div class="tab-pane" id="unaligned">
+      <div class="row-fluid">
+        <!-- motif-a binding sites -->
+        <div class="span6">
+          <pre>{% for meta_site in motif_a.ensemble_report.meta_sites %}
+            {{ meta_site.0.site_instance.seq }}{% endfor %}
+	  </pre>
 
-<div class="tab-content">
-  <!-- WEBLOGO COMPARISON -->
-  <div class="tab-pane active" id="weblogo">
-    <div class="row-fluid">
-      <div class="span6">
-        <div class="boxed">
-	  <img src=""
+        </div>
+        <!-- motif-b binding sites -->
+        <div class="span6">
+          <pre>{% for meta_site in motif_b.ensemble_report.meta_sites %}
+            {{ meta_site.0.site_instance.seq }}{% endfor %}
+	  </pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALIGNED BINDING SITES COMPARISON -->
+    <div class="tab-pane" id="aligned">
+      <div class="row-fluid">
+
+        <!-- motif-a binding sites -->
+        <div class="span6">
+          <pre>{% for site in motif_a.ensemble_report.aligned_sites %}
+            {{ site }}{% endfor %}</pre>
+        </div>
+        <!-- motif-b binding sites -->
+        <div class="span6">
+          <pre>{% for site in motif_b.ensemble_report.aligned_sites %}
+            {{ site }}{% endfor %}</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- MOTIF SIMILARITY -->
+    <div class="tab-pane active" id="similarity">
+      <div class="row-fluid">
+        <!-- motif-similarity column A -->
+        <div class="span6">
+          <img src=""
                class="weblogo_img"
                site_data={% for site in motif_a.ensemble_report.aligned_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}>
         </div>
-      </div>
-      <div class="span6">
-        <div class="boxed">
+        <!-- -similarity column B -->
+        <div class="span6">
           <img src=""
                class="weblogo_img"
                site_data={% for site in motif_b.ensemble_report.aligned_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}>
-        </div>      
-      </div>
-    </div>
-  </div>
-  <!-- UNALIGNED BINDING SITES COMPARISON -->
-  <div class="tab-pane" id="unaligned">
-    <div class="row-fluid">
-      <!-- motif-a binding sites -->
-      <div class="span6">
-        <pre>{% for meta_site in motif_a.ensemble_report.meta_sites %}
-          {{ meta_site.0.site_instance.seq }}{% endfor %}
-	</pre>
-
-      </div>
-      <!-- motif-b binding sites -->
-      <div class="span6">
-        <pre>{% for meta_site in motif_b.ensemble_report.meta_sites %}
-          {{ meta_site.0.site_instance.seq }}{% endfor %}
-	</pre>
-      </div>
-    </div>
-  </div>
-
-  <!-- ALIGNED BINDING SITES COMPARISON -->
-  <div class="tab-pane" id="aligned">
-    <div class="row-fluid">
-
-      <!-- motif-a binding sites -->
-      <div class="span6">
-        <pre>{% for site in motif_a.ensemble_report.aligned_sites %}
-          {{ site }}{% endfor %}</pre>
-      </div>
-      <!-- motif-b binding sites -->
-      <div class="span6">
-        <pre>{% for site in motif_a.ensemble_report.aligned_sites %}
-          {{ site }}{% endfor %}</pre>
-      </div>
-    </div>
-  </div>
-
-  <!-- MOTIF SIMILARITY -->
-  <div class="tab-pane" id="similarity">
-    <div class="row-fluid">
-      <!-- motif-similarity column A -->
-      <div class="span6">
-        <div class="boxed">
-          column A
         </div>
       </div>
-      <!-- motif-similarity column B -->
-      <div class="span6">
-        <div class="boxed">
-          column B
+      
+      <hr />
+
+      <div class="tabbable tabs-left">
+        <ul class="nav nav-tabs">
+          <li class="active"><a href="#levenshtein" data-toggle="tab">Levenshtein distance</a></li>
+          <li><a href="#PCC" data-toggle="tab">Pearson Correlation Coefficient</a></li>
+          <li><a href="#ALLR" data-toggle="tab">Average Log Likelihood Ratio</a></li>
+          <li><a href="#KL" data-toggle="tab">Kullback-Leibler Divergence</a></li>
+          <li><a href="#ED" data-toggle="tab">Eucledian Distance</a></li>
+        </ul>
+        <div class="tab-content">
+          <!-- Levenstein distance -->
+          <div class="tab-pane active" id="levenshtein">
+            {% lorem %}
+            <p></p>
+            <div class="text-center">
+              <button class="btn btn-small">Run Levenshtein distance</button>
+            </div>
+          </div>
+          
+          <div class="tab-pane" id="PCC">
+            {% lorem %}
+            <p></p>
+            <div class="text-center">
+              <button class="btn btn-small" onclick="motifSimilarityAJAX(this, 'pcc'); return false;">Run Pearson Correlation Coefficient</button>
+            </div>
+          </div>
+
+          <div class="tab-pane" id="ALLR">
+            {% lorem %}
+            <p></p>
+            <div class="text-center">
+              <button class="btn btn-small">Run Average Log Likelihood Ratio</button>
+            </div>
+          </div>
+
+          <div class="tab-pane" id="KL">
+            {% lorem %}
+            <p></p>
+            <div class="text-center">
+              <button class="btn btn-small">Run Kullback-Leibler distance</button>
+            </div>
+          </div>
+
+          <div class="tab-pane" id="ED">
+            {% lorem %}
+            <div class="text-center">
+              <button class="btn btn-small">Run Euclidean distance</button>
+            </div>
+          </div>
+
         </div>
       </div>
+
     </div>
   </div>
 </div>
 
+<div>
 <form action="" method="post">{% csrf_token %}
-{% include "motif_compare_wizard_navigate.html" %}
+  {% include "motif_compare_wizard_navigate.html" %}
 </form>
+</div>
 
+{% endblock %}
+
+{% block javascript %}
 
 <script>
-  $(document).ready(function() {
-  $('.weblogo_img').each(function() {
-  var img = $(this);
-  img.parent().block({message: 'Loading sequence logo'});
-  var site_data = $(this).attr('site_data');
-  $.ajax({
-  type: "POST",
-  url: "{% url baseapp.views.get_weblogo %}",
-  data: {
-  sites: site_data,
-  csrfmiddlewaretoken:'{{csrf_token}}', 
-  },
-  success: function(data) {
-  img.attr('src', data);
-  img.parent().unblock();
-  },
-  });
-  });
-  });
+
+function motifSimilarityAJAX(el, fun) {
+    // request motif similarity for two motifs
+    // el is the element that the function is called
+    // fun is the function to be used for motif similarity measurement
+    $(el).parent().block({message: 'Loading'});
+    $.ajax({
+        type: "POST",
+        url: "{% url motif_sim_measure %}",
+        data: {
+            fun: fun,
+            sites_a: "ACTC,CAGT",
+            sites_b: "ACGG,CATT",
+            csrfmiddlewaretoken: '{{csrf_token}}'
+        },
+        success: function(data) {
+            $(el).parent().unblock();
+            $(el).parent().parent().append(data);
+        }
+    });
+}
+
+$(document).ready(function() {
+    $('.weblogo_img').each(function() {
+        var img = $(this);
+        img.parent().block({message: 'Loading sequence logo'});
+        var site_data = $(this).attr('site_data');
+        $.ajax({
+            type: "POST",
+            url: "{% url baseapp.views.get_weblogo %}",
+            data: {
+                sites: site_data,
+                csrfmiddlewaretoken:'{{csrf_token}}'
+            },
+            success: function(data) {
+                img.attr('src', data);
+                img.parent().unblock();
+            }
+        });
+    });
+});
+
 </script>
 
 {% endblock %}

@@ -317,3 +317,5 @@ def create_motif(seqs):
             print "Diff motif size length?"
             return None
     return m
+
+

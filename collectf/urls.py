@@ -72,6 +72,7 @@ urlpatterns = patterns('',
 
     # motif comparison
     url(r'^compare_motifs/$', browseapp.compare_motifs.MotifComparisonWizard.as_view(browseapp.compare_motifs.FORMS), name="compare_motifs"),
+    url(r'^motif_similarity_measure/$', browseapp.compare_motifs.motif_sim_measure, name="motif_sim_measure"),
                        
     # view results
     url(r'^view_results/$', browseapp.view_results.view_results),
