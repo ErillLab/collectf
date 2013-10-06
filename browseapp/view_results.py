@@ -45,9 +45,7 @@ def prepare_results(motif_csi_list, non_motif_csi_list, integrate_non_motif=Fals
     trimmed = lasagna.TrimAlignment(aligned) if len(aligned) > 1 else aligned
     trimmed = [s.upper() for s in trimmed]
     # create weblogo for the list of sites
-    #weblogo_data = bioutils.weblogo_uri(trimmed)
     weblogo_data='x' 
-    
     ensemble_report = {'meta_sites': ensemble_meta_sites,
                        'aligned_sites': trimmed,
                        'weblogo_image_data': weblogo_data}

@@ -69,7 +69,7 @@
 $(document).ready(function() {
     $('.weblogo_img').each(function() {
 	var img = $(this);
-        img.parent().block({message: '<h2>Loading.<br/><i class="icon-spinner icon-spin"></i></h2>'});
+        img.parent().block();
 	var site_data = $(this).attr('site_data');
 	$.ajax({
 	    type: "POST",

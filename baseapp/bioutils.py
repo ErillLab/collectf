@@ -310,12 +310,15 @@ def overlap_non_motif_site_meta_site(non_motif_curation_site_instance, meta_site
 def create_motif(seqs):
     """Create motif from sequences"""
     m = Motif.Motif(alphabet=IUPAC.unambiguous_dna)
+
     for seq in seqs:
         try:
             m.add_instance(Seq(seq, m.alphabet))
         except:
             print "Diff motif size length?"
             return None
+
+    m.make_counts_from_instances()
     return m
 
 

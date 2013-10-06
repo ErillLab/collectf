@@ -22,13 +22,12 @@ FORMS = [("motif_a", MotifComparisonForm),
 
 TEMPLATES = {"motif_a": "motif_compare_search.html",
              "motif_b": "motif_compare_search.html",
-             #"search_results": "motif_compare_search_results.html",
              "comparison_results": "motif_compare_comparison_results.html"}
 
 FORM_TITLES = {"motif_a": "Search for the first motif.",
                "motif_b": "Search for the second motif.",
-               #"search_results": "Search results are ready for comparison",
                "comparison_results": "Motif comparison results"}
+
 FORM_DESCRIPTIONS = {
     "motif_a": """Search in CollecTF is fully customizable. Just select a taxonomic
                unit (e.g. the Vibrio genus), a transcription factor family or
@@ -39,8 +38,6 @@ FORM_DESCRIPTIONS = {
                unit (e.g. the Vibrio genus), a transcription factor family or
                instance (e.g. LexA) and the set of experimental techniques that
                reported sites should be backed by and proceed.""",
-    
-    #"search_results": "",
 
     "comparison_results": "",
     }
@@ -87,7 +84,6 @@ class MotifComparisonWizard(CookieWizardView):
             c.update({"motif_a": motif_a_data,
                       "motif_b": motif_b_data,
                       })
-
         return c
 
     def process_step(self, form):
@@ -114,26 +110,53 @@ def motif_sim_measure(request):
     Request has the similarity function and two motifs (comma seperated strings).
     Reponse returns HTML which is embedded into the main comparison page.
     """
-    fun = euclidean_distance # TODO 
-    request.POST['fun']
-    sites_a = request.POST['sites_a'].split(',')
-    sites_b = request.POST['sites_b'].split(',')
-    fig = motif_sim_test(sites_a, sites_b, fun)
-    return render_to_response("motif_similarity_ajax.html",
-                              {'plot': fig,
-                               'fun': fun,
-                               'sc': fun(sites_a, sites_b)},
-                              context_instance=RequestContext(request))
+    def levenshtein_measure(motif_a, motif_b):
+        a_vs_a = levenshtein_motifs(motif_a, motif_a)
+        a_vs_b = levenshtein_motifs(motif_a, motif_b)
+        b_vs_b = levenshtein_motifs(motif_b, motif_b)
+        plt.boxplot([a_vs_a, a_vs_b, b_vs_b])
+        plt.xticks(range(1,4), [r'$M_a$ vs $M_a$', r'$M_a$ vs $M_b$', r'$M_b$ vs $M_b$'])
+        boxplot = fig2img(plt.gcf())
+        plt.hist([a_vs_a, a_vs_b, b_vs_b], bins=15, normed=1,
+                 label=[r'$M_a$ vs $M_a$', r'$M_a$ vs $M_b$', r'$M_b$ vs $M_b$'])
+        plt.legend()
+        hist = fig2img(plt.gcf())
+        return boxplot, hist
+
+    #sites_a = request.POST['sites_a'].strip().split(',')
+    #sites_b = request.POST['sites_b'].strip().split(',')
+    sites_a = ['ACTTT', 'ATCAC']
+    sites_b = ['ACACA', 'GCCAC']
+    if request.POST['fun'] == 'levenshtein':
+        boxplot, hist = levenshtein_measure(sites_a, sites_b)
+        return render_to_response("motif_sim_levenshtein.html",
+                                  {'boxplot': boxplot,
+                                   'hist': hist,},
+                                  context_instance=RequestContext(request))
+        
+    else: # other similarity metrics
+        fun_str = request.POST['fun']
+        fun2call = {'ED': euclidean_distance,
+                    'PCC': pearson_correlation_coefficient,
+                    'KL': kullback_leibler_divergence,
+                    'ALLR': average_log_likelihood_ratio,
+                    }[fun_str]
+        fig = motif_sim_test(sites_a, sites_b, fun2call)
+        return render_to_response("motif_sim_%s.html" % fun_str,
+                                  {'plot': fig,
+                                   'sc': fun2call(sites_a, sites_b)},
+                                  context_instance=RequestContext(request))
 
 def motif_sim_test(ma, mb, fnc):
     """Given two motifs and a similarity function, perform the permutation tests and
     return the histogram"""
+    print 'a'
     permuted_dists = permutation_test(ma, mb, fnc)
+    print 'b'
     true_dist = fnc(ma, mb)
     plt.hist(permuted_dists, bins=30, normed=1, color='c')
     plt.axvline(true_dist, linestyle='dashed', linewidth=2, color='b')
     return fig2img(plt.gcf())
-
 
 def fig2img(fig):
     """Given matplotlib plot return data URI."""
@@ -142,19 +165,6 @@ def fig2img(fig):
     plt.clf()
     imgdata.seek(0) # rewind the data
     return "data:image/png;base64,%s" % b64encode(imgdata.buf)
-
-def boxplot(d):
-    """Generate boxplot and return it as data URI."""
-    plt.boxplot(d)
-    plt.xticks(range(1,4), [r'$M_a$ vs $M_a$', r'$M_a$ vs $M_b$', r'$M_b$ vs $M_b$'])
-    return fig2img(plt.gcf())
-
-def hist(d):
-    """Generate histogram of data array d and return it as data URI."""
-    plt.hist(d, bins=15, normed=1,
-             label=[r'$M_a$ vs $M_a$', r'$M_a$ vs $M_b$', r'$M_b$ vs $M_b$'])
-    plt.legend()
-    return fig2img(plt.gcf())
 
 def sample(n,xs,replace=True):
     """Sample n objects from the list xs"""
@@ -229,3 +239,33 @@ def kullback_leibler_divergence(sites_a, sites_b):
     mb = bioutils.create_motif(sites_b)
     return sum(kl(cola, colb) for (cola,colb) in zip(ma.pwm(), mb.pwm()))
 
+def pearson_correlation_coefficient(sites_a, sites_b):
+    """PEarson correlation coefficient"""
+    def pcc(cola, colb):
+        cola_avg = sum(cola[l] for l in "ACTG") / 4.0
+        colb_avg = sum(colb[l] for l in "ACTG") / 4.0
+        return (sum(((cola[l]-cola_avg) * (colb[l]-colb_avg)) for l in "ACTG") /
+                math.sqrt(sum((cola[l]-cola_avg)**2 for l in "ACTG") *
+                          sum((colb[l]-colb_avg)**2 for l in "ACTG")))
+    
+    ma = bioutils.create_motif(sites_a)
+    mb = bioutils.create_motif(sites_b)
+    return sum(pcc(cola, colb) for (cola,colb) in zip(ma.pwm(), mb.pwm()))
+
+def average_log_likelihood_ratio(sites_a, sites_b):
+    """Average Log-likelihood ratio distance"""
+    def safe_log2(x):
+        return math.log(x,2) if x != 0 else 0.0
+    def allr(cola, colb, cnta, cntb):
+        return (sum((cnta[l]*safe_log2(colb[l]/0.25) +
+                     cntb[l]*safe_log2(cola[l]/0.25))
+                    for l in "ACTG") /
+                sum(cnta[l] + cntb[l] for l in 'ACTG'))
+    ma = bioutils.create_motif(sites_a)
+    mb = bioutils.create_motif(sites_b)
+    # reformat biopython count matrices
+    counts_a = [dict((l, ma.counts[l][i]) for l in "ACTG") for i in xrange(ma.length)]
+    counts_b = [dict((l, mb.counts[l][i]) for l in "ACTG") for i in xrange(mb.length)]
+    return sum(allr(cola, colb, cnta, cntb)
+               for (cola,colb,cnta,cntb) in zip(ma.pwm(), mb.pwm(), counts_a, counts_b))
+        

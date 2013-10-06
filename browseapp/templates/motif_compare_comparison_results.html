@@ -4,21 +4,22 @@
 {% block form %}
 {% load webdesign %}
 
+<div class="boxed">
 <p>
-  <b>1st motif ($M_a$)</b> - 
-  <span class="text-info">{{ motif_a.TFs|join:", " }}</span> transcription factor binding sites from organisms
-  <span class="text-info"><i>{{ motif_a.species|join:", "}}</i></span>
+  <b>1st motif $(M_a)$</b> - 
+  <u>{{ motif_a.TFs|join:", " }}</u> transcription factor binding sites from organisms</span>
+<u><i>{{ motif_a.species|join:", "}}</i></u>
   <small><a href="#" onclick="$('#view_all_motif_a').submit(); return false;"><u>[detailed view]</u></a></small>
 </p>
 
 <p>
-  <b>2nd motif ($M_b$)</b> -
-  <span class="text-info">{{ motif_b.TFs|join:", " }}</span> transcription factor binding sites from organisms
-  <span class="text-info"><i>{{ motif_b.species|join:", "}}</i></span>
+  2nd motif $(M_b)$ -
+  <u>{{ motif_b.TFs|join:", " }}</u> transcription factor binding sites from organisms
+  <u><i>{{ motif_b.species|join:", "}}</i></u>
   <small><a href="#" onclick="$('#view_all_motif_b').submit(); return false;"><u>[detailed view]</u></a></small>
 </p>
+</div>
 
-<p></p>
 
 <form style="display:inline;" method="post" action="{% url browseapp.view_results.view_results %}" id="view_all_motif_a" action="">
   {% csrf_token %}
@@ -106,51 +107,26 @@
       <div class="tabbable tabs-left">
         <ul class="nav nav-tabs">
           <li class="active"><a href="#levenshtein" data-toggle="tab">Levenshtein distance</a></li>
-          <li><a href="#PCC" data-toggle="tab">Pearson Correlation Coefficient</a></li>
-          <li><a href="#ALLR" data-toggle="tab">Average Log Likelihood Ratio</a></li>
-          <li><a href="#KL" data-toggle="tab">Kullback-Leibler Divergence</a></li>
-          <li><a href="#ED" data-toggle="tab">Eucledian Distance</a></li>
+          <li><a href="#PCC" data-toggle="tab" onclick="motifSimilarityAJAX('PCC'); return false;">
+              Pearson Correlation Coefficient</a></li>
+          <li><a href="#ALLR" data-toggle="tab" onclick="motifSimilarityAJAX('ALLR'); return false;">
+              Average Log Likelihood Ratio</a></li>
+          <li><a href="#KL" data-toggle="tab" onclick="motifSimilarityAJAX('KL'); return false;">
+              Kullback-Leibler Divergence</a></li>
+          <li><a href="#ED" data-toggle="tab" onclick="motifSimilarityAJAX('ED'); return false;">
+              Eucledian Distance</a></li>
         </ul>
         <div class="tab-content">
           <!-- Levenstein distance -->
-          <div class="tab-pane active" id="levenshtein">
-            {% lorem %}
-            <p></p>
-            <div class="text-center">
-              <button class="btn btn-small">Run Levenshtein distance</button>
-            </div>
-          </div>
+          <div class="tab-pane active" id="levenshtein"></div>
           
-          <div class="tab-pane" id="PCC">
-            {% lorem %}
-            <p></p>
-            <div class="text-center">
-              <button class="btn btn-small" onclick="motifSimilarityAJAX(this, 'pcc'); return false;">Run Pearson Correlation Coefficient</button>
-            </div>
-          </div>
+          <div class="tab-pane" id="PCC"></div>
 
-          <div class="tab-pane" id="ALLR">
-            {% lorem %}
-            <p></p>
-            <div class="text-center">
-              <button class="btn btn-small">Run Average Log Likelihood Ratio</button>
-            </div>
-          </div>
+          <div class="tab-pane" id="ALLR"></div>
 
-          <div class="tab-pane" id="KL">
-            {% lorem %}
-            <p></p>
-            <div class="text-center">
-              <button class="btn btn-small">Run Kullback-Leibler distance</button>
-            </div>
-          </div>
+          <div class="tab-pane" id="KL"></div>
 
-          <div class="tab-pane" id="ED">
-            {% lorem %}
-            <div class="text-center">
-              <button class="btn btn-small">Run Euclidean distance</button>
-            </div>
-          </div>
+          <div class="tab-pane" id="ED"></div>
 
         </div>
       </div>
@@ -171,23 +147,26 @@
 
 <script>
 
-function motifSimilarityAJAX(el, fun) {
+function motifSimilarityAJAX(el) {
     // request motif similarity for two motifs
-    // el is the element that the function is called
-    // fun is the function to be used for motif similarity measurement
-    $(el).parent().block({message: '<h2>Loading.<br/><i class="icon-spinner icon-spin"></i></h2>'});
+    var elDOM = $('#'+el);
+    // if already done, dont make that request again.
+    if (!elDOM.is(':empty')) {return false;}
+    elDOM.block();
     $.ajax({
         type: "POST",
         url: "{% url motif_sim_measure %}",
         data: {
-            fun: fun,
-            sites_a: "ACTC,CAGT",
-            sites_b: "ACGG,CATT",
+            fun: el,
+            sites_a: "{% for site in motif_a.ensemble_report.aligned_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}",
+            sites_b: "{% for site in motif_b.ensemble_report.aligned_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}",
             csrfmiddlewaretoken: '{{csrf_token}}'
         },
         success: function(data) {
-            $(el).parent().unblock();
-            $(el).parent().parent().append(data);
+            elDOM.unblock();
+            elDOM.append(data);
+            // render MathJax
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, el]);
         }
     });
 }
@@ -195,7 +174,7 @@ function motifSimilarityAJAX(el, fun) {
 $(document).ready(function() {
     $('.weblogo_img').each(function() {
         var img = $(this);
-        img.parent().block({message: '<h2>Loading.<br/><i class="icon-spinner icon-spin"></i></h2>'});
+        img.parent().block();
         var site_data = $(this).attr('site_data');
         $.ajax({
             type: "POST",
@@ -210,6 +189,9 @@ $(document).ready(function() {
             }
         });
     });
+
+    // bring data for levenshtein distance
+    motifSimilarityAJAX('levenshtein');
 });
 
 </script>
