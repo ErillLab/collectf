@@ -11,8 +11,6 @@ from collectf import settings
 from base64 import b64encode
 import lasagna
 
-
-
 Entrez.email = "sefakilic@gmail.com"
 
 def get_pubmed(pmid):
@@ -189,9 +187,10 @@ def to_fasta(seqs):
 def weblogo(sequences):
     # if all sequences don't have the same length, apply LASAGNA
     # use LASAGNA to align sites
-    aligned, idxAligned, strands = lasagna.LASAGNA(map(lambda s: str(s.lower()), sequences), 0)
-    trimmed = lasagna.TrimAlignment(aligned) if len(aligned) > 1 else aligned
-    trimmed = [s.upper() for s in trimmed]
+    #aligned, idxAligned, strands = lasagna.LASAGNA(map(lambda s: str(s.lower()), sequences), 0)
+    #trimmed = lasagna.TrimAlignment(aligned) if len(aligned) > 1 else aligned
+    #trimmed = [s.upper() for s in trimmed]
+    trimmed = call_lasagna(sequences)
     
     assert all(len(seq) == len(trimmed[0]) for seq in trimmed), "sequences do not have the same length"
 
@@ -322,3 +321,15 @@ def create_motif(seqs):
     return m
 
 
+def call_lasagna(sites, trim=True):
+    """
+    Given the list of site sequences, run LASAGNA and return the aligned
+    output.
+    """
+    sites = [site.lower() for site in sites]
+    aligned, idxAligned, strands = lasagna.LASAGNA(sites, 0)
+    if not trim:
+        return aligned
+    trimmed = lasagna.TrimAlignment(aligned) if len(aligned) > 1 else aligned
+    trimmed = [s.upper() for s in trimmed]
+    return trimmed

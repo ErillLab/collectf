@@ -127,9 +127,10 @@ def get_random_motif(motif_len_th=30, motif_sz_th=10):
         csis = csis.all()
         if len(csis) > motif_sz_th:
             # align sites
-            aligned, idxAligned, strands = lasagna.LASAGNA(map(lambda s:str(s.site_instance.seq).lower(), csis), 0)
-            trimmed = lasagna.TrimAlignment(aligned) if len(aligned) > 1 else aligned
-            trimmed = [s.upper() for s in trimmed]
+            #aligned, idxAligned, strands = lasagna.LASAGNA(map(lambda s:str(s.site_instance.seq).lower(), csis), 0)
+            #trimmed = lasagna.TrimAlignment(aligned) if len(aligned) > 1 else aligned
+            #trimmed = [s.upper() for s in trimmed]
+            trimmed = bioutils.call_lasagna(map(lambda s: str(s.site_instance.seq), csis))
             if len(trimmed[0]) < motif_len_th:
                 # get non-motif-associated data
                 ncsis = models.Curation_SiteInstance.objects.filter(curation__TF_instance__protein_accession=TF_genome[1],

@@ -44,9 +44,7 @@ def browse_tax(request):
     all_species_ids = models.Curation_SiteInstance.objects.values_list('site_instance__genome__taxonomy__pk', flat=True).distinct()
     all_species = models.Taxonomy.objects
     # get all phylums
-    taxonomy = {
-        'phyla': all_species.filter(rank='phylum')
-    }
+    taxonomy = {'phyla': all_species.filter(rank='phylum')}
     return render_to_response('browse_SP.html',
                               {'taxonomy': taxonomy},
                               context_instance=RequestContext(request))
@@ -67,16 +65,12 @@ def browse_tax_all_reports_ajax(request, id):
     motif_csis = models.Curation_SiteInstance.objects.filter(site_instance__genome__taxonomy__in=all_sp, is_motif_associated=True)
     non_motif_csis = models.Curation_SiteInstance.objects.filter(site_instance__genome__taxonomy__in=all_sp, is_motif_associated=False)
     all_reports = group_search_results(motif_csis, non_motif_csis)['reports']
-
-
     return render_to_response("browse_tab.html",
                               {'title': models.Taxonomy.objects.get(pk=id).name,
                                'description': '',
                                'reports': all_reports},
                               context_instance=RequestContext(request))
 
-
-    
 def browse_techniques(request):
     all_categories = models.ExperimentalTechniqueCategory.objects.all().order_by('name')
     binding_techniques = {}
@@ -92,14 +86,11 @@ def browse_techniques(request):
     binding_techniques = dict((x,y) for (x,y) in binding_techniques.items() if y)
     expression_techniques = dict((x,y) for (x,y) in expression_techniques.items() if y)
     all_categories = dict((x.category_id, x) for x in all_categories)
-
-    print binding_techniques
     return render_to_response('browse_TECH.html',
                               {'binding_techniques': binding_techniques,
                                'expression_techniques': expression_techniques,
                                'categories': all_categories},
                               context_instance=RequestContext(request))
-    
 
 def browse_techniques_all_reports_ajax(request, type, id):
     techniques = None
@@ -128,14 +119,11 @@ def browse_techniques_all_reports_ajax(request, type, id):
         title = techniques.all()[:1].get().name
         desc = techniques.all()[:1].get().description
 
-
     motif_csis = models.Curation_SiteInstance.objects.filter(curation__experimental_techniques__in=techniques, is_motif_associated=True)
     non_motif_csis = models.Curation_SiteInstance.objects.filter(curation__experimental_techniques__in=techniques, is_motif_associated=False)
     all_reports = search_results(motif_csis, non_motif_csis)['reports']
-
     return render_to_response("browse_tab.html",
                               {'title': title,
                                'description': desc,
                                'reports': all_reports},
                               context_instance=RequestContext(request))
-        

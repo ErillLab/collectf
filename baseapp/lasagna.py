@@ -517,5 +517,3 @@ def Align(params):
         print '>%s %s\n%s' % (headers[i], strand, seq)
 
 
-
-

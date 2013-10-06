@@ -87,9 +87,10 @@ def browse_TF_and_species_selected(request, TF_param, TF_ids, species_param, spe
     for report in reports:
         ensemble_meta_sites.extend(report['meta_sites'].values())
     # lasagna alignment for ensemble
-    aligned, idxAligned, strands = lasagna.LASAGNA(map(lambda s:str(s[0].site_instance.seq).lower(), ensemble_meta_sites), 0)
-    trimmed = lasagna.TrimAlignment(aligned) if len(aligned) > 1 else aligned
-    trimmed = [s.upper() for s in trimmed]
+    #aligned, idxAligned, strands = lasagna.LASAGNA(map(lambda s:str(s[0].site_instance.seq).lower(), ensemble_meta_sites), 0)
+    #trimmed = lasagna.TrimAlignment(aligned) if len(aligned) > 1 else aligned
+    #trimmed = [s.upper() for s in trimmed]
+    trimmed = bioutils.call_lasagna(map(lambda s: str(s[0].site_instance.seq), ensemble_meta_sites))
     # create weblogo for the list of sites
     weblogo_data = bioutils.weblogo_uri(trimmed)
     
