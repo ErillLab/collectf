@@ -41,12 +41,13 @@ def prepare_results(motif_csi_list, non_motif_csi_list, integrate_non_motif=Fals
     for report in reports:
         ensemble_meta_sites.extend(report['meta_sites'].values())
     # lasagna alignment for ensemble
-    trimmed = bioutils.call_lasagna(map(lambda s: str(s[0].site_instance.seq), ensemble_meta_sites))
+    trimmed = bioutils.call_lasagna(map(lambda s: s[0].site_instance, ensemble_meta_sites))
+    
+    #trimmed = bioutils.call_lasagna(map(lambda s: str(s[0].site_instance.seq), ensemble_meta_sites))
     # create weblogo for the list of sites
-    weblogo_data='x' 
     ensemble_report = {'meta_sites': ensemble_meta_sites,
                        'aligned_sites': trimmed,
-                       'weblogo_image_data': weblogo_data}
+                       'weblogo_image_data': 'x'}
 
     return {'reports': reports,
             'ensemble_report': ensemble_report,
@@ -61,12 +62,9 @@ def view_results(request):
         
     csi_list = request.POST['motif_csi_list'].strip().split(',')
     non_motif_csi_list = None
-
     if request.POST['non_motif_csi_list']:
         non_motif_csi_list = request.POST['non_motif_csi_list'].strip().split(',')
-        
     integrate_non_motif = bool('integrate_non_motif' in request.POST)
-    
     template = prepare_results(csi_list, non_motif_csi_list, integrate_non_motif)
     return render(request,
                   'view_report.html',
@@ -80,16 +78,9 @@ def get_sites_by_TF_and_species(curation_site_instances, non_motif_curation_site
      meta_site_regulation_dict,
      meta_site_technique_dict,
      meta_site_genome_accession_dict) = group_curation_site_instances(curation_site_instances, non_motif_curation_site_instances)
-    # Use LASAGNA to align sites    # use LASAGNA to align sites
-    aligned, idxAligned, strands = lasagna.LASAGNA(map(lambda s:str(s[0].site_instance.seq).lower(), meta_sites.values()), 0)
-    trimmed = lasagna.TrimAlignment(aligned) if len(aligned) > 1 else aligned
-    trimmed = [s.upper() for s in trimmed]
-    #weblogo_data = bioutils.weblogo_uri(trimmed)
-    weblogo_data = 'x'
-
-    #assert all(x.site_instance.genome==meta_site[0].site_instance.genome for meta_site in meta_sites.values() for x in meta_site)
-    #assert all(x.curation.TF_instance==meta_site[0].curation.TF_instance for meta_site in meta_sites.values() for x in meta_site)
-    
+    # Use LASAGNA to align sites 
+    #trimmed = bioutils.call_lasagna(map(lambda s:str(s[0].site_instance.seq), meta_sites.values()))
+    trimmed = bioutils.call_lasagna(map(lambda s: s[0].site_instance, meta_sites.values()))
     return {
         'meta_sites': meta_sites,
         'meta_site_genome_accession_dict': {}, #dict((k, meta_sites[k][0].site_instance.genome.genome_accession) for k in meta_sites),
@@ -97,7 +88,7 @@ def get_sites_by_TF_and_species(curation_site_instances, non_motif_curation_site
         'meta_site_curation_dict': meta_site_curation_dict,
         'meta_site_regulation_dict': meta_site_regulation_dict,
         'meta_site_technique_dict': meta_site_technique_dict,
-        'weblogo_image_data': weblogo_data,
+        'weblogo_image_data': 'x',
         'aligned_sites': trimmed
     }
     

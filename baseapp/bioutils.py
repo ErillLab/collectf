@@ -13,6 +13,9 @@ import lasagna
 
 Entrez.email = "sefakilic@gmail.com"
 
+def reverse_complement(seq):
+    return Seq(seq).reverse_complement().tostring()
+
 def get_pubmed(pmid):
     """Retrieve pubmed publication from NCBI database."""
     try:
@@ -187,18 +190,12 @@ def to_fasta(seqs):
 def weblogo(sequences):
     # if all sequences don't have the same length, apply LASAGNA
     # use LASAGNA to align sites
-    #aligned, idxAligned, strands = lasagna.LASAGNA(map(lambda s: str(s.lower()), sequences), 0)
-    #trimmed = lasagna.TrimAlignment(aligned) if len(aligned) > 1 else aligned
-    #trimmed = [s.upper() for s in trimmed]
-    trimmed = call_lasagna(sequences)
-    
-    assert all(len(seq) == len(trimmed[0]) for seq in trimmed), "sequences do not have the same length"
-
-    al = to_fasta(trimmed)
+    #trimmed = call_lasagna(sequences)
+    #assert all(len(seq) == len(trimmed[0]) for seq in trimmed), "sequences do not have the same length"
+    al = to_fasta(sequences)
     from subprocess import Popen, PIPE, STDOUT
     p = Popen(['weblogo', '-F', 'png', '-s', 'LARGE', '-c', 'classic', '--errorbars', 'YES'], stdout=PIPE, stdin=PIPE, stderr=PIPE)
     stdout_data, stderr_data = p.communicate(input=al)
-    print stderr_data
     return stdout_data
     
 def weblogo_depr(sequences, format="PNG"):
@@ -297,7 +294,6 @@ def overlap_site_meta_site(curation_site_instance, meta_site_instance):
 
 def overlap_test_2(loca, locb):
     # assuming loca is the larger (non-motif-associated)
-
     overlap = get_overlap(loca, locb)
     return overlap >= (locb[1]-locb[0])
 
@@ -309,27 +305,52 @@ def overlap_non_motif_site_meta_site(non_motif_curation_site_instance, meta_site
 def create_motif(seqs):
     """Create motif from sequences"""
     m = Motif.Motif(alphabet=IUPAC.unambiguous_dna)
-
     for seq in seqs:
         try:
             m.add_instance(Seq(seq, m.alphabet))
         except:
             print "Diff motif size length?"
             return None
-
     m.make_counts_from_instances()
     return m
 
 
-def call_lasagna(sites, trim=True):
+def call_lasagna(site_instances, trim=True):
     """
     Given the list of site sequences, run LASAGNA and return the aligned
     output.
     """
-    sites = [site.lower() for site in sites]
+    sites = [str(site_instance.seq).lower() for site_instance in site_instances]
     aligned, idxAligned, strands = lasagna.LASAGNA(sites, 0)
     if not trim:
-        return aligned
+        return [s.upper() for s in aligned]
+    
     trimmed = lasagna.TrimAlignment(aligned) if len(aligned) > 1 else aligned
+    # make uppercase
+    aligned = [s.upper() for s in aligned]
     trimmed = [s.upper() for s in trimmed]
+
+    assert map(int, idxAligned) == range(len(idxAligned)), "lasagna sites are not sorted"
+
+    recovered = [recover_lasagna_gaps(site_instance, a, t, s)
+                 for (site_instance, a, t, s) in zip(site_instances, aligned, trimmed, strands)]
+
+    return recovered
+
+def recover_lasagna_gaps(site_instance, aligned, trimmed, aligned_strand):
+    """
+    Lasagna output may contain gaps in the alignment. This function replaces those
+    gaps with the original base that is looked up from the genome.
+    """
+    if '-' not in aligned:  # no gaps -> no replacement
+        return aligned
+
+    if aligned_strand == '+':
+        assert site_instance.seq in aligned
+    else:
+        assert reverse_complement(site_instance.seq) in aligned
+    assert aligned_strand in ['+', '-']
+
+    trimmed = trimmed.replace('-', '*')
     return trimmed
+    

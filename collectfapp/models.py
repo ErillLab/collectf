@@ -253,6 +253,10 @@ class SiteInstance(models.Model):
                   self.seq,]
         return '\t'.join(fields)
 
+    def get_expansion(self, n=100):
+        # get [-n, +n] surrounding regions
+        return self.genome.sequence[self.start-n:self.end+n]
+
 
 class Curation_SiteInstance(models.Model):
     # through model between Curation and SiteInstance models

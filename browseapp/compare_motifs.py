@@ -123,10 +123,11 @@ def motif_sim_measure(request):
         hist = fig2img(plt.gcf())
         return boxplot, hist
 
-    #sites_a = request.POST['sites_a'].strip().split(',')
-    #sites_b = request.POST['sites_b'].strip().split(',')
-    sites_a = ['ACTTT', 'ATCAC']
-    sites_b = ['ACACA', 'GCCAC']
+    sites_a = request.POST['sites_a'].strip().split(',')
+    sites_b = request.POST['sites_b'].strip().split(',')
+    # remove gaps for now
+    sites_a = [site.replace('-', 'A') for site in sites_a]
+    sites_b = [site.replace('-', 'A') for site in sites_b]
     if request.POST['fun'] == 'levenshtein':
         boxplot, hist = levenshtein_measure(sites_a, sites_b)
         return render_to_response("motif_sim_levenshtein.html",
@@ -150,13 +151,21 @@ def motif_sim_measure(request):
 def motif_sim_test(ma, mb, fnc):
     """Given two motifs and a similarity function, perform the permutation tests and
     return the histogram"""
-    print 'a'
     permuted_dists = permutation_test(ma, mb, fnc)
-    print 'b'
     true_dist = fnc(ma, mb)
     plt.hist(permuted_dists, bins=30, normed=1, color='c')
     plt.axvline(true_dist, linestyle='dashed', linewidth=2, color='b')
     return fig2img(plt.gcf())
+
+def motif_alignment(sites_a, sites_b, fnc):
+    """
+    Given two motifs and a similiarity function, align two motifs that gives the
+    maximum similarity. Returns two offset values, one for ma and one for mb. It
+    means that motifs are aligned starting from columns ma[offset_a] and
+    mb[offset_b].
+    """
+    pass
+    
 
 def fig2img(fig):
     """Given matplotlib plot return data URI."""
@@ -188,7 +197,7 @@ def permute_motif(motif):
         motif[i] = "".join(site[p[j]] for j in p)
     return motif
 
-def permutation_test(motif_a, motif_b, dist_fun, n=100):
+def permutation_test(motif_a, motif_b, dist_fun, n=250):
     """Permute columns of two motifs and measure the similarity/distance with the
     specified function. Do this for n times and return the list of scores."""
     dists = [dist_fun(permute_motif(motif_a), permute_motif(motif_b))

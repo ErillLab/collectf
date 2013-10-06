@@ -29,8 +29,7 @@ def browse_by_site(request, dbxref_id):
 
     alignment = None
     if len(curation_site_instances) > 1:
-        alignment = bioutils.call_lasagna(map(lambda csi: str(csi.site_instance.seq), curation_site_instances), trim=False)
-
+        alignment = bioutils.call_lasagna(map(lambda csi: csi.site_instance, curation_site_instances), trim=False)
     
     # get curations
     curation_ids = models.Curation.objects.values_list('curation_id', flat=True).distinct()
