@@ -42,6 +42,7 @@ def prepare_results(motif_csi_list, non_motif_csi_list, integrate_non_motif=Fals
         ensemble_meta_sites.extend(report['meta_sites'].values())
     # lasagna alignment for ensemble
     trimmed = bioutils.call_lasagna(map(lambda s: s[0].site_instance, ensemble_meta_sites))
+
     
     #trimmed = bioutils.call_lasagna(map(lambda s: str(s[0].site_instance.seq), ensemble_meta_sites))
     # create weblogo for the list of sites

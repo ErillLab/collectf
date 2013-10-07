@@ -332,9 +332,14 @@ def call_lasagna(site_instances, trim=True):
 
     assert map(int, idxAligned) == range(len(idxAligned)), "lasagna sites are not sorted"
 
+    #for t in trimmed:
+    #    print t
+    #print '---'
     recovered = [recover_lasagna_gaps(site_instance, a, t, s)
                  for (site_instance, a, t, s) in zip(site_instances, aligned, trimmed, strands)]
-
+    #for r in recovered:
+    #    print r
+    #print '*****'
     return recovered
 
 def recover_lasagna_gaps(site_instance, aligned, trimmed, aligned_strand):
@@ -342,8 +347,8 @@ def recover_lasagna_gaps(site_instance, aligned, trimmed, aligned_strand):
     Lasagna output may contain gaps in the alignment. This function replaces those
     gaps with the original base that is looked up from the genome.
     """
-    if '-' not in aligned:  # no gaps -> no replacement
-        return aligned
+    if '-' not in trimmed:  # no gaps -> no replacement
+        return trimmed
 
     if aligned_strand == '+':
         assert site_instance.seq in aligned

@@ -62,7 +62,9 @@ def search_post_helper(request):
     cat_input3 = [x for x in cat_input_3 if x!='on']
  
     if not (TF_input and species_input and (cat_input_1 or cat_input2 or cat_input3)):
-        message = "Please select at least one TF, species and experimental technique to search database."
+        raise
+        message = "shouldn't be here"
+        #message = "Please select at least one TF, species and experimental technique to search database."
         messages.add_message(request, messages.ERROR, message)
         return HttpResponseRedirect(reverse(search))
     
@@ -103,7 +105,13 @@ def search_post(request):
     curation_site_instances from database using `search_post_helper` function and
     render the results.
     """
-    motif_csis, non_motif_csis = search_post_helper(request)
+    try:
+        motif_csis, non_motif_csis = search_post_helper(request)
+    except Exception as e:
+        message = "Please select at least one TF, species and experimental technique to search database."
+        messages.add_message(request, messages.ERROR, message)
+        return HttpResponseRedirect(reverse(search))
+    
     return render_search_results(request, motif_csis, non_motif_csis)
 
 def render_search_results(request, csis, non_motif_csis):

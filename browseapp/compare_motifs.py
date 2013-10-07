@@ -1,5 +1,6 @@
 from browse_base import *
 from django import forms
+from django.core.exceptions import ValidationError
 from django.contrib.formtools.wizard.views import CookieWizardView
 import search
 import view_results
@@ -9,8 +10,6 @@ from matplotlib import rc
 rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 rc('text', usetex=True)
 from base64 import b64encode
-import random
-import math
 
 class MotifComparisonForm(forms.Form):
     pass
@@ -45,6 +44,9 @@ FORM_DESCRIPTIONS = {
 class MotifComparisonWizard(CookieWizardView):
     def get_template_names(self):
         return [TEMPLATES[self.steps.current]]
+
+    def get_form_kwargs(self, step):
+        return {}
 
     def get_context_data(self, form, **kwargs):
         """
@@ -86,14 +88,19 @@ class MotifComparisonWizard(CookieWizardView):
                       })
         return c
 
-    def process_step(self, form):
+    def process_step(self, form, **kwargs):
         """
         Process data after each step.
         Used to perform searches for both motifs before comparison step
         """
         if self.steps.current in ["motif_a", "motif_b"]: # if one of the motif search steps
             # get motif and non-motif -associated sites
-            motif_csis, non_motif_csis = search.search_post_helper(self.request)
+            try:
+                motif_csis, non_motif_csis = search.search_post_helper(self.request)
+            except:
+                message = "Please select at least one TF, species and experimental technique to search database."
+                messages.add_message(self.request, messages.ERROR, message)
+                
             search_results = search.group_search_results(motif_csis, non_motif_csis)
             # store search results
             self.request.session[self.steps.current] = search_results
@@ -102,7 +109,7 @@ class MotifComparisonWizard(CookieWizardView):
         return self.get_form_step_data(form)
 
     def done(self, form_list, **kwargs):
-        return render_to_response("success.html")
+        return render_to_response("success.html")    
 
 def motif_sim_measure(request):
     """
@@ -126,8 +133,9 @@ def motif_sim_measure(request):
     sites_a = request.POST['sites_a'].strip().split(',')
     sites_b = request.POST['sites_b'].strip().split(',')
     # remove gaps for now
-    sites_a = [site.replace('-', 'A') for site in sites_a]
-    sites_b = [site.replace('-', 'A') for site in sites_b]
+    sites_a = [site.replace('*', 'A') for site in sites_a]
+    sites_b = [site.replace('*', 'A') for site in sites_b]
+
     if request.POST['fun'] == 'levenshtein':
         boxplot, hist = levenshtein_measure(sites_a, sites_b)
         return render_to_response("motif_sim_levenshtein.html",
@@ -136,13 +144,20 @@ def motif_sim_measure(request):
                                   context_instance=RequestContext(request))
         
     else: # other similarity metrics
-        fun_str = request.POST['fun']
-        fun2call = {'ED': euclidean_distance,
-                    'PCC': pearson_correlation_coefficient,
-                    'KL': kullback_leibler_divergence,
-                    'ALLR': average_log_likelihood_ratio,
-                    }[fun_str]
-        fig = motif_sim_test(sites_a, sites_b, fun2call)
+        try:
+            fun_str = request.POST['fun']
+            fun2call = {'ED': euclidean_distance,
+                        'PCC': pearson_correlation_coefficient,
+                        'KL': kullback_leibler_divergence,
+                        'ALLR': average_log_likelihood_ratio,
+                        }[fun_str]
+            
+            sites_a, sites_b = motif_alignment(sites_a, sites_b, fun2call) # align motif_a and motif_b
+            print bioutils.create_motif(sites_a).consensus()
+            print bioutils.create_motif(sites_b).consensus()
+            fig = motif_sim_test(sites_a, sites_b, fun2call)
+        except Exception as e:
+            print e
         return render_to_response("motif_sim_%s.html" % fun_str,
                                   {'plot': fig,
                                    'sc': fun2call(sites_a, sites_b)},
@@ -151,6 +166,7 @@ def motif_sim_measure(request):
 def motif_sim_test(ma, mb, fnc):
     """Given two motifs and a similarity function, perform the permutation tests and
     return the histogram"""
+
     permuted_dists = permutation_test(ma, mb, fnc)
     true_dist = fnc(ma, mb)
     plt.hist(permuted_dists, bins=30, normed=1, color='c')
@@ -159,14 +175,38 @@ def motif_sim_test(ma, mb, fnc):
 
 def motif_alignment(sites_a, sites_b, fnc):
     """
-    Given two motifs and a similiarity function, align two motifs that gives the
-    maximum similarity. Returns two offset values, one for ma and one for mb. It
-    means that motifs are aligned starting from columns ma[offset_a] and
-    mb[offset_b].
+    Given two sets of sites and a similiarity/distance function, align two motifs
+    that gives the maximum similarity (minimum distance). Returns two sets of sites
+    that are aligned and of same length.
     """
-    pass
+    def submotif(sites, offset, motif_len):
+        # return submotif of length motif_len starting from offset
+        return [site[offset:offset+motif_len] for site in sites]
     
+    assert all(len(sites_a[0]) == len(sites_a[i]) for i in xrange(len(sites_a)))
+    assert all(len(sites_b[0]) == len(sites_b[i]) for i in xrange(len(sites_b)))
 
+    swapped = False
+    if len(sites_a[0]) > len(sites_b[0]):
+        sites_a, sites_b = sites_b, sites_a
+        swapped = True
+    # after this point, assuming motif_A is smaller than motif_B
+    len_motif_a = len(sites_a[0])
+    len_motif_b = len(sites_b[0])
+    max_score = fnc(sites_a, submotif(sites_b, 0, len_motif_a))
+    max_offset = 0
+    for offset in range(1, len_motif_b - len_motif_a):
+        sc = fnc(sites_a, submotif(sites_b, offset, len_motif_a))
+        if sc > max_score:
+            max_score = sc
+            max_offset = offset
+
+    aligned_a = sites_a
+    aligned_b = submotif(sites_b, max_offset, len_motif_a)
+    if swapped: # back to original
+        aligned_a, aligned_b = aligned_b, aligned_a
+    return aligned_a, aligned_b
+    
 def fig2img(fig):
     """Given matplotlib plot return data URI."""
     imgdata = StringIO.StringIO()
@@ -232,13 +272,13 @@ def euclidean_distance(sites_a, sites_b):
     ma = bioutils.create_motif(sites_a)
     mb = bioutils.create_motif(sites_b)
     def ed(cola, colb):
-        return math.sqrt(sum((cola[l] - colb[l])**2 for l in "ACGT"))
+        return -math.sqrt(sum((cola[l] - colb[l])**2 for l in "ACGT"))
     return sum(ed(cola, colb) for (cola,colb) in zip(ma.pwm(), mb.pwm()))
 
 def kullback_leibler_divergence(sites_a, sites_b):
     """Kullback-Leibler divergence between two sets of sites"""
     def safe_log2(x):
-        return math.log(x,2) if x != 0 else 0.0
+        return -math.log(x,2) if x != 0 else 0.0
 
     def kl(cola, colb):
         return (sum(cola[l] * safe_log2(cola[l] / colb[l]) for l in "ACTG") +
@@ -256,7 +296,7 @@ def pearson_correlation_coefficient(sites_a, sites_b):
         return (sum(((cola[l]-cola_avg) * (colb[l]-colb_avg)) for l in "ACTG") /
                 math.sqrt(sum((cola[l]-cola_avg)**2 for l in "ACTG") *
                           sum((colb[l]-colb_avg)**2 for l in "ACTG")))
-    
+
     ma = bioutils.create_motif(sites_a)
     mb = bioutils.create_motif(sites_b)
     return sum(pcc(cola, colb) for (cola,colb) in zip(ma.pwm(), mb.pwm()))

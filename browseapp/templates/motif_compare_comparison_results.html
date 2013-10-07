@@ -152,7 +152,7 @@ function motifSimilarityAJAX(el) {
     var elDOM = $('#'+el);
     // if already done, dont make that request again.
     if (!elDOM.is(':empty')) {return false;}
-    elDOM.block();
+    elDOM.parent().parent().block({message: 'Loading.<br/><i class="icon-spin icon-large icon-spinner"> </i>'});
     $.ajax({
         type: "POST",
         url: "{% url motif_sim_measure %}",
@@ -163,11 +163,11 @@ function motifSimilarityAJAX(el) {
             csrfmiddlewaretoken: '{{csrf_token}}'
         },
         success: function(data) {
-            elDOM.unblock();
+            elDOM.parent().parent().unblock();
             elDOM.append(data);
             // render MathJax
             MathJax.Hub.Queue(["Typeset", MathJax.Hub, el]);
-        }
+        },
     });
 }
 
@@ -186,6 +186,8 @@ $(document).ready(function() {
             success: function(data) {
                 img.attr('src', data);
                 img.parent().unblock();
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) { 
             }
         });
     });
