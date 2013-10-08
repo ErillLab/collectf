@@ -1,20 +1,51 @@
 
-<div class="accordion" id="accordion-allr">
-  <div class="accordion-group">
-    <div class="accordion-heading">
-      <a class="accordion-toggle" data-toggle="collapse" data-parent="accordion-allr" href="#collapse-allr">
-        Average Log Likelihood Ratio <small>[click to expand]</small>
-      </a>
+<ul class="nav nav-tabs">
+  <li class="active"><a href="#ALLR_similarity" data-toggle="tab">Motif similarity</a></li>
+  <li><a href="#ALLR_unaligned" data-toggle="tab">Unaligned binding sites</a></li>
+  <li><a href="#ALLR_aligned" data-toggle="tab">Aligned binding sites</a></li>
+</ul>
+
+<div class="tab-content">
+  <div class="tab-pane active" id="ALLR_similarity">
+    <p>$ALLR(M_a, M_b) = {{ sc }}$</p>
+    <div>
+      <img src="{{ plot }}" />
     </div>
-    <div id="collapse-allr"class="accordion-body collapse">
-      <div class="accordion-inner">
+  </div>
+
+  <div class="tab-pane" id="ALLR_unaligned">
+    <div class="row-fluid">
+      <div class="span6">
+        <pre>
+          {% for site in unaligned_sites_a %}{{ site }}
+          {% endfor %}
+        </pre>
+      </div>
+      <div class="span6">
+        <pre>
+          {% for site in unaligned_sites_b %}{{ site }}
+          {% endfor %}
+        </pre>
+      </div>
+    </div>
+  </div>
+  
+  <div class="tab-pane" id="ALLR_aligned">
+    <div class="row-fluid">
+      <div class="span6">
+        <pre>
+          {% for site in aligned_sites_a %}{{ site }}
+          {% endfor %}
+        </pre>
+      </div>
+      <div class="span6">
+        <pre>
+          {% for site in aligned_sites_b %}{{ site }}
+          {% endfor %}
+        </pre>
       </div>
     </div>
   </div>
 </div>
 
-<p>$ALLR(M_a, M_b) = {{ sc }}$</p>
 
-<div>
-<img src="{{ plot }}" />
-</div>

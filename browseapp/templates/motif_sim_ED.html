@@ -1,25 +1,51 @@
 
-<div class="accordion" id="accordion-ed">
-  <div class="accordion-group">
-    <div class="accordion-heading">
-      <a class="accordion-toggle" data-toggle="collapse" data-parent="accordion-ed" href="#collapse-ed">
-        Euclidean Distance <small>[click to expand]</small>
-      </a>
+<ul class="nav nav-tabs">
+  <li class="active"><a href="#ED_similarity" data-toggle="tab">Motif similarity</a></li>
+  <li><a href="#ED_unaligned" data-toggle="tab">Unaligned binding sites</a></li>
+  <li><a href="#ED_aligned" data-toggle="tab">Aligned binding sites</a></li>
+</ul>
+
+<div class="tab-content">
+  <div class="tab-pane active" id="ED_similarity">
+    <p>$ED(M_a, M_b) = {{ sc }}$</p>
+    <div>
+      <img src="{{ plot }}" />
     </div>
-    <div id="collapse-ed"class="accordion-body collapse">
-      <div class="accordion-inner">
-        text here
+  </div>
+
+  <div class="tab-pane" id="ED_unaligned">
+    <div class="row-fluid">
+      <div class="span6">
+        <pre>
+          {% for site in unaligned_sites_a %}{{ site }}
+          {% endfor %}
+        </pre>
+      </div>
+      <div class="span6">
+        <pre>
+          {% for site in unaligned_sites_b %}{{ site }}
+          {% endfor %}
+        </pre>
+      </div>
+    </div>
+  </div>
+  
+  <div class="tab-pane" id="ED_aligned">
+    <div class="row-fluid">
+      <div class="span6">
+        <pre>
+          {% for site in aligned_sites_a %}{{ site }}
+          {% endfor %}
+        </pre>
+      </div>
+      <div class="span6">
+        <pre>
+          {% for site in aligned_sites_b %}{{ site }}
+          {% endfor %}
+        </pre>
       </div>
     </div>
   </div>
 </div>
 
-<div>
 
-<p>$ED(M_a, M_b) = {{ sc }}$</p>
-
-<div>
-  <img src="{{ plot }}" />
-</div>
-
-</div>

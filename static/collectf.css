@@ -123,3 +123,12 @@ sup > a {
 .tooltip-inner {
     text-align:left;
 }
+
+.alert.null{
+    color: #5A5A5A;
+    background-color: #fff;
+    border-color: #ddd;
+}
+.alert.null h4 {
+    color: #5A5A5A;
+}

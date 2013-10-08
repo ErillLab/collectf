@@ -71,9 +71,9 @@ urlpatterns = patterns('',
     url(r'^search/$', browseapp.search.search),
 
     # motif comparison
-    url(r'^compare_motifs/$', browseapp.compare_motifs.MotifComparisonWizard.as_view(browseapp.compare_motifs.FORMS), name="compare_motifs"),
     url(r'^motif_similarity_measure/$', browseapp.compare_motifs.motif_sim_measure, name="motif_sim_measure"),
-                       
+    url(r'^compare_motifs/$', browseapp.compare_motifs.motif_comparison_step1, name="compare_motifs"),
+    url(r'^compare_motifs/2/$', browseapp.compare_motifs.motif_comparison_step2),   
     # view results
     url(r'^view_results/$', browseapp.view_results.view_results),
      

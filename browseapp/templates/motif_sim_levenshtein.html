@@ -1,9 +1,55 @@
-<h3>Levenshtein Distance</h3>
 
-<div>
-<img src="{{ boxplot }}" />
+<ul class="nav nav-tabs">
+  <li class="active"><a href="#Levenshtein_similarity" data-toggle="tab">Motif similarity</a></li>
+  <li><a href="#Levenshtein_unaligned" data-toggle="tab">Unaligned binding sites</a></li>
+  <li><a href="#Levenshtein_aligned" data-toggle="tab">Aligned binding sites</a></li>
+</ul>
+
+<div class="tab-content">
+  <div class="tab-pane active" id="Levenshtein_similarity">
+    <p>$Levenshtein(M_a, M_b) = {{ sc }}$</p>
+    <div>
+      <img src="{{ plot }}" />
+    </div>
+    
+    <div>
+      <img src="{{ hist }}" />
+    </div>
+  </div>
+
+  <div class="tab-pane" id="Levenshtein_unaligned">
+    <div class="row-fluid">
+      <div class="span6">
+        <pre>
+          {% for site in unaligned_sites_a %}{{ site }}
+          {% endfor %}
+        </pre>
+      </div>
+      <div class="span6">
+        <pre>
+          {% for site in unaligned_sites_b %}{{ site }}
+          {% endfor %}
+        </pre>
+      </div>
+    </div>
+  </div>
+  
+  <div class="tab-pane" id="Levenshtein_aligned">
+    <div class="row-fluid">
+      <div class="span6">
+        <pre>
+          {% for site in aligned_sites_a %}{{ site }}
+          {% endfor %}
+        </pre>
+      </div>
+      <div class="span6">
+        <pre>
+          {% for site in aligned_sites_b %}{{ site }}
+          {% endfor %}
+        </pre>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div>
-<img src="{{ hist }}" />
-</div>
+

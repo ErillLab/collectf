@@ -5,88 +5,15 @@
 {% load webdesign %}
 
 <div class="boxed">
-<p>
-  <b>1st motif $(M_a)$</b> - 
-  <u>{{ motif_a.TFs|join:", " }}</u> transcription factor binding sites from organisms</span>
-<u><i>{{ motif_a.species|join:", "}}</i></u>
-  <small><a href="#" onclick="$('#view_all_motif_a').submit(); return false;"><u>[detailed view]</u></a></small>
-</p>
-
-<p>
-  2nd motif $(M_b)$ -
-  <u>{{ motif_b.TFs|join:", " }}</u> transcription factor binding sites from organisms
-  <u><i>{{ motif_b.species|join:", "}}</i></u>
-  <small><a href="#" onclick="$('#view_all_motif_b').submit(); return false;"><u>[detailed view]</u></a></small>
-</p>
-</div>
-
-
-<form style="display:inline;" method="post" action="{% url browseapp.view_results.view_results %}" id="view_all_motif_a" action="">
-  {% csrf_token %}
-  <input type="hidden"
-         name="motif_csi_list"
-         value="{% for csi_pk in motif_a.motif_csi_list %}{{ csi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}">
-  <input type="hidden"
-         name="non_motif_csi_list"
-         value="{% for ncsi_pk in motif_a.non_motif_csi_list %}{{ ncsi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}">
-</form>
-
-<form style="display:inline;" method="post" action="{% url browseapp.view_results.view_results %}" id="view_all_motif_b" action="">
-  {% csrf_token %}
-  <input type="hidden"
-         name="motif_csi_list"
-         value="{% for csi_pk in motif_b.motif_csi_list %}{{ csi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}">
-  <input type="hidden"
-         name="non_motif_csi_list"
-         value="{% for ncsi_pk in motif_b.non_motif_csi_list %}{{ ncsi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}">
-</form>
-
-<div class="boxed">
   <ul class="nav nav-tabs">
-    <li class="active"><a href="#similarity" data-toggle="tab">Motif similarity</a></li>
-    <li><a href="#unaligned" data-toggle="tab">Unaligned binding sites</a></li>
-    <li><a href="#aligned" data-toggle="tab">Aligned binding sites</a></li>
+    <li class="active"><a href="#motif_based" data-toggle="tab">Motif-based similarity</a></li>
+    <li><a href="#site_based" data-toggle="tab" onclick="motifSimilarityAJAX('site_based'); false;">Site-based similarity</a></li>
+    <li><a href="#compared_motifs" data-toggle="tab">Compared motifs</a></li>
   </ul>
-
+  
   <div class="tab-content">
-    <!-- UNALIGNED BINDING SITES COMPARISON -->
-    <div class="tab-pane" id="unaligned">
-      <div class="row-fluid">
-        <!-- motif-a binding sites -->
-        <div class="span6">
-          <pre>{% for meta_site in motif_a.ensemble_report.meta_sites %}
-            {{ meta_site.0.site_instance.seq }}{% endfor %}
-	  </pre>
-
-        </div>
-        <!-- motif-b binding sites -->
-        <div class="span6">
-          <pre>{% for meta_site in motif_b.ensemble_report.meta_sites %}
-            {{ meta_site.0.site_instance.seq }}{% endfor %}
-	  </pre>
-        </div>
-      </div>
-    </div>
-
-    <!-- ALIGNED BINDING SITES COMPARISON -->
-    <div class="tab-pane" id="aligned">
-      <div class="row-fluid">
-
-        <!-- motif-a binding sites -->
-        <div class="span6">
-          <pre>{% for site in motif_a.ensemble_report.aligned_sites %}
-            {{ site }}{% endfor %}</pre>
-        </div>
-        <!-- motif-b binding sites -->
-        <div class="span6">
-          <pre>{% for site in motif_b.ensemble_report.aligned_sites %}
-            {{ site }}{% endfor %}</pre>
-        </div>
-      </div>
-    </div>
-
-    <!-- MOTIF SIMILARITY -->
-    <div class="tab-pane active" id="similarity">
+    <!-- MOTIF-BASED SIMILARITY -->
+    <div class="tab-pane active" id="motif_based">
       <div class="row-fluid">
         <!-- motif-similarity column A -->
         <div class="span6">
@@ -101,26 +28,23 @@
                site_data={% for site in motif_b.ensemble_report.aligned_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}>
         </div>
       </div>
-      
       <hr />
-
-      <div class="tabbable tabs-left">
-        <ul class="nav nav-tabs">
-          <li class="active"><a href="#levenshtein" data-toggle="tab">Levenshtein distance</a></li>
-          <li><a href="#PCC" data-toggle="tab" onclick="motifSimilarityAJAX('PCC'); return false;">
-              Pearson Correlation Coefficient</a></li>
-          <li><a href="#ALLR" data-toggle="tab" onclick="motifSimilarityAJAX('ALLR'); return false;">
-              Average Log Likelihood Ratio</a></li>
-          <li><a href="#KL" data-toggle="tab" onclick="motifSimilarityAJAX('KL'); return false;">
-              Kullback-Leibler Divergence</a></li>
-          <li><a href="#ED" data-toggle="tab" onclick="motifSimilarityAJAX('ED'); return false;">
-              Eucledian Distance</a></li>
-        </ul>
+      <div class="tabbable">
+        <div class="tabs-left">
+          <ul class="nav nav-tabs">
+            <li class="active"> <a href="#PCC" data-toggle="tab" onclick="deactivate_tabs(this); motifSimilarityAJAX('PCC'); return false;">
+                Pearson Correlation Coefficient</a></li>
+            <li><a href="#ALLR" data-toggle="tab" onclick="deactivate_tabs(this); motifSimilarityAJAX('ALLR'); return false;">
+                Average Log Likelihood Ratio</a></li>
+            <li><a href="#KL" data-toggle="tab" onclick="deactivate_tabs(this); motifSimilarityAJAX('KL'); return false;">
+                Kullback-Leibler Divergence</a></li>
+            <li><a href="#ED" data-toggle="tab" onclick="deactivate_tabs(this); motifSimilarityAJAX('ED'); return false;">
+                Eucledian Distance</a></li>
+          </ul>
+        </div>
         <div class="tab-content">
           <!-- Levenstein distance -->
-          <div class="tab-pane active" id="levenshtein"></div>
-          
-          <div class="tab-pane" id="PCC"></div>
+          <div class="tab-pane active" id="PCC"></div>
 
           <div class="tab-pane" id="ALLR"></div>
 
@@ -128,18 +52,122 @@
 
           <div class="tab-pane" id="ED"></div>
 
+          <div class="tab-pane" id="motif-based-unaligned">Sites here</div>
+          
+          <div class="tab-pane" id="motif-based-aligned">Aligned sites here</div>
+
         </div>
       </div>
+    </div>
+    <!-- SITE-BASED SIMILARITY -->
+    <div class="tab-pane active" id="site_based"></div>
 
+    <!-- COMPARED MOTIFS -->
+    <div class="tab-pane" id="compared_motifs">
+      <div class="row-fluid">
+        <div class="span6">
+          <table class="table table-striped table-bordered">
+            <thead><th colspan="3">First motif</th></thead>
+            <thead>
+              <th>TF</th>
+              <th>Species</th>
+              <th>Report</th>
+            </thead>
+            <tbody>
+              {% for report in motif_a_reports %}
+              <tr>
+                <td>{{ report.TF_name }}</td>
+                <td>{{ report.species_name }}</td>
+                {% with form_id=report.TF_name|slugify|add:'_'|add:report.species_name|slugify %}
+	            <td><a href="#" onclick="$('#{{ form_id }}').submit();">view</a>
+	              <form action="{% url browseapp.view_results.view_results %}" method="post" style="display:inline;" id={{ form_id }}>{% csrf_token %}
+	                <input type="hidden" name="motif_csi_list" value="{% for csi_pk in report.csi_list %}{{ csi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}"/>
+	                <input type="hidden" name="non_motif_csi_list" value="{% for ncsi_pk in report.non_motif_csi_list %}{{ ncsi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}"/>
+	              </form>
+	            </td>
+	            {% endwith %}
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="span6">
+          <table class="table table-striped table-bordered">
+            <thead><th colspan="3">Second motif</th></thead>
+            <thead>
+              <th>TF</th>
+              <th>Species</th>
+              <th>Report</th>
+            </thead>
+            <tbody>
+              {% for report in motif_b_reports %}
+              <tr>
+                <td>{{ report.TF_name }}</td>
+                <td>{{ report.species_name }}</td>
+
+                {% with form_id=report.TF_name|slugify|add:'_'|add:report.species_name|slugify %}
+	            <td><a href="#" onclick="$('#{{ form_id }}').submit();">view</a>
+	              <form action="{% url browseapp.view_results.view_results %}" method="post" style="display:inline;" id={{ form_id }}>{% csrf_token %}
+	                <input type="hidden" name="motif_csi_list" value="{% for csi_pk in report.csi_list %}{{ csi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}"/>
+	                <input type="hidden" name="non_motif_csi_list" value="{% for ncsi_pk in report.non_motif_csi_list %}{{ ncsi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}"/>
+	              </form>
+	            </td>
+	            {% endwith %}
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
 <div>
-<form action="" method="post">{% csrf_token %}
-  {% include "motif_compare_wizard_navigate.html" %}
-</form>
+  <form action="" method="post">{% csrf_token %}
+    {% include "motif_compare_wizard_navigate.html" %}
+  </form>
 </div>
+
+<!--
+    <div class="boxed">
+      <p>
+        <b>1st motif $(M_a)$</b> - 
+        <u>{{ motif_a.TFs|join:", " }}</u> transcription factor binding sites from organisms
+        <u><i>{{ motif_a.species|join:", "}}</i></u>
+        <small><a href="#" onclick="$('#view_all_motif_a').submit(); return false;"><u>[detailed view]</u></a></small>
+      </p>
+
+      <p>
+        2nd motif $(M_b)$ -
+        <u>{{ motif_b.TFs|join:", " }}</u> transcription factor binding sites from organisms
+        <u><i>{{ motif_b.species|join:", "}}</i></u>
+        <small><a href="#" onclick="$('#view_all_motif_b').submit(); return false;"><u>[detailed view]</u></a></small>
+      </p>
+    </div>
+
+
+    <form style="display:inline;" method="post" action="{% url browseapp.view_results.view_results %}" id="view_all_motif_a" action="">
+      {% csrf_token %}
+      <input type="hidden"
+             name="motif_csi_list"
+             value="{% for csi_pk in motif_a.motif_csi_list %}{{ csi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}">
+      <input type="hidden"
+             name="non_motif_csi_list"
+             value="{% for ncsi_pk in motif_a.non_motif_csi_list %}{{ ncsi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}">
+    </form>
+
+    <form style="display:inline;" method="post" action="{% url browseapp.view_results.view_results %}" id="view_all_motif_b" action="">
+      {% csrf_token %}
+      <input type="hidden"
+             name="motif_csi_list"
+             value="{% for csi_pk in motif_b.motif_csi_list %}{{ csi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}">
+      <input type="hidden"
+             name="non_motif_csi_list"
+             value="{% for ncsi_pk in motif_b.non_motif_csi_list %}{{ ncsi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}">
+    </form>
+    -->
+
 
 {% endblock %}
 
@@ -147,54 +175,60 @@
 
 <script>
 
-function motifSimilarityAJAX(el) {
-    // request motif similarity for two motifs
-    var elDOM = $('#'+el);
-    // if already done, dont make that request again.
-    if (!elDOM.is(':empty')) {return false;}
-    elDOM.parent().parent().block({message: 'Loading.<br/><i class="icon-spin icon-large icon-spinner"> </i>'});
-    $.ajax({
-        type: "POST",
-        url: "{% url motif_sim_measure %}",
-        data: {
-            fun: el,
-            sites_a: "{% for site in motif_a.ensemble_report.aligned_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}",
-            sites_b: "{% for site in motif_b.ensemble_report.aligned_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}",
-            csrfmiddlewaretoken: '{{csrf_token}}'
-        },
-        success: function(data) {
-            elDOM.parent().parent().unblock();
-            elDOM.append(data);
-            // render MathJax
-            MathJax.Hub.Queue(["Typeset", MathJax.Hub, el]);
-        },
-    });
-}
+  function motifSimilarityAJAX(el) {
+  // request motif similarity for two motifs
+  var elDOM = $('#'+el);
+  // if already done, dont make that request again.
+  if (!elDOM.is(':empty')) {return false;}
+  elDOM.parent().parent().block({message: 'Loading.<br/><i class="icon-spin icon-large icon-spinner"> </i>'});
+  $.ajax({
+  type: "POST",
+  url: "{% url motif_sim_measure %}",
+  data: {
+  fun: el,
+  sites_a: "{% for site in motif_a.ensemble_report.aligned_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}",
+  sites_b: "{% for site in motif_b.ensemble_report.aligned_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}",
+  unaligned_sites_a: "{% for meta_site in motif_a.ensemble_report.meta_sites %}{{ meta_site.0.site_instance.seq }}{% if not forloop.last %},{% endif %}{% endfor %}",
+  unaligned_sites_b: "{% for meta_site in motif_b.ensemble_report.meta_sites %}{{ meta_site.0.site_instance.seq }}{% if not forloop.last %},{% endif %}{% endfor %}",
+  csrfmiddlewaretoken: '{{csrf_token}}'
+  },
+  success: function(data) {
+  elDOM.parent().parent().unblock();
+  elDOM.append(data);
+  // render MathJax
+  MathJax.Hub.Queue(["Typeset", MathJax.Hub, el]);
+  },
+  });
+  }
 
-$(document).ready(function() {
-    $('.weblogo_img').each(function() {
-        var img = $(this);
-        img.parent().block();
-        var site_data = $(this).attr('site_data');
-        $.ajax({
-            type: "POST",
-            url: "{% url baseapp.views.get_weblogo %}",
-            data: {
-                sites: site_data,
-                csrfmiddlewaretoken:'{{csrf_token}}'
-            },
-            success: function(data) {
-                img.attr('src', data);
-                img.parent().unblock();
-            },
-            error: function(XMLHttpRequest, textStatus, errorThrown) { 
-            }
-        });
-    });
+  function deactivate_tabs(el) {
+  // if a tab is clicked, deactivate all other tabs in the same page
+  return false;
+  }
 
-    // bring data for levenshtein distance
-    motifSimilarityAJAX('levenshtein');
-});
+  $(document).ready(function() {
+  $('.weblogo_img').each(function() {
+  var img = $(this);
+  img.parent().block();
+  var site_data = $(this).attr('site_data');
+  $.ajax({
+  type: "POST",
+  url: "{% url baseapp.views.get_weblogo %}",
+  data: {
+  sites: site_data,
+  csrfmiddlewaretoken:'{{csrf_token}}'
+  },
+  success: function(data) {
+  img.attr('src', data);
+  img.parent().unblock();
+  },
+  error: function(XMLHttpRequest, textStatus, errorThrown) { 
+  }
+  });
+  });
+
+  motifSimilarityAJAX('PCC');
+  });
 
 </script>
 

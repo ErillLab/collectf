@@ -1,8 +1,51 @@
-<h3>Pearson Correlation Coefficient</h3>
 
-<p>$PCC(M_a, M_b) = {{ sc }}$</p>
+<ul class="nav nav-tabs">
+  <li class="active"><a href="#PCC_similarity" data-toggle="tab">Motif similarity</a></li>
+  <li><a href="#PCC_unaligned" data-toggle="tab">Unaligned binding sites</a></li>
+  <li><a href="#PCC_aligned" data-toggle="tab">Aligned binding sites</a></li>
+</ul>
 
-<div>
-<img src="{{ plot }}" />
+<div class="tab-content">
+  <div class="tab-pane active" id="PCC_similarity">
+    <p>$PCC(M_a, M_b) = {{ sc }}$</p>
+    <div>
+      <img src="{{ plot }}" />
+    </div>
+  </div>
+
+  <div class="tab-pane" id="PCC_unaligned">
+    <div class="row-fluid">
+      <div class="span6">
+        <pre>
+          {% for site in unaligned_sites_a %}{{ site }}
+          {% endfor %}
+        </pre>
+      </div>
+      <div class="span6">
+        <pre>
+          {% for site in unaligned_sites_b %}{{ site }}
+          {% endfor %}
+        </pre>
+      </div>
+    </div>
+  </div>
+  
+  <div class="tab-pane" id="PCC_aligned">
+    <div class="row-fluid">
+      <div class="span6">
+        <pre>
+          {% for site in aligned_sites_a %}{{ site }}
+          {% endfor %}
+        </pre>
+      </div>
+      <div class="span6">
+        <pre>
+          {% for site in aligned_sites_b %}{{ site }}
+          {% endfor %}
+        </pre>
+      </div>
+    </div>
+  </div>
 </div>
+
 

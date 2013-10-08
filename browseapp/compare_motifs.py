@@ -7,9 +7,23 @@ import view_results
 import StringIO
 import matplotlib.pyplot as plt
 from matplotlib import rc
-rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
-rc('text', usetex=True)
 from base64 import b64encode
+
+FORM_TITLES = ["Step 1/3: Search for the first motif.",
+               "Step 2/3: Search for the second motif.",
+               "Step 3/3: Motif comparison results"]
+
+FORM_DESCRIPTIONS = [
+"""Search in CollecTF is fully customizable. Just select a taxonomic unit (e.g. the
+Vibrio genus), a transcription factor family or instance (e.g. LexA) and the set of
+experimental techniques that reported sites should be backed by and proceed.""",
+
+"""Search for the second motif to be compared. Just select a taxonomic unit (e.g. the
+Vibrio genus), a transcription factor family or instance (e.g. LexA) and the set of
+experimental techniques that reported sites should be backed by and proceed.""",
+
+"",
+]
 
 class MotifComparisonForm(forms.Form):
     pass
@@ -23,93 +37,68 @@ TEMPLATES = {"motif_a": "motif_compare_search.html",
              "motif_b": "motif_compare_search.html",
              "comparison_results": "motif_compare_comparison_results.html"}
 
-FORM_TITLES = {"motif_a": "Search for the first motif.",
-               "motif_b": "Search for the second motif.",
-               "comparison_results": "Motif comparison results"}
+def motif_comparison_get(request, step):
+    template = search.search_get_template()
+    template["form_title"] = FORM_TITLES[step-1]
+    template["form_description"] = FORM_DESCRIPTIONS[step-1]
+    return render_to_response("motif_compare_search.html",
+                              template,
+                              context_instance=RequestContext(request))
 
-FORM_DESCRIPTIONS = {
-    "motif_a": """Search in CollecTF is fully customizable. Just select a taxonomic
-               unit (e.g. the Vibrio genus), a transcription factor family or
-               instance (e.g. LexA) and the set of experimental techniques that
-               reported sites should be backed by and proceed.""",
+def motif_comparison_post(request, step):
+    try:
+        motif_csis, non_motif_csis = search.search_post_helper(request)
+    except:
+        message = "Please select at least one TF, species and experimental technique to search database."
+        messages.add_message(request, messages.ERROR, message)
+        return HttpResponseRedirect(reverse(eval('motif_comparison_step%d' % step)))
+    if not motif_csis:
+        message = "No results found for selected TF and species"
+        messages.add_message(request, messages.ERROR, message)
+        return HttpResponseRedirect(reverse(eval('motif_comparison_step%d' % step)))
 
-    "motif_b": """Search for the second motif to be compared. Just select a taxonomic
-               unit (e.g. the Vibrio genus), a transcription factor family or
-               instance (e.g. LexA) and the set of experimental techniques that
-               reported sites should be backed by and proceed.""",
+    search_results = search.group_search_results(motif_csis, non_motif_csis)
+    # store search results
+    request.session['cstep%d' % step] = search_results
+    request.session.modified = True
 
-    "comparison_results": "",
-    }
+    if step == 1:
+        return HttpResponseRedirect(reverse(motif_comparison_step2))
+    else: # step2
+        # render results
+        # get motif_associated and non-motif_associated curation site instances
+        motif_a_csi_list = request.session["cstep1"]["view_all_csis"]
+        motif_a_ncsi_list = request.session["cstep1"]["view_all_ncsis"]
+        motif_b_csi_list = request.session["cstep2"]["view_all_csis"]
+        motif_b_ncsi_list = request.session["cstep2"]["view_all_ncsis"]
+        # get the ensemble views
+        motif_a_data = view_results.prepare_results(motif_a_csi_list, motif_a_ncsi_list)
+        motif_b_data = view_results.prepare_results(motif_b_csi_list, motif_b_ncsi_list)
+        # put list of TF and species names in template
+        get_TF_name = lambda reports: list(set(map(lambda rep: rep["TF_name"], reports)))
+        get_sp_name = lambda reports: list(set(map(lambda rep: rep["species_name"], reports)))
+        motif_a_data["TFs"] = get_TF_name(request.session["cstep1"]["reports"])
+        motif_b_data["TFs"] = get_TF_name(request.session["cstep2"]["reports"])
+        motif_a_data["species"] = get_sp_name(request.session["cstep1"]["reports"])
+        motif_b_data["species"] = get_sp_name(request.session["cstep2"]["reports"])
+        return render_to_response("motif_compare_comparison_results.html",
+                                  {"form_title": FORM_TITLES[2],
+                                   "form_description": FORM_DESCRIPTIONS[2],
+                                   "motif_a": motif_a_data,
+                                   "motif_b": motif_b_data,
+                                   "motif_a_reports": request.session['cstep1']['reports'],
+                                   "motif_b_reports": request.session['cstep2']['reports']},
+                                  context_instance=RequestContext(request))
+        
+def motif_comparison_step1(request):
+    if request.POST:
+        return motif_comparison_post(request, 1)
+    return motif_comparison_get(request, 1)
 
-class MotifComparisonWizard(CookieWizardView):
-    def get_template_names(self):
-        return [TEMPLATES[self.steps.current]]
-
-    def get_form_kwargs(self, step):
-        return {}
-
-    def get_context_data(self, form, **kwargs):
-        """
-        Update context to include search form in the first two steps of motif
-        comparison.
-        """
-        c = super(MotifComparisonWizard, self).get_context_data(form=form, **kwargs)
-        # Update title and description
-        c["form_title"] = FORM_TITLES[self.steps.current]
-        c["form_description"] = FORM_DESCRIPTIONS[self.steps.current]
-
-        # If it is motif search step, generate the search form
-        if self.steps.current in ["motif_a", "motif_b"]:
-            template = search.search_get_template()
-            c.update(template)
-
-        if self.steps.current == "search_results":
-            c.update({"motif_a": self.request.session["motif_a"],
-                      "motif_b": self.request.session["motif_b"]})
-
-        if self.steps.current == "comparison_results":
-            # get motif_associated and non-motif_associated curation site instances
-            motif_a_csi_list = self.request.session["motif_a"]["view_all_csis"]
-            motif_a_ncsi_list = self.request.session["motif_a"]["view_all_ncsis"]
-            motif_b_csi_list = self.request.session["motif_b"]["view_all_csis"]
-            motif_b_ncsi_list = self.request.session["motif_b"]["view_all_ncsis"]
-            # get the ensemble views
-            motif_a_data = view_results.prepare_results(motif_a_csi_list, motif_a_ncsi_list)
-            motif_b_data = view_results.prepare_results(motif_b_csi_list, motif_b_ncsi_list)
-            # put list of TF and species names in template
-            get_TF_name = lambda reports: list(set(map(lambda rep: rep["TF_name"], reports)))
-            get_sp_name = lambda reports: list(set(map(lambda rep: rep["species_name"], reports)))
-            motif_a_data["TFs"] = get_TF_name(self.request.session["motif_a"]["reports"])
-            motif_b_data["TFs"] = get_TF_name(self.request.session["motif_b"]["reports"])
-            motif_a_data["species"] = get_sp_name(self.request.session["motif_a"]["reports"])
-            motif_b_data["species"] = get_sp_name(self.request.session["motif_b"]["reports"])
-            c.update({"motif_a": motif_a_data,
-                      "motif_b": motif_b_data,
-                      })
-        return c
-
-    def process_step(self, form, **kwargs):
-        """
-        Process data after each step.
-        Used to perform searches for both motifs before comparison step
-        """
-        if self.steps.current in ["motif_a", "motif_b"]: # if one of the motif search steps
-            # get motif and non-motif -associated sites
-            try:
-                motif_csis, non_motif_csis = search.search_post_helper(self.request)
-            except:
-                message = "Please select at least one TF, species and experimental technique to search database."
-                messages.add_message(self.request, messages.ERROR, message)
-                
-            search_results = search.group_search_results(motif_csis, non_motif_csis)
-            # store search results
-            self.request.session[self.steps.current] = search_results
-            self.request.session.modified = True
-            
-        return self.get_form_step_data(form)
-
-    def done(self, form_list, **kwargs):
-        return render_to_response("success.html")    
+def motif_comparison_step2(request):
+    if request.POST:
+        return motif_comparison_post(request, 2)
+    return motif_comparison_get(request, 2)
 
 def motif_sim_measure(request):
     """
@@ -117,30 +106,25 @@ def motif_sim_measure(request):
     Request has the similarity function and two motifs (comma seperated strings).
     Reponse returns HTML which is embedded into the main comparison page.
     """
-    def levenshtein_measure(motif_a, motif_b):
-        a_vs_a = levenshtein_motifs(motif_a, motif_a)
-        a_vs_b = levenshtein_motifs(motif_a, motif_b)
-        b_vs_b = levenshtein_motifs(motif_b, motif_b)
-        plt.boxplot([a_vs_a, a_vs_b, b_vs_b])
-        plt.xticks(range(1,4), [r'$M_a$ vs $M_a$', r'$M_a$ vs $M_b$', r'$M_b$ vs $M_b$'])
-        boxplot = fig2img(plt.gcf())
-        plt.hist([a_vs_a, a_vs_b, b_vs_b], bins=15, normed=1,
-                 label=[r'$M_a$ vs $M_a$', r'$M_a$ vs $M_b$', r'$M_b$ vs $M_b$'])
-        plt.legend()
-        hist = fig2img(plt.gcf())
-        return boxplot, hist
 
+    unaligned_sites_a = request.POST['unaligned_sites_a'].strip().split(',')
+    unaligned_sites_b = request.POST['unaligned_sites_b'].strip().split(',')
     sites_a = request.POST['sites_a'].strip().split(',')
     sites_b = request.POST['sites_b'].strip().split(',')
+
     # remove gaps for now
     sites_a = [site.replace('*', 'A') for site in sites_a]
     sites_b = [site.replace('*', 'A') for site in sites_b]
 
-    if request.POST['fun'] == 'levenshtein':
+    if request.POST['fun'] == 'site_based':
         boxplot, hist = levenshtein_measure(sites_a, sites_b)
         return render_to_response("motif_sim_levenshtein.html",
                                   {'boxplot': boxplot,
-                                   'hist': hist,},
+                                   'hist': hist,
+                                   'unaligned_sites_a': unaligned_sites_a,
+                                   'unaligned_sites_b': unaligned_sites_b,
+                                   'aligned_sites_a': sites_a,
+                                   'aligned_sites_b': sites_b},
                                   context_instance=RequestContext(request))
         
     else: # other similarity metrics
@@ -153,15 +137,32 @@ def motif_sim_measure(request):
                         }[fun_str]
             
             sites_a, sites_b = motif_alignment(sites_a, sites_b, fun2call) # align motif_a and motif_b
-            print bioutils.create_motif(sites_a).consensus()
-            print bioutils.create_motif(sites_b).consensus()
+            #print bioutils.create_motif(sites_a).consensus()
+            #print bioutils.create_motif(sites_b).consensus()
             fig = motif_sim_test(sites_a, sites_b, fun2call)
         except Exception as e:
             print e
         return render_to_response("motif_sim_%s.html" % fun_str,
                                   {'plot': fig,
-                                   'sc': fun2call(sites_a, sites_b)},
+                                   'sc': fun2call(sites_a, sites_b),
+                                   'unaligned_sites_a': unaligned_sites_a,
+                                   'unaligned_sites_b': unaligned_sites_b,
+                                   'aligned_sites_a': sites_a,
+                                   'aligned_sites_b': sites_b},
                                   context_instance=RequestContext(request))
+
+def levenshtein_measure(motif_a, motif_b):
+    a_vs_a = levenshtein_motifs(motif_a, motif_a)
+    a_vs_b = levenshtein_motifs(motif_a, motif_b)
+    b_vs_b = levenshtein_motifs(motif_b, motif_b)
+    plt.boxplot([a_vs_a, a_vs_b, b_vs_b])
+    plt.xticks(range(1,4), [r'$M_a$ vs $M_a$', r'$M_a$ vs $M_b$', r'$M_b$ vs $M_b$'])
+    boxplot = fig2img(plt.gcf())
+    plt.hist([a_vs_a, a_vs_b, b_vs_b], bins=15, normed=1,
+             label=[r'$M_a$ vs $M_a$', r'$M_a$ vs $M_b$', r'$M_b$ vs $M_b$'])
+    plt.legend()
+    hist = fig2img(plt.gcf())
+    return boxplot, hist
 
 def motif_sim_test(ma, mb, fnc):
     """Given two motifs and a similarity function, perform the permutation tests and
@@ -237,7 +238,7 @@ def permute_motif(motif):
         motif[i] = "".join(site[p[j]] for j in p)
     return motif
 
-def permutation_test(motif_a, motif_b, dist_fun, n=250):
+def permutation_test(motif_a, motif_b, dist_fun, n=500):
     """Permute columns of two motifs and measure the similarity/distance with the
     specified function. Do this for n times and return the list of scores."""
     dists = [dist_fun(permute_motif(motif_a), permute_motif(motif_b))
@@ -272,13 +273,13 @@ def euclidean_distance(sites_a, sites_b):
     ma = bioutils.create_motif(sites_a)
     mb = bioutils.create_motif(sites_b)
     def ed(cola, colb):
-        return -math.sqrt(sum((cola[l] - colb[l])**2 for l in "ACGT"))
+        return math.sqrt(sum((cola[l] - colb[l])**2 for l in "ACGT"))
     return sum(ed(cola, colb) for (cola,colb) in zip(ma.pwm(), mb.pwm()))
 
 def kullback_leibler_divergence(sites_a, sites_b):
     """Kullback-Leibler divergence between two sets of sites"""
     def safe_log2(x):
-        return -math.log(x,2) if x != 0 else 0.0
+        return math.log(x,2) if x != 0 else 0.0
 
     def kl(cola, colb):
         return (sum(cola[l] * safe_log2(cola[l] / colb[l]) for l in "ACTG") +

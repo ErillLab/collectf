@@ -1,7 +1,4 @@
 from browse_base import *
-from django.http import HttpResponseRedirect
-from django.core.urlresolvers import reverse
-from django.contrib import messages
 from browse_TF_and_species import browse_TF_and_species_selected
 from browse_TF_and_species import browse_TF_and_species_selected_non_motif
 
