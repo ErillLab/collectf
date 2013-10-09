@@ -10,6 +10,7 @@ import pickle
 from collectf import settings
 from base64 import b64encode
 import lasagna
+import models
 
 Entrez.email = "sefakilic@gmail.com"
 
@@ -320,42 +321,62 @@ def call_lasagna(site_instances, trim=True):
     Given the list of site sequences, run LASAGNA and return the aligned
     output.
     """
+    print 'calling lasagna'
     sites = [str(site_instance.seq).lower() for site_instance in site_instances]
     aligned, idxAligned, strands = lasagna.LASAGNA(sites, 0)
     if not trim:
         return [s.upper() for s in aligned]
     
-    trimmed = lasagna.TrimAlignment(aligned) if len(aligned) > 1 else aligned
-    # make uppercase
     aligned = [s.upper() for s in aligned]
-    trimmed = [s.upper() for s in trimmed]
-
     assert map(int, idxAligned) == range(len(idxAligned)), "lasagna sites are not sorted"
 
-    #for t in trimmed:
-    #    print t
-    #print '---'
-    recovered = [recover_lasagna_gaps(site_instance, a, t, s)
-                 for (site_instance, a, t, s) in zip(site_instances, aligned, trimmed, strands)]
-    #for r in recovered:
-    #    print r
-    #print '*****'
-    return recovered
+    # batch fetch of genomes from the database
+    site_instance_qs = models.SiteInstance.objects.filter(site_id__in=[si.site_id for si in site_instances])
+    site_genome_dict = dict((v['site_id'], v['genome__genome_id'])
+                            for v in site_instance_qs.values('site_id', 'genome__genome_id').distinct())
+    genome_ids = list(set(site_genome_dict.values()))
+    genomes = list(models.Genome.objects.filter(genome_id__in=genome_ids))
+    recovered = []
+    for site_instance, aligned_site, aligned_strand in zip(site_instances, aligned, strands):
+        g = [g for g in genomes if int(g.genome_id) == int(site_genome_dict[site_instance.site_id])][0]
+        recovered.append(fill_gaps(site_instance, aligned_site, aligned_strand, g.sequence))
 
-def recover_lasagna_gaps(site_instance, aligned, trimmed, aligned_strand):
-    """
-    Lasagna output may contain gaps in the alignment. This function replaces those
-    gaps with the original base that is looked up from the genome.
-    """
-    if '-' not in trimmed:  # no gaps -> no replacement
-        return trimmed
+    trimmed = lasagna.TrimAlignment(recovered) if len(recovered) > 1 else recovered
 
-    if aligned_strand == '+':
-        assert site_instance.seq in aligned
-    else:
-        assert reverse_complement(site_instance.seq) in aligned
-    assert aligned_strand in ['+', '-']
+    print len(recovered[0]), len(trimmed[0])
 
-    trimmed = trimmed.replace('-', '*')
     return trimmed
+
+def extend_site(site_instance, genome_seq, n=100):
+    seq = genome_seq[site_instance.start-n: site_instance.end+n+1]
+    return (seq if site_instance.strand==1 else reverse_complement(seq))
+
+def fill_gaps(site_instance, aligned_site, aligned_strand, genome_seq):
+    original_seq = (site_instance.seq if aligned_strand == '+'
+                    else reverse_complement(site_instance.seq))
+    num_left_gaps = 0
+    num_right_gaps = 0
+    while aligned_site[num_left_gaps] == '-':
+        num_left_gaps += 1
+    while aligned_site[-num_right_gaps-1] == '-':
+        num_right_gaps += 1
+
+    # check if correct
+    assert '-' * num_left_gaps + str(original_seq) + '-'*num_right_gaps == aligned_site
+    # extend site
+    n = max(num_left_gaps, num_right_gaps)
+    extended_site = extend_site(site_instance, genome_seq, n)
+    if aligned_strand == '-':
+        extended_site = reverse_complement(extended_site)
+
+    if num_right_gaps == n:
+        recovered_site = extended_site[n-num_left_gaps:]
+    else:
+        recovered_site = extended_site[n-num_left_gaps: num_right_gaps-n]
+    assert len(recovered_site) == len(aligned_site)
+    assert recovered_site in extended_site
+    return str(recovered_site)
+    
+
+
     

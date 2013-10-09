@@ -1,19 +1,63 @@
+<div class="accordion" id="PCC_accordion">
+  <div class="accordion-heading">
+    <a href="#PCC_collapse" data-toggle="collapse" data-parent="PCC_accordion">
+      <span class="pull-right"><small>[expand/collapse]</small></span></a>
+    Pearson Correlation Coefficient (PCC) gives a measure of correlation between base
+    frequencies of two motif columns. 
+  </div>
+  <div id="PCC_collapse" class="accordion-body collapse">
+    
+    <p>
+    Given two motif columns $X$ and $Y$, PCC is defined as
+
+    <div class="eq">
+      $$
+      PCC(X,Y) = \frac{\sum_{b \in B} (f_X(b) - \bar{f_X}) \cdot (f_Y(b) - \bar{f_Y})}
+      {\sqrt{\sum_{b \in B} (f_X(b) - \bar{f_X})^2 \cdot
+      \sum_{b \in B} (f_Y(b) - \bar{f_Y})^2}}
+      $$
+    </div>
+    where $B = (A,C,G,T)$, $f_X(b)$ is the frequency of base $b$ on column $X$ and $\bar{f_X}$ is the average frequency of column $X$.
+    </p>
+
+    <p>
+    The PCC between two motifs is defined as the sum of the column comparison scores of the ungapped alignment of the two motifs.
+    </p>
+  </div>
+</div>
 
 <ul class="nav nav-tabs">
   <li class="active"><a href="#PCC_similarity" data-toggle="tab">Motif similarity</a></li>
+  <li><a href="#PCC_alignment" data-toggle="tab">Motif alignment</a></li>
   <li><a href="#PCC_unaligned" data-toggle="tab">Unaligned binding sites</a></li>
   <li><a href="#PCC_aligned" data-toggle="tab">Aligned binding sites</a></li>
 </ul>
 
 <div class="tab-content">
   <div class="tab-pane active" id="PCC_similarity">
-    <p>$PCC(M_a, M_b) = {{ sc }}$</p>
+    Below is the PCC score histogram of permutations of the two motifs. On each
+    permutation test, the columns of motifs are randomly shuffled and similarity
+    between two shuffled motifs is measured. The true similarity between two motifs
+    is denoted with the dashed horizontal line. $PCC(M_a, M_b) = {{ sc }}$.
     <div>
       <img src="{{ plot }}" />
     </div>
   </div>
 
+  <div class="tab-pane" id="PCC_alignment">
+    <p>Below is the visual representation of the alignment of the two
+    motifs. Different from the original sequence logos, the alignment shows the aligned
+    submotifs only.</p>
+
+    <img src="" class="weblogo_img" site_data={% for site in aligned_sites_a %}{{site}}{% if not forloop.last %},{% endif %}{% endfor %} />
+
+    <br /> 
+    <img src="" class="weblogo_img" site_data={% for site in aligned_sites_b %}{{site}}{% if not forloop.last %},{% endif %}{% endfor %} />
+  </div>
+
+
   <div class="tab-pane" id="PCC_unaligned">
+    <p>The list of binding sites for two motifs as curated</p>
     <div class="row-fluid">
       <div class="span6">
         <pre>
@@ -31,6 +75,7 @@
   </div>
   
   <div class="tab-pane" id="PCC_aligned">
+    <p></p>
     <div class="row-fluid">
       <div class="span6">
         <pre>

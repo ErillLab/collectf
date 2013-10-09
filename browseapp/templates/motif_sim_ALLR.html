@@ -1,19 +1,64 @@
+<div class="accordion" id="ALLR_accordion">
+  <div class="accordion-heading">
+    <a href="#ALLR_collapse" data-toggle="collapse" data-parent="ALLR_accordion">
+      <span class="pull-right"><small>[expand/collapse]</small></span></a>
+    Average Log Likelihood Ratio (ALLR) between two motif columns is the sum of two
+    log-likelihood ratios.
+
+  </div>
+  <div id="ALLR_collapse" class="accordion-body collapse">
+    <p>
+    ALLR between two columns $X$ and $Y$ is defined as
+    <div class="eq">
+      $$
+      ALLR(X,Y) = \frac{\sum_{b \in B} n_X(b) \cdot \log{\frac{f_Y(b)}{p(b)}} +
+      \sum_{b \in B} n_Y(b) \cdot \log{\frac{f_X(b)}{p(b)}}}
+      {\sum_{b \in B} (n_X(b) + n_Y(b))}
+      $$
+    </div>
+    where $B = (A,C,G,T)$, $n_X(b)$ is the count of the base $b$ in column $X$,
+    $f_X(b)$ the frequency of base $b$ on column $X$ and $p(b)$ the background probability of base $b$.    
+    </p>
+
+    <p>
+    The ALLR between two motifs is defined as the sum of the column comparison scores of the ungapped alignment of the two motifs.
+    </p>
+    
+  </div>
+</div>
 
 <ul class="nav nav-tabs">
   <li class="active"><a href="#ALLR_similarity" data-toggle="tab">Motif similarity</a></li>
+  <li><a href="#ALLR_alignment" data-toggle="tab">Motif alignment</a></li>
   <li><a href="#ALLR_unaligned" data-toggle="tab">Unaligned binding sites</a></li>
   <li><a href="#ALLR_aligned" data-toggle="tab">Aligned binding sites</a></li>
 </ul>
 
 <div class="tab-content">
   <div class="tab-pane active" id="ALLR_similarity">
-    <p>$ALLR(M_a, M_b) = {{ sc }}$</p>
+    <p>Below is the ALLR score histogram of permutations of the two motifs. On each
+    permutation test, the columns of motifs are randomly shuffled and similarity
+    between two shuffled motifs is measured. The true similarity between two motifs
+    is denoted with the dashed horizontal line. $ALLR(M_a, M_b) = {{ sc }}$</p>
     <div>
       <img src="{{ plot }}" />
     </div>
   </div>
 
+  <div class="tab-pane" id="ALLR_alignment">
+    <p>Below is the visual representation of the alignment of the two
+    motifs. Different from the original sequence logos, the alignment shows the aligned
+    submotifs only.</p>
+
+    <img src="" class="weblogo_img" site_data={% for site in aligned_sites_a %}{{site}}{% if not forloop.last %},{% endif %}{% endfor %} />
+
+    <br /> 
+    <img src="" class="weblogo_img" site_data={% for site in aligned_sites_b %}{{site}}{% if not forloop.last %},{% endif %}{% endfor %} />
+  </div>
+
+
   <div class="tab-pane" id="ALLR_unaligned">
+    <p>The list of binding sites for two motifs as curated</p>
     <div class="row-fluid">
       <div class="span6">
         <pre>

@@ -1,19 +1,67 @@
+<div class="accordion" id="ED_accordion">
+  <div class="accordion-heading">
+    <a href="#ED_collapse" data-toggle="collapse" data-parent="ED_accordion">
+      <span class="pull-right"><small>[expand/collapse]</small></span></a>
+
+    Euclidean distance (ED) is the distance between two points in $n$-dimensional
+    space. 
+  <div id="ED_collapse" class="accordion-body collapse">
+
+    <p>
+    
+      The ED for two DNA motif columns $X$ and $Y$ is defined as
+    
+    <div class="eq">
+      $$
+      ED(X,Y) = \sqrt{\sum_{b\in B} (f_X(b)-f_Y(b))^2}
+      $$
+    </div>
+    where $B = (A,C,G,T)$, $f_X(b)$ is the frequency of base $b$ in column $X$.
+    </p>
+
+    <p>
+
+      The ED between two motifs is defined as the sum of the column comparison scores of the ungapped alignment of the two motifs.
+    </p>
+  </div>
+
+
+  </div>
+</div>
 
 <ul class="nav nav-tabs">
   <li class="active"><a href="#ED_similarity" data-toggle="tab">Motif similarity</a></li>
+  <li><a href="#ED_alignment" data-toggle="tab">Motif alignment</a></li>
   <li><a href="#ED_unaligned" data-toggle="tab">Unaligned binding sites</a></li>
   <li><a href="#ED_aligned" data-toggle="tab">Aligned binding sites</a></li>
 </ul>
 
 <div class="tab-content">
   <div class="tab-pane active" id="ED_similarity">
-    <p>$ED(M_a, M_b) = {{ sc }}$</p>
+    
+    <p>Below is the ED score histogram of permutations of the two motifs. On each
+    permutation test, the columns of motifs are randomly shuffled and distance
+    between two shuffled motifs is measured. The true distance between two motifs
+    is denoted with the dashed horizontal line. $ED(M_a, M_b) = {{ sc }}$</p>
     <div>
       <img src="{{ plot }}" />
     </div>
   </div>
 
+  <div class="tab-pane" id="ED_alignment">
+    <p>Below is the visual representation of the alignment of the two
+    motifs. Different from the original sequence logos, the alignment shows the aligned
+    submotifs only.</p>
+
+    <img src="" class="weblogo_img" site_data={% for site in aligned_sites_a %}{{site}}{% if not forloop.last %},{% endif %}{% endfor %} />
+
+    <br /> 
+    <img src="" class="weblogo_img" site_data={% for site in aligned_sites_b %}{{site}}{% if not forloop.last %},{% endif %}{% endfor %} />
+  </div>
+
+
   <div class="tab-pane" id="ED_unaligned">
+    <p>The list of binding sites for two motifs as curated</p>
     <div class="row-fluid">
       <div class="span6">
         <pre>

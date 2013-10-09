@@ -82,9 +82,15 @@ def get_sites_by_TF_and_species(curation_site_instances, non_motif_curation_site
     # Use LASAGNA to align sites 
     #trimmed = bioutils.call_lasagna(map(lambda s:str(s[0].site_instance.seq), meta_sites.values()))
     trimmed = bioutils.call_lasagna(map(lambda s: s[0].site_instance, meta_sites.values()))
+
+    site_instances_qs = models.SiteInstance.objects.filter(pk__in=[meta_sites[k][0].site_instance.pk for k in meta_sites])
+    site_instance_genome_dict = dict((v['site_id'], v['genome__genome_accession'])
+                                     for v in site_instances_qs.values('site_id', 'genome__genome_accession'))
+    
     return {
         'meta_sites': meta_sites,
-        'meta_site_genome_accession_dict': {}, #dict((k, meta_sites[k][0].site_instance.genome.genome_accession) for k in meta_sites),
+        'meta_site_genome_accession_dict': dict((k, site_instance_genome_dict[meta_sites[k][0].site_instance.site_id]) for k in meta_sites),
+        #'meta_site_genome_accession_dict': {}, #dict((k, meta_sites[k][0].site_instance.genome.genome_accession) for k in meta_sites),
         'meta_site_protein_accession_dict': dict((k, meta_sites[k][0].curation.TF_instance.protein_accession) for k in meta_sites),
         'meta_site_curation_dict': meta_site_curation_dict,
         'meta_site_regulation_dict': meta_site_regulation_dict,

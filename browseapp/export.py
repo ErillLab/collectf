@@ -45,7 +45,10 @@ def export_sites(request):
 
 def export_base(meta_sites):
     rows = []
-    for meta_site in meta_sites:
+
+    aligned = bioutils.call_lasagna([m[0].site_instance for m in meta_sites])
+    
+    for i,meta_site in enumerate(meta_sites):
         values = meta_site.values('curation__TF__name',
                                   'curation__TF_instance__protein_accession',
                                   'site_instance__genome__genome_accession',
@@ -56,6 +59,7 @@ def export_base(meta_sites):
         values['end_pos'] = meta_site[0].site_instance.end+1
         values['strand'] = meta_site[0].site_instance.strand
         values['seq'] = meta_site[0].site_instance.seq
+        values['aligned_seq'] = aligned[i]
         rows.append(values)
     return rows
     
@@ -172,13 +176,13 @@ def export_matrix(meta_sites, type):
     Export PSFM/PSSM
     """
     rows = export_base(meta_sites)
-    sites = [row['seq'] for row in rows]
+    sites = [row['aligned_seq'] for row in rows]
     motif = bioutils.create_motif(sites)
     # todo backgrounds
     matrix = motif.pwm() if type=="PSFM" else motif.log_odds()
-    matrix_rows = []
-    for letter in "ACTG":
-        matrix_rows.append('\t'.join(str(matrix[i][letter]) for i in xrange(motif.length)))
+    matrix_rows = ['> CollecTF_motif_export']
+    for letter in "ACGT":
+        matrix_rows.append(letter + ' [ ' + ' '.join(str(matrix[i][letter]) for i in xrange(motif.length)) + ' ]')
     return '\n'.join(matrix_rows)
 
 def export_PSFM(meta_sites):

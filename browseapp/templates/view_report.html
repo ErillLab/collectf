@@ -217,38 +217,38 @@
 	  <input type="hidden" name="site_id" value="{% for csi in meta_site %}{{ csi.pk }}{% if not forloop.last %}|{% endif %}{% endfor %}">
 	  {% endfor %}
 	  {% endfor %}
-	  <ul class="">
-	    <li><input type="submit" value="Download FASTA" class="btn btn-link" name="fasta">
-	      <p>
-		Download data in FASTA format. 
-	      </p>
-	    </li>
-	    <li>
-	      <input type="submit" value="Download spreadsheet (TSV)" class="btn btn-link" name="tsv">
-	      <p>
-		Download data in TSV (tab-separated-value) format. For each binding
-		site, all sources of evidence (i.e. experimental techniques and
-		publication information) are combined into one record.
-	      </p>
-	    </li>
-	    <li>
-	      <input type="submit" value="Download spreadsheet (TSV, raw)" class="btn btn-link" name="tsv-raw">
-	      <p>Download raw data in TSV format. All reported sites are exported
-	        individually.</p>
-	    </li>
-	    <li>
-	      <input type="submit" value="Download ARFF" class="btn btn-link" name="arff">
-	      <p>Download data in Attribute-Relation File Format (ARFF).</p>
-	    </li>
-            <li>
-              <input type="submit" value="Download PSFM" class="btn btn-link" name="PSFM">
-              <p>Download Position-Specific-Frequency-Matrix of the motif.</p>
-            </li>
-            <li>
-              <input type="submit" value="Download PSSM" class="btn btn-link" name="PSSM">
-              <p>Download Position-Specific-Scoring-Matrix of the motif.</p>
-            </li>
-	  </ul>
+
+          <table class="table table-bordered table-striped">
+            <tbody>
+              <tr>
+                <td><input type="submit" value="Download FASTA" class="btn btn-link" name="fasta"></td>
+                <td>Download data in FASTA format.</td>
+              </tr>
+              <tr>
+                <td><input type="submit" value="Download spreadsheet (TSV)" class="btn btn-link" name="tsv"></td>
+                <td> Download data in TSV (tab-separated-value) format. For each
+		binding site, all sources of evidence (i.e. experimental techniques
+		and publication information) are combined into one record.</td>
+              </tr>
+              <tr>
+                <td><input type="submit" value="Download spreadsheet (TSV, raw)" class="btn btn-link" name="tsv-raw"></td>
+                <td>             Download raw data in TSV format. All reported sites are exported
+	          individually.</td>
+              </tr>
+	      <tr>
+                <td><input type="submit" value="Download ARFF" class="btn btn-link" name="arff"></td>
+                <td>Download data in Attribute-Relation File Format (ARFF).</td>
+              </tr>
+              <tr>
+                <td><input type="submit" value="Download PSFM" class="btn btn-link" name="PSFM"></td>
+                <td>Download Position-Specific-Frequency-Matrix of the motif.</td>
+              </tr>
+              <tr>
+                <td><input type="submit" value="Download PSSM" class="btn btn-link" name="PSSM"></td>
+                <td>Download Position-Specific-Scoring-Matrix of the motif.</td>
+              </tr>
+            </tbody>
+          </table>
 	</form>
 
       </div>

@@ -112,10 +112,6 @@ def motif_sim_measure(request):
     sites_a = request.POST['sites_a'].strip().split(',')
     sites_b = request.POST['sites_b'].strip().split(',')
 
-    # remove gaps for now
-    sites_a = [site.replace('*', 'A') for site in sites_a]
-    sites_b = [site.replace('*', 'A') for site in sites_b]
-
     if request.POST['fun'] == 'site_based':
         boxplot, hist = levenshtein_measure(sites_a, sites_b)
         return render_to_response("motif_sim_levenshtein.html",
@@ -137,8 +133,6 @@ def motif_sim_measure(request):
                         }[fun_str]
             
             sites_a, sites_b = motif_alignment(sites_a, sites_b, fun2call) # align motif_a and motif_b
-            #print bioutils.create_motif(sites_a).consensus()
-            #print bioutils.create_motif(sites_b).consensus()
             fig = motif_sim_test(sites_a, sites_b, fun2call)
         except Exception as e:
             print e
@@ -167,11 +161,16 @@ def levenshtein_measure(motif_a, motif_b):
 def motif_sim_test(ma, mb, fnc):
     """Given two motifs and a similarity function, perform the permutation tests and
     return the histogram"""
-
     permuted_dists = permutation_test(ma, mb, fnc)
     true_dist = fnc(ma, mb)
-    plt.hist(permuted_dists, bins=30, normed=1, color='c')
-    plt.axvline(true_dist, linestyle='dashed', linewidth=2, color='b')
+    plt.hist(permuted_dists, bins=30, normed=1, color='LightSlateGray', label="permuted motifs")
+    plt.axvline(true_dist, linestyle='dashed', linewidth=2, color='DarkRed', label="true motif")
+    plt.xlabel({euclidean_distance: "Eucledian distance",
+                pearson_correlation_coefficient: "Pearson Correlation Coefficient",
+                kullback_leibler_divergence: "Kullback-Leibler Divergence",
+                average_log_likelihood_ratio: "average log likelihood ratio"}[fnc])
+    plt.ylabel('frequency')
+    plt.legend()
     return fig2img(plt.gcf())
 
 def motif_alignment(sites_a, sites_b, fnc):
@@ -238,7 +237,7 @@ def permute_motif(motif):
         motif[i] = "".join(site[p[j]] for j in p)
     return motif
 
-def permutation_test(motif_a, motif_b, dist_fun, n=500):
+def permutation_test(motif_a, motif_b, dist_fun, n=100):
     """Permute columns of two motifs and measure the similarity/distance with the
     specified function. Do this for n times and return the list of scores."""
     dists = [dist_fun(permute_motif(motif_a), permute_motif(motif_b))

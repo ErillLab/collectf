@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
+from baseapp import bioutils
 
 # Create your models here.
 class Curation(models.Model):
@@ -252,11 +253,6 @@ class SiteInstance(models.Model):
                   '%d' % self.end,
                   self.seq,]
         return '\t'.join(fields)
-
-    def get_expansion(self, n=100):
-        # get [-n, +n] surrounding regions
-        return self.genome.sequence[self.start-n:self.end+n]
-
 
 class Curation_SiteInstance(models.Model):
     # through model between Curation and SiteInstance models
