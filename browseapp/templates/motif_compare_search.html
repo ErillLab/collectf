@@ -7,12 +7,9 @@
 <form action="" method="post">{% csrf_token %}
 {# include search fields here #}
 {% include "search_form_fields.html" %}
-<!--{% include "motif_compare_wizard_navigate.html" %}-->
 <input class="btn btn-info" type="submit" value="next step"/>
 </form>
 </div>
-
-
 
 {# don't forget to populate search fields with taxonomy, TF list and experimental techniques #}
 <script>

@@ -75,12 +75,12 @@ def motif_comparison_post(request, step):
         motif_a_data = view_results.prepare_results(motif_a_csi_list, motif_a_ncsi_list)
         motif_b_data = view_results.prepare_results(motif_b_csi_list, motif_b_ncsi_list)
         # put list of TF and species names in template
-        get_TF_name = lambda reports: list(set(map(lambda rep: rep["TF_name"], reports)))
-        get_sp_name = lambda reports: list(set(map(lambda rep: rep["species_name"], reports)))
-        motif_a_data["TFs"] = get_TF_name(request.session["cstep1"]["reports"])
-        motif_b_data["TFs"] = get_TF_name(request.session["cstep2"]["reports"])
-        motif_a_data["species"] = get_sp_name(request.session["cstep1"]["reports"])
-        motif_b_data["species"] = get_sp_name(request.session["cstep2"]["reports"])
+        #get_TF_name = lambda reports: list(set(map(lambda rep: rep["TF_name"], reports)))
+        #get_sp_name = lambda reports: list(set(map(lambda rep: rep["species_name"], reports)))
+        #motif_a_data["TFs"] = get_TF_name(request.session["cstep1"]["reports"])
+        #motif_b_data["TFs"] = get_TF_name(request.session["cstep2"]["reports"])
+        #motif_a_data["species"] = get_sp_name(request.session["cstep1"]["reports"])
+        #motif_b_data["species"] = get_sp_name(request.session["cstep2"]["reports"])
         return render_to_response("motif_compare_comparison_results.html",
                                   {"form_title": FORM_TITLES[2],
                                    "form_description": FORM_DESCRIPTIONS[2],
@@ -149,13 +149,22 @@ def levenshtein_measure(motif_a, motif_b):
     a_vs_a = levenshtein_motifs(motif_a, motif_a)
     a_vs_b = levenshtein_motifs(motif_a, motif_b)
     b_vs_b = levenshtein_motifs(motif_b, motif_b)
-    plt.boxplot([a_vs_a, a_vs_b, b_vs_b])
+
+    bp = plt.boxplot([a_vs_a, a_vs_b, b_vs_b])
     plt.xticks(range(1,4), [r'$M_a$ vs $M_a$', r'$M_a$ vs $M_b$', r'$M_b$ vs $M_b$'])
+    plt.setp(bp['boxes'], color='#0088CC')
+    plt.setp(bp['whiskers'], color='#0088CC')
+    plt.setp(bp['fliers'], color='#0088CC', marker='+')
+    plt.ylabel('Levenshtein distance')
     boxplot = fig2img(plt.gcf())
-    plt.hist([a_vs_a, a_vs_b, b_vs_b], bins=15, normed=1,
-             label=[r'$M_a$ vs $M_a$', r'$M_a$ vs $M_b$', r'$M_b$ vs $M_b$'])
+    plt.hist([a_vs_a, a_vs_b, b_vs_b], bins=15,
+             label=[r'$M_a$ vs $M_a$', r'$M_a$ vs $M_b$', r'$M_b$ vs $M_b$'],
+             color=["#FFCC33", "#006699", "#FF6633"])
+    plt.ylabel('frequency of site-pairs')
+    plt.xlabel('Levenshtein distance')
     plt.legend()
     hist = fig2img(plt.gcf())
+
     return boxplot, hist
 
 def motif_sim_test(ma, mb, fnc):
@@ -163,8 +172,8 @@ def motif_sim_test(ma, mb, fnc):
     return the histogram"""
     permuted_dists = permutation_test(ma, mb, fnc)
     true_dist = fnc(ma, mb)
-    plt.hist(permuted_dists, bins=30, normed=1, color='LightSlateGray', label="permuted motifs")
-    plt.axvline(true_dist, linestyle='dashed', linewidth=2, color='DarkRed', label="true motif")
+    plt.hist(permuted_dists, bins=30, normed=1, color='#0088CC', label="permuted motifs")
+    plt.axvline(true_dist, linestyle='dashed', linewidth=2, color='#FF3300', label="true motif")
     plt.xlabel({euclidean_distance: "Eucledian distance",
                 pearson_correlation_coefficient: "Pearson Correlation Coefficient",
                 kullback_leibler_divergence: "Kullback-Leibler Divergence",

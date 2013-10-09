@@ -26,114 +26,119 @@
   </head>
 
   <body>
-   
+    
     <div id="wrap">
       <!-- header -->
       <div class="navbar navbar-fixed-top">
-	<div class="navbar-inner">
-	  <div class="container-fluid">
-            
-	    <div class="nav-collapse collapse">
-	      <ul class="nav">
-		<a class="brand" href="{% url collectfapp.views.home %}">collecTF</a>
-		<li class="divider-vertical"></li>
-		<li class="dropdown">
-		  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Menu <b class="caret"></b></a>
-		  <ul class="dropdown-menu">
-		    <li><a href="{% url mainpageapp.views.about %}">About</a></li>
-		    <li><a href="{% url mainpageapp.views.browse %}">Browse</a></li>
-		    <li><a href="{% url mainpageapp.views.search %}">Search</a></li>
+        <div class="navbar-inner">
+          <div class="container-fluid">
+            <div class="nav-collapse collapse">
+              <ul class="nav">
+                <a class="brand" href="{% url collectfapp.views.home %}">collecTF</a>
+                <li class="divider-vertical"></li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Menu <b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li><a href="{% url mainpageapp.views.about %}">About</a></li>
+                    <li><a href="{% url mainpageapp.views.browse %}">Browse</a></li>
+                    <li><a href="{% url mainpageapp.views.search %}">Search</a></li>
                     <li><a href="{% url mainpageapp.views.compare_motifs %}">Compare motifs</a></li>
-		    <li><a href="{% url mainpageapp.views.contribute %}">Contribute</a></li>
-		    <li><a href="{% url mainpageapp.views.stats %}">Stats</a></li>
-		    <li><a href="{% url mainpageapp.views.links %}">Links</a></li>
-		    <li><a href="{% url mainpageapp.views.feedback %}">Feedback</a></li>
-		    <li><a href="{% url mainpageapp.views.cite %}">Cite</a></li>
-		    <li><a href="{% url mainpageapp.views.acknowledgements %}">Acknowledgements</a></li>
-		    {% if user.is_superuser %}
-		    <hr />
-		    <li><a href="{% url admin:index %}" class="navbar-link">Admin page</a></li>
-		    <li><a href="{% url ncbiapp.views.export_tbl_view %}">Export NCBI submission</a></li>
-		    {% endif %}
-		  </ul>
-	      </ul>
+                    <li><a href="{% url mainpageapp.views.contribute %}">Contribute</a></li>
+                    <li><a href="{% url mainpageapp.views.stats %}">Stats</a></li>
+                    <li><a href="{% url mainpageapp.views.links %}">Links</a></li>
+                    <li><a href="{% url mainpageapp.views.feedback %}">Feedback</a></li>
+                    <li><a href="{% url mainpageapp.views.cite %}">Cite</a></li>
+                    <li><a href="{% url mainpageapp.views.acknowledgements %}">Acknowledgements</a></li>
+                    {% if user.is_superuser %}
+                    <hr />
+                    <li><a href="{% url admin:index %}" class="navbar-link">Admin page</a></li>
+                    <li><a href="{% url ncbiapp.views.export_tbl_view %}">Export NCBI submission</a></li>
+                    {% endif %}
+                  </ul>
+              </ul>
 
-	      <ul class="nav pull-right">
+              <ul class="nav pull-right">
+                {% if user.is_authenticated %}
+                <li class="navbar-text">logged in as {{user.username}}</li>
+                <li class="divider-vertical"></li>
+                <li><a href="{% url collectfapp.signupview.logout %}" class="navbar-link">Logout</a></li>
+                {% else %}
+                <li><a class="navbar-link" href="{% url mainpageapp.views.register_request %}">Register</a></li>
+                <li class="divider-vertical"></li>
+                <li><a class="navbar-link" href="{% url collectfapp.signupview.login %}">Login</a></li>
+                {% endif %}
+              </ul>
 
-		{% if user.is_authenticated %}
-		<li class="navbar-text">logged in as {{user.username}}</li>
-		<li class="divider-vertical"></li>
-		<li><a href="{% url collectfapp.signupview.logout %}" class="navbar-link">Logout</a></li>
-		{% else %}
-		<li><a class="navbar-link" href="{% url mainpageapp.views.register_request %}">Register</a></li>
-		 <li class="divider-vertical"></li>
-		<li><a class="navbar-link" href="{% url collectfapp.signupview.login %}">Login</a></li>
-		{% endif %}
-	      </ul>
-
-            </div><!--/.nav-collapse -->
-	  </div>
-	</div>
-      </div>
-
+            </div>  <!--/.nav-collapse -->
+          </div> <!-- container-fluid -->
+        </div> <!-- navbar-inner -->
+      </div> <!-- navbar navbar-fixed-top -->
 
       <div class="container-fluid" id="main">
-         <!--[if lte IE 7]>
-        <div class="alert alert-error">
-          It seems that your are running an old version of Internet Explorer (version
-          7 or lower), or running it in Compatibility mode. To access the full
-          functionality of CollecTF with Internet Explorer, please disable the
-          compatibility mode or upgrade to a more recent version of Internet
-          Explorer.
-        </div>
-        <![endif]-->
+        <!--[if lte IE 7]>
+            <div class="alert alert-error">
+              It seems that your are running an old version of Internet Explorer (version
+              7 or lower), or running it in Compatibility mode. To access the full
+              functionality of CollecTF with Internet Explorer, please disable the
+              compatibility mode or upgrade to a more recent version of Internet
+              Explorer.
+            </div>
+            <![endif]-->
 
-	<!-- any messages? -->
-	{% for message in messages %}
-	<div class="alert alert-block alert-{{message.tags}}">
-	  <button type="button" class="close" data-dismiss="alert">x</button>
-	  {{ message }}
-	</div>
-	{% endfor %}
-	<!-- main stuff -->
-	{% block content %}
-	{% endblock %}
+        <!-- any messages? -->
+        {% for message in messages %}
+        <div class="alert alert-block alert-{{message.tags}}">
+          <button type="button" class="close" data-dismiss="alert">x</button>
+          {{ message }}
+        </div>
+        {% endfor %}
+        <!-- main stuff -->
+        {% block content %}
+        {% endblock %}
       </div>
       <div id="push"></div>
     </div>
 
     <div id="footer">
       <div class="container-fluid">
-	<div class="row-fluid">
-	  <div class="span9">
-	    <p>Please send comments to <a href="mailto:collectfdb@umbc.edu">collectfdb@umbc.edu</a>.
-	    </p>
-	    <hr />
+        <div class="row-fluid">
+          <div class="span9">
+            <p>Please send comments to <a href="mailto:collectfdb@umbc.edu">collectfdb@umbc.edu</a>.
+            </p>
           </div>
         </div>
         <div class="row-fluid">
           <div class="span9">
-	    <p class="muted">
-	      <small>
-		This material is based upon work supported by the National Science Foundation under Grant Number MCB-1158056.
-		Any opinions, findings, and conclusions or recommendations expressed in this material
-		are those of the author(s) and do not necessarily reflect the views of the National
-		Science Foundation.</small></p>
-	  </div>
+            <p class="muted">
+              <small>
+                This material is based upon work supported by the National Science Foundation under Grant Number MCB-1158056.
+                Any opinions, findings, and conclusions or recommendations expressed in this material
+                are those of the author(s) and do not necessarily reflect the views of the National
+                Science Foundation.</small></p>
+          </div>
 
-	  <div class="span2">
-	    <p class="text-right">
-	      {% load static from staticfiles %}
-	      <a href="http://compbio.umbc.edu"><img src="{% static "lablogo.png" %}"></a>
-	    </p>
-	  </div>
-	</div>
+          <div class="span2">
+            <p class="text-right">
+              {% load static from staticfiles %}
+              <a href="http://compbio.umbc.edu"><img src="{% static "lablogo.png" %}"></a>
+            </p>
+          </div>
+        </div>
+
+        
+        <p class="pull-right">
+          <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-html401-blue"
+                 alt="Valid HTML 4.01!" height="31" width="88" /></a>
+          <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-css-blue"
+                 alt="Valid CSS!" height="31" width="88" /></a>
+        </p>
+
       </div>
     </div>
-    
     {% block javascript %}
     {% endblock %}
-
   </body>
 </html>
 

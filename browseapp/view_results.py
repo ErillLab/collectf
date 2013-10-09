@@ -6,7 +6,7 @@ import collectfapp.views
 def prepare_results(motif_csi_list, non_motif_csi_list, integrate_non_motif=False):
     """
     Given lists of motif-associated and non-motif-associated curation site
-    instanaces, pass them to the view results function.
+    instances, pass them to the view results function.
     """
     # get curation_site_instances
     csis = models.Curation_SiteInstance.objects.filter(pk__in=motif_csi_list)
@@ -16,7 +16,7 @@ def prepare_results(motif_csi_list, non_motif_csi_list, integrate_non_motif=Fals
         non_motif_csis = models.Curation_SiteInstance.objects.filter(pk__in=non_motif_csi_list)
     else:
         non_motif_csis = models.Curation_SiteInstance.objects.none()
-    # get data associated with curation-site-instances
+    # get data, associated with curation-site-instances
     values = csis.values('curation__TF','site_instance__genome__taxonomy').distinct()
 
     # create all reports
@@ -42,9 +42,6 @@ def prepare_results(motif_csi_list, non_motif_csi_list, integrate_non_motif=Fals
         ensemble_meta_sites.extend(report['meta_sites'].values())
     # lasagna alignment for ensemble
     trimmed = bioutils.call_lasagna(map(lambda s: s[0].site_instance, ensemble_meta_sites))
-
-    
-    #trimmed = bioutils.call_lasagna(map(lambda s: str(s[0].site_instance.seq), ensemble_meta_sites))
     # create weblogo for the list of sites
     ensemble_report = {'meta_sites': ensemble_meta_sites,
                        'aligned_sites': trimmed,
@@ -52,8 +49,8 @@ def prepare_results(motif_csi_list, non_motif_csi_list, integrate_non_motif=Fals
 
     return {'reports': reports,
             'ensemble_report': ensemble_report,
-            'motif_csi_list': ','.join(motif_csi_list),
-            'non_motif_csi_list': ','.join(non_motif_csi_list)}
+            'motif_csi_list': ','.join(map(str, motif_csi_list)),
+            'non_motif_csi_list': ','.join(map(str, non_motif_csi_list)) if non_motif_csi_list else ""}
     
 def view_results(request):
     #assert request.POST, '

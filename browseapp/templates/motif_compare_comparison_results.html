@@ -64,6 +64,11 @@
 
     <!-- COMPARED MOTIFS -->
     <div class="tab-pane" id="compared_motifs">
+    <p>
+      Here is the list of TFs and species of all binding motifs used for the
+      comparison. Individual motifs and detailed gene regulation reports are also
+      available.
+    </p>
       <div class="row-fluid">
         <div class="span6">
           <table class="table table-striped table-bordered">
@@ -81,8 +86,8 @@
                 {% with form_id=report.TF_name|slugify|add:'_'|add:report.species_name|slugify %}
 	            <td><a href="#" onclick="$('#{{ form_id }}').submit();">view</a>
 	              <form action="{% url browseapp.view_results.view_results %}" method="post" style="display:inline;" id={{ form_id }}>{% csrf_token %}
-	                <input type="hidden" name="motif_csi_list" value="{% for csi_pk in report.csi_list %}{{ csi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}"/>
-	                <input type="hidden" name="non_motif_csi_list" value="{% for ncsi_pk in report.non_motif_csi_list %}{{ ncsi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}"/>
+	                <input type="hidden" name="motif_csi_list" value="{% for csi in report.csi_list %} {{ csi }}{% if not forloop.last %},{% endif %}{% endfor %}"/>
+	                <input type="hidden" name="non_motif_csi_list" value="{% for ncsi in report.non_motif_csi_list %}{{ ncsi }}{% if not forloop.last %},{% endif %}{% endfor %}">
 	              </form>
 	            </td>
 	            {% endwith %}
@@ -123,12 +128,6 @@
   </div>
 </div>
 
-<div>
-  <form action="" method="post">{% csrf_token %}
-    {% include "motif_compare_wizard_navigate.html" %}
-  </form>
-</div>
-
 
 {% endblock %}
 
@@ -141,7 +140,8 @@ function motifSimilarityAJAX(el) {
     var elDOM = $('#'+el);
     // if already done, dont make that request again.
     if (!elDOM.is(':empty')) {return false;}
-    elDOM.parent().parent().block({message: 'Loading.<br/><i class="icon-spin icon-large icon-spinner"> </i>'});
+    $.blockUI();
+    //elDOM.parent().parent().block({message: 'Loading.<br/><i class="icon-spin icon-large icon-spinner"> </i>'});
     $.ajax({
         type: "POST",
         url: "{% url motif_sim_measure %}",
@@ -154,7 +154,8 @@ function motifSimilarityAJAX(el) {
             csrfmiddlewaretoken: '{{csrf_token}}'
         },
         success: function(data) {
-            elDOM.parent().parent().unblock();
+            $.unblockUI();
+            //elDOM.parent().parent().unblock();
             elDOM.append(data);
             // render MathJax
             MathJax.Hub.Queue(["Typeset", MathJax.Hub]);

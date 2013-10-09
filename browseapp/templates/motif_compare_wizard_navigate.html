@@ -1,11 +1,5 @@
-{{ wizard.management_form }}
 <div class="control-group text-center">
   <div class="controls">
-    {% if wizard.steps.prev %}
-    <button class="btn btn-info" name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">prev step</button>
-    {% endif %}
-    {% if wizard.steps.next %}
     <input class="btn btn-info" type="submit" value="next step"/>
-    {% endif %}
   </div>
 </div>
