@@ -52,8 +52,8 @@ def prepare_results(motif_csi_list, non_motif_csi_list, integrate_non_motif=Fals
 
     return {'reports': reports,
             'ensemble_report': ensemble_report,
-            'motif_csi_list': motif_csi_list,
-            'non_motif_csi_list': non_motif_csi_list}
+            'motif_csi_list': ','.join(motif_csi_list),
+            'non_motif_csi_list': ','.join(non_motif_csi_list)}
     
 def view_results(request):
     #assert request.POST, '
