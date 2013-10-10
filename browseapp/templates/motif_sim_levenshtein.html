@@ -4,10 +4,10 @@
       <span class="pull-right"><small>[expand/collapse]</small></span></a>
 
     <p>In addition to motif-based similarity/distance measures (i.e. Kullback-Leibler
-    Divergence, Pearson Correlation Coefficient), two motifs can be compared by
-    measuring the similarity/distance between all pairs of sites from the two
-    motifs. CollecTF uses Levenshtein distance (also known as "edit distance") to
-    measure the distance between two sites.
+      Divergence, Pearson Correlation Coefficient), two motifs can be compared by
+      measuring the similarity/distance between all pairs of sites from the two
+      motifs. CollecTF uses Levenshtein distance (also known as "edit distance") to
+      measure the distance between two sites.
     </p>
   </div>
   <div id="levenshtein_collapse" class="accordion-body collapse">
@@ -20,61 +20,64 @@
   </div>
 </div>
 
-<ul class="nav nav-tabs">
-  <li class="active"><a href="#Levenshtein_similarity" data-toggle="tab">Motif similarity</a></li>
-  <li><a href="#Levenshtein_unaligned" data-toggle="tab">Unaligned binding sites</a></li>
-  <li><a href="#Levenshtein_aligned" data-toggle="tab">Aligned binding sites</a></li>
-</ul>
+<div class="tabbable">
+  <div class="tabs-left">
+    <ul class="nav nav-tabs">
+      <li class="active"><a href="#Levenshtein_similarity" data-toggle="tab">Motif similarity</a></li>
+      <li><a href="#Levenshtein_unaligned" data-toggle="tab">Unaligned binding sites</a></li>
+      <li><a href="#Levenshtein_aligned" data-toggle="tab">Aligned binding sites</a></li>
+    </ul>
 
-<div class="tab-content">
-  <div class="tab-pane active" id="Levenshtein_similarity">
-    <div>
-      <img src="{{ boxplot }}" />
-    </div>
-    
-    <div>
-      <img src="{{ hist }}" />
-    </div>
-  </div>
+    <div class="tab-content">
+      <div class="tab-pane active" id="Levenshtein_similarity">
+        <div>
+          <img src="{{ boxplot }}" />
+        </div>
+        
+        <div>
+          <img src="{{ hist }}" />
+        </div>
+      </div>
 
-  <div class="tab-pane" id="Levenshtein_unaligned">
-    <p>The list of binding sites for two motifs as curated</p>
-    <div class="row-fluid">
-      <div class="span6">
-        <pre>
-          {% for site in unaligned_sites_a %}{{ site }}
-          {% endfor %}
-        </pre>
+      <div class="tab-pane" id="Levenshtein_unaligned">
+        <p>The list of binding sites for two motifs as curated</p>
+        <div class="row-fluid">
+          <div class="span6">
+            <pre>
+              {% for site in unaligned_sites_a %}{{ site }}
+              {% endfor %}
+            </pre>
+          </div>
+          <div class="span6">
+            <pre>
+              {% for site in unaligned_sites_b %}{{ site }}
+              {% endfor %}
+            </pre>
+          </div>
+        </div>
       </div>
-      <div class="span6">
-        <pre>
-          {% for site in unaligned_sites_b %}{{ site }}
-          {% endfor %}
-        </pre>
-      </div>
-    </div>
-  </div>
-  
-  <div class="tab-pane" id="Levenshtein_aligned">
-    <p>The collection of binding sites for the two motifs. For the alignment of variable-length binding sites,
-      <a href"http://www.biomedcentral.com/1471-2105/14/108/">LASAGNA</a> is used.
-    </p>
+      
+      <div class="tab-pane" id="Levenshtein_aligned">
+        <p>The collection of binding sites for the two motifs. For the alignment of variable-length binding sites,
+          <a href="http://www.biomedcentral.com/1471-2105/14/108/">LASAGNA</a> is used.
+        </p>
 
-    <div class="row-fluid">
-      <div class="span6">
-        <pre>
-          {% for site in aligned_sites_a %}{{ site }}
-          {% endfor %}
-        </pre>
-      </div>
-      <div class="span6">
-        <pre>
-          {% for site in aligned_sites_b %}{{ site }}
-          {% endfor %}
-        </pre>
+        <div class="row-fluid">
+          <div class="span6">
+            <pre>
+              {% for site in aligned_sites_a %}{{ site }}
+              {% endfor %}
+            </pre>
+          </div>
+          <div class="span6">
+            <pre>
+              {% for site in aligned_sites_b %}{{ site }}
+              {% endfor %}
+            </pre>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
-
 

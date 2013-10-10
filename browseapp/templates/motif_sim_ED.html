@@ -29,72 +29,18 @@
   </div>
 </div>
 
-<ul class="nav nav-tabs">
-  <li class="active"><a href="#ED_similarity" data-toggle="tab">Motif similarity</a></li>
-  <li><a href="#ED_alignment" data-toggle="tab">Motif alignment</a></li>
-  <li><a href="#ED_unaligned" data-toggle="tab">Unaligned binding sites</a></li>
-  <li><a href="#ED_aligned" data-toggle="tab">Aligned binding sites</a></li>
-</ul>
-
-<div class="tab-content">
-  <div class="tab-pane active" id="ED_similarity">
-    
-    <p>Below is the ED score histogram of permutations of the two motifs. On each
-    permutation test, the columns of motifs are randomly shuffled and distance
-    between two shuffled motifs is measured. The true distance between two motifs
-    is denoted with the dashed horizontal line. $ED(M_a, M_b) = {{ sc }}$</p>
-    <div>
-      <img src="{{ plot }}" />
-    </div>
-  </div>
-
-  <div class="tab-pane" id="ED_alignment">
-    <p>Below is the visual representation of the alignment of the two
-    motifs. Different from the original sequence logos, the alignment shows the aligned
-    submotifs only.</p>
-
-    <img src="" class="weblogo_img" site_data={% for site in aligned_sites_a %}{{site}}{% if not forloop.last %},{% endif %}{% endfor %} />
-
-    <br /> 
-    <img src="" class="weblogo_img" site_data={% for site in aligned_sites_b %}{{site}}{% if not forloop.last %},{% endif %}{% endfor %} />
-  </div>
-
-
-  <div class="tab-pane" id="ED_unaligned">
-    <p>The list of binding sites for two motifs as curated</p>
-    <div class="row-fluid">
-      <div class="span6">
-        <pre>
-          {% for site in unaligned_sites_a %}{{ site }}
-          {% endfor %}
-        </pre>
-      </div>
-      <div class="span6">
-        <pre>
-          {% for site in unaligned_sites_b %}{{ site }}
-          {% endfor %}
-        </pre>
-      </div>
-    </div>
-  </div>
-  
-  <div class="tab-pane" id="ED_aligned">
-    <p>Below is the collection of binding sites used in the alignment of the two motifs.</p>
-    <div class="row-fluid">
-      <div class="span6">
-        <pre>
-          {% for site in aligned_sites_a %}{{ site }}
-          {% endfor %}
-        </pre>
-      </div>
-      <div class="span6">
-        <pre>
-          {% for site in aligned_sites_b %}{{ site }}
-          {% endfor %}
-        </pre>
-      </div>
-    </div>
-  </div>
+<hr />
+<p>
+  ED score histogram for random permutations on the two motifs.  For each test, 100
+  replicates of each motif are obtained by randomly sampling without replacement.
+  Motif similarity is computed using the ED statistic.  Blue bars denote frequencies
+  of ED values for replicate pair comparisons. The red dashed lines corresponds to
+  the ED of compared motifs.  
+</p>
+<p>$ED(M_a, M_b) = {{ sc }}$ and $p = {{p_value}}$</p>
+<div>
+  <img src="{{ plot }}" />
 </div>
+
 
 

@@ -74,20 +74,24 @@ def motif_comparison_post(request, step):
         # get the ensemble views
         motif_a_data = view_results.prepare_results(motif_a_csi_list, motif_a_ncsi_list)
         motif_b_data = view_results.prepare_results(motif_b_csi_list, motif_b_ncsi_list)
-        # put list of TF and species names in template
-        #get_TF_name = lambda reports: list(set(map(lambda rep: rep["TF_name"], reports)))
-        #get_sp_name = lambda reports: list(set(map(lambda rep: rep["species_name"], reports)))
-        #motif_a_data["TFs"] = get_TF_name(request.session["cstep1"]["reports"])
-        #motif_b_data["TFs"] = get_TF_name(request.session["cstep2"]["reports"])
-        #motif_a_data["species"] = get_sp_name(request.session["cstep1"]["reports"])
-        #motif_b_data["species"] = get_sp_name(request.session["cstep2"]["reports"])
+        sites_a = motif_a_data['ensemble_report']['aligned_sites']
+        sites_b = motif_b_data['ensemble_report']['aligned_sites']
+        aligned_sites_a, aligned_sites_b = motif_alignment(sites_a, sites_b)
+        # clean session data from possible previous requests
+        request.session['permute_motif_a'] = None
+        request.session['permute_motif_b'] = None
+        request.session.modified = True
+        
+
         return render_to_response("motif_compare_comparison_results.html",
                                   {"form_title": FORM_TITLES[2],
                                    "form_description": FORM_DESCRIPTIONS[2],
                                    "motif_a": motif_a_data,
                                    "motif_b": motif_b_data,
                                    "motif_a_reports": request.session['cstep1']['reports'],
-                                   "motif_b_reports": request.session['cstep2']['reports']},
+                                   "motif_b_reports": request.session['cstep2']['reports'],
+                                   "aligned_sites_a": aligned_sites_a,
+                                   "aligned_sites_b": aligned_sites_b},
                                   context_instance=RequestContext(request))
         
 def motif_comparison_step1(request):
@@ -106,7 +110,6 @@ def motif_sim_measure(request):
     Request has the similarity function and two motifs (comma seperated strings).
     Reponse returns HTML which is embedded into the main comparison page.
     """
-
     unaligned_sites_a = request.POST['unaligned_sites_a'].strip().split(',')
     unaligned_sites_b = request.POST['unaligned_sites_b'].strip().split(',')
     sites_a = request.POST['sites_a'].strip().split(',')
@@ -132,13 +135,14 @@ def motif_sim_measure(request):
                         'ALLR': average_log_likelihood_ratio,
                         }[fun_str]
             
-            sites_a, sites_b = motif_alignment(sites_a, sites_b, fun2call) # align motif_a and motif_b
-            fig = motif_sim_test(sites_a, sites_b, fun2call)
+            sites_a, sites_b = motif_alignment(sites_a, sites_b) # align motif_a and motif_b
+            fig, p_val = motif_sim_test(request, sites_a, sites_b, fun2call)
         except Exception as e:
             print e
         return render_to_response("motif_sim_%s.html" % fun_str,
                                   {'plot': fig,
-                                   'sc': fun2call(sites_a, sites_b),
+                                   'sc': '%.3lf' % fun2call(sites_a, sites_b),
+                                   'p_value': '%.3lf' % p_val,
                                    'unaligned_sites_a': unaligned_sites_a,
                                    'unaligned_sites_b': unaligned_sites_b,
                                    'aligned_sites_a': sites_a,
@@ -167,54 +171,76 @@ def levenshtein_measure(motif_a, motif_b):
 
     return boxplot, hist
 
-def motif_sim_test(ma, mb, fnc):
+def motif_sim_test(request, ma, mb, fnc):
     """Given two motifs and a similarity function, perform the permutation tests and
     return the histogram"""
-    permuted_dists = permutation_test(ma, mb, fnc)
+    permuted_dists = permutation_test(request, ma, mb, fnc)
     true_dist = fnc(ma, mb)
-    plt.hist(permuted_dists, bins=30, normed=1, color='#0088CC', label="permuted motifs")
-    plt.axvline(true_dist, linestyle='dashed', linewidth=2, color='#FF3300', label="true motif")
+    plt.hist(permuted_dists, bins=30, normed=False, color='#0088CC', label="permuted pairs")
+    plt.axvline(true_dist, linestyle='dashed', linewidth=2, color='#FF3300', label="motif pair")
     plt.xlabel({euclidean_distance: "Eucledian distance",
                 pearson_correlation_coefficient: "Pearson Correlation Coefficient",
                 kullback_leibler_divergence: "Kullback-Leibler Divergence",
                 average_log_likelihood_ratio: "average log likelihood ratio"}[fnc])
     plt.ylabel('frequency')
     plt.legend()
-    return fig2img(plt.gcf())
+    # calc p-value
+    if fnc in [euclidean_distance, kullback_leibler_divergence]:
+        p_value = (sum(1 if pd<true_dist else 0 for pd in permuted_dists) + 1.0) / (len(permuted_dists)+1)
+    else:
+        p_value = (sum(1 if pd>true_dist else 0 for pd in permuted_dists) + 1.0) / (len(permuted_dists)+1)
+    return fig2img(plt.gcf()), p_value
 
-def motif_alignment(sites_a, sites_b, fnc):
+def motif_alignment(sites_a, sites_b):
     """
     Given two sets of sites and a similiarity/distance function, align two motifs
     that gives the maximum similarity (minimum distance). Returns two sets of sites
     that are aligned and of same length.
     """
-    def submotif(sites, offset, motif_len):
-        # return submotif of length motif_len starting from offset
-        return [site[offset:offset+motif_len] for site in sites]
+    return motif_SW(sites_a, sites_b)
     
-    assert all(len(sites_a[0]) == len(sites_a[i]) for i in xrange(len(sites_a)))
-    assert all(len(sites_b[0]) == len(sites_b[i]) for i in xrange(len(sites_b)))
-
-    swapped = False
-    if len(sites_a[0]) > len(sites_b[0]):
-        sites_a, sites_b = sites_b, sites_a
-        swapped = True
-    # after this point, assuming motif_A is smaller than motif_B
+def motif_SW(sites_a, sites_b):
+    # motif smith-waterman similarity
     len_motif_a = len(sites_a[0])
     len_motif_b = len(sites_b[0])
-    max_score = fnc(sites_a, submotif(sites_b, 0, len_motif_a))
-    max_offset = 0
-    for offset in range(1, len_motif_b - len_motif_a):
-        sc = fnc(sites_a, submotif(sites_b, offset, len_motif_a))
-        if sc > max_score:
-            max_score = sc
-            max_offset = offset
+    M = [[None for i in xrange(len_motif_b+1)] for j in xrange(len_motif_a+1)]
+    for j in xrange(len_motif_b+1):
+        M[0][j] = 0
+    for i in xrange(len_motif_a+1):
+        M[i][0] = 0
+    # fill the matrix
+    for i in xrange(1, len_motif_a+1):
+        for j in xrange(1, len_motif_b+1):
+            # score from diag
+            # ungapped
+            M[i][j] = max(0,
+                          (M[i-1][j-1] + pearson_correlation_coefficient([site[i-1] for site in sites_a],\
+                                                                         [site[j-1] for site in sites_b])))
 
-    aligned_a = sites_a
-    aligned_b = submotif(sites_b, max_offset, len_motif_a)
-    if swapped: # back to original
-        aligned_a, aligned_b = aligned_b, aligned_a
-    return aligned_a, aligned_b
+    # find max/min
+    opt_score = M[0][0]
+    opt_i = 0
+    opt_j = 0
+    for i in xrange(len(M)):
+        for j in xrange(len(M[0])):
+            if M[i][j] > opt_score:
+                opt_score = M[i][j]
+                opt_i, opt_j = i,j
+
+    alignment_a_start = opt_i-1
+    alignment_a_end = opt_i
+    alignment_b_start = opt_j-1
+    alignment_b_end = opt_j
+
+    while opt_i >= 0 and opt_j >= 0 and M[opt_i][opt_j] > 0:
+        alignment_a_start = opt_i-1
+        alignment_b_start = opt_j-1
+        opt_i -= 1
+        opt_j -= 1
+    
+    return ([site[alignment_a_start:alignment_a_end] for site in sites_a],
+            [site[alignment_b_start:alignment_b_end] for site in sites_b])
+    
     
 def fig2img(fig):
     """Given matplotlib plot return data URI."""
@@ -246,11 +272,19 @@ def permute_motif(motif):
         motif[i] = "".join(site[p[j]] for j in p)
     return motif
 
-def permutation_test(motif_a, motif_b, dist_fun, n=100):
+def permutation_test(request, motif_a, motif_b, dist_fun, n=100):
     """Permute columns of two motifs and measure the similarity/distance with the
     specified function. Do this for n times and return the list of scores."""
-    dists = [dist_fun(permute_motif(motif_a), permute_motif(motif_b))
-             for i in xrange(n)]
+    if 'permuted_motif_a' not in request.session:
+        print 'creating new permutations for a'
+        request.session['permuted_motif_a'] = [permute_motif(motif_a) for i in xrange(n)]
+        request.session.modified = True
+    if 'permuted_motif_b' not in request.session:
+        print 'creating new permutations for b'
+        request.session['permuted_motif_b'] = [permute_motif(motif_b) for i in xrange(n)]
+        request.session.modified = True
+    dists = [dist_fun(a,b) for a,b in zip(request.session['permuted_motif_a'],
+                                          request.session['permuted_motif_b'])]
     return dists
 
 def levenshtein(seq1, seq2):
