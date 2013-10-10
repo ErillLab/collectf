@@ -4,14 +4,16 @@ def export_sites(request):
     """Given a list of sites, report FASTA/CSV file
     containing sites for particular TF and species"""
 
-    export_options = ['fasta', 'tsv', 'tsv-raw', 'arff', 'PSFM-jaspar', 'PSFM-transfac']
+    export_options = ['fasta', 'tsv', 'tsv-raw', 'arff',
+                      'PSFM-jaspar', 'PSFM-transfac', 'PSFM-raw-fasta']
     ext = {
         'fasta': 'fas',
         'tsv': 'tsv',
         'tsv-raw': 'tsv',
         'arff': 'arff',
         'PSFM-jaspar': 'mat',
-        'PSFM-transfac': 'mat'
+        'PSFM-transfac': 'mat',
+        'PSFM-raw-fasta': 'mat'
     }
     func = {
         'fasta': export_fasta,
@@ -20,6 +22,7 @@ def export_sites(request):
         'arff': export_arff,
         'PSFM-jaspar': export_PSFM,
         'PSFM-transfac': export_PSFM,
+        'PSFM-raw-fasta': export_PSFM,
     }
     kwargs = {
         'fasta': {},
@@ -28,7 +31,9 @@ def export_sites(request):
         'arff': {},
         'PSFM-jaspar': {'format':'JASPAR'},
         'PSFM-transfac': {'format':'TRANSFAC'},
+        'PSFM-raw-fasta': {'format': 'raw_fasta'},
         }
+
                           
     for opt in export_options:
         if opt in request.POST:
@@ -205,6 +210,13 @@ def export_PSFM(meta_sites, **kwargs):
                                                    consensus[po])
                      for po in range(motif.length))
         lines.append('XX')
+    elif format == 'raw_fasta':
+        lines.append('>CollecTF_%s_%s' % (TF_name, sp))
+        lines.extend('%d\t%d\t%d\t%d' % (motif.counts['A'][po],
+                                         motif.counts['C'][po],
+                                         motif.counts['G'][po],
+                                         motif.counts['T'][po])
+                     for po in range(motif.length))
         
     return '\n'.join(lines)
 
