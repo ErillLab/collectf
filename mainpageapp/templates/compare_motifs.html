@@ -3,13 +3,13 @@
 {% block right_frame %}
 
 
-<h3>Compare motifs</h3>
+<h3>Compare search results</h3>
 
-<p>CollecTF can be used to compare two motifs. Any two sets of transcription factor
-binding sites from two or more organisms can be analyzed on the same view. CollecTF
-also provides some motif similarity/distance measures together with
-some statistical analysis. </p>
+<p>CollecTF allows users to perform pair-wise comparisons of arbitrary searches on
+the database. Query results can be compared using site- and motif- based statistics
+relying on dynamic aligment of query results and contextualized using permutation
+tests.  </p>
 
-<p><a href="{% url compare_motifs %}">Click here for motif comparison</a></p>
+<p><a href="{% url compare_motifs %}">Click here to perform a comparative query</a></p>
 
 {% endblock %}
