@@ -315,13 +315,11 @@ def create_motif(seqs):
     m.make_counts_from_instances()
     return m
 
-
 def call_lasagna(site_instances, trim=True):
     """
     Given the list of site sequences, run LASAGNA and return the aligned
     output.
     """
-    print 'calling lasagna'
     sites = [str(site_instance.seq).lower() for site_instance in site_instances]
     aligned, idxAligned, strands = lasagna.LASAGNA(sites, 0)
     if not trim:
@@ -344,7 +342,6 @@ def call_lasagna(site_instances, trim=True):
     trimmed = lasagna.TrimAlignment(recovered) if len(recovered) > 1 else recovered
 
     print len(recovered[0]), len(trimmed[0])
-
     return trimmed
 
 def extend_site(site_instance, genome_seq, n=100):
@@ -378,5 +375,46 @@ def fill_gaps(site_instance, aligned_site, aligned_strand, genome_seq):
     return str(recovered_site)
     
 
-
+# grabbed and modified from Biopython motifs library
+def degenerate_consensus(motif):
+    # Following the rules adapted from
+    # D. R. Cavener: "Comparison of the consensus sequence flanking
+    # translational start sites in Drosophila and vertebrates."
+    # Nucleic Acids Research 15(4): 1353-1361. (1987).
+    # The same rules are used by TRANSFAC.
+    degenerate_nucleotide = {
+        'A': 'A',
+        'C': 'C',
+        'G': 'G',
+        'T': 'T',
+        'AC': 'M',
+        'AG': 'R',
+        'AT': 'W',
+        'CG': 'S',
+        'CT': 'Y',
+        'GT': 'K',
+        'ACG': 'V',
+        'ACT': 'H',
+        'AGT': 'D',
+        'CGT': 'B',
+        'ACGT': 'N',
+    }
+    sequence = ""
+    for i in range(motif.length):
+        def get(nucleotide):
+            return motif.counts[nucleotide][i]
+        nucleotides = sorted(motif.counts, key=get, reverse=True)
+        counts = [motif.counts[c][i] for c in nucleotides]
+        # Follow the Cavener rules:
+        if counts[0] >= sum(counts[1:]) and counts[0] >= 2*counts[1]:
+            key = nucleotides[0]
+        elif 4*sum(counts[:2]) > 3*sum(counts):
+            key = "".join(sorted(nucleotides[:2]))
+        elif counts[3]==0:
+            key = "".join(sorted(nucleotides[:3]))
+        else:
+            key = "ACGT"
+        nucleotide = degenerate_nucleotide[key]
+        sequence += nucleotide
+    return sequence
     

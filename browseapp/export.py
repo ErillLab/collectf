@@ -4,23 +4,31 @@ def export_sites(request):
     """Given a list of sites, report FASTA/CSV file
     containing sites for particular TF and species"""
 
-    export_options = ['fasta', 'tsv', 'tsv-raw', 'arff', 'PSFM', 'PSSM']
+    export_options = ['fasta', 'tsv', 'tsv-raw', 'arff', 'PSFM-jaspar', 'PSFM-transfac']
     ext = {
         'fasta': 'fas',
         'tsv': 'tsv',
         'tsv-raw': 'tsv',
         'arff': 'arff',
-        'PSSM': 'mat',
-        'PSFM': 'mat'
+        'PSFM-jaspar': 'mat',
+        'PSFM-transfac': 'mat'
     }
     func = {
         'fasta': export_fasta,
         'tsv': export_tsv,
         'tsv-raw': export_tsv_raw,
         'arff': export_arff,
-        'PSFM': export_PSFM,
-        'PSSM': export_PSSM,
+        'PSFM-jaspar': export_PSFM,
+        'PSFM-transfac': export_PSFM,
     }
+    kwargs = {
+        'fasta': {},
+        'tsv': {},
+        'tsv-raw': {},
+        'arff': {},
+        'PSFM-jaspar': {'format':'JASPAR'},
+        'PSFM-transfac': {'format':'TRANSFAC'},
+        }
                           
     for opt in export_options:
         if opt in request.POST:
@@ -30,16 +38,14 @@ def export_sites(request):
     
     # given the list of curation-site-instance objects,
     curation_site_id_groups = request.POST.getlist('site_id')
-
     meta_sites = [models.Curation_SiteInstance.objects.filter(pk__in=id_group.split('|'))
                   for id_group in curation_site_id_groups]
     
     response = HttpResponse(content_type='application/download')
-
     # call corresponding export function
     response["Content-Disposition"] = \
             "attachment;filename=collectf-export-%s.%s" % (export_format, ext[export_format])
-    response.write(func[export_format](meta_sites))
+    response.write(func[export_format](meta_sites, **kwargs[export_format]))
     return response
 
 
@@ -63,7 +69,7 @@ def export_base(meta_sites):
         rows.append(values)
     return rows
     
-def export_fasta(meta_sites):
+def export_fasta(meta_sites, **kwargs):
     fasta_str = ""
     # dont load genome sequence when retrieving from DB
     rows = export_base(meta_sites)
@@ -93,7 +99,7 @@ tsv_header = tsv_sep.join(['TF',
                            'regulated genes (locus_tags)'
                            ])
 
-def export_tsv(meta_sites):
+def export_tsv(meta_sites, **kwargs):
     tsv_lines = []
     sep = '\t'
     tsv_lines.append(tsv_header)
@@ -119,7 +125,7 @@ def export_tsv(meta_sites):
         tsv_lines.append(line)
     return '\n'.join(tsv_lines)
 
-def export_tsv_raw(meta_sites):
+def export_tsv_raw(meta_sites, **kwargs):
     tsv_lines = []
     tsv_lines.append(tsv_header)
     rows = export_base(meta_sites)
@@ -144,7 +150,7 @@ def export_tsv_raw(meta_sites):
     return '\n'.join(tsv_lines)
                                     
 
-def export_arff(meta_sites):
+def export_arff(meta_sites, **kwargs):
     arff_lines = []
     # comments
     arff_lines.append('@RELATION "CollecTF export"')
@@ -171,33 +177,35 @@ def export_arff(meta_sites):
                                     row['seq']]))
     return '\n'.join(arff_lines)
 
-def export_matrix(meta_sites, type):
-    """
-    Export PSFM/PSSM
-    """
+def export_PSFM(meta_sites, **kwargs):
+    """Export Position-Specific-Frequency-Matrix"""
+    format = kwargs['format']
     rows = export_base(meta_sites)
     sites = [row['aligned_seq'] for row in rows]
     motif = bioutils.create_motif(sites)
-    # todo backgrounds
-    matrix = motif.pwm() if type=="PSFM" else motif.log_odds()
-    matrix_rows = ['> CollecTF_motif_export']
-    for letter in "ACGT":
-        matrix_rows.append(letter + ' [ ' + ' '.join(str(matrix[i][letter]) for i in xrange(motif.length)) + ' ]')
-    return '\n'.join(matrix_rows)
-
-def export_PSFM(meta_sites):
-    """
-    Export Position-Specific-Frequency-Matrix
-    """
-    return export_matrix(meta_sites, "PSFM")
-
-
-def export_PSSM(meta_sites):
-    """
-    Export Position-Specific-Scoring-Matrix of the motif.
-    """
-    return export_matrix(meta_sites, "PSSM")
-
+    consensus = bioutils.degenerate_consensus(motif)
     
-    
+    TF_name= ','.join(set(row['curation__TF__name'] for row in rows))
+    sp = ','.join(set('_'.join(row['site_instance__genome__organism'].split()) for row in rows))
+    lines = []
+    if format == 'JASPAR':
+        lines.append('> CollecTF_%s_%s' % (TF_name, sp))
+        lines.append('A [ %s ]' % (' '.join(map(str, motif.counts['A']))))
+        lines.append('C [ %s ]' % (' '.join(map(str, motif.counts['C']))))
+        lines.append('G [ %s ]' % (' '.join(map(str, motif.counts['G']))))
+        lines.append('T [ %s ]' % (' '.join(map(str, motif.counts['T']))))
+    elif format == 'TRANSFAC':
+        lines.append('ID %s' % TF_name)
+        lines.append('BF %s' % sp)
+        lines.append('PO\tA\tC\tG\tT')
+        lines.extend('%02d\t%d\t%d\t%d\t%d\t%s' % (po+1, motif.counts['A'][po],
+                                                   motif.counts['C'][po],
+                                                   motif.counts['G'][po],
+                                                   motif.counts['T'][po],
+                                                   consensus[po])
+                     for po in range(motif.length))
+        lines.append('XX')
+        
+    return '\n'.join(lines)
+
 
