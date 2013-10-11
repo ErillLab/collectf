@@ -17,7 +17,7 @@
   </a>
 </p>
 
-<form style="display:inline;" method="post" action="{% url browseapp.view_results.view_results %}" id="view_all" action="">
+<form style="display:inline;" method="post" action="{% url browseapp.view_results.view_results %}" id="view_all">
   {% csrf_token %}
   <input type="hidden"
          name="motif_csi_list"
@@ -59,8 +59,9 @@
   </table>
 
   <div>
-    <img src="" class="weblogo_img"
-         id="ex_weblogo" site_data={% for site in random_rec.aligned_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}>
+    <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+	 class="weblogo_img" alt=""
+         id="ex_weblogo" data-site="{% for site in random_rec.aligned_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}">
   </div>
 </div>
 
@@ -70,7 +71,7 @@ $(document).ready(function() {
     $('.weblogo_img').each(function() {
 	var img = $(this);
         img.parent().block();
-	var site_data = $(this).attr('site_data');
+	var site_data = $(this).data('site');
 	$.ajax({
 	    type: "POST",
 	    url: "{% url baseapp.views.get_weblogo %}",

@@ -4,7 +4,7 @@
 {% block form %}
 
 <div class="boxed">
-<form action="" method="post">{% csrf_token %}
+<form method="post">{% csrf_token %}
 {# include search fields here #}
 {% include "search_form_fields.html" %}
 <input class="btn btn-info" type="submit" value="next step"/>

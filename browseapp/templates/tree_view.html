@@ -13,26 +13,13 @@ $(function () {
         if ($(this).hasClass('expandable')) {
             $(this).next().hide();
             $(this).children('i').addClass('icon-angle-right');
+            
         }
+            $(this).children('i').css('width', '1em');
+            $(this).children('i').css('display', 'inline-block');
+            $(this).css('padding-left', '20px');
+            $(this).parent().children('ul').css('padding-left', '20px');
     });
 });
 </script>
 
-<style>
-    ul {
-    font-family: Consolas, "Liberation Mono", Courier, monospace;
-    font-size: 14px;
-    }
-    .node {
-
-    }
-
-    li  ul  li{
-    padding-left:20px;
-    }
-
-    ul i {
-    width: 1em;
-    display: inline-block;
-    }
-</style>

@@ -1,28 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    <title>CollecTF</title>
     <!-- Bootstrap -->
     <link href='http://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet' type='text/css'>
     {% load static from staticfiles %}
     <link href="{% static "bootstrap/css/bootstrap.min.css" %}" rel="stylesheet" media="screen">
-    <link href="{% static "font-awesome/css/font-awesome.min.css" %}" rel="stylesheet">
+    <link href="{% static "font-awesome/css/font-awesome.css" %}" rel="stylesheet">
     <link href="{% static "bootstrap/css/docs.css" %}" rel="stylesheet" media="screen">
     <link href="{% static "select2/select2.css" %}" rel="stylesheet">
     <link href="{% static "collectf.css" %}" rel="stylesheet">
-    <script src="{% static "jquery-1.10.2.min.js" %}"></script>
-    <script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
-    <script src="{% static "collectf.js" %}"></script>
-    <script src="{% static "jquery.blockUI.js" %}"></script>
-    <script src="{% static "browse.js" %}"></script>
-    <script src="{% static "bootstrap_tree.js" %}"></script>
-    <script src="{% static "select2/select2.js" %}"></script>
+    <script type="text/javascript" src="{% static "jquery-1.10.2.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "collectf.js" %}"></script>
+    <script type="text/javascript" src="{% static "jquery.blockUI.js" %}"></script>
+    <script type="text/javascript" src="{% static "browse.js" %}"></script>
+    <script type="text/javascript" src="{% static "bootstrap_tree.js" %}"></script>
+    <script type="text/javascript" src="{% static "select2/select2.js" %}"></script>
     <script type="text/x-mathjax-config">
       MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
     </script>
     <script type="text/javascript"
             src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
     </script>
-
   </head>
 
   <body>
@@ -34,7 +35,7 @@
           <div class="container-fluid">
             <div class="nav-collapse collapse">
               <ul class="nav">
-                <a class="brand" href="{% url collectfapp.views.home %}">collecTF</a>
+                <li><a class="brand" href="{% url collectfapp.views.home %}">collecTF</a></li>
                 <li class="divider-vertical"></li>
                 <li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown">Menu <b class="caret"></b></a>
@@ -120,25 +121,21 @@
           <div class="span2">
             <p class="text-right">
               {% load static from staticfiles %}
-              <a href="http://compbio.umbc.edu"><img src="{% static "lablogo.png" %}"></a>
+              <a href="http://compbio.umbc.edu"><img src="{% static "lablogo.png" %}" alt="erilllab_logo"/></a>
             </p>
           </div>
         </div>
-
-        
         <p class="pull-right">
-          <a href="http://validator.w3.org/check?uri=referer">
-            <img src="http://www.w3.org/Icons/valid-html401-blue"
-                 alt="Valid HTML 4.01!" height="31" width="88" /></a>
-          <a href="http://validator.w3.org/check?uri=referer">
-            <img src="http://www.w3.org/Icons/valid-css-blue"
-                 alt="Valid CSS!" height="31" width="88" /></a>
+	  <small>
+            <a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/html/logo/downloads/HTML5_Logo_32.png" alt="valid HTML"></a>
+	  </small>
         </p>
 
       </div>
     </div>
     {% block javascript %}
     {% endblock %}
+
   </body>
 </html>
 

@@ -20,7 +20,7 @@ or evidence for experimental support, please let us know.
 
 <!-- <p>To contact us, you can either use the form below or send an email to collectfdb@umbc.edu</p>-->
 
-    <form class="form-horizontal boxed" id="feedback" action="{% url mainpageapp.views.feedback_send_email %}" method="POST">{% csrf_token %}
+    <form class="form-horizontal boxed" id="feedback-form" action="{% url mainpageapp.views.feedback_send_email %}" method="POST">{% csrf_token %}
       <div class="control-group">
 	<label class="control-label" for="form_email">
 	  Your email address
@@ -48,7 +48,7 @@ or evidence for experimental support, please let us know.
 	  Comment
 	</label>
 	<div class="controls">
-	  <textarea type="text" id="form_comment" rows="10" name="comment" required></textarea>
+	  <textarea required id="form_comment" rows="10" name="comment" ></textarea>
 	</div>
       </div>
       
