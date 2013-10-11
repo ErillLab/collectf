@@ -121,7 +121,7 @@ def browse_techniques_all_reports_ajax(request, type, id):
 
     motif_csis = models.Curation_SiteInstance.objects.filter(curation__experimental_techniques__in=techniques, is_motif_associated=True)
     non_motif_csis = models.Curation_SiteInstance.objects.filter(curation__experimental_techniques__in=techniques, is_motif_associated=False)
-    all_reports = search_results(motif_csis, non_motif_csis)['reports']
+    all_reports = group_search_results(motif_csis, non_motif_csis)['reports']
     return render_to_response("browse_tab.html",
                               {'title': title,
                                'description': desc,
