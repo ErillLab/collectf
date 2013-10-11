@@ -338,10 +338,8 @@ def call_lasagna(site_instances, trim=True):
     for site_instance, aligned_site, aligned_strand in zip(site_instances, aligned, strands):
         g = [g for g in genomes if int(g.genome_id) == int(site_genome_dict[site_instance.site_id])][0]
         recovered.append(fill_gaps(site_instance, aligned_site, aligned_strand, g.sequence))
-
     trimmed = lasagna.TrimAlignment(recovered) if len(recovered) > 1 else recovered
-
-    print len(recovered[0]), len(trimmed[0])
+    
     return trimmed
 
 def extend_site(site_instance, genome_seq, n=100):
@@ -370,7 +368,7 @@ def fill_gaps(site_instance, aligned_site, aligned_strand, genome_seq):
         recovered_site = extended_site[n-num_left_gaps:]
     else:
         recovered_site = extended_site[n-num_left_gaps: num_right_gaps-n]
-    assert len(recovered_site) == len(aligned_site)
+    assert len(recovered_site) == len(aligned_site), '%s %d' % (str(site_instance), n)
     assert recovered_site in extended_site
     return str(recovered_site)
     

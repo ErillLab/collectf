@@ -29,3 +29,9 @@ def experimental_techniques(request):
                   "experimental_techniques.html",
                   {'techs': exp_techniques},
                   context_instance=RequestContext(request))
+
+    
+    
+def release_history(request):
+    return render(request,
+                  "release_history.html")

@@ -6,7 +6,7 @@
 
 sitestatic/*
 collectfapp/migrations/*
-
-*pickle
+pickles/
+media/
 
 access.log

@@ -56,9 +56,6 @@ def export_sites(request):
 
 def export_base(meta_sites):
     rows = []
-
-    aligned = bioutils.call_lasagna([m[0].site_instance for m in meta_sites])
-    
     for i,meta_site in enumerate(meta_sites):
         values = meta_site.values('curation__TF__name',
                                   'curation__TF_instance__protein_accession',
@@ -70,7 +67,6 @@ def export_base(meta_sites):
         values['end_pos'] = meta_site[0].site_instance.end+1
         values['strand'] = meta_site[0].site_instance.strand
         values['seq'] = meta_site[0].site_instance.seq
-        values['aligned_seq'] = aligned[i]
         rows.append(values)
     return rows
     
@@ -186,8 +182,8 @@ def export_PSFM(meta_sites, **kwargs):
     """Export Position-Specific-Frequency-Matrix"""
     format = kwargs['format']
     rows = export_base(meta_sites)
-    sites = [row['aligned_seq'] for row in rows]
-    motif = bioutils.create_motif(sites)
+    aligned = bioutils.call_lasagna([m[0].site_instance for m in meta_sites])
+    motif = bioutils.create_motif(aligned)
     consensus = bioutils.degenerate_consensus(motif)
     
     TF_name= ','.join(set(row['curation__TF__name'] for row in rows))

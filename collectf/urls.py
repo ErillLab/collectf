@@ -102,6 +102,7 @@ urlpatterns = patterns('',
     url(r'^db_stats/$', dbstatsapp.views.curation_stats),
     url(r'^curator_roster/$', dbstatsapp.views.curator_roster),
     url(r'^exp_tech_list/$', dbstatsapp.views.experimental_techniques),
+    url(r'^release_history/$', dbstatsapp.views.release_history),
     # export tbl for ncbi submission
     url(r'^export_ncbi/$', ncbiapp.views.export_tbl_view),
 
@@ -124,9 +125,10 @@ urlpatterns = patterns('',
     url(r'^main_page_links/$', mainpageapp.views.links),
     url(r'^main_page_ack/$', mainpageapp.views.acknowledgements),
     url(r'^feedback_send_email/$', mainpageapp.views.feedback_send_email),
-                       
-                       
 )
 
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.conf.urls.static import static
+from django.conf import settings
 urlpatterns += staticfiles_urlpatterns()
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
