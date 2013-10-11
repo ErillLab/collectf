@@ -22,10 +22,13 @@ def site_fix():
                 new_seq_in_genome = bioutils.reverse_complement(new_seq_in_genome)
             assert new_seq_in_genome == csi.site_instance.seq, new_seq_in_genome + ' | ' + csi.site_instance.seq
             print 'fixing', csi.site_instance.site_id
-            csi.site_instance.start = start
-            csi.site_instance.end = end
-            csi.site_instance.save()
+            #csi.site_instance.start = start
+            #csi.site_instance.end = end
+            #csi.site_instance.save()
             
+
+
+
 
         """
         if csi.site_instance.seq != seq_in_genome:

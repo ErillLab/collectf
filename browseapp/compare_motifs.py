@@ -5,6 +5,8 @@ from django.contrib.formtools.wizard.views import CookieWizardView
 import search
 import view_results
 import StringIO
+import matplotlib
+matplotlib.use('Agg') # generate images without having a window appear
 import matplotlib.pyplot as plt
 from matplotlib import rc
 from base64 import b64encode
