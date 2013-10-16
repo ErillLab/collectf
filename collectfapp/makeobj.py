@@ -23,7 +23,7 @@ def make_pub(pubrec, cd):
                     pmid=pmid,
                     authors = ', '.join(pubrec.get("AuthorList")), 
                     journal = pubrec.get("FullJournalName"),
-                    title = pubrec.get("Title"),
+                    title = unicode(pubrec.get("Title")),
                     publication_date = pubrec.get("PubDate"),
                     volume = pubrec.get("Volume"),
                     issue = pubrec.get("Issue"),
