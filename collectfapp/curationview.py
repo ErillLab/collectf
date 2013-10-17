@@ -243,6 +243,7 @@ def site_regulation_get_form(wiz, form):
 
 def curation_review_get_form(wiz, form):
     """Get curation review form"""
+    """
     curator = models.Curator.objects.get(user=wiz.request.user)
     # if user is external, hide some fields
     if not curator.is_staff:
@@ -250,7 +251,7 @@ def curation_review_get_form(wiz, form):
         form.fields['revision_reasons'].widget = forms.HiddenInput()
         form.fields['NCBI_submission_ready'].initial = False
         form.fields['NCBI_submission_ready'].widget = forms.HiddenInput()
-        
+    """
     return form
 
 # curation process step functions
