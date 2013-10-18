@@ -153,7 +153,8 @@ class Genome(models.Model):
     truly a natural key that can be taken as primary. It isn't primary. Only
     surrogates can be primary.]"""
     genome_accession = models.CharField(max_length=20, unique=True)
-    sequence = models.TextField(editable=False)
+    genome_sequence = models.OneToOneField("GenomeSequence", null=False, blank=False)
+    #sequence = models.TextField(editable=False)
     GC_content = models.FloatField()
     gi = models.CharField(max_length=50, null=False)
     chromosome = models.CharField(max_length=10, null=False)
@@ -162,6 +163,11 @@ class Genome(models.Model):
     
     def __unicode__(self):
         return self.genome_accession + ' ' + self.organism
+
+class GenomeSequence(models.Model):
+    sequence = models.TextField()
+    def __unicode__(self):
+        return str(self.genome.genome_accession)
 
 class Taxonomy(models.Model):
     """
