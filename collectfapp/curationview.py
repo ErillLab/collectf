@@ -304,7 +304,6 @@ def techniques_process(wiz, form):
     p.contains_expression_data = form.cleaned_data["contains_expression_data"]
     p.save()
 
-
 def site_report_process(wiz, form):
     """For site report form, the user may enter either site sequences or
     coordinates. In addition to that, quantitative data associated with sites may be

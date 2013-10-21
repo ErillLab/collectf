@@ -2,7 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
-
+from django.core.cache import cache
+import sys
 
 # Create your models here.
 class Curation(models.Model):
@@ -76,8 +77,6 @@ class Curation(models.Model):
 
     def TF_type_verbose(self):
         return self._get_display(self.TF_type, self.TF_TYPE)
-        
-    
 
 class Curator(models.Model):
     """
@@ -91,8 +90,6 @@ class Curator(models.Model):
         return u'%s' % self.user
 
 class Publication(models.Model):
-    """
-    """
     PUBLICATION_TYPE = (("pubmed", "Pubmed article"),
                         ("nonpubmed", "Non-pubmed article"),
                         ("nonpublished", "Non-published data"))
@@ -123,8 +120,6 @@ class Publication(models.Model):
                 self.reported_species, self.assigned_to)
 
 class Gene(models.Model):
-    """
-    """
     # choices
     STRAND = ((1, "Top strand"), (-1, "Bottom strand"))
     # fields
@@ -141,8 +136,6 @@ class Gene(models.Model):
         return '%s (%s-%s)' % (self.gene_id, self.name, self.genome.genome_accession)
 
 class Genome(models.Model):
-    """
-    """
     GENOME_TYPE = (("chromosome", "chromosome"), ("plasmid", "plasmid"))
     genome_id = models.AutoField(primary_key=True)
 
@@ -170,8 +163,6 @@ class GenomeSequence(models.Model):
         return str(self.genome.genome_accession)
 
 class Taxonomy(models.Model):
-    """
-    """
     taxonomy_id = models.CharField(max_length=20, unique=True)
     rank = models.CharField(max_length=20, choices=(('phylum', 'phylum'),
                                                     ('class', 'class'),
@@ -196,8 +187,6 @@ class Taxonomy(models.Model):
             
 
 class TF(models.Model):
-    """
-    """
     TF_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
     family = models.ForeignKey("TFFamily")
@@ -210,7 +199,6 @@ class TF(models.Model):
         verbose_name_plural = "TFs"
 
 class TFFamily(models.Model):
-    
     TF_family_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
     description = models.TextField()
@@ -260,6 +248,16 @@ class SiteInstance(models.Model):
                   self.seq,]
         return '\t'.join(fields)
 
+    def get_genome_sequence(self):
+        key = "genome-sequence-%s" % self.genome.genome_accession
+        if not cache.has_key(key):
+            print 'key not in cache, retrieving..'
+            value = self.genome.genome_sequence.sequence
+            value = str(value) # no need for unicode, less memory usage
+            print sys.getsizeof(value)
+            cache.set(key, value)
+        return cache.get(key)
+ 
 class Curation_SiteInstance(models.Model):
     # through model between Curation and SiteInstance models
     curation = models.ForeignKey("Curation", null=False)
