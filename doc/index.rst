@@ -22,7 +22,7 @@ http://erilllab.biosci.umbc.edu/collectf/main_page_about/
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :titlesonly:
 
    database
    curation

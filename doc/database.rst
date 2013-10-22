@@ -9,9 +9,60 @@ class (model) and access to the database is through instances of those classes.
 
 Below, each table is described in detail.
 
+Curation
+--------
 
-.. class:: collectfapp.models.Curation
-asdad
+Curator
+-------
 
-.. class:: collectfapp.models.Curator
-adsad
+Publication
+-----------
+
+Gene
+----
+
+Genome
+------
+
+GenomeSequence
+--------------
+
+Taxonomy
+--------
+
+TF
+--
+
+TFFamily
+--------
+
+TFInstance
+----------
+
+SiteInstance
+------------
+
+Curation_SiteInstance
+---------------------
+
+Regulation
+----------
+
+NotAnnotatedSiteInstance
+------------------------
+
+ExperimentalTechnique
+---------------------
+
+ChipInfo
+--------
+
+ExternalDatabase
+----------------
+
+Curation_ExternalDatabase
+-------------------------
+
+NCBISubmission
+--------------
+
