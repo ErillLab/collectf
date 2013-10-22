@@ -3,15 +3,11 @@ from browse_TF_and_species import browse_TF_and_species_selected
 from browse_TF_and_species import browse_TF_and_species_selected_non_motif
 
 def search(request):
-    """
-    Handler for search by TF/species
-    """
+    """Handler for search by TF/species"""
     return search_get(request) if not request.POST else search_post(request)
 
 def search_get_template():
-    """
-    Return the template for search get handler.
-    """
+    """Return the template for search get handler."""
     # return the template for search html
     binding, expression, insilico = get_techniques()
     template = {
@@ -80,8 +76,6 @@ def search_post_helper(request):
 
     csis = all_csis.filter(is_motif_associated=True)
     non_motif_csis = all_csis.filter(is_motif_associated=False)
-
-    print 'booleans', boolean1, boolean2
     if boolean1 == 'and' and boolean2 == 'and':
         csis = csis.filter(q1, q2, q3)
     elif boolean1 == 'and' and boolean2 == 'or':
@@ -93,7 +87,6 @@ def search_post_helper(request):
         csis = csis.filter(q1|q2|q3)
     else:
         assert False, 'shouldnt be here, unhandled case'
-
     return csis, non_motif_csis
 
 def search_post(request):

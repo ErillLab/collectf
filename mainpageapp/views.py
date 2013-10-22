@@ -110,7 +110,6 @@ def get_random_motif(motif_len_th=30, motif_sz_th=10):
     Randomly selected motif must be no longer than <motif_len_th> and
     motif size must be at least <motif_sz_th>
     """
-
     TF_genome_list = models.Curation_SiteInstance.objects.values_list(
         'curation__TF__name',
         'curation__TF_instance__protein_accession',

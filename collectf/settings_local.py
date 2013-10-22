@@ -15,11 +15,11 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'STORAGE_ENGINE': 'MyISAM',
-        'NAME': 'collectfdb_test',                      # Or path to database file if using sqlite3.
-        'USER': 'sefa',                      # Not used with sqlite3.
-        'PASSWORD': '46544654',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'NAME': 'collectfdb_test',            # Or path to database file if using sqlite3.
+        'USER': 'sefa',                       # Not used with sqlite3.
+        'PASSWORD': '46544654',               # Not used with sqlite3.
+        'HOST': '',                           # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',                           # Set to empty string for default. Not used with sqlite3.
     }
 }
 
@@ -132,9 +132,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Uncomment the next line to enable the admin:
      'django.contrib.admin',
-    # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'baseapp',
     'collectfapp',
@@ -144,7 +142,7 @@ INSTALLED_APPS = (
     'django.contrib.webdesign',
     'django_extensions',
     #'south',
-    #'debug_toolbar'
+    'debug_toolbar'
 )
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -202,4 +200,10 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.profiling.ProfilingDebugPanel',
 )
 
-
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+        'LOCATION': '127.0.0.1:11211',
+        'TIMEOUT': 2500000, # almost 30 days
+    }
+}

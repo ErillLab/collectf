@@ -2,7 +2,9 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
-
+from django.core.cache import cache
+import sys
+import bioutils
 
 # Create your models here.
 class Curation(models.Model):
@@ -76,8 +78,6 @@ class Curation(models.Model):
 
     def TF_type_verbose(self):
         return self._get_display(self.TF_type, self.TF_TYPE)
-        
-    
 
 class Curator(models.Model):
     """
@@ -91,8 +91,6 @@ class Curator(models.Model):
         return u'%s' % self.user
 
 class Publication(models.Model):
-    """
-    """
     PUBLICATION_TYPE = (("pubmed", "Pubmed article"),
                         ("nonpubmed", "Non-pubmed article"),
                         ("nonpublished", "Non-published data"))
@@ -123,8 +121,6 @@ class Publication(models.Model):
                 self.reported_species, self.assigned_to)
 
 class Gene(models.Model):
-    """
-    """
     # choices
     STRAND = ((1, "Top strand"), (-1, "Bottom strand"))
     # fields
@@ -141,8 +137,6 @@ class Gene(models.Model):
         return '%s (%s-%s)' % (self.gene_id, self.name, self.genome.genome_accession)
 
 class Genome(models.Model):
-    """
-    """
     GENOME_TYPE = (("chromosome", "chromosome"), ("plasmid", "plasmid"))
     genome_id = models.AutoField(primary_key=True)
 
@@ -153,7 +147,8 @@ class Genome(models.Model):
     truly a natural key that can be taken as primary. It isn't primary. Only
     surrogates can be primary.]"""
     genome_accession = models.CharField(max_length=20, unique=True)
-    sequence = models.TextField(editable=False)
+    genome_sequence = models.OneToOneField("GenomeSequence", null=False, blank=False)
+    #sequence = models.TextField(editable=False)
     GC_content = models.FloatField()
     gi = models.CharField(max_length=50, null=False)
     chromosome = models.CharField(max_length=10, null=False)
@@ -163,9 +158,12 @@ class Genome(models.Model):
     def __unicode__(self):
         return self.genome_accession + ' ' + self.organism
 
+class GenomeSequence(models.Model):
+    sequence = models.TextField()
+    def __unicode__(self):
+        return str(self.genome.genome_accession)
+
 class Taxonomy(models.Model):
-    """
-    """
     taxonomy_id = models.CharField(max_length=20, unique=True)
     rank = models.CharField(max_length=20, choices=(('phylum', 'phylum'),
                                                     ('class', 'class'),
@@ -190,8 +188,6 @@ class Taxonomy(models.Model):
             
 
 class TF(models.Model):
-    """
-    """
     TF_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
     family = models.ForeignKey("TFFamily")
@@ -204,7 +200,6 @@ class TF(models.Model):
         verbose_name_plural = "TFs"
 
 class TFFamily(models.Model):
-    
     TF_family_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
     description = models.TextField()
@@ -229,14 +224,14 @@ class TFInstance(models.Model):
         
 class SiteInstance(models.Model):
     site_id = models.AutoField(primary_key=True)
-    seq = models.TextField(max_length=100000)
+    _seq = models.TextField(max_length=100000) # redundant info, kept for sanity check
     genome = models.ForeignKey("Genome")
     start = models.IntegerField() # genome start position (0 index)
-    end = models.IntegerField()   # genome end position (end position! not the first position after site sequence, 0 index too.)
+    end = models.IntegerField()   # genome end position (end position! Not the first position following site sequence, 0 index too.)
     strand = models.IntegerField(choices=Gene.STRAND) # genome strand (1 or -1)
 
     def __unicode__(self):
-        return u'%s [%s]' % (self.site_id, self.seq)
+        return u'%s [%s]' % (self.site_id, self._seq)
 
     def to_fasta(self):
         desc = "%s %s(%d, %d)" % (self.genome.genome_accession,
@@ -254,6 +249,28 @@ class SiteInstance(models.Model):
                   self.seq,]
         return '\t'.join(fields)
 
+    def get_genome_sequence(self):
+        key = "genome-sequence-%s" % self.genome.genome_accession
+        if not cache.has_key(key):
+            print 'key not in cache, retrieving..'
+            value = self.genome.genome_sequence.sequence
+            value = str(value) # no need for unicode, less memory usage
+            print sys.getsizeof(value)
+            cache.set(key, value)
+        ret = cache.get(key)
+        assert ret
+        return ret
+
+    @property
+    def seq(self):
+        genome = self.get_genome_sequence()
+        sequence = genome[self.start:self.end+1]
+        if self.strand == -1:
+            # reverse complement
+            sequence = bioutils.reverse_complement(sequence)
+        assert sequence == self._seq
+        return sequence
+ 
 class Curation_SiteInstance(models.Model):
     # through model between Curation and SiteInstance models
     curation = models.ForeignKey("Curation", null=False)

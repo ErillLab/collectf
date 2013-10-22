@@ -1,9 +1,7 @@
 from browse_base import *
 import baseapp.templatetags.TF_desc_htmlify as htmlify
 from django.forms.models import model_to_dict
-from django.core.urlresolvers import reverse
 from browse_TF_and_species import browse_TF_and_species_selected
-import Queue
 from search import group_search_results
 
 def browse_TF(request):

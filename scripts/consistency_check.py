@@ -8,50 +8,23 @@ def site_fix():
     not_same = 0
     for csi in models.Curation_SiteInstance.objects.all().iterator():
         #print csi.site_instance.site_id
-        seq_in_genome = csi.site_instance.genome.sequence[csi.site_instance.start:csi.site_instance.end+1]
+        seq_in_genome = csi.site_instance.genome.genome_sequence.sequence[csi.site_instance.start:csi.site_instance.end+1]
         if csi.site_instance.strand == -1:
             seq_in_genome = bioutils.reverse_complement(seq_in_genome)
 
-        if not seq_in_genome == csi.site_instance.seq:
+        if not seq_in_genome == csi.site_instance._seq:
             #print csi.site_instance.seq, csi.site_instance.start, csi.site_instance.end, seq_in_genome
             print csi.site_instance.site_id
             start = csi.site_instance.start-1
             end= csi.site_instance.end-2
-            new_seq_in_genome = csi.site_instance.genome.sequence[start:end+1]
+            new_seq_in_genome = csi.site_instance.genome.genome_sequence.sequence[start:end+1]
             if csi.site_instance.strand==-1:
                 new_seq_in_genome = bioutils.reverse_complement(new_seq_in_genome)
-            assert new_seq_in_genome == csi.site_instance.seq, new_seq_in_genome + ' | ' + csi.site_instance.seq
-            print 'fixing', csi.site_instance.site_id
+            assert new_seq_in_genome == csi.site_instance._seq, new_seq_in_genome + ' | ' + csi.site_instance.seq
+            #print 'fixing', csi.site_instance.site_id
             #csi.site_instance.start = start
             #csi.site_instance.end = end
             #csi.site_instance.save()
-            
-
-
-
-
-        """
-        if csi.site_instance.seq != seq_in_genome:
-            print csi.site_instance.genome.strain.name
-            print csi.site_instance.seq
-            print seq_in_genome, csi.site_instance.strand
-            print csi.annotated_seq
-            print ''
-            
-            #print 'change?'
-            #raw_input()
-            #csi.site_instance.end -= 1
-            #csi.site_instance.save()
-            #csi.annotated_seq, csi.site_instance.seq = csi.site_instance.seq, csi.annotated_seq
-            #csi.site_instance.save()
-            #csi.save()
-        
-        if csi.site_instance.seq == csi.annotated_seq:
-            same += 1
-        else:
-            not_same += 1
-    print 'same', same, 'not_same', not_same
-    """
 
 
 def check_regulation_duplicates():

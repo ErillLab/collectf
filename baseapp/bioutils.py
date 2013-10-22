@@ -10,8 +10,6 @@ import pickle
 from collectf import settings
 from base64 import b64encode
 import lasagna
-import models
-
 Entrez.email = "sefakilic@gmail.com"
 
 def reverse_complement(seq):
@@ -320,6 +318,7 @@ def call_lasagna(site_instances, trim=True):
     Given the list of site sequences, run LASAGNA and return the aligned
     output.
     """
+    import models
     sites = [str(site_instance.seq).lower() for site_instance in site_instances]
     aligned, idxAligned, strands = lasagna.LASAGNA(sites, 0)
     if not trim:
@@ -337,7 +336,7 @@ def call_lasagna(site_instances, trim=True):
     recovered = []
     for site_instance, aligned_site, aligned_strand in zip(site_instances, aligned, strands):
         g = [g for g in genomes if int(g.genome_id) == int(site_genome_dict[site_instance.site_id])][0]
-        recovered.append(fill_gaps(site_instance, aligned_site, aligned_strand, g.sequence))
+        recovered.append(fill_gaps(site_instance, aligned_site, aligned_strand, site_instance.get_genome_sequence()))
     trimmed = lasagna.TrimAlignment(recovered) if len(recovered) > 1 else recovered
     
     return trimmed
