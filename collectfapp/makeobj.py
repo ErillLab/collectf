@@ -80,9 +80,11 @@ def make_genome(genome_record, strain_taxon):
     assert genome_record.features[0].type=='source'
     q = genome_record.features[0].qualifiers
     chromosome = q['chromosome'][0] if 'chromosome' in q else ''
+    # create genome sequence object
+    genome_sequence = GenomeSequence.objects.create(sequence=genome_record.seq.tostring())
     # create genome object
     g = Genome(genome_accession=genome_record.id,
-               sequence=genome_record.seq.tostring(),
+               genome_sequence = genome_sequence,
                GC_content=gc,
                gi=genome_record.annotations['gi'],
                organism=genome_record.annotations['organism'],

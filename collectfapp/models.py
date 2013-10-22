@@ -4,6 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.core.cache import cache
 import sys
+import bioutils
 
 # Create your models here.
 class Curation(models.Model):
@@ -223,14 +224,14 @@ class TFInstance(models.Model):
         
 class SiteInstance(models.Model):
     site_id = models.AutoField(primary_key=True)
-    seq = models.TextField(max_length=100000)
+    _seq = models.TextField(max_length=100000) # redundant info, kept for sanity check
     genome = models.ForeignKey("Genome")
     start = models.IntegerField() # genome start position (0 index)
-    end = models.IntegerField()   # genome end position (end position! not the first position after site sequence, 0 index too.)
+    end = models.IntegerField()   # genome end position (end position! Not the first position following site sequence, 0 index too.)
     strand = models.IntegerField(choices=Gene.STRAND) # genome strand (1 or -1)
 
     def __unicode__(self):
-        return u'%s [%s]' % (self.site_id, self.seq)
+        return u'%s [%s]' % (self.site_id, self._seq)
 
     def to_fasta(self):
         desc = "%s %s(%d, %d)" % (self.genome.genome_accession,
@@ -256,7 +257,19 @@ class SiteInstance(models.Model):
             value = str(value) # no need for unicode, less memory usage
             print sys.getsizeof(value)
             cache.set(key, value)
-        return cache.get(key)
+        ret = cache.get(key)
+        assert ret
+        return ret
+
+    @property
+    def seq(self):
+        genome = self.get_genome_sequence()
+        sequence = genome[self.start:self.end+1]
+        if self.strand == -1:
+            # reverse complement
+            sequence = bioutils.reverse_complement(sequence)
+        assert sequence == self._seq
+        return sequence
  
 class Curation_SiteInstance(models.Model):
     # through model between Curation and SiteInstance models

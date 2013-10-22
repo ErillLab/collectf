@@ -712,7 +712,6 @@ def site_match_done(wiz, curation, regulations):
 
     is_motif_associated = sutils.sget(wiz.request.session, 'is_motif_associated')
     
-
     for sid, match in all_site_matches.items():
         # create SiteInstance object (or get if available)
         si, created  = models.SiteInstance.objects.get_or_create(
@@ -720,7 +719,7 @@ def site_match_done(wiz, curation, regulations):
             start=match.match.start,
             end=match.match.end,
             strand=match.match.strand,
-            seq=match.match.seq)
+            _seq=match.match.seq)
 
                 
         # create curation_siteinstance object (through relation)
@@ -732,15 +731,12 @@ def site_match_done(wiz, curation, regulations):
                                           #quantitative_data_format=quantitative_data_format,
                                           quantitative_value = quantitative_vals.get(sid, None))
         cs.save()
-
         # for site instance, add regulation information
         regulation_done(wiz,
                         regulations=regulations[sid],
                         match=match,
                         curation_site_instance=cs)
 
-
-        
 def not_matched_sites_done(wiz, curation):
     """Create not matched site instances."""
     sites = sutils.sget(wiz.request.session, 'sites')
