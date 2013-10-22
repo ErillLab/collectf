@@ -203,51 +203,33 @@ class SiteReportForm(forms.Form):
                                              initial=True,
                                              label=description_markup%(help_dict['is_motif_associated'],
                                                                        "Reported sites are motif associated."))
-                                                                       
-                                             #help_text=help_dict['is_motif_associated'])
-
     is_chip_data = forms.BooleanField(initial=False,
                                       required=False,
                                       label=description_markup%(help_dict['is_chip_data'],
                                                                 "This paper reports ChIP data"))
-                                      #label="This paper reports ChIP data",
-                                      #help_text=help_dict['is_chip_data'])
-
     has_quantitative_data = forms.BooleanField(initial=False,
                                                required=False,
                                                label=description_markup%(help_dict['has_quantitative_data'],
                                                                          "Sites with quantitative data"))
-                                               #label="Sites with quantitative data",
-                                               #help_text=help_dict['has_quantitative_data'])
-    
     is_coordinate = forms.BooleanField(initial=False,
                                        required=False,
                                        label=description_markup%(help_dict['is_coordinate'],
                                                                  "Coordinate entry mode"))
-                                       #label="Coordinate entry mode",
-                                       #help_text=help_dict['is_coordinate'])
-
     sites = forms.CharField(required=True,
                             widget=forms.Textarea,
                             label="Sites",
                             help_text=help_dict['sites'])
-
     # ChIP Fields
     quantitative_data_format = forms.CharField(required=False,
                                           label=description_markup%(help_dict['quantitative_data_format'],
                                                                     "Quantitative data format"))
-                                          #label="Quantitative data format")
-
     assay_conditions = forms.CharField(required=False,
                                        label=description_markup%(help_dict['assay_conditions'],
                                                                  "Assay conditions"),
-                                       #label="Assay conditions",
                                        widget=forms.Textarea)
-    
     chip_method_notes = forms.CharField(required=False,
                                         label=description_markup%(help_dict['chip_method_notes'],
                                                                   "ChIP method notes"),
-                                        #label="ChIP Method notes",
                                         widget=forms.Textarea)
 
     # Extra ChIP-field for associating quantitative values from non-motif reported
@@ -259,13 +241,9 @@ class SiteReportForm(forms.Form):
     chip_data_extra_field = forms.CharField(required=False,
                                             label=description_markup%(help_dict['chip_data_extra_field'],
                                                                       "Supporting ChIP quantitative data"),
-                                            #label="Supporting ChIP quantitative data.",
-                                            #help_text=help_dict['chip_data_extra_field'],
                                             widget=forms.Textarea)
 
     # End of ChIP fields
-
-
 
     # Based on variables about site data, namely
     # - is_motif_associated
@@ -562,7 +540,6 @@ class SiteReportForm(forms.Form):
 
                 
         return self.cleaned_data
-
             
 class SiteExactMatchForm(forms.Form):
     """Form to select and match reported sites to their equivalents in the
@@ -597,7 +574,7 @@ class CurationReviewForm(forms.Form):
     revision_reasons = forms.ChoiceField(choices=choices,
                                          label="Revision required",
                                          help_text=help_dict['revision_reasons'])
-    
+
     confidence = forms.BooleanField(required=False,
                                     label="I am confident of the results reported in this manuscript.",
                                     help_text=help_dict['confidence'])
@@ -618,7 +595,6 @@ class CurationReviewForm(forms.Form):
     confirm = forms.BooleanField(required=True,
                                  label="I want to submit this curation",
                                  help_text=help_dict['confirm'])
-
 
 # One extra form goes here: Site quantitative value form
 class SiteQuantitativeDataForm(forms.Form):

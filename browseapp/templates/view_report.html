@@ -64,8 +64,8 @@
 	  <div class="tab-pane" id="{{TF_name}}_{{sp_name}}_unaligned">
 	    <p>Sites are listed as curated.</p>
 	    <pre>
-	      {% for id,meta_site in report.meta_sites.items %}
-	      {{ meta_site.0.site_instance.seq }}{% endfor %}
+	      {% for meta_site in report.meta_sites %}
+	      {{ meta_site.sites.0.site_instance.seq }}{% endfor %}
 	    </pre>
 	  </div>
 	  <div class="tab-pane" id="{{TF_name}}_{{sp_name}}_aligned">
@@ -81,9 +81,9 @@
 	  </div>
 	  <div class="tab-pane active" id="{{TF_name}}_{{sp_name}}_weblogo">
 	    <p>To generate the weblogo, aligned binding sites are used.</p>
-	    <!-- <img src="{{ report.weblogo_image_data }}"> -->
 	    <div class="">
-	      <img src="" class="weblogo_img" id="{{TF_name}}_{{sp_name}}_weblogo" site_data={% for site in report.aligned_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}>
+	      <img src="" class="weblogo_img" id="{{TF_name}}_{{sp_name}}_weblogo"
+                   site_data={% for site in report.aligned_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}>
 	    </div>
 
 	  </div>
@@ -107,39 +107,38 @@
 	      </thead>
 	      <tbody>
 
-		{% for ms_id, meta_site in report.meta_sites.items %}
-		{# meta_site is a list of curation_site_instance objects #}
+		{% for meta_site in report.meta_sites %}
 		<tr>
-		  {% with g=report.meta_site_genome_accession_dict|get_item:ms_id %}
+                  {% with g=meta_site.sites.0.site_instance.genome.genome_accession %}
 		  <td class="genome"><a href="http://www.ncbi.nlm.nih.gov/nuccore/?term={{ g }}"><span class="fixed-width">{{ g }}</span></a></td>
 		  {% endwith %}
-		  {% with p=report.meta_site_protein_accession_dict|get_item:ms_id %}
+		  {% with p=meta_site.curations.0.TF_instance.protein_accession %}
 		  <td class="TF"><a href="http://www.ncbi.nlm.nih.gov/protein/?term={{ p }}"><span class="fixed-width">{{ p }}</span></a></td>
 		  {% endwith %}
 
-		  <td><a href="{% url browseapp.view_site.browse_by_site meta_site.0.pk|id2dbxref_hex_only %}"><span class="sequence">{{ meta_site.0.site_instance.seq }}</span></a></td>
+		  <td><a href="{% url browseapp.view_site.browse_by_site meta_site.sites.0.pk|id2dbxref_hex_only %}"><span class="sequence">{{ meta_site.sites.0.site_instance.seq }}</span></a></td>
 		  
 		  <td class="techniques">
-		    {% for tech in report.meta_site_technique_dict|get_item:ms_id %}
+		    {% for tech in meta_site.techniques %}
 		    {{ tech.name }}{% if not forloop.last %},{% endif %}
 		    {% endfor %}
 		  </td>
 		  
 		  <td class="diagram">
-		    {% for reg in report.meta_site_regulation_dict|get_item:ms_id %}
+		    {% for reg in meta_site.regulations %}
 		    <a href="http://www.ncbi.nlm.nih.gov/gene/{{ reg.gene.gene_accession }}">
 		      <span class="fixed-width {% if reg.evidence_type == "exp_verified" %} exp_verified_reg {% endif %}">
 			{{reg.gene.name}} [{{ reg.gene.locus_tag }}]</span></a>{% if not forloop.last %},{% endif %}
 		    {% endfor %}
 		    <div class="regulation_diagram">
-		      {% with regs=report.meta_site_regulation_dict|get_item:ms_id %}
-		      {{ regs|regulation_diagram:meta_site.0.site_instance }}
+		      {% with regs=meta_site.regulations %}
+		      {{ regs|regulation_diagram:meta_site.sites.0.site_instance }}
 		      {% endwith %}
 		    </div>
 
 		  </td>
 
-		  <td>{% for cur in report.meta_site_curation_dict|get_item:ms_id %}
+		  <td>{% for cur in meta_site.curations %}
 		    <span class="fixed-width">
 		      <a href="{% url browseapp.view_curation.view_curation cur.curation_id %}">[{{cur.curation_id}}]</a>{% if not forloop.last %}, {% endif %}
 		    </span>
@@ -175,8 +174,8 @@
 	  <div class="tab-pane" id="ensemble_view_unaligned">
 	    <p>Sites are listed as curated.</p>
 	    <pre>
-	      {% for meta_site in ensemble_report.meta_sites %}
-	      {{ meta_site.0.site_instance.seq }}{% endfor %}
+	      {% for site in ensemble_report.unaligned_sites %}
+	      {{ site }}{% endfor %}
 	    </pre>
 	  </div>
 	  <div class="tab-pane" id="ensemble_view_aligned">

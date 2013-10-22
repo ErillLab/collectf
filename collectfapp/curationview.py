@@ -73,7 +73,6 @@ def genome_get_form(wiz, form):
         curated. For convenience, fields in this form are automatically filled based on
         the previous curation of the paper. They may differ in this curation, so it is
         best to check that they are correct before proceeding to the next step."""
-        
         messages.warning(wiz.request, mark_safe(msg))
         
     return form
@@ -99,7 +98,6 @@ def techniques_get_form(wiz, form):
         form.fields['external_db_accession'].initial = external_db.accession_number if external_db else ""
         form.fields['forms_complex'].initial = c.forms_complex
         form.fields['complex_notes'].initial = c.complex_notes
-
     return form
 
 def site_report_get_form(wiz, form):
@@ -113,19 +111,16 @@ def site_report_get_form(wiz, form):
             form.fields['has_quantitative_data'].initial = curation_site_instance.quantitative_value
         except:
             pass
-        
+
         if c.chip_info:
             form.fields['is_chip_data'].initial = True
             form.fields['assay_conditions'].initial = c.chip_info.assay_conditions
             form.fields['chip_method_notes'].initial = c.chip_info.method_notes
 
-
         form.fields['quantitative_data_format'].initial = c.quantitative_data_format
-        
         # delete session data, if user change any field and then come back,
         # store users last entered data, instead of populated data.
         sutils.sput(wiz.request.session, "previously_curated_paper", None)
-        
     return form
 
 # helper function for site_exact_match_form and site_soft_match_forms
@@ -153,20 +148,15 @@ def site_exact_match_get_form(wiz, form):
     add_no_valid_opt = not is_coordinate
     for sid, matches in site_match_choices.items(): # for all matches belong to a site
         label = pretty_print.site2label(sid,sites[sid])
-        choices = populate_match_choices(sites[sid],
-                                         matches,
-                                         is_exact=True,
+        choices = populate_match_choices(sites[sid], matches, is_exact=True,
                                          add_no_valid_opt=add_no_valid_opt)
         # make the form field
-        form.fields[sid] = forms.ChoiceField(label=label,
-                                             choices=choices,
+        form.fields[sid] = forms.ChoiceField(label=label, choices=choices,
                                              widget=forms.RadioSelect())
-        
 
         if is_coordinate: # make the first option selected
             #form.fields[sid].widget.attrs['disabled']='disabled'
             form.fields[sid].initial = choices[0][0]
-            
     return form
 
 def site_soft_match_get_form(wiz, form):
@@ -204,8 +194,6 @@ def site_quantitative_data_get_form(wiz, form):
             label=pretty_print.site2label(sid,sites[sid]),
             help_text=pretty_print.print_site_match(sites[sid], all_site_matches[sid], is_exact=True),
             initial=site_quantitative_data[sid])
-
-    print 'form_ready'
     return form
 
 def site_regulation_get_form(wiz, form):
@@ -229,13 +217,11 @@ def site_regulation_get_form(wiz, form):
             choices.append((g.gene_id, '%s (%s): %s' % (g.locus_tag, g.name, g.description)))
 
         label = pretty_print.match2label(sid, match)
-
         form.fields[sid] = forms.MultipleChoiceField(label=label,
                                                      choices=choices,
                                                      required=False,
                                                      widget=forms.CheckboxSelectMultiple(),
                                                      help_text=gene_diagram.site_match_diagram(match))
-        
         # disable checkbox if publication is marked as not having expression data
         if not publication.contains_expression_data:
             form.fields[sid].widget.attrs['disabled'] = 'disabled'
@@ -270,8 +256,6 @@ def publication_process(wiz, form):
         paper.save()
         sutils.sput(wiz.request.session, "paper_contains_no_data", True)
         return
-
-
     # if paper is previously curated, populate genome and TF information form
     # search db if there is any curation object belonging to this publication
     p = models.Publication.objects.get(publication_id=pubid)
@@ -293,7 +277,6 @@ def genome_process(wiz, form):
     # store site species in session data
     sutils.sput(wiz.request.session, 'site_species', form.cleaned_data['site_species'])
     
-
 def techniques_process(wiz, form):
     # set publication fields
     # - contains_promoter_data
@@ -362,7 +345,6 @@ def site_report_process(wiz, form):
         # of ChIP sequences (not-motif-associated-sites), with peak-intensity-values
         # are read from ChIP-extra-field and peak-intensity-values are associated
         # with motif-associated-sites.
-
         print 'process_helper_chip_assoc'
         # make sure quantitative values exist.
         assert form.cleaned_data['has_quantitative_data'], "has_quantitative_data error"
