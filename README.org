@@ -1,0 +1,6 @@
+* CollecTF
+
+CollecTF (http://collectf.umbc.edu) is a database of transcription factor binding
+sites (TFBS) in the Bacteria domain.
+
+This repository contains the source code for the database and web interface.
