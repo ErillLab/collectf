@@ -211,9 +211,9 @@
       <div class="boxed">
 	<form action="{% url browseapp.export.export_sites %}" method="POST">{% csrf_token %}
 	  {% for report in reports %}
-	  {% for ms_id, meta_site in report.meta_sites.items %}
+	  {% for meta_site in report.meta_sites %}
 	  {# reporting first site instance from each meta_site -- for now #}
-	  <input type="hidden" name="site_id" value="{% for csi in meta_site %}{{ csi.pk }}{% if not forloop.last %}|{% endif %}{% endfor %}">
+	  <input type="hidden" name="site_id" value="{% for csi in meta_site.sites %}{{ csi.pk }}{% if not forloop.last %}|{% endif %}{% endfor %}">
 	  {% endfor %}
 	  {% endfor %}
 
