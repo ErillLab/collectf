@@ -25,7 +25,7 @@ import ncbiapp.views
 import baseapp.views
 
 import mainpageapp.views
-
+import mastercuratorapp
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
@@ -125,6 +125,7 @@ urlpatterns = patterns('',
     url(r'^main_page_links/$', mainpageapp.views.links),
     url(r'^main_page_ack/$', mainpageapp.views.acknowledgements),
     url(r'^feedback_send_email/$', mainpageapp.views.feedback_send_email),
+    url(r'^mastercuratorapp/', include('mastercuratorapp.urls')),
 )
 
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns

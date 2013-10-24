@@ -139,6 +139,7 @@ INSTALLED_APPS = (
     'browseapp',
     'dbstatsapp',
     'mainpageapp',
+    'mastercuratorapp',
     'django.contrib.webdesign',
     'django_extensions',
     #'south',
