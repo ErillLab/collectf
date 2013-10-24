@@ -48,7 +48,7 @@ function getReportLinksSpecies(id) {
     $.blockUI({message: block_message});
     $.ajax({
         type: "GET",
-        url: '/browse_tax_all_reports_ajax/' + id,
+        url: '/browseapp/browse_tax_all_reports_ajax/' + id,
         success: function (data) {
             $("#browse").html(data);
             get_wiki($("#browse #description h4").text());
@@ -63,7 +63,7 @@ function getReportLinksTechniques(type, id) {
     $.blockUI({message: block_message});
     $.ajax({
         type: "GET",
-        url: '/browse_techniques_all_reports_ajax/' + type + '/' + id,
+        url: '/browseapp/browse_techniques_all_reports_ajax/' + type + '/' + id,
         success: function (data) {
             $("#browse").html(data);
         }
@@ -78,7 +78,7 @@ function getReportLinksTF(type, id) {
     $.blockUI({message: block_message});
     $.ajax({
         type: "GET",
-        url: '/browse_TF_all_reports_ajax/' + type + '/' + id,
+        url: '/browseapp/browse_TF_all_reports_ajax/' + type + '/' + id,
         success: function (data) {
             $("#browse").html(data);
         }
