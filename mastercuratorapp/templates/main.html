@@ -2,4 +2,40 @@
 
 {% block content %}
 
+<div class="container">
+
+<table class="table table-bordered table-striped">
+  
+  <thead>
+    <tr>
+      <th>Curation id</th>
+      <th>Curator</th>
+      <th>PMID</th>
+      <th>TF</th>
+      <th>Species</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  {% for curation in curations %}
+  <tr>
+    <td><a href="{% url browseapp.view_curation.view_curation curation.pk %}">{{ curation.pk }}</td>
+    <td>{% with curator=curation.curator.user %}{{ curator.first_name }} {{ curator.last_name }}{% endwith %}</td>
+    <td>{{ curation.publication.pmid }}</td>
+    <td>{{ curation.TF.name }}</td>
+    <td>{{ curation.site_instances.all.0.genome.taxonomy.name }}</td>
+    <td><a href="{% url mastercuratorapp.views.validate_curation curation.pk %}">edit/validate</a></td>
+  </tr>
+  {% endfor %}
+  
+  <tbody>
+    
+  </tbody>
+</table>
+
+</div>
+
+<script type="text/javascript">
+  $('[data-toggle="confirmation"]').confirmation();
+</script>
+
 {% endblock %}

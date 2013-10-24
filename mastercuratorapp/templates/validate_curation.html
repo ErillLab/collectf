@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+
+{% load bootstrap_tags %}
+<form method="post" action="" class="form-horizontal">{% csrf_token %}
+
+{% if form.non_field_errors %}
+<div class="alert alert-error">
+  {% if form_error_title %}
+  <strong>{{ form_error_title }}</strong>
+  {% endif %}
+  {% for error in form.non_field_errors %}
+  {{ error }}<br />
+  {% endfor %}
+</div>
+{% endif %}
+
+{% with f="bootstrap/field.html" %}
+
+<div class="boxed">
+<h3>TF/Genome information</h3>
+{% with field=form.TF %}{% include f %}{% endwith %}
+{% with field=form.TF_type %}{% include f %}{% endwith %}
+{% with field=form.TF_function %}{% include f %}{% endwith %}
+{% with field=form.genome_accession %}{% include f %}{% endwith %}
+{% with field=form.site_species_same %}{% include f %}{% endwith %}
+{% with field=form.TF_accession %}{% include f %}{% endwith %}
+{% with field=form.TF_species_same %}{% include f %}{% endwith %}
+{% with field=form.site_species %}{% include f %}{% endwith %}
+{% with field=form.TF_species %}{% include f %}{% endwith %}
+</div>
+
+<div class="boxed">
+<h3>Experimental Techniques</h3>
+{% with field=form.contains_promoter_data %}{% include f %}{% endwith %}
+{% with field=form.contains_expression_data %}{% include f %}{% endwith %}
+{% with field=form.techniques %}{% include f %}{% endwith %}
+{% with field=form.experimental_process %}{% include f %}{% endwith %}
+{% with field=form.external_db_type %}{% include f %}{% endwith %}
+{% with field=form.external_db_accession %}{% include f %}{% endwith %}
+{% with field=form.forms_complex %}{% include f %}{% endwith %}
+{% with field=form.complex_notes %}{% include f %}{% endwith %}
+</div>
+
+<div class="boxed">
+<h3>Curation Review</h3>
+{% with field=form.revision_reasons %}{% include f %}{% endwith %}
+{% with field=form.confidence %}{% include f %}{% endwith %}
+{% with field=form.NCBI_submission_ready %}{% include f %}{% endwith %}
+{% with field=form.paper_complete %}{% include f %}{% endwith %}
+{% with field=form.notes %}{% include f %}{% endwith %}
+</div>
+
+{% endwith %}
+
+</form>
+
+</div>
+
+{% endblock %}
