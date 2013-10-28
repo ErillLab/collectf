@@ -74,6 +74,7 @@ def validate_curation(request, curation_id):
     form = forms.EditCurationForm(data)
     # add sites
     populate_site_instances(form)
-    template = {'form': form}
+    template = {'form': form,
+                'curation': curation}
     return render_to_response(template_file, template,
                               context_instance=RequestContext(request))

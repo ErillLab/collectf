@@ -3,6 +3,7 @@
 {% block content %}
 
 {% load utils %}
+{% load publication_tags %}
 
 <div class="container">
 
@@ -19,6 +20,19 @@
   {% endfor %}
 </div>
 {% endif %}
+
+<div class="boxed">
+<h3>General information</h3>
+<dl class="dl-horizontal">
+  <dt>Curator</dt>
+  <dd>{% with curator=curation.curator.user %}{{ curator.first_name }} {{ curator.last_name }}{% endwith %}</dd>
+  <dt>Publication</dt>
+  <dd>{{ curation.publication|as_publication }}</dd>
+  <dt>Last modified at</dt>
+  <dd>{{ curation.last_modified }}</dd>
+</dl>
+
+</div>
 
 {% with f="bootstrap/field.html" %}
 
