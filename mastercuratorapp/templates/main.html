@@ -23,7 +23,8 @@
     <td>{{ curation.publication.pmid }}</td>
     <td>{{ curation.TF.name }}</td>
     <td>{{ curation.site_instances.all.0.genome.taxonomy.name }}</td>
-    <td><a href="{% url mastercuratorapp.views.validate_curation curation.pk %}">edit/validate</a></td>
+    <td><small><a href="{% url mastercuratorapp.views.validate_curation curation.pk %}">validate</a> | 
+        <a href="#"> resubmit</a></small></td>
   </tr>
   {% endfor %}
   

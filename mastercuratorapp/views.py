@@ -3,6 +3,8 @@ from django.template import RequestContext
 from django.http import HttpResponseRedirect
 import models
 import forms
+import django.forms as dforms
+from baseapp.templatetags import pretty_print, gene_diagram
 
 def home(request):
     template_file = "main.html"
@@ -32,8 +34,18 @@ def validate_curation(request, curation_id):
             external_db = None
         return external_db
 
+    def populate_site_instances(form):
+        for csi in curation.curation_siteinstance_set.all():
+            site_instance = csi.site_instance
+            seq = csi.site_instance.seq
+            strand = '+' if site_instance.strand == 1 else '-'
+            loc = '[%d,%d]' % (site_instance.start+1, site_instance.end+1)
+            label = pretty_print.site2label(csi.pk, seq+' '+strand+loc)
+            help_text = gene_diagram.regulation_diagram(csi.regulation_set.all(), csi.site_instance)
+            form.fields["site_instance_%d"] = dforms.BooleanField(label=label,
+                                                                  help_text=help_text)
+                                                      
     external_db = get_external_db()
-
     data = dict(
         # genome/TF initialization
         TF = curation.TF,
@@ -60,6 +72,8 @@ def validate_curation(request, curation_id):
         notes = curation.notes,
     )
     form = forms.EditCurationForm(data)
+    # add sites
+    populate_site_instances(form)
     template = {'form': form}
     return render_to_response(template_file, template,
                               context_instance=RequestContext(request))

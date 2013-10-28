@@ -28,3 +28,10 @@ def defer_field(queryset, field):
 def unique_TF_names(TF_list):
     # given a list of TF names, remove duplicates
     return list(set(lambda TF: TF.name, TF_list))
+
+@register.filter
+def startswith(value,arg):
+    """Returns True if the given string starts with an argument prefix, otherwise
+    returns False."""
+    print value
+    return value.startswith(arg)

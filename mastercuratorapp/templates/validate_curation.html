@@ -2,6 +2,8 @@
 
 {% block content %}
 
+{% load utils %}
+
 <div class="container">
 
 {% load bootstrap_tags %}
@@ -43,6 +45,15 @@
 {% with field=form.external_db_accession %}{% include f %}{% endwith %}
 {% with field=form.forms_complex %}{% include f %}{% endwith %}
 {% with field=form.complex_notes %}{% include f %}{% endwith %}
+</div>
+
+<div class="boxed">
+<h3>Site instances</h3>
+{% for field in form %}
+{% if field.name|startswith:"site_instance" %}
+{% include f %}
+{% endif %}
+{% endfor %}
 </div>
 
 <div class="boxed">

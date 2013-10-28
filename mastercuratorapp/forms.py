@@ -5,4 +5,3 @@ class EditCurationForm(curationform.GenomeForm,
                        curationform.TechniquesForm,
                        curationform.CurationReviewForm):
     pass
-
