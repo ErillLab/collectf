@@ -504,7 +504,7 @@ class SiteReportForm(forms.Form):
         cleaned_data['sites'].strip()  # remove trailing spaces
         if not cleaned_data['sites']: return # raise form validation error
 
-        print cleaned_data
+        #print cleaned_data
 
         is_motif_associated = cleaned_data.get("is_motif_associated")
         is_chip_data = cleaned_data.get("is_chip_data")
@@ -520,7 +520,7 @@ class SiteReportForm(forms.Form):
                 ('1' if has_quantitative_data else '0') +
                 ('1' if is_coordinate else '0'))
         func_call_str = 'self.clean_helper_%d(cleaned_data)' % int(func,2)
-        print 'form_validation:', func_call_str
+        #print 'form_validation:', func_call_str
         eval(func_call_str)
 
         # extra validation for quantitative data

@@ -1,10 +1,14 @@
 from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.template import RequestContext
 from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
+from django.contrib import messages
 import models
 import forms
 import django.forms as dforms
 from baseapp.templatetags import pretty_print, gene_diagram
+import browseapp.view_curation
 
 def home(request):
     template_file = "main.html"
@@ -17,9 +21,30 @@ def home(request):
                               context_instance=RequestContext(request))
 
 def validate_curation(request, curation_id):
-    curation = models.Curation.objects.get(pk=curation_id)
-    template_file = "validate_curation.html"
-    # initial data preparation functions
+    if request.method == 'POST':
+        form = forms.EditCurationForm(request.POST)
+        curation = models.Curation.objects.get(pk=request.POST["curation_id"])
+        if form.is_valid():
+            print 'form valid'
+            # edit curation
+            #print 'form is valid'
+            #print form.cleaned_data
+            messages.add_message(request, messages.SUCCESS, "Curation was modified/validated successfully.")
+            return HttpResponseRedirect(reverse(browseapp.view_curation.view_curation, kwargs={'cid': curation.pk}))
+        else: print form.errors
+    else:
+        print 'request GET'
+        curation = models.Curation.objects.get(pk=curation_id)
+        # initial data preparation functions
+        form = make_form(curation)
+        template = {'form': form,
+                    'curation': curation}
+        
+    return render(request, "validate_curation.html",
+                  {'form': form, 'curation': curation},
+                  context_instance=RequestContext(request))
+
+def make_form(curation):
     def get_genome_accession():
         if curation.site_instances.all():
             return curation.site_instances.all()[0].genome.genome_accession
@@ -42,9 +67,11 @@ def validate_curation(request, curation_id):
             loc = '[%d,%d]' % (site_instance.start+1, site_instance.end+1)
             label = pretty_print.site2label(csi.pk, seq+' '+strand+loc)
             help_text = gene_diagram.regulation_diagram(csi.regulation_set.all(), csi.site_instance)
-            form.fields["site_instance_%d"] = dforms.BooleanField(label=label,
-                                                                  help_text=help_text)
-                                                      
+            form.fields["site_instance_%d"%csi.pk] = dforms.BooleanField(label=label,
+                                                                         help_text=help_text,
+                                                                         required=False)
+            form.fields["site_instance_%d"%csi.pk].initial = True
+            
     external_db = get_external_db()
     data = dict(
         # genome/TF initialization
@@ -74,7 +101,7 @@ def validate_curation(request, curation_id):
     form = forms.EditCurationForm(data)
     # add sites
     populate_site_instances(form)
-    template = {'form': form,
-                'curation': curation}
-    return render_to_response(template_file, template,
-                              context_instance=RequestContext(request))
+    return form
+
+
+    

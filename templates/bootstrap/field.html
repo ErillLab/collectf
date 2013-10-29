@@ -47,8 +47,14 @@
     {% if field|css_class != "checkboxselectmultiple" and field|css_class != "radioselect" %}
     <!-- checkbox input -->
     {% if field|css_class == "checkboxinput" %}
-    <label for="{{ field.auto_id }}" class="checkbox {% if field.field.required %}required-field{% endif %}">
-      {{ field }}
+    <label for="{{ field.auto_id }}" class="checkbox {% if field.field.required %}required-field{% endif %}" >
+      <input type="checkbox"
+      {% if field.field.widget.attrs.disabled == "disabled" %} disabled="disabled" {% endif %}
+      {% if field.value %} checked="checked" {% endif %}
+      {% if field.field.initial %} checked="checked" {% endif %}
+      name="{{ field.html_name }}"
+      id="{{ field.auto_id }}">
+      {# {{ field }} #}
       {{ field.label|safe }}
     </label>
     {% include "bootstrap/_field_errors_block.html" %}

@@ -8,7 +8,7 @@
 <div class="container">
 
 {% load bootstrap_tags %}
-<form method="post" action="" class="form-horizontal">{% csrf_token %}
+<form method="post" action="" class="form-horizontal boxed">{% csrf_token %}
 
 {% if form.non_field_errors %}
 <div class="alert alert-error">
@@ -21,7 +21,7 @@
 </div>
 {% endif %}
 
-<div class="boxed">
+<div class="well">
 <h3>General information</h3>
 <dl class="dl-horizontal">
   <dt>Curator</dt>
@@ -36,7 +36,7 @@
 
 {% with f="bootstrap/field.html" %}
 
-<div class="boxed">
+<div class="well">
 <h3>TF/Genome information</h3>
 {% with field=form.TF %}{% include f %}{% endwith %}
 {% with field=form.TF_type %}{% include f %}{% endwith %}
@@ -49,7 +49,7 @@
 {% with field=form.TF_species %}{% include f %}{% endwith %}
 </div>
 
-<div class="boxed">
+<div class="well">
 <h3>Experimental Techniques</h3>
 {% with field=form.contains_promoter_data %}{% include f %}{% endwith %}
 {% with field=form.contains_expression_data %}{% include f %}{% endwith %}
@@ -61,7 +61,7 @@
 {% with field=form.complex_notes %}{% include f %}{% endwith %}
 </div>
 
-<div class="boxed">
+<div class="well">
 <h3>Site instances</h3>
 {% for field in form %}
 {% if field.name|startswith:"site_instance" %}
@@ -70,16 +70,25 @@
 {% endfor %}
 </div>
 
-<div class="boxed">
+<div class="well">
 <h3>Curation Review</h3>
 {% with field=form.revision_reasons %}{% include f %}{% endwith %}
 {% with field=form.confidence %}{% include f %}{% endwith %}
 {% with field=form.NCBI_submission_ready %}{% include f %}{% endwith %}
 {% with field=form.paper_complete %}{% include f %}{% endwith %}
 {% with field=form.notes %}{% include f %}{% endwith %}
+{% with field=form.confirm %}{% include f %}{% endwith %}
 </div>
 
 {% endwith %}
+
+<input type="hidden" name="curation_id" value="{{ curation.pk }}">
+
+<div class="control-group">
+  <div class="controls">
+    <input type="submit" value="Submit Curation" />
+  </div>
+</div>
 
 </form>
 
