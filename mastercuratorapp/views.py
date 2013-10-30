@@ -9,8 +9,8 @@ import forms
 import django.forms as dforms
 from baseapp.templatetags import pretty_print, gene_diagram
 import browseapp.view_curation
+import collectfapp.editcurationview
 from django.contrib.auth.decorators import user_passes_test
-
 
 @user_passes_test(lambda u: u.is_superuser)
 def home(request):
@@ -22,6 +22,10 @@ def home(request):
     template = {'curations': curations}
     return render_to_response(template_file, template,
                               context_instance=RequestContext(request))
+
+@user_passes_test(lambda u: u.is_superuser)
+def edit_curation(request, curation_id):
+    return collectfapp.editcurationview.edit_curation(request, curation_id)
 
 @user_passes_test(lambda u: u.is_superuser)
 def validate_curation(request, curation_id):
@@ -162,7 +166,9 @@ def form_done(form, curation):
     techniques_done()
     curation_review_done()
     site_instances_done()
+    curation.master_curator_verified = True
     curation.save()
+    
 
 
 

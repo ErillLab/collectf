@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
@@ -7,6 +8,7 @@ from collectfapp.curationform import *
 import models
 import sutils
 import views
+
 
 def init_publication(curation):
     """Return publication data for new curation obj."""
@@ -74,7 +76,8 @@ def init_curation_review_form(curation):
                 notes = curation.notes)
 
 
-@login_required
+
+@user_passes_test(lambda u: u.is_superuser)
 def edit_curation(request, cid):
     """Handler function for curation editing.
     - Get curation being edited.
@@ -83,8 +86,8 @@ def edit_curation(request, cid):
     - When new form is submitted, insert new curation instance to DB and remove the
     old one.
     """
-    messages.warning(request, 'Edit curation is temporarily unavailable.')
-    return HttpResponseRedirect(reverse(views.home))
+    #messages.warning(request, 'Edit curation is temporarily unavailable.')
+    #return HttpResponseRedirect(reverse(views.home))
     # get curation
     old_curation = models.Curation.objects.get(curation_id=cid)
     # get initial data for new curation form

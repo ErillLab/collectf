@@ -10,6 +10,7 @@ urlpatterns += patterns('collectfapp.curationview',
     url(r'^curation/$', 'curation'),
 )
 
+
 urlpatterns += patterns('collectfapp.editcurationview',
     url(r'^edit_curation/(?P<cid>\d+)/$', 'edit_curation'),
 )

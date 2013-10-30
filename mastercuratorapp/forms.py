@@ -11,6 +11,8 @@ class EditCurationForm(curationform.GenomeForm,
         super(EditCurationForm, self).__init__(*args, **kwargs)
         # populate site instances
         self._populate_site_instances(curation)
+        # if chip-data, add fields
+        #self._populate_chip_fields(curation)
         # make genome text readonly
         self.fields['genome_accession'].widget.attrs['readonly'] = True
         # hide some fields
