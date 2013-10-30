@@ -19,7 +19,4 @@ urlpatterns += patterns('collectfapp.pubview',
     url(r'^non_pubmed_submission/$', 'non_pubmed_submission'),
 )
 
-urlpatterns += patterns('collectfapp.signupview',
-    url(r'^accounts/login/$', 'login'),
-    url(r'^accounts/logout/$', 'logout'),
-)
+

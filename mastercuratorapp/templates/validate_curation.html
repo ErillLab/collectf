@@ -77,18 +77,22 @@
 {% with field=form.NCBI_submission_ready %}{% include f %}{% endwith %}
 {% with field=form.paper_complete %}{% include f %}{% endwith %}
 {% with field=form.notes %}{% include f %}{% endwith %}
-{% with field=form.confirm %}{% include f %}{% endwith %}
+
 </div>
 
-{% endwith %}
+
 
 <input type="hidden" name="curation_id" value="{{ curation.pk }}">
 
 <div class="control-group">
+  {% with field=form.confirm %}{% include f %}{% endwith %}
   <div class="controls">
+    
     <input type="submit" value="Submit Curation" />
   </div>
 </div>
+
+{% endwith %}
 
 </form>
 
