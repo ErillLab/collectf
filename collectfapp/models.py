@@ -86,7 +86,7 @@ class Curator(models.Model):
     """
     curator_id = models.AutoField(primary_key=True)
     user = models.OneToOneField(User) # extend Django's user model
-    is_staff = models.BooleanField(default=False, blank=True)
+    
 
     def __unicode__(self):
         return u'%s' % self.user

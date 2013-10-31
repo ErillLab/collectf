@@ -54,6 +54,7 @@
                     {% if user.is_superuser %}
                     <hr />
                     <li><a href="{% url admin:index %}" class="navbar-link">Admin page</a></li>
+                    <li><a href="{% url mastercuratorapp.views.home %}">Edit/validate curations</a></li>
                     <li><a href="{% url ncbiapp.views.export_tbl_view %}">Export NCBI submission</a></li>
                     {% endif %}
                   </ul>
