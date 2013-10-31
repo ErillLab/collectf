@@ -122,7 +122,10 @@ TEMPLATE_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
     os.path.join(os.path.dirname(os.path.dirname(__file__)), "templates"),
     os.path.join(os.path.dirname(os.path.dirname(__file__)), 'baseapp', 'templates'),
-    os.path.join(os.path.dirname(os.path.dirname(__file__)), 'mainpageapp', 'templates')
+    os.path.join(os.path.dirname(os.path.dirname(__file__)), 'mainpageapp', 'templates'),
+    os.path.join(os.path.dirname(os.path.dirname(__file__)), 'collecctfapp', 'templates'),
+    os.path.join(os.path.dirname(os.path.dirname(__file__)), 'ncbiapp', 'templates'),
+    os.path.join(os.path.dirname(os.path.dirname(__file__)), 'browseapp', 'templates'),
 )
 
 INSTALLED_APPS = (
