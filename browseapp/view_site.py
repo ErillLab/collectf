@@ -9,6 +9,12 @@ def browse_by_site(request, dbxref_id):
     try:
         id = dbxref_utils.dbxref2id(dbxref_id)
         curation_site_instance = models.Curation_SiteInstance.objects.get(pk=id)
+        if curation_site_instance.is_obsolete:
+            messages.add_message(request, messages.ERROR,
+                                 "The requested site instance seems obsolete. "
+                                 "It will be removed on the next release. "
+                                 "Description: %s" % curation_site_instance.why_obsolete)
+            
     except:
         messages.add_message(request, messages.ERROR, "Invalid binding site id.")
         return HttpResponseRedirect(reverse(collectfapp.views.home))
