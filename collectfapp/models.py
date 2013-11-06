@@ -84,8 +84,11 @@ class Curator(models.Model):
     """
     Curator table. Each curator entry is linked to Django user object
     """
+    CURATOR_TYPE = (("internal", "internal"),
+                    ("external", "external"))
     curator_id = models.AutoField(primary_key=True)
     user = models.OneToOneField(User) # extend Django's user model
+    curator_type = models.CharField(max_length=20, choices=CURATOR_TYPE)
     
 
     def __unicode__(self):

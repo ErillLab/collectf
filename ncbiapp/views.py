@@ -27,21 +27,21 @@ def generate_tbl_string(curation_site_instances, test_export):
                 break
         else:
             meta_sites[len(meta_sites)+1] = [csi]
-    # FIXME
+
     # header
-    tbl_str += ('>Feature\tgi|%(gi)s|ref|%(accession)s|\tTF_%(TF)s_%(TF_accession)s\n' %
+    tbl_str += ('>Feature\tgi|%(gi)s|ref|%(accession)s\n' %
                 {'gi': curation_site_instances[0].site_instance.genome.gi,
-                 'accession': curation_site_instances[0].site_instance.genome.genome_accession,
-                 'TF': curation_site_instances[0].curation.TF.name,
-                 'TF_accession': curation_site_instances[0].curation.TF_instance.protein_accession})
+                 'accession': curation_site_instances[0].site_instance.genome.genome_accession})
+    
     # write each protein_bind feature
     genome = curation_site_instances[0].site_instance.genome.genome_accession
     for ms_id, meta_site in meta_sites.items():
-        # pick a site to report its id as dbxref.
+        # if any of the sites in the meta-site is submitted to NCBI before, skip it.
         ncbi_sites = [csi for csi in meta_site if models.NCBISubmission.objects.filter(genome_submitted_to=genome,
                                                                                        curation_site_instance=csi)]
-                                                                                       
-        if not ncbi_sites: # pick first site as ncbi_xref
+        if ncbi_sites:
+            continue 
+        else: # pick first site as ncbi_xref
             if not test_export:
                 n = models.NCBISubmission(genome_submitted_to=genome, curation_site_instance=meta_site[0])
                 n.save()
@@ -70,7 +70,6 @@ def generate_tbl_string(curation_site_instances, test_export):
             tbl_str += ('\t\t\tnote\tEvidence of regulation for: %s\n' % (', '.join(evidence4regulation)))
         # write dbxref
         tbl_str += ('\t\t\tdb_xref\t%s\n' % dbxref_utils.id2dbxref(int(meta_site[0].pk)))
-
     return str(tbl_str)
 
 def generate_src_string(curation_site_instances):
@@ -112,47 +111,34 @@ def export_tbl_view(request):
     # For given TF instance and genome, return all site instances in .tbl format
     form = ExportForm(request.POST)
     form.is_valid()
-    TF_instance = form.cleaned_data['TF_instances']
     genome = form.cleaned_data['genomes']
     test_export = form.cleaned_data['is_test_export']
 
     # get all curation_site_instances
     curation_site_instances = models.Curation_SiteInstance.objects.filter(
         site_instance__genome=genome,
-        curation__TF_instance=TF_instance,
         curation__NCBI_submission_ready=True,
+        #curation__master_curator_verified=True,
         is_motif_associated=True,
         is_obsolete=False,
-        curation__experimental_techniques__preset_function='binding').order_by('site_instance__start')
-
-    if len(set(csi.curation.TF for csi in curation_site_instances)) > 1:
-        msg = "Inconsistent TF-TF_instance links. This TF_instance is linked to more than one TF."
-        messages.add_message(request, messages.ERROR, msg)
-        return render(request, 'ncbi_export.html', {'form':form}, context_instance=RequestContext(request))
+        curation__experimental_techniques__preset_function='binding').order_by('curation__TF_instance',
+                                                                               'site_instance__start')
 
     if len(curation_site_instances) == 0:
-        msg = "No curation found for this TF and genome."
+        msg = "No curation found for this genome."
         messages.add_message(request, messages.WARNING, msg)
         return render(request, 'ncbi_export.html', {'form':form}, context_instance=RequestContext(request))
 
     collectf_tbl_str = generate_tbl_string(curation_site_instances, test_export)
-    #orig_tbl_str = download_full_tbl(genome.genome_accession)
-    #concat_tbl_str = orig_tbl_str + '\n' + collectf_tbl_str
-    #fasta_str = download_full_fasta(genome.genome_accession)
     genome_asn_str = download_genome_asn(genome.genome_accession)
-    #src_str = generate_src_string(curation_site_instances)
     readme_str = generate_readme_string()
 
     # create a zip file
-    filename = genome.genome_accession.replace('.', '_') + '_' + TF_instance.protein_accession
+    filename = genome.genome_accession.replace('.', '_')
     in_memory = StringIO()
     zip = ZipFile(in_memory, 'a')
-    #zip.writestr(filename+'_original'+'.tbl', orig_tbl_str)
     zip.writestr(filename+'.tbl', collectf_tbl_str)
-    #zip.writestr(filename+'_concat'+'.tbl', concat_tbl_str)
-    #zip.writestr(filename+'.fsa', fasta_str)
     zip.writestr(filename+'.asn', genome_asn_str)
-    #zip.writestr(filename+'.src', src_str)
     zip.writestr("CollecTF_template.sbt", COLLECTF_TEMPLATE_SBT)
     zip.writestr("command.txt", readme_str)
     zip.close()
