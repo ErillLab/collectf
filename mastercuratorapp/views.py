@@ -170,6 +170,17 @@ def form_done(form, curation):
     curation.save()
     
 
-
-
-
+def withdraw_site(request):
+    """Mark a site instance as obsolete"""
+    assert request.POST
+    from baseapp.templatetags import dbxref_utils
+    site_id = request.POST['csi_id']
+    why_obsolete = request.POST['why_obsolete']
+    csi = models.Curation_SiteInstance.objects.get(pk=site_id)
+    csi.is_obsolete = True
+    csi.why_obsolete = why_obsolete
+    csi.save()
+    messages.add_message(request, messages.SUCCESS, "Site was marked as obsolete.")
+    print dbxref_utils.id2dbxref(site_id)
+    return browseapp.view_site.browse_by_site(request, dbxref_utils.id2dbxref_hex_only(site_id))
+    
