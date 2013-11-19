@@ -62,3 +62,4 @@ def pub_external_submission(request):
         messages.add_message(request, messages.ERROR, "Something went wrong. Please try again.")
 
     return home(request)
+    

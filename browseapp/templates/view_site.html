@@ -4,17 +4,6 @@
 
 <div class="container">
 
-<!--
-<section id="extra">
-<label class="checkbox">
-  <input type="checkbox"> Integrate non-motif-associated sites
-</label>
-<label class="checkbox">
-  <input type="checkbox"> View non-motif-associated sites only.
-</label>
-</section>
--->
-
 <section id="info">
 <h3>Transcription Factor Binding Site Information</h3>
 <dl class="dl-horizontal">
@@ -102,5 +91,10 @@ for TF-site mediated regulation are displayed in green.
 </div>
 
 </section>
+
+<script type="text/javascript">
+  $('[data-toggle="confirmation"]').confirmation({popout: true, singleton: true, container: 'body'});
+</script>
+
 
 {% endblock %}

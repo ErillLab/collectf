@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% load bootstrap_tags %}
+
+<form class="form-horizontal" method="post" action="">{% csrf_token %}
+
+{{ form|as_bootstrap }}
+
+<div class="control-group">
+  <div class="controls">
+    <input type="submit" value="Submit" />
+  </div>
+</div>
+
+</form>
+
+{% endblock %}

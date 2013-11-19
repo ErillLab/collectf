@@ -2,43 +2,9 @@
 
 {% block content %}
 
-<div class="container">
-
-<table class="table table-bordered table-striped">
-  
-  <thead>
-    <tr>
-      <th>Curation id</th>
-      <th>Curator</th>
-      <th>PMID</th>
-      <th>TF</th>
-      <th>Species</th>
-      <th>Action</th>
-    </tr>
-  </thead>
-  {% for curation in curations %}
-  <tr>
-    <td><a href="{% url browseapp.view_curation.view_curation curation.pk %}">{{ curation.pk }}</td>
-    <td>{% with curator=curation.curator.user %}{{ curator.first_name }} {{ curator.last_name }}{% endwith %}</td>
-    <td>{{ curation.publication.pmid }}</td>
-    <td>{{ curation.TF.name }}</td>
-    <td>{{ curation.site_instances.all.0.genome.taxonomy.name }}</td>
-    <td><small><a data-toggle="confirmation" data-href="{% url mastercuratorapp.views.validate_curation curation.pk %}"
-                  data-title="Are you sure?">validate</a> | 
-        <a data-toggle="confirmation" data-href="{% url collectfapp.editcurationview.edit_curation curation.pk %}"
-           data-title="Are you sure?">resubmit</a></small></td>
-  </tr>
-  {% endfor %}
-  
-  <tbody>
-    
-  </tbody>
-</table>
-
-</div>
-
-<script type="text/javascript">
-  $('[data-toggle="confirmation"]').confirmation({popout: true, singleton: true, container: 'body'});
-</script>
+<ul>
+  <li><a href="{% url mastercuratorapp.views.validate_edit_main %}">Edit/validate curation</a></li>
+  <li><a href="{% url mastercuratorapp.views.view_validated_curations %}">See validated curations</a></li>
+</ul>
 
 {% endblock %}

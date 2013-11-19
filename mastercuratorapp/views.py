@@ -15,9 +15,23 @@ from django.contrib.auth.decorators import user_passes_test
 @user_passes_test(lambda u: u.is_superuser)
 def home(request):
     template_file = "main.html"
+    return render_to_response(template_file, {}, context_instance=RequestContext(request))
+
+def validate_edit_main(request):
+    template_file = "validate_edit_main.html"
     # get all not validated curations
     curations = models.Curation.objects.\
-                filter(master_curator_verified=False).\
+                filter(validated_by=None).\
+                order_by('created').all()
+    template = {'curations': curations}
+    return render_to_response(template_file, template,
+                              context_instance=RequestContext(request))
+
+def view_validated_curations(request):
+    template_file = "view_validated_curations.html"
+    # get all validated curation objects
+    curations = models.Curation.objects.\
+                exclude(validated_by=None).\
                 order_by('created').all()
     template = {'curations': curations}
     return render_to_response(template_file, template,
@@ -34,13 +48,13 @@ def validate_curation(request, curation_id):
         form = forms.EditCurationForm(request.POST, curation=curation)
         
         if form.is_valid():
-            form_done(form, curation)
+            validate_form_done(request, form, curation)
             messages.add_message(request, messages.SUCCESS, "Curation was modified/validated successfully.")
             return HttpResponseRedirect(reverse(browseapp.view_curation.view_curation, kwargs={'cid': curation.pk}))
     else:
         curation = models.Curation.objects.get(pk=curation_id)
         # initial data preparation functions
-        form = get_form(curation)
+        form = validate_get_form(curation)
         template = {'form': form,
                     'curation': curation}
         
@@ -48,7 +62,34 @@ def validate_curation(request, curation_id):
                   {'form': form, 'curation': curation},
                   context_instance=RequestContext(request))
 
-def get_form(curation):
+@user_passes_test(lambda u: u.is_superuser)
+def edit_validated_curation(request, curation_id):
+    if request.method == 'POST':
+        curation = models.Curation.objects.get(pk=request.POST["curation_id"])
+        form = forms.EditCurationForm(request.POST, curation=curation)
+        if form.is_valid():
+            validate_form_done(request, form, curation)
+            messages.add_message(request, messages.SUCCESS, "Curation was modified/validated successfully.")
+            return HttpResponseRedirect(reverse(browseapp.view_curation.view_curation, kwargs={'cid': curation.pk}))
+    else:
+        curation = models.Curation.objects.get(pk=curation_id)
+        form = validate_get_form(curation)
+        # check if any of the sites has been submitted to NCBI.
+        ncbi_submitted = False
+        csis = curation.curation_siteinstance_set.all()
+        print csis
+        if models.NCBISubmission.objects.filter(curation_site_instance__in=csis):
+            ncbi_submitted = True
+
+        template = {'form': form,
+                    'curation': curation,
+                    'ncbi_submitted': ncbi_submitted,}
+        
+    return render(request, "edit_validated_curation.html",
+                  template,
+                  context_instance=RequestContext(request))
+
+def validate_get_form(curation):
     def get_genome_accession():
         if curation.site_instances.all():
             return curation.site_instances.all()[0].genome.genome_accession
@@ -109,9 +150,16 @@ def get_form(curation):
     form = forms.EditCurationForm(data, **kwargs)
     return form
 
-def form_done(form, curation):
+def validate_form_done(request, form, curation):
     """Called when the form is submitted."""
     cd = form.cleaned_data
+    assert request.method == "POST"
+    assert "ncbi_submitted" in request.POST
+    assert "why_obsolete" in request.POST
+    cd['ncbi_submitted'] = True if request.POST['ncbi_submitted']=='True' else False
+    cd['why_obsolete'] = request.POST['why_obsolete']
+    print 'ncbi_submitted', cd['ncbi_submitted']
+    print 'why_obsolete', cd['why_obsolete']
     def TF_genome_done():
         # TF/Genome update
         curation.TF = cd['TF']
@@ -154,22 +202,30 @@ def form_done(form, curation):
             publication.curation_complete = False
         publication.save()
 
-    def site_instances_done():
+    def site_instances_done(ncbi_submitted, why_obsolete):
+        # if a site is deselected
+        # (a) if ncbi_submitted, don't delete it, mark it as obsolete
+        # (b) otherwise, delete
         for k,v in cd.items():
             if k.startswith('site_instance'):
                 site_id = int(k.replace("site_instance_", ""))
                 curation_site_instance = models.Curation_SiteInstance.objects.get(pk=site_id)
                 if v == False:
-                    curation_site_instance.delete()
+                    if ncbi_submitted:
+                        curation_site_instance.is_obsolete = True
+                        curation_site_instance.why_obsolete = why_obsolete
+                        curation_site_instance.save()
+                    else:
+                        curation_site_instance.delete()
 
     TF_genome_done()
     techniques_done()
     curation_review_done()
-    site_instances_done()
+    site_instances_done(cd['ncbi_submitted'], cd['why_obsolete'])
     curation.master_curator_verified = True
     curation.save()
     
-
+@user_passes_test(lambda u: u.is_superuser)
 def withdraw_site(request):
     """Mark a site instance as obsolete"""
     assert request.POST

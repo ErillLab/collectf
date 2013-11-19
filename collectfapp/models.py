@@ -35,7 +35,7 @@ class Curation(models.Model):
     confidence = models.BooleanField()              # is curation confident?
     NCBI_submission_ready = models.BooleanField()   # is ready to submit to NCBI?
     requires_revision = models.CharField(max_length=20, choices=REVISION_REASONS, null=True, blank=True)
-    master_curator_verified = models.BooleanField(null=False, blank=False, default=False) # is validated by master curator?
+    validated_by = models.ForeignKey("Curator", null=True, blank=True, related_name="validated_by")
     experimental_process = models.TextField(null=True, blank=True)
     forms_complex = models.BooleanField()           # does TF forms complex
     complex_notes = models.TextField(null=True, blank=True) # if forms complex,

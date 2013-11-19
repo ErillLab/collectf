@@ -6,6 +6,15 @@ urlpatterns = patterns('collectfapp.views',
     url(r'^ext_pubmed_submission', 'pub_external_submission'),
 )
 
+urlpatterns += patterns('collectfapp.add_TF_view',
+    url(r'^add_TF/$', 'add_TF'),
+    url(r'^add_TF_family/$', 'add_TF_family'),
+)
+
+urlpatterns += patterns('collectfapp.add_technique_view',
+    url(r'^add_technique/$', 'add_technique'),
+)
+
 urlpatterns += patterns('collectfapp.curationview',
     url(r'^curation/$', 'curation'),
 )
