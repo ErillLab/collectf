@@ -70,6 +70,18 @@
 {% endfor %}
 </div>
 
+<input type="hidden" name="ncbi_submitted" value="{{ ncbi_submitted }}" />
+<div class="control-group" {% if not ncbi_submitted %}style="display:none"{% endif %}>
+  <div class="controls">
+    <p>It seems that reported sites have been submitted to NCBI. If you deselect any
+      of them, they will not be removed from the database. Instead, they will be marked
+      as obsolete. If you deselect any of the sites, please explain why the sites are
+      no longer valid.
+      <textarea rows="4" name="why_obsolete"></textarea>
+  </div>
+</div>
+
+
 <div class="well">
 <h3>Curation Review</h3>
 {% with field=form.revision_reasons %}{% include f %}{% endwith %}

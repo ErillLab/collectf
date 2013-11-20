@@ -66,7 +66,7 @@
                 <li class="divider-vertical"></li>
                 <li><a href="{% url collectfapp.signupview.logout %}" class="navbar-link">Logout</a></li>
                 {% else %}
-                <li><a class="navbar-link" href="{% url mainpageapp.views.register_request %}">Register</a></li>
+                <li><a class="navbar-link" href="{% url registration_register %}">Register</a></li>
                 <li class="divider-vertical"></li>
                 <li><a class="navbar-link" href="{% url collectfapp.signupview.login %}">Login</a></li>
                 {% endif %}

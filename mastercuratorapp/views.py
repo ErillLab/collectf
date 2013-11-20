@@ -85,7 +85,7 @@ def edit_validated_curation(request, curation_id):
                     'curation': curation,
                     'ncbi_submitted': ncbi_submitted,}
         
-    return render(request, "edit_validated_curation.html",
+    return render(request, "validate_curation.html",
                   template,
                   context_instance=RequestContext(request))
 
@@ -222,7 +222,9 @@ def validate_form_done(request, form, curation):
     techniques_done()
     curation_review_done()
     site_instances_done(cd['ncbi_submitted'], cd['why_obsolete'])
-    curation.master_curator_verified = True
+    curator = models.Curator.objects.get(user=request.user)
+    print curator
+    curation.validated_by = curator
     curation.save()
     
 @user_passes_test(lambda u: u.is_superuser)
