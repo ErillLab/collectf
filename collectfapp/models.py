@@ -88,7 +88,8 @@ class Curator(models.Model):
                     ("external", "external"))
     curator_id = models.AutoField(primary_key=True)
     user = models.OneToOneField(User) # extend Django's user model
-    curator_type = models.CharField(max_length=20, choices=CURATOR_TYPE)
+    curator_type = models.CharField(max_length=20, choices=CURATOR_TYPE,
+                                    default="external")
     
 
     def __unicode__(self):

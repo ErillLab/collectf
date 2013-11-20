@@ -146,7 +146,8 @@ INSTALLED_APPS = (
     'django.contrib.webdesign',
     'django_extensions',
     #'south',
-    'debug_toolbar'
+    'debug_toolbar',
+    'registration',
 )
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -211,3 +212,6 @@ CACHES = {
         'TIMEOUT': 2500000, # almost 30 days
     }
 }
+
+# required for django-registration
+ACCOUNT_ACTIVATION_DAYS = 7

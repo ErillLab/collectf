@@ -12,7 +12,9 @@ urlpatterns = patterns('',
     url(r'^$', collectfapp.views.home),
     url(r'^accounts/login/$', collectfapp.signupview.login),
     url(r'^accounts/logout/$', collectfapp.signupview.logout),
+    url(r'^accounts/', include('registration.backends.default.urls')),
 
+    
     url(r'^admin/', include(admin.site.urls)),
     url(r'^collectfapp/', include('collectfapp.urls')),
     url(r'^browseapp/', include('browseapp.urls')),
