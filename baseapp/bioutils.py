@@ -193,7 +193,8 @@ def weblogo(sequences):
     #assert all(len(seq) == len(trimmed[0]) for seq in trimmed), "sequences do not have the same length"
     al = to_fasta(sequences)
     from subprocess import Popen, PIPE, STDOUT
-    p = Popen(['weblogo', '-F', 'png', '-s', 'LARGE', '-c', 'classic', '--errorbars', 'YES'], stdout=PIPE, stdin=PIPE, stderr=PIPE)
+    p = Popen(['/usr/local/bin/weblogo', '-F', 'png', '-s', 'LARGE', '-c', 'classic', '--errorbars', 'YES'],
+              stdout=PIPE, stdin=PIPE, stderr=PIPE)
     stdout_data, stderr_data = p.communicate(input=al)
     return stdout_data
     
