@@ -7,5 +7,5 @@ class LargeMemcachedCache(MemcachedCache):
         if getattr(self, '_client', None) is None:
             self._client = self._lib.Client(self._servers, 
                            pickleProtocol=pickle.HIGHEST_PROTOCOL, 
-                           server_max_value_length = 1024*1024*10)
+                           server_max_value_length = 1024*1024*32)
         return self._client
