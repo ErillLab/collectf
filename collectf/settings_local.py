@@ -205,9 +205,10 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.profiling.ProfilingDebugPanel',
 )
 
+import large_memcached
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+        'BACKEND': 'LargeMemcachedCache',
         'LOCATION': '127.0.0.1:11211',
         'TIMEOUT': 2500000, # almost 30 days
     }
