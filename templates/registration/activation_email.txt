@@ -5,3 +5,4 @@ To activate this account, please click the following link within the next {{ exp
 127.0.0.1:8000{% url registration_activate activation_key=activation_key %}
 
 
+

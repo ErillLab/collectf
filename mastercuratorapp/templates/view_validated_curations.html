@@ -14,6 +14,7 @@
       <th>PMID</th>
       <th>TF</th>
       <th>Species</th>
+      <th>Validated by</th>
       <th>Action</th>
     </tr>
   </thead>
@@ -26,6 +27,7 @@
     <td>{{ curation.publication.pmid }}</td>
     <td>{{ curation.TF.name }}</td>
     <td>{{ curation.site_instances.all.0.genome.taxonomy.name }}</td>
+    <td>{% with master_curator=curation.validated_by %}{{ master_curator }} {% endwith %}</td>
     <td><a href="{% url mastercuratorapp.views.edit_validated_curation curation.pk %}">Edit validated curation</a></td>
   </tr>
   {% endif %}
@@ -44,6 +46,7 @@
       <th>PMID</th>
       <th>TF</th>
       <th>Species</th>
+      <th>Validated by</th>
       <th>Action</th>
     </tr>
   </thead>
@@ -56,6 +59,7 @@
     <td>{{ curation.publication.pmid }}</td>
     <td>{{ curation.TF.name }}</td>
     <td>{{ curation.site_instances.all.0.genome.taxonomy.name }}</td>
+    <td>{% with master_curator=curation.validated_by %}{{ master_curator }} {% endwith %}</td>
     <td><a href="{% url mastercuratorapp.views.edit_validated_curation curation.pk %}">Edit validated curation</a></td>
 
   </tr>

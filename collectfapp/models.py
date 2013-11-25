@@ -164,7 +164,7 @@ class Genome(models.Model):
         return self.genome_accession + ' ' + self.organism
 
 class GenomeSequence(models.Model):
-    sequence = models.TextField()
+    sequence = models.TextField(editable=False)
     def __unicode__(self):
         return str(self.genome.genome_accession)
 
