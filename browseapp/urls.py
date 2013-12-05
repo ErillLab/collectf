@@ -17,10 +17,7 @@ urlpatterns += patterns('browseapp.browse_TF_and_species',
         'browse_TF_and_species_selected_non_motif'),
 )
 
-urlpatterns += patterns('browseapp.view_site',
-    url(r'^expsite_(?P<dbxref_id>\w+)$', 'browse_by_site'),
-    url(r'^EXPSITE_(?P<dbxref_id>\w+)$', 'browse_by_site'),
-)
+
 
 urlpatterns += patterns('browseapp.view_curation',
     url(r'^view_curation/(?P<cid>\d+)/$', 'view_curation'),

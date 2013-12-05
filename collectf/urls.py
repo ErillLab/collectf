@@ -24,6 +24,14 @@ urlpatterns = patterns('',
     url(r'^dbstatsapp/', include('dbstatsapp.urls')),
     url(r'^mastercuratorapp/', include('mastercuratorapp.urls')),
 )
+
+import browseapp.view_site
+# This should be in browseapp urls.py, but since NCBI links cannot be changed, it
+# will serve here.
+urlpatterns += patterns('',
+    url(r'^expsite_(?P<dbxref_id>\w+)$', browseapp.view_site.browse_by_site),
+    url(r'^EXPSITE_(?P<dbxref_id>\w+)$', browseapp.view_site.browse_by_site),
+)
 urlpatterns += staticfiles_urlpatterns()
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
