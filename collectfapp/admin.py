@@ -2,6 +2,11 @@ from collectfapp.models import *
 from django.contrib import admin
 from django.db.models import get_models
 from django.db.models import get_app
+from django.contrib import messages
+from django import forms
+from django.shortcuts import render_to_response
+from django.http import HttpResponseRedirect
+from django.template import RequestContext
 
 # curation admin view
 class CurationSiteInstanceInline(admin.StackedInline):
@@ -37,10 +42,45 @@ class Curation_SiteInstanceAdmin(admin.ModelAdmin):
     list_filter = ('is_motif_associated',)
     ordering = ('-id',)
 
+
+class BatchAssignForm(forms.Form):
+    _selected_action = forms.CharField(widget=forms.MultipleHiddenInput)
+    curator = forms.ModelChoiceField(Curator.objects)
+    
+def assign_papers(modeladmin, request, queryset):
+    print 'assign papers'
+    # check if any selected curation is complete
+    for obj in queryset:
+        if obj.curation_complete:
+            messages.error(request, "Some of the selected papers are already curated. "
+                           "Curated papers can not be reassigned.")
+            return
+
+    # reassignment step
+    form = None
+    if 'apply' in request.POST:
+        form = BatchAssignForm(request.POST)
+        if form.is_valid():
+            curator = form.cleaned_data['curator']
+            for obj in queryset:
+                obj.assigned_to = curator
+                obj.save()
+            messages.success(request, "Papers successfully assigned to %s." % curator.user.username)
+            return HttpResponseRedirect(request.get_full_path())
+
+    if not form:
+        form = BatchAssignForm(initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
+
+    return render_to_response('admin/batch_paper_assign.html',
+                              {'papers': queryset, 'form': form},
+                              context_instance = RequestContext(request))
+assign_papers.short_description = "Assign selected papers to a curator"
+    
 class PublicationAdmin(admin.ModelAdmin):
     list_display = ('publication_id', 'pmid', 'title', 'assigned_to')
     list_filter = ('assigned_to', 'curation_complete', 'reported_TF', 'reported_species')
     search_fields = ('pmid',)
+    actions = [assign_papers]
 
 class ExperimentalTechniqueAdmin(admin.ModelAdmin):
     list_display = ('name', )

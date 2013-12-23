@@ -82,6 +82,9 @@ changes in the last step (curation review step). For external users, the field
 * Master-curator view
 
 * Implementation notes
+** Source
+All source code for CollecTF implementation is available at http://github.com/sefakilic/collectf
+
 ** Operon prediction
 ** Meta-site rule
 Experimental evidence for a given binding site may be reported in more than one
@@ -106,3 +109,4 @@ is used for dbxref link-out.
 Each CollecTF annotation in NCBI RefSeq records has unique dbxref out-link to
 CollecTF record, pointing a curated site instance. There is one-to-one mapping
 between each annotated site-instance id and corresponding dbxref.
+
