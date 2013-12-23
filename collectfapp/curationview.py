@@ -107,7 +107,8 @@ def site_report_get_form(wiz, form):
         # pick any curation_site_instance object for this curation
         try:
             curation_site_instance = models.Curation_SiteInstance.objects.filter(curation=c).all()[:1].get()
-            form.fields['is_motif_associated'].initial = curation_site_instance.is_motif_associated
+            #form.fields['is_motif_associated'].initial = curation_site_instance.is_motif_associated
+            form.fields['site_type'].initial = curation_site_instance.site_type
             form.fields['has_quantitative_data'].initial = curation_site_instance.quantitative_value
         except:
             pass
@@ -514,7 +515,8 @@ def site_report_process(wiz, form):
     sutils.sput(wiz.request.session, 'site_quantitative_data', {})
     sutils.sput(wiz.request.session, 'soft_site_match_choices', {})
 
-    is_motif_associated = form.cleaned_data.get('is_motif_associated')
+    #is_motif_associated = form.cleaned_data.get('is_motif_associated')
+    site_type = form.cleaned_data.get('site_type')
     is_chip_data = form.cleaned_data.get('is_chip_data')
     is_coordinate = form.cleaned_data.get('is_coordinate')
     has_quantitative_data = form.cleaned_data.get('has_quantitative_data')
@@ -523,7 +525,7 @@ def site_report_process(wiz, form):
     genome = sutils.sget(wiz.request.session, 'genome')
     genes = models.Gene.objects.filter(genome=genome).order_by('start')
 
-    call_func_id = (('1' if is_motif_associated else '0') +
+    call_func_id = (('1' if site_type in ["motif_associated", "var_motif_associated"] else '0') +
                     ('1' if is_chip_data else '0') +
                     ('1' if has_quantitative_data else '0') +
                     ('1' if is_coordinate else '0'))
@@ -533,7 +535,8 @@ def site_report_process(wiz, form):
     eval(call_func_str)
 
     # store booleans
-    sutils.sput(wiz.request.session, 'is_motif_associated', is_motif_associated)
+    #sutils.sput(wiz.request.session, 'is_motif_associated', is_motif_associated)
+    sutils.sput(wiz.request.session, 'site_type', site_type)
     sutils.sput(wiz.request.session, 'is_chip_data', is_chip_data)
     sutils.sput(wiz.request.session, 'is_coordinate', is_coordinate)
     sutils.sput(wiz.request.session, 'has_quantitative_data', has_quantitative_data)
@@ -710,7 +713,8 @@ def site_match_done(wiz, curation, regulations):
     all_site_matches += soft_site_matches.items() if soft_site_matches else []
     all_site_matches = dict(all_site_matches)
 
-    is_motif_associated = sutils.sget(wiz.request.session, 'is_motif_associated')
+    #is_motif_associated = sutils.sget(wiz.request.session, 'is_motif_associated')
+    site_type = sutils.sget(wiz.request.session, 'site_type')
     
     for sid, match in all_site_matches.items():
         # create SiteInstance object (or get if available)
@@ -726,7 +730,8 @@ def site_match_done(wiz, curation, regulations):
         cs = models.Curation_SiteInstance(curation=curation,
                                           site_instance=si,
                                           annotated_seq=sites[sid],
-                                          is_motif_associated=is_motif_associated,
+                                          #is_motif_associated=is_motif_associated,
+                                          site_type = site_type,
                                           #chip_info=chip_data,
                                           #quantitative_data_format=quantitative_data_format,
                                           quantitative_value = quantitative_vals.get(sid, None))
@@ -798,8 +803,9 @@ class CurationWizard(SessionWizardView):
 
         if self.steps.current == '4':
             sites = sutils.sget(self.request.session, 'sites')
-            is_motif_associated = sutils.sget(self.request.session, 'is_motif_associated')
-            if is_motif_associated and len(sites) > 1:
+            #is_motif_associated = sutils.sget(self.request.session, 'is_motif_associated')
+            site_type = sutils.sget(self.request.session, 'site_type')
+            if site_type in ["motif_associated", "var_motif_associated"] and len(sites) > 1:
                 context.update({'weblogo_img': bioutils.weblogo_uri(sites.values())})
         
         return context

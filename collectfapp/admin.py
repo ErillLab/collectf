@@ -39,7 +39,7 @@ class SiteInstanceAdmin(admin.ModelAdmin):
 
 class Curation_SiteInstanceAdmin(admin.ModelAdmin):
     list_display = ('id', )
-    list_filter = ('is_motif_associated',)
+    list_filter = ('site_type',)
     ordering = ('-id',)
 
 

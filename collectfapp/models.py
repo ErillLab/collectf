@@ -280,9 +280,14 @@ class Curation_SiteInstance(models.Model):
     # through model between Curation and SiteInstance models
     curation = models.ForeignKey("Curation", null=False)
     site_instance = models.ForeignKey("SiteInstance", null=False)
-    is_motif_associated = models.BooleanField(null=False) # is the site instance actual motif,
+    #is_motif_associated = models.BooleanField(null=False) # is the site instance actual motif,
                                                  # or a (longer) sequence that
                                                  # contains the site somewhere
+    SITE_TYPE = (('motif_associated', "motif associated"),
+                 ('non_motif_associated', "non-motif associated"),
+                 ('var_motif_associated', "variable spaced motif associated"))
+    site_type = models.CharField(max_length=50, choices=SITE_TYPE)
+    
     annotated_seq = models.TextField(max_length=100000)
     # regulation
     regulates = models.ManyToManyField("Gene", through="Regulation")

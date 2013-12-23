@@ -199,10 +199,10 @@ class SiteReportForm(forms.Form):
     description_markup = u'<span data-toggle="tooltip" title="%s">%s</span>'
 
     # for these fields, show help text as popover
-    is_motif_associated = forms.BooleanField(required=False,
-                                             initial=True,
-                                             label=description_markup%(help_dict['is_motif_associated'],
-                                                                       "Reported sites are motif associated."))
+    site_type = forms.ChoiceField(choices=Curation_SiteInstance.SITE_TYPE,
+                                  required=True,
+                                  label="site type")
+    
     is_chip_data = forms.BooleanField(initial=False,
                                       required=False,
                                       label=description_markup%(help_dict['is_chip_data'],
@@ -506,7 +506,9 @@ class SiteReportForm(forms.Form):
 
         #print cleaned_data
 
-        is_motif_associated = cleaned_data.get("is_motif_associated")
+        #is_motif_associated = cleaned_data.get("is_motif_associated")
+        is_motif_associated = cleaned_data.get("site_type") in ["motif_associated",
+                                                               "var_motif_associated"]
         is_chip_data = cleaned_data.get("is_chip_data")
         has_quantitative_data = cleaned_data.get('has_quantitative_data')
         is_coordinate = cleaned_data.get("is_coordinate")

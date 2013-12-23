@@ -34,11 +34,25 @@ def get_all_TF_instances_without_curation():
     for x in not_used:
         print x.protein_accession,
 
+def foo():
+    num_all = models.Curation_SiteInstance.objects.all().count()
+    ma = models.Curation_SiteInstance.objects.filter(is_motif_associated=True)
+    nma = models.Curation_SiteInstance.objects.filter(is_motif_associated=False)
+    print num_all, ma.count(), nma.count()
+    for csi in ma:
+        csi.site_type = "motif_associated"
+        csi.save()
+    for csi in nma:
+        csi.site_type = "non_motif_associated"
+        csi.save()
+
+    
 
         
 def run():
     #get_all_curation_site_instances()
     #get_all_curations_with_chip()
-    get_all_TF_instances_without_curation()
+    #get_all_TF_instances_without_curation()
+    foo()
     
     
