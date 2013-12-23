@@ -53,14 +53,21 @@ def search_post_helper(request):
     cat_input1 = [x for x in cat_input_1 if x!='on']
     cat_input2 = [x for x in cat_input_2 if x!='on']
     cat_input3 = [x for x in cat_input_3 if x!='on']
- 
+
+    print TF_input
+    print species_input
+    print cat_input_1
+    print cat_input_2
+    print cat_input_3
+
     if not (TF_input and species_input and (cat_input_1 or cat_input2 or cat_input3)):
         raise
         message = "shouldn't be here"
         #message = "Please select at least one TF, species and experimental technique to search database."
         messages.add_message(request, messages.ERROR, message)
         return HttpResponseRedirect(reverse(search))
-    
+
+
     TFs = models.TF.objects.filter(TF_id__in=TF_input)
     species = models.Taxonomy.objects.filter(pk__in=species_input)
     techniques1 = models.ExperimentalTechnique.objects.filter(technique_id__in=cat_input1)
@@ -71,11 +78,16 @@ def search_post_helper(request):
     q2 = technique_list_to_Q(techniques2)
     q3 = technique_list_to_Q(techniques3)
     # get all curation_site_instance objects satisfying those conditions
+    print 'z'
+    
     all_csis = models.Curation_SiteInstance.objects.filter(curation__TF__in=TFs,
                                                        site_instance__genome__taxonomy__in=species)
+    print all_csis.count()
+    print 't'
 
-    csis = all_csis.filter(is_motif_associated=True)
-    non_motif_csis = all_csis.filter(is_motif_associated=False)
+    csis = all_csis.filter(site_type="motif_associated")
+    non_motif_csis = all_csis.filter(site_type="non_motif_associated")
+    
     if boolean1 == 'and' and boolean2 == 'and':
         csis = csis.filter(q1, q2, q3)
     elif boolean1 == 'and' and boolean2 == 'or':
@@ -98,6 +110,7 @@ def search_post(request):
     try:
         motif_csis, non_motif_csis = search_post_helper(request)
     except Exception as e:
+        print e
         message = "Please select at least one TF, species and experimental technique to search database."
         messages.add_message(request, messages.ERROR, message)
         return HttpResponseRedirect(reverse(search))

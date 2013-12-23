@@ -52,13 +52,13 @@ def browse_TF_and_species_selected(request, TF_param, TF_ids, species_param, spe
     # better to get all in one query (assuming most combinations return empty)
     csis = models.Curation_SiteInstance.objects.filter(site_instance__genome__taxonomy__in=species,
                                                        curation__TF__in=TFs,
-                                                       is_motif_associated=True)
+                                                       site_type="motif_associated")
     # get all non motif curation-site instances
     non_motif_csis = None
     if integrate_non_motif:
         non_motif_csis = models.Curation_SiteInstance.objects.filter(site_instance__genome__taxonomy__in=species,
                                                                      curation__TF__in=TFs,
-                                                                     is_motif_associated=False)
+                                                                     site_type="non_motif_associated")
     # group all motif-associated site instances by TF and speciess
     values = csis.values('curation__TF',
                          'site_instance__genome__taxonomy').distinct()

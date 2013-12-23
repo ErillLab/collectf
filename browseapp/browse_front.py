@@ -24,9 +24,9 @@ def browse_TF_all_reports_ajax(request, t, id):
         TF_name = TF_family.name
         
     motif_csis = models.Curation_SiteInstance.objects.filter(curation__TF__in=TFs,
-                                                             is_motif_associated=True)
+                                                             site_type="motif_associated")
     non_motif_csis = models.Curation_SiteInstance.objects.filter(curation__TF__in=TFs,
-                                                                 is_motif_associated=False)
+                                                                 site_type="non_motif_associated")
     all_reports = group_search_results(motif_csis, non_motif_csis)['reports']
 
     assert TF_name
@@ -60,8 +60,8 @@ def browse_tax_all_reports_ajax(request, id):
         else:
             all_sp.append(s)
 
-    motif_csis = models.Curation_SiteInstance.objects.filter(site_instance__genome__taxonomy__in=all_sp, is_motif_associated=True)
-    non_motif_csis = models.Curation_SiteInstance.objects.filter(site_instance__genome__taxonomy__in=all_sp, is_motif_associated=False)
+    motif_csis = models.Curation_SiteInstance.objects.filter(site_instance__genome__taxonomy__in=all_sp, site_type="motif_associated")
+    non_motif_csis = models.Curation_SiteInstance.objects.filter(site_instance__genome__taxonomy__in=all_sp, site_type="non_motif_associated")
     all_reports = group_search_results(motif_csis, non_motif_csis)['reports']
     return render_to_response("browse_tab.html",
                               {'title': models.Taxonomy.objects.get(pk=id).name,
@@ -117,8 +117,8 @@ def browse_techniques_all_reports_ajax(request, type, id):
         title = techniques.all()[:1].get().name
         desc = techniques.all()[:1].get().description
 
-    motif_csis = models.Curation_SiteInstance.objects.filter(curation__experimental_techniques__in=techniques, is_motif_associated=True)
-    non_motif_csis = models.Curation_SiteInstance.objects.filter(curation__experimental_techniques__in=techniques, is_motif_associated=False)
+    motif_csis = models.Curation_SiteInstance.objects.filter(curation__experimental_techniques__in=techniques, site_type="motif_associated")
+    non_motif_csis = models.Curation_SiteInstance.objects.filter(curation__experimental_techniques__in=techniques, site_type="non_motif_associated")
     all_reports = group_search_results(motif_csis, non_motif_csis)['reports']
     return render_to_response("browse_tab.html",
                               {'title': title,

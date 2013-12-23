@@ -23,7 +23,7 @@ def browse_by_site(request, dbxref_id):
     all_curation_site_instances = models.Curation_SiteInstance.objects.filter(
         curation__TF_instance=curation_site_instance.curation.TF_instance,
         site_instance__genome=curation_site_instance.site_instance.genome,
-        is_motif_associated=True).all()
+        site_type_in=["motif_associated", "var_motif_associated"]).all()
 
     # get all curation_site_instances that overlap with the queried site
     curation_site_instances = [curation_site_instance]
