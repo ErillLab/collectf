@@ -122,7 +122,7 @@ def get_random_motif(motif_len_th=30, motif_sz_th=10):
         # get all for this TF and genome
         csis = models.Curation_SiteInstance.objects.filter(curation__TF_instance__protein_accession=TF_genome[1],
                                                            site_instance__genome__genome_id=TF_genome[2],
-                                                           is_motif_associated=True)
+                                                           site_type="motif_associated")
         csis = csis.all()
         if len(csis) > motif_sz_th:
             # align sites
@@ -131,7 +131,7 @@ def get_random_motif(motif_len_th=30, motif_sz_th=10):
                 # get non-motif-associated data
                 ncsis = models.Curation_SiteInstance.objects.filter(curation__TF_instance__protein_accession=TF_genome[1],
                                                                    site_instance__genome__genome_id=TF_genome[2],
-                                                                   is_motif_associated=False).all()
+                                                                   site_type="non_motif_associated").all()
 
                 return {
                     'aligned_sites': trimmed,
