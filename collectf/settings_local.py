@@ -146,7 +146,7 @@ INSTALLED_APPS = (
     'django.contrib.webdesign',
     'django_extensions',
     #'south',
-    'debug_toolbar',
+    #'debug_toolbar',
     'registration',
 )
 # A sample logging configuration. The only tangible logging
