@@ -25,6 +25,7 @@ def browse_TF_all_reports_ajax(request, t, id):
         
     motif_csis = models.Curation_SiteInstance.objects.filter(curation__TF__in=TFs,
                                                              site_type="motif_associated")
+    
     non_motif_csis = models.Curation_SiteInstance.objects.filter(curation__TF__in=TFs,
                                                                  site_type="non_motif_associated")
     all_reports = group_search_results(motif_csis, non_motif_csis)['reports']

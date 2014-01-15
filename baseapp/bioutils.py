@@ -264,7 +264,7 @@ def weblogo_depr(sequences, format="PNG"):
     
 def weblogo_uri(sequences):
     """Generate the weblogo and make it ready for direct embed into response html"""
-    image_data = weblogo(sequences)
+    image_data = weblogo_depr(sequences)
     encoded = b64encode(image_data)
     mime = "image/png"
     

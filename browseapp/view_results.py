@@ -5,14 +5,14 @@ from django.http import HttpResponseRedirect
 from collections import namedtuple
 
 def prepare_results(motif_csi_list, non_motif_csi_list, integrate_non_motif=False):
-    """
-    Given lists of motif-associated and non-motif-associated curation site
-    instances, pass them to the view results function.
-    """
+    """Given lists of motif-associated and non-motif-associated curation site
+    instances, pass them to the view results function. """
+    
     csis = models.Curation_SiteInstance.objects.filter(pk__in=motif_csi_list)
     # get non-motif-associated curation-site-instances
     # if non_motif_csi_list is empty filter doesn't work!
     non_motif_csis = models.Curation_SiteInstance.objects.none()
+    
     if integrate_non_motif and non_motif_csi_list:
         non_motif_csis = models.Curation_SiteInstance.objects.filter(pk__in=non_motif_csi_list)
     # get data, associated with curation-site-instances
@@ -86,7 +86,7 @@ def group_curation_site_instances(curation_site_instances, non_motif_curation_si
         for csi in curation_site_instances.iterator():
             for ms in meta_sites: # check all existing meta-sites if there is any fit
                 if (ms['sites'][0].site_instance.genome == csi.site_instance.genome and
-                    ms['sites'][0].curation.TF_instance == csi.curation.TF_instance and
+                    ms['sites'][0].curation.TF_instances.all() == csi.curation.TF_instances.all() and
                     bioutils.overlap_site_meta_site(csi, ms['sites'])):
                     ms['sites'].append(csi)
                     break
@@ -101,7 +101,7 @@ def group_curation_site_instances(curation_site_instances, non_motif_curation_si
         for ncsi in non_motif_curation_site_instances.iterator():
             for ms in meta_sites:
                 if (ms['sites'][0].site_instance.genome == ncsi.site_instance.genome and
-                    ms['sites'][0].curation.TF_instance == ncsi.curation.TF_instance and
+                    ms['sites'][0].curation.TF_instances.all() == ncsi.curation.TF_instances.all() and
                     bioutils.overlap_non_motif_site_meta_site(ncsi, ms['sites'])):
                     ms['sites'].append(ncsi)
                     # no break here; incorporate each non-motif-associated site to all
@@ -116,7 +116,8 @@ def group_curation_site_instances(curation_site_instances, non_motif_curation_si
         all_techniques = models.ExperimentalTechnique.objects.all()
         for ms in meta_sites:
             ms['techniques'] = list(set(all_techniques.filter(preset_function__in=['binding', 'expression'],
-                                                              curation__in=ms['curations'])))
+                                                              curation_siteinstance__in=ms['sites'])))
+            
 
     def group_regulations_for_each_meta_site(meta_sites):
         #all_regs = models.Regulation.objects.all()

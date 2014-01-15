@@ -8,9 +8,6 @@ import bioutils
 
 # Create your models here.
 class Curation(models.Model):
-    """
-    Curation table.
-    """
     # choices
     REVISION_REASONS = (("genome_not_available", "No comparable genome in NCBI"),
                         ("in_progress", "Matching genome still in progress"),
@@ -47,15 +44,23 @@ class Curation(models.Model):
     # situations. Similarly, same TF protein can bind DNA both as monomer and
     # dimer, etc. Therefore, instead of storing TF function and type in
     # TFInstance model, keep them here
-    TF_function = models.CharField(max_length=50, choices=TF_FUNCTION)
+    #TF_function = models.CharField(max_length=50, choices=TF_FUNCTION)
+    
     TF_type = models.CharField(max_length=50, choices=TF_TYPE)
 
     # relations
     curator = models.ForeignKey("Curator")
     publication = models.ForeignKey("Publication")
     TF = models.ForeignKey("TF", null=True)
-    TF_instance = models.ForeignKey("TFInstance")
-    experimental_techniques = models.ManyToManyField("ExperimentalTechnique", related_name='curation')
+
+    #TF_instance = models.ForeignKey("TFInstance")
+    # Many to many relation between curation and TF instance allows to define
+    # TFs composed of several subunits with different accession numbers
+
+    TF_instances = models.ManyToManyField("TFInstance", related_name='curations')
+    
+    #experimental_techniques = models.ManyToManyField("ExperimentalTechnique", related_name='curation')
+    
     site_instances = models.ManyToManyField("SiteInstance", through="Curation_SiteInstance")
 
     # ChIP link (NULL if site instance is not curated as ChIP data)
@@ -277,6 +282,11 @@ class SiteInstance(models.Model):
         return sequence
  
 class Curation_SiteInstance(models.Model):
+
+    TF_FUNCTION = (("ACT", "activator"),
+                   ("REP", "repressor"),
+                   ("N/A", "not specified"))
+    
     # through model between Curation and SiteInstance models
     curation = models.ForeignKey("Curation", null=False)
     site_instance = models.ForeignKey("SiteInstance", null=False)
@@ -289,8 +299,14 @@ class Curation_SiteInstance(models.Model):
     site_type = models.CharField(max_length=50, choices=SITE_TYPE)
     
     annotated_seq = models.TextField(max_length=100000)
+
+    # TF function
+    TF_function = models.CharField(max_length=50, choices=TF_FUNCTION, null=False, default="N/A")
+
     # regulation
     regulates = models.ManyToManyField("Gene", through="Regulation")
+    # experimental techniques used to determine the site
+    experimental_techniques = models.ManyToManyField("ExperimentalTechnique")
     # quantitative value
     quantitative_value = models.FloatField(null=True, blank=True)
 

@@ -54,12 +54,6 @@ def search_post_helper(request):
     cat_input2 = [x for x in cat_input_2 if x!='on']
     cat_input3 = [x for x in cat_input_3 if x!='on']
 
-    print TF_input
-    print species_input
-    print cat_input_1
-    print cat_input_2
-    print cat_input_3
-
     if not (TF_input and species_input and (cat_input_1 or cat_input2 or cat_input3)):
         raise
         message = "shouldn't be here"
@@ -78,16 +72,12 @@ def search_post_helper(request):
     q2 = technique_list_to_Q(techniques2)
     q3 = technique_list_to_Q(techniques3)
     # get all curation_site_instance objects satisfying those conditions
-    print 'z'
-    
     all_csis = models.Curation_SiteInstance.objects.filter(curation__TF__in=TFs,
-                                                       site_instance__genome__taxonomy__in=species)
-    print all_csis.count()
-    print 't'
+                                                           site_instance__genome__taxonomy__in=species)
 
     csis = all_csis.filter(site_type="motif_associated")
     non_motif_csis = all_csis.filter(site_type="non_motif_associated")
-    
+
     if boolean1 == 'and' and boolean2 == 'and':
         csis = csis.filter(q1, q2, q3)
     elif boolean1 == 'and' and boolean2 == 'or':
@@ -99,6 +89,7 @@ def search_post_helper(request):
         csis = csis.filter(q1|q2|q3)
     else:
         assert False, 'shouldnt be here, unhandled case'
+
     return csis, non_motif_csis
 
 def search_post(request):
@@ -109,6 +100,7 @@ def search_post(request):
     """
     try:
         motif_csis, non_motif_csis = search_post_helper(request)
+        
     except Exception as e:
         print e
         message = "Please select at least one TF, species and experimental technique to search database."
@@ -167,7 +159,7 @@ def technique_list_to_Q(techniques):
     # prepare filters
     q = Q(curation__curation_id=-9999)
     for t in techniques:
-        q = q | Q(curation__experimental_techniques=t)
+        q = q | Q(experimental_techniques=t)
     return q
 
 def get_techniques():

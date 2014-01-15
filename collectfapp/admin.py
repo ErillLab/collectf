@@ -17,7 +17,7 @@ class CurationAdmin(admin.ModelAdmin):
     def PMID(self, obj):
         return obj.publication.pmid
     
-    filter_horizontal = ("experimental_techniques",)
+    filter_horizontal = ("TF_instances",)
     list_display = ('curation_id', 'TF_species', 'PMID', 'curator')
     list_filter = ('curator', 'NCBI_submission_ready', 'requires_revision')
     ordering = ('-curation_id',)
@@ -40,8 +40,8 @@ class SiteInstanceAdmin(admin.ModelAdmin):
 class Curation_SiteInstanceAdmin(admin.ModelAdmin):
     list_display = ('id', )
     list_filter = ('site_type',)
+    filter_horizontal = ("experimental_techniques",)
     ordering = ('-id',)
-
 
 class BatchAssignForm(forms.Form):
     _selected_action = forms.CharField(widget=forms.MultipleHiddenInput)

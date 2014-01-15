@@ -112,7 +112,7 @@ def get_random_motif(motif_len_th=30, motif_sz_th=10):
     """
     TF_genome_list = models.Curation_SiteInstance.objects.values_list(
         'curation__TF__name',
-        'curation__TF_instance__protein_accession',
+        'curation__TF_instances',
         'site_instance__genome__genome_id',
         'site_instance__genome__genome_accession',
         'site_instance__genome__organism')
@@ -120,7 +120,7 @@ def get_random_motif(motif_len_th=30, motif_sz_th=10):
     while True:
         TF_genome = random.choice(TF_genome_list)
         # get all for this TF and genome
-        csis = models.Curation_SiteInstance.objects.filter(curation__TF_instance__protein_accession=TF_genome[1],
+        csis = models.Curation_SiteInstance.objects.filter(curation__TF_instances__protein_accession=TF_genome[1],
                                                            site_instance__genome__genome_id=TF_genome[2],
                                                            site_type="motif_associated")
         csis = csis.all()
@@ -129,9 +129,9 @@ def get_random_motif(motif_len_th=30, motif_sz_th=10):
             trimmed = bioutils.call_lasagna(map(lambda s: s.site_instance, csis))
             if len(trimmed[0]) < motif_len_th:
                 # get non-motif-associated data
-                ncsis = models.Curation_SiteInstance.objects.filter(curation__TF_instance__protein_accession=TF_genome[1],
-                                                                   site_instance__genome__genome_id=TF_genome[2],
-                                                                   site_type="non_motif_associated").all()
+                ncsis = models.Curation_SiteInstance.objects.filter(curation__TF_instances__protein_accession=TF_genome[1],
+                                                                    site_instance__genome__genome_id=TF_genome[2],
+                                                                    site_type="non_motif_associated").all()
 
                 return {
                     'aligned_sites': trimmed,

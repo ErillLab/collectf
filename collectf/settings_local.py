@@ -145,7 +145,7 @@ INSTALLED_APPS = (
     'mastercuratorapp',
     'django.contrib.webdesign',
     'django_extensions',
-    #'south',
+    'south',
     #'debug_toolbar',
     'registration',
 )

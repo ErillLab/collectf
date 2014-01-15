@@ -8,5 +8,6 @@ sitestatic/*
 collectfapp/migrations/*
 pickles/
 media/
+registration/
 
 access.log
