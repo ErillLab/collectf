@@ -1,0 +1,26 @@
+
+{% extends "homepage_base.html" %}
+
+{% block right-frame %}
+
+<h3>Search CollecTF</h3>
+
+<p><a href="{% url 'browse.search.search' %}">Click here to search CollecTF.</a></p>
+
+
+<p>
+  <b class="">Search in CollecTF is fully customizable.</b> Just select a taxonomic unit
+(e.g. the Vibrio genus), a transcription factor family or instance (e.g. LexA) and
+the set of experimental techniques that reported sites should be backed by and click
+    Search.
+</p>
+
+<p>
+  <b class="">Reports and exporting</b>
+Search results can be seen as individual reports (one report per TF/species) or as
+ensemble reports (multiple TF/species). Click Export to access the data in machine
+  readable format.
+</p>
+
+
+{% endblock %}

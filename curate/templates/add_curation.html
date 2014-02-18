@@ -1,0 +1,51 @@
+{% load bootstrap %}
+
+<div class="progress progress-striped">
+  <div class="progress-bar progress-bar-info" role="progressbar"
+       aria-valnow="{{ wizard.steps.step1 }}"
+       aria-valmin="0"
+       aria-valmax="{{ wizard.steps.count }}"
+       style="width:{% widthratio wizard.steps.step1 wizard.steps.count 100%}%">
+    <span class=""> Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}</span>
+  </div>
+</div>
+
+<h2>
+  {{ form_title }}
+  <p><small>{{ form_description }}</small></p>
+</h2>
+
+<legend></legend>
+
+<div class="boxed">
+  <form method="post" action="" class="form-horizontal">  {% csrf_token %}
+
+    {{ wizard.management_form }}
+
+    {% if weblogo_img %}
+
+    {% comment %}
+    At site-match step, weblogo is rendered. For other steps, the weblogo_img
+    variable returns empty, no weblogo is rendered #}
+    {% endcomment %}
+
+    <div class="" style="text-align:right;"><img src="{{ weblogo_img }}"></div>
+    {% endif %}
+
+    &nbsp;
+
+    {{ wizard.form|bootstrap_horizontal }}
+
+    <div class="form-group">
+      <div class=" col-sm-offset-2 col-sm-10 col-lg-offset-2 col-lg-10">
+        {% if wizard.steps.prev %}
+        <button class="btn btn-primary" name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">prev step</button>
+        {% endif %}
+        <input class="btn btn-primary" type="submit" value="next step"/>
+      </div>
+    </div>
+  </form>
+</div>
+
+
+

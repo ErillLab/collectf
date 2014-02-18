@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% include "add_curation.html" %}
+
+<script type="text/javascript">
+
+// collapse external DB type and accession number fields together
+function hide_external_db() {
+    var dom =  $("#id_2-external_db_type").parent().parent();
+    dom.toggle();
+    dom.next().toggle();
+    console.log('x');
+    dom.before('<div class=" col-sm-offset-2 col-sm-10 col-lg-offset-2 col-lg-10"><a href="#" onclick="show_external_db();">External DB</div>');
+}
+
+function show_external_db() {
+    var dom =  $("#id_2-external_db_type").parent().parent();
+    dom.toggle();
+    dom.next().toggle();
+}
+
+//xhide_external_db();
+
+</script>
+
+{% endblock %}

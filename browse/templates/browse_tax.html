@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row-fluid">
+
+  <div class="col-md-3 boxed_browse">
+    <ul class="list-unstyled">
+      {% for phylum in taxonomy.phyla %}
+      <li>
+	    <div class="node expandable">
+	      <i class=""></i>
+	      <a href="#" onclick="getReportLinksSpecies({{ phylum.pk }}, '{{ phylum.name }}'); return false;">{{ phylum.name }}</a>
+	    </div>
+	    <ul class="list-unstyled">
+	      {% for class in phylum.taxonomy_set.all %}
+	      <li>
+	        <div class="node expandable">
+	          <i class=""></i>
+	          <a href="#" onclick="getReportLinksSpecies({{ class.pk }}, '{{ class.name }}'); return false;">{{ class.name }}</a>
+	        </div>
+	        <ul class="list-unstyled">
+	          {% for order in class.taxonomy_set.all %}
+	          <li>
+		        <div class="node expandable">
+		          <i class=""></i>
+		          <a href="#" onclick="getReportLinksSpecies({{ order.pk }}, '{{ order.name }}'); return false;">{{ order.name }}</a>
+		        </div>
+		        <ul class="list-unstyled">
+		          {% for family in order.taxonomy_set.all %}
+		          <li>
+		            <div class="node expandable">
+		              <i class=""></i>
+		              <a href="#" onclick="getReportLinksSpecies({{ family.pk }}, '{{ family.name }}'); return false;">{{ family.name }}</a>
+		            </div>
+		            <ul class="list-unstyled">
+		              {% for genus in family.taxonomy_set.all %}
+		              <li>
+			            <div class="node expandable">
+			              <i></i>
+			              <a href="#" onclick="getReportLinksSpecies({{ genus.pk }}, '{{ genus.name }}'); return false;">{{ genus.name }}</a>
+			            </div>
+			            <ul class="list-unstyled">
+			              {% for species in genus.taxonomy_set.all %}
+			              <li>
+			                <div class="node">
+			                  <i></i>
+			                  <a href="#" onclick="getReportLinksSpecies({{ species.pk }}, '{{ species.name }}'); return false;">{{ species.name }}</a>
+			                </div>
+			              </li>
+			              {% endfor %}
+			            </ul>
+		              </li>
+		              {% endfor %}
+		            </ul>
+		          </li>
+		          {% endfor %}
+		        </ul>
+	          </li>
+	          {% endfor %}
+	        </ul>
+	      </li>
+	      {% endfor %}
+	    </ul>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="col-md-7" id="browse">
+    <div id="intro" class="boxed">
+      <p>
+        Browse the database using up-to-date NCBI taxonomy. Just click on each
+        taxonomical unit to expand it and see its associated information, and
+        link out to species-specific reports.
+      </p>
+    </div>
+  </div>
+</div>
+
+{% load static from staticfiles %}
+<script type="text/javascript" src="{% static "tree_view.js" %}"></script>
+<script type="text/javascript" src="{% static "browse.js" %}"></script>
+
+{% endblock %}
+

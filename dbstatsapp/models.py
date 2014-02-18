@@ -1,1 +1,0 @@
-from collectfapp.models import *

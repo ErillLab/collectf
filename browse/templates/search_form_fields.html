@@ -1,0 +1,157 @@
+<div class="row">
+  <div class="col-md-12">
+    <ul class="nav nav-tabs">
+      <li class="active"><a href="#TF" data-toggle="tab">Step 1: Transcription Factors</a></li>
+      <li><a href="#species" data-toggle="tab">Step 2: Species</a></li>
+      <li><a href="#techniques" data-toggle="tab">Step 3: Experimental Techniques</a></li>
+      {% if compare %}
+      <input type="submit"  class="btn btn-primary pull-right" value="Next step" />
+      {% else %}
+      {# that means this form is being used for motif search #}
+      <input type="submit"  class="btn btn-primary pull-right" value="Search" />
+      {% endif %}
+    </ul>
+  </div>
+</div>
+
+<div class="tab-content">
+  <div class="tab-pane boxed_tab boxed active" id="TF">
+    <h3>Step 1/3: Select transcription factor(s)</h3>
+    <hr />
+    <div class="" style="display:inline-block;">
+      <input type="text" class="form-control input-sm search_input input-block-level search-query" id="tf_tree_search" placeholder="search">
+      <br/>
+      <label class="checkbox">
+        <a href="#" id="tf_tree_toggle" class="toggle_link pull-right"> <small>expand/collapse</small></a>
+        <input type="checkbox" class="select_box" id="tf_tree_select"> Select all
+      </label>
+      <div id="tf_tree" class="tf_tree" style="margin-left:-1em;">
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-pane boxed_tab boxed" id="species">
+    <h3>Step 2/3: Select species</h3>
+    <hr />
+    <div class="" style="display:inline-block;">
+      <input type="text" class="form-control input-sm search_input input-block-level search-query" id="species_tree_search" placeholder="search">
+      <br/>
+      <label class="checkbox">
+        <a href="#" id="species_tree_toggle" class="toggle_link pull-right"> <small>expand/collapse</small></a>
+        <input type="checkbox" class="select_box" id="species_tree_select"> Select all
+      </label>
+      <div id="species_tree" class="species_tree" style="margin-left:-1em;">
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-pane boxed_tab boxed" id="techniques">
+    <h3>Step 3/3: Select experimental techniques</h3>
+    <div class="row">
+      <div class="col-md-3">
+      </div>
+      
+      <div class="col-md-2">
+        <select name="boolean1" class="input-sm form-control">
+          <option value="and">and</option>
+          <option value="or" selected="selected">or</option>
+        </select>
+      </div>
+      
+      <div class="col-md-2">
+      </div>
+      
+      <div class="col-md-2">
+        <select name="boolean2" class="input-sm form-control">
+          <option value="and">and</option>
+          <option value="or" selected="selected">or</option>
+        </select>
+      </div>
+      
+      <div class="col-md-2">
+      </div>
+    </div>
+    <br/>
+
+<div class="row">
+      <div class="col-md-4">
+        <select name="main_category1" id="cat1" class="form-control category">
+          <option value="binding" selected="selected">Binding</option>
+          <option value="expression">Expression</option>
+          <option value="insilico">In-silico</option>
+        </select>
+      </div>
+      
+      <div class="col-md-4">
+        <select name="main_category2" id="cat2" class="form-control category">
+          <option value="binding">Binding</option>
+          <option value="expression"  selected="selected">Expression</option>
+          <option value="insilico">In-silico</option>
+        </select>
+      </div>
+      
+      <div class="col-md-4">
+        <select name="main_category3" id="cat3" class="form-control category">
+          <option value="binding" >Binding</option>
+          <option value="expression">Expression</option>
+          <option value="insilico" selected="selected">In-silico</option>
+        </select>
+      </div>
+    </div>
+
+
+    <div class="row">
+      <div class="col-md-4" style="display:inline-block;">
+        <div class="boxed">
+          <input type="text" class="form-control input-sm search_input input-block-level search-query" id="cat1_search" placeholder="search">
+          <br/>
+          <label class="checkbox">
+	        <a href="#" id="cat1_toggle" class="toggle_link pull-right"> <small>expand/collapse</small></a>
+            <input type="checkbox" class="select_box" id="cat1_select"> Select all
+          </label>
+          
+          <div  class="cat1 binding" data-tree-input-name="cat_input_1" style="display:block; margin-left:-2em; font-size:12px;">
+          </div>
+          <div  class="cat1 expression " data-tree-input-name="cat_input_1" style="display:none; margin-left:-2em; font-size:12px;">
+          </div>
+          <div  class="cat1 insilico " data-tree-input-name="cat_input_1" style="display:none; margin-left:-2em; font-size:12px;">
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-4" style="display:inline-block;">
+        <div class="boxed">
+          <input type="text" class="form-control input-sm search_input input-block-level search-query" id="cat2_search" placeholder="search">
+          <br/>
+          <label class="checkbox">
+	        <a href="#" id="cat2_toggle" class="toggle_link pull-right"> <small>expand/collapse</small></a>
+            <input type="checkbox" class="select_box" id="cat2_select"> Select all
+          </label>
+          <div  class="cat2 binding " data-tree-input-name="cat_input_2" style="display:none;  margin-left:-2em;  font-size:12px;" > 
+          </div>
+          <div  class="cat2 expression " data-tree-input-name="cat_input_2" style="display:block; margin-left:-2em;  font-size:12px;">
+          </div>
+          <div  class="cat2 insilico " data-tree-input-name="cat_input_2" style="display:none; margin-left:-2em;  font-size:12px;">
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-4" style="display:inline-block;">
+        <div class="boxed">
+          <input type="text" class="form-control input-sm search_input input-block-level search-query" id="cat3_search" placeholder="search">
+          <br/>
+          <label class="checkbox">
+	        <a href="#" id="cat3_toggle" class="toggle_link pull-right"> <small>expand/collapse</small></a>
+            <input type="checkbox" class="select_box" id="cat3_select"> Select all
+          </label>
+          <div  class="cat3 binding " data-tree-input-name="cat_input_3" style="display:none; margin-left:-2em; font-size:12px;">
+          </div>
+          <div  class="cat3 expression " data-tree-input-name="cat_input_3" style="display:none; margin-left:-2em; font-size:12px;">
+          </div>
+          <div  class="cat3 insilico " data-tree-input-name="cat_input_3" style="display:block; margin-left:-2em; font-size:12px;">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

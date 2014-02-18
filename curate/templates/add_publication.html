@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+{% load bootstrap %}
+
+<h2>Publication submission </h2>
+<p>Use this form to submit a candidate publication for curation in
+CollecTF. Read briefly the publication abstract to validate that it contains
+relevant data before submitting.</p>
+
+<legend></legend>
+
+<div class="boxed">
+<form class="form-horizontal" role="form" action="" method="post">{% csrf_token %}
+
+  {{ form|bootstrap_horizontal }}
+  <div class="control-group">
+    <div class="controls">
+      <input type="hidden" name="{{ stage_field }}" value="1"/>
+      <input type="submit" class="btn btn-primary btn-block" role="button" value="Preview" />
+    </div>
+  </div>
+</form>
+</div>
+
+
+{% endblock %}

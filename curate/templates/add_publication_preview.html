@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% load bootstrap %}
+{% load print_pub %}
+
+<h1>Submit publication</h1>
+<div class="boxed">
+<form class="form-horizontal" role="form" action="" method="post">{% csrf_token %}
+
+  {% for field in form %}
+  <div class="form-group">
+  <dl class="dl-horizontal">
+    <dt style="white-space: normal;">{{ field.label }}</dt>
+    <dd>{{ field.data }}</dd>
+  </dl>
+  </div>
+
+  {% endfor %}
+
+  <div class="form-group">
+  <h2><i>Publication information</i></h2>
+  {{ pub|print_pub }}
+
+  {% for field in form %}
+  {{ field.as_hidden }}
+  {% endfor %}
+  <input type="hidden" name="{{ stage_field }}" value="2" />
+  <input type="hidden" name="{{ hash_field }}" value="{{ hash_value }}" />
+  </div>
+
+  <div class="form-group">
+  <label class="checkbox">
+    <input type="checkbox" name="assignment">I want to be curator for this paper.
+  </label>
+
+  <label class="checkbox">
+    <input type="checkbox" name="contains_no_data">This paper contains no data.
+  </label>
+  <p class="text-error">Check this button if, after examining the paper, you
+    find that the paper does not have data on binding sites. Checking this
+    button will mark the paper as having no binding site data and set it to
+    the 'curation complete' status.
+  </p>
+  </div>
+
+  
+  <button class="btn btn-default btn-block" type="submit" value="Submit">Submit</button>
+  
+</form>
+</div>
+
+<h1>Or edit it again</h1>
+
+<div class="boxed">
+<form class="form-horizontal" action="" method="post">{% csrf_token %}
+
+  {{ form|bootstrap_horizontal }}
+  <div class="form-group">
+      <input type="hidden" name="{{ stage_field }}" value="1"/>
+      <input class="btn btn-default btn-block" type="submit" value="Preview" />
+  </div>
+</form>
+</div>
+
+{% endblock %}

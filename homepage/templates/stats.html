@@ -1,0 +1,21 @@
+
+{% extends "homepage_base.html" %}
+
+{% block right-frame %}
+
+<h3>CollecTF statistics</h3>
+
+<ul>
+  <li> <a href="{% url 'browse.stats.curation_stats' %}#global">CollecTF global statistics</a></li>
+  <li> <a href="{% url 'browse.stats.curation_stats' %}#curations">Curation statistics</a></li>
+  <li> <a href="{% url 'browse.stats.curation_stats' %}#site">Site statistics</a></li>
+  <li> <a href="{% url 'browse.stats.view_all_curations' %}">Curations</a></li>
+  <li> <a href="{% url 'browse.stats.view_all_publications' %}">Publications</a></li>
+  <li> <a href="{% url 'browse.stats.experimental_techniques' %}">Experimental techniques</a></li>
+  <li> <a href="{% url 'browse.stats.curator_roster' %}">Curators roster</a></li>
+  <li> <a href="{% url 'browse.stats.release_history' %}">Release history</a></li>
+  
+<!--  <li> <a href="#">CSV file templates</a></li> -->
+</ul>
+
+{% endblock %}

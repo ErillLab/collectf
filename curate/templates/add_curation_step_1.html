@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% include "add_curation.html" %}
+
+<script type="text/javascript">
+
+function disableTFSpecies() {
+    // Disable TF-species field if it is checked as same
+    cb = $("#id_1-TF_species_same");
+    text = $("#id_1-TF_species");
+    text.attr("disabled", cb.attr("checked"));
+    cb.click(function() {text.attr("disabled", this.checked);});
+}
+
+function disableSiteSpecies() {
+    // Disable site-species field if it is checked as same
+    cb = $("#id_1-site_species_same");
+    text = $("#id_1-site_species");
+    text.attr("disabled", cb.attr("checked"));
+    cb.click(function() {text.attr("disabled", this.checked);});
+}
+
+function typeaheadUpdater(item) {
+    // Function to be called when typeahead input element is selected.
+    return item.split(' ')[0];
+}
+
+function genomeAccessionTypeAhead() {
+    // Typeahead for genome accession number textbox
+    genomeFields = $("[id^=id_1-genome_accession]")
+    genomeFields.attr('autocomplete', 'off');
+    $.getJSON("{% url 'browse.json_views.get_genomes' %}", function (data) {
+        var genomes = $.map(data, function (n, i) {
+            return n['genome_accession'] + ' - ' + n['organism'];
+        });
+        genomeFields.typeahead({
+            source: genomes,
+            updater: typeaheadUpdater
+        });
+    });
+}
+
+function TFAccesssionTypeAhead() {
+    // Typeahead for TF accession number textbox
+    TFFields = $("[id^=id_1-TF_accession]")
+    TFFields.attr('autocomplete', 'off');
+    $.getJSON("{% url 'browse.json_views.get_TF_instances' %}", function (data) {
+        var TFs = $.map(data, function (n, i) {
+            return n['protein_accession'] + ' - ' + n['description'];
+        });
+        TFFields.typeahead({
+            source: TFs,
+            updater: typeaheadUpdater
+        });
+    });
+}
+
+function addGenomeAccession() {
+    // add genome accession textbox
+}
+
+$(document).ready(function (){
+    disableTFSpecies();
+    disableSiteSpecies();
+    genomeAccessionTypeAhead();
+    TFAccesssionTypeAhead();
+});
+
+</script>
+
+{% endblock %}

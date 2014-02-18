@@ -1,0 +1,60 @@
+{% load browsetags  %}
+
+<div id="description" class="boxed">
+  <h4>{{ title }}</h4>
+  <p> {{ description|HTMLify }}</p>
+</div>
+
+<div id="report_table" class="boxed">
+  {% if reports %}
+  {% if all_cur_site_insts %} 
+  {# put view_all link #}
+  <p>
+    <a class="block_before_load" href="#" onclick="$('#view_all').submit(); return false;">
+      Combined report
+    </a>
+  </p>
+  <form style="display:inline;" method="post" action="{% url 'browse.view_reports.view_reports' %}" id="view_all" action="">
+    {% comment %}
+    Hidden input listing all motif-associated-curation-site-instance and
+    non-motif-associated curation-site-instance-ids
+    {% endcomment %}
+    {% csrf_token %}
+    <input type="hidden" name="csi_list"
+           value="{% for csi in all_cur_site_insts %}{{ csi }}{% if not forloop.last %},{% endif %}{% endfor %}">
+  </form>
+  {% endif %}
+
+  <table class="table table-condensed table-striped">
+    <thead>
+      <th>TF</th>
+      <th>Species</th>
+      <th>Report</th>
+    </thead>
+    <tbody>
+      {% for report in reports %}
+      <tr>
+        <td>{{ report.TF_name }}</td>
+        <td>{{ report.species_name }}</td>
+        {% with form_id=report.TF_name|slugify|add:'_'|add:report.species_name|slugify %}
+        <td>
+	      <a class="block_before_load" href="#" onclick="$('#{{ form_id }}').submit(); return false;">
+            view
+          </a>
+	      <form style="display:inline;" method="post"
+                action="{% url 'browse.view_reports.view_reports' %}" id="{{ form_id }}" action="post">
+            {% csrf_token %}
+	        <input type="hidden" name="csi_list"
+                   value="{% for csi_pk in report.cur_site_insts %}{{ csi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}">
+	      </form>
+        </td>
+        {% endwith %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% else %}
+  <p class="text-warning">No record was found.</p>
+  {% endif %}
+</div>

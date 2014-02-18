@@ -1,0 +1,15 @@
+{% extends "homepage_base.html" %}
+
+{% block right-frame %}
+
+
+<h3>Compare search results</h3>
+
+<p>CollecTF allows users to perform pair-wise comparisons of arbitrary searches on
+the database. Query results can be compared using site- and motif- based statistics
+relying on dynamic alignment of query results and contextualized using permutation
+tests.  </p>
+
+<p><a href="{% url 'browse.compare.motif_comparison_step1' %}">Click here to perform a comparative query</a></p>
+
+{% endblock %}
