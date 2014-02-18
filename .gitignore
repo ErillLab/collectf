@@ -1,13 +1,10 @@
 *.pyc
 *~
-
 \#*#
 .#*
-
 sitestatic/*
-collectfapp/migrations/*
+collectf/migrations/*
 pickles/
 media/
 registration/
-
 access.log
