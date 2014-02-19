@@ -216,7 +216,7 @@ function motifSimilarityAJAX(el) {
     var elDOM = $('#'+el);
     // if already done, dont make that request again.
     if (!elDOM.is(':empty')) {return false;}
-    //$.blockUI();
+    $.blockUI();
     //elDOM.parent().parent().block({message: 'Loading.<br/><i class="icon-spin icon-large icon-spinner"> </i>'});
     $.ajax({
         type: "POST",
@@ -230,7 +230,7 @@ function motifSimilarityAJAX(el) {
             csrfmiddlewaretoken: '{{csrf_token}}'
         },
         success: function(data) {
-            //$.unblockUI();
+            $.unblockUI();
             //elDOM.parent().parent().unblock();
             elDOM.append(data);
             // render MathJax
@@ -245,7 +245,7 @@ function motifSimilarityAJAX(el) {
 
 function weblogo(el) {
     var img = $(el);
-    img.parent().block();
+    $.blockUI();
     var site_data = $(el).attr('site_data');
     $.ajax({
         type: "POST",
@@ -256,7 +256,7 @@ function weblogo(el) {
         },
         success: function(data) {
             img.attr('src', data);
-            img.parent().unblock();
+            $.unblockUI();
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) { 
         }

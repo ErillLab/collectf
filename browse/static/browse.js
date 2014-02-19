@@ -7,13 +7,6 @@ if (!window.console.log) {
     window.console.log = function () { };
 }
 
-function overrideBlockUIDefaults() {
-    // http://malsup.com/jquery/block/#options
-    $.blockUI.defaults.message = '<h2>Please wait.<br/><i class="fa fa-spinner fa-spin"></i></h2>';
-    $.blockUI.defaults.css.border = "3px";
-}
-
-
 function get_wiki(name) {
     // given title, return first paragraph of wikipedia article
     $.ajax({
@@ -90,7 +83,6 @@ function getReportLinksTF(type, id) {
 }
 
 $(document).ready(function () {
-    overrideBlockUIDefaults();
     $(document).on('click', 'a.block_before_load', function (ev) {
         ev.preventDefault();
         $.blockUI();
