@@ -16,6 +16,7 @@ urlpatterns = patterns('',
     url(r'^home/', include('homepage.urls')),
     url(r'^browse/', include('browse.urls')),
     url(r'^curate/', include('curate.urls')),
+    url(r'^ncbi/', include('ncbi.urls')),
 
     # login/logout
     url(r'^accounts/login/$', base.views.login),

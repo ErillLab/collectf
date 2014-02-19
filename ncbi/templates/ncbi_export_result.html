@@ -1,0 +1,16 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<pre>
+TF: {{ TF_instance.protein_accession }}
+genome: {{ genome.genome_accession }}
+</pre>
+
+<pre>
+{{ tbl }}
+</pre>
+
+{% endblock %}
+

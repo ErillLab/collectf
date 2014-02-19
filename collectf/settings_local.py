@@ -29,6 +29,7 @@ TEMPLATE_DIRS = (
     os.path.join(os.path.dirname(os.path.dirname(__file__)), 'homepage', 'templates'),
     os.path.join(os.path.dirname(os.path.dirname(__file__)), 'browse', 'templates'),
     os.path.join(os.path.dirname(os.path.dirname(__file__)), 'curate', 'templates'),
+    os.path.join(os.path.dirname(os.path.dirname(__file__)), 'ncbi', 'templates'),
 )
 
 ALLOWED_HOSTS = []

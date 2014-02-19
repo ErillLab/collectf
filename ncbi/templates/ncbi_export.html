@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% load bootstrap %}
+
+{% block content %}
+
+<div class="container">
+<form method="POST" class="form-horizontal"> {% csrf_token %}
+  {{ form|bootstrap_horizontal }}
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10 col-lg-offset-2 col-lg-10">
+      <button class="btn btn-info" type="submit">Submit</button>
+    </div>
+  </div>
+</form>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+    $('#id_genomes').addClass('select2');
+    $('.select2').select2();
+});
+
+</script>
+
+{% endblock %}
+
