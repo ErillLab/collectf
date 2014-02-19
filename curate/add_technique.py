@@ -22,6 +22,7 @@ def add_technique(request):
                 new_technique.categories.add(cat)
             messages.add_message(request, messages.INFO,
                                  "The experimental technique was added successfully.")
+            return HttpResponseRedirect(reverse(base.views.home))
     else:
         form = add_technique_form.AddTechniqueForm()
 
