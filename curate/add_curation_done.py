@@ -12,6 +12,8 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 
+import browse.view_curation
+
 head = lambda x: x[0]
 
 def publication_done(wiz):
@@ -24,11 +26,23 @@ def publication_done(wiz):
 def genome_done(wiz, form_list):
     """Get genome and TF data from the genome. (2nd step)"""
     form = head([f for f in form_list if type(f) == GenomeForm])
+
+    # Get TF instances
+    TF_accession = form.cleaned_data['TF_accession']
+    TF_instances = [models.TFInstance.objects.get(protein_accession=TF_accession)]
+    # Extra genome accession numbers (if any)
+    tf = form.cleaned_data.get('TF_accession_1', None)
+    if tf: TF_instances.append(models.TFInstance.objects.get(protein_accession=tf))
+    tf = form.cleaned_data.get('TF_accession_2', None)
+    if tf: TF_instances.append(models.TFInstance.objects.get(protein_accession=g))
+    assert TF_instances
+
     return dict(
         TF = form.cleaned_data['TF'],
         TF_type = form.cleaned_data['TF_type'],
         TF_species = form.cleaned_data['TF_species'],
-        site_species = form.cleaned_data['site_species']
+        site_species = form.cleaned_data['site_species'],
+        TF_instances = TF_instances,
     )
 
 def techniques_done(wiz, form_list):
@@ -101,7 +115,7 @@ def master_done(wiz, form_list, **kwargs):
     session_utils.clear(wiz.request.session)
     # Return success message
     messages.success(wiz.request, "Curation was successfully submitted.")
-    return HttpResponseRedirect(reverse(base.views.home))
+    return HttpResponseRedirect(reverse(browse.view_curation.view_curation, kwargs={'cid': curation.pk}))
 
 def create_curation(wiz, genome_dict, techniques_dict, curation_review_dict):
     """Create curation object and save it to the database."""
@@ -124,6 +138,11 @@ def create_curation(wiz, genome_dict, techniques_dict, curation_review_dict):
                                NCBI_submission_ready=curation_review_dict['NCBI_submission_ready'],
                                curator=              curator)
     curation.save()
+    # Add TF instances
+    for TF_instance in genome_dict['TF_instances']:
+        curation.TF_instances.add(TF_instance)
+    curation.save()
+    
     return curation
 
 def create_site_instances(wiz, curation, site_type):

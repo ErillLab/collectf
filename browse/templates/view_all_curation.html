@@ -26,7 +26,7 @@
   <td><span title="{% with pub=curation.publication %}{{ pub.title }}, {{ pub.authors }} {% endwith %}">
       <a href="http://www.ncbi.nlm.nih.gov/pubmed/?term={{ curation.publication.pmid }}">{{ curation.publication.pmid }}</a></span></td>
   <td>{{ curation.curator.user.first_name }} {{ curation.curator.user.last_name }}</td>
-  <td>    <a href="#">view</a></td>
+  <td>    <a href="{% url 'browse.view_curation.view_curation'  curation.pk  %}">view</a></td>
 
 </tr>
 {% endfor %}

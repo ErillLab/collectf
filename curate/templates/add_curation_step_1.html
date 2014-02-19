@@ -8,16 +8,16 @@
 
 function disableTFSpecies() {
     // Disable TF-species field if it is checked as same
-    cb = $("#id_1-TF_species_same");
-    text = $("#id_1-TF_species");
+    var cb = $("#id_1-TF_species_same");
+    var text = $("#id_1-TF_species");
     text.attr("disabled", cb.attr("checked"));
     cb.click(function() {text.attr("disabled", this.checked);});
 }
 
 function disableSiteSpecies() {
     // Disable site-species field if it is checked as same
-    cb = $("#id_1-site_species_same");
-    text = $("#id_1-site_species");
+    var cb = $("#id_1-site_species_same");
+    var text = $("#id_1-site_species");
     text.attr("disabled", cb.attr("checked"));
     cb.click(function() {text.attr("disabled", this.checked);});
 }

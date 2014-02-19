@@ -3,56 +3,60 @@
 {% block content %}
 
 <div class="boxed">
-<h3>Curation Information</h3>
-<dl class="dl-horizontal">
-  <dt>Publication</dt>
-  <dd>
+  <h3>Curation Information</h3>
+  <dl class="dl-horizontal">
+    <dt>Publication</dt>
+    <dd>
       {% with pub=curation.publication %}
       {{ pub.title }};{{ pub.authors }};{{ pub.journal }} {{pub.publication_date}};
       {{pub.volume}}({{pub.issue}}):{{pub.pages}}
       {% endwith %}
       <a href="http://www.ncbi.nlm.nih.gov/pubmed/?term={{ curation.publication.pmid }}">[{{ curation.publication.pmid }}]</a>
-  </dd>
+    </dd>
 
-  <dt>TF</dt>
-  <dd>{{ curation.TF.name }} <a href="http://www.ncbi.nlm.nih.gov/protein/?term={{ curation.TF_instances.all.0.protein_accession }}">
-      [{{ curation.TF_instances.all.0.protein_accession }}] </a></dd>
+    <dt>TF</dt>
+    <dd>{{ curation.TF.name }} 
 
-  <dt>Reported TF sp.</dt>
-  <dd>{{ curation.TF_species|default:"-" }}</dd>
-  
-  <dt>Reported site sp.</dt>
-  <dd>{{ curation.site_species|default:"-"}}</dd>
+      {% for TF_instance in curation.TF_instances.all %}<a href="http://www.ncbi.nlm.nih.gov/protein/?term={{ TF_instance.protein_accession }}">
+        [{{ TF_instance.protein_accession }}]</a>{% if not forloop.last %}, {% endif %}{% endfor %}</dd>
 
-  <dt>TF type</dt>
-  <dd>{{ curation.TF_type_verbose|default:"not specified" }} </dd>
+    <dt>Reported TF sp.</dt>
+    <dd>{{ curation.TF_species|default:"-" }}</dd>
+    
+    <dt>Reported site sp.</dt>
+    <dd>{{ curation.site_species|default:"-"}}</dd>
 
-  <dt>Created by</dt>
-  <dd>{{ curation.curator.user.first_name }} {{ curation.curator.user.last_name }}</dd>
-  
-  <dt>Curation notes</dt>
-  <dd>{{ curation.notes|default:"-" }}</dd>
-</dl>
+    <dt>TF type</dt>
+    <dd>{{ curation.TF_type_verbose|default:"not specified" }} </dd>
+
+    <dt>Created by</dt>
+    <dd>{{ curation.curator.user.first_name }} {{ curation.curator.user.last_name }}</dd>
+    
+    <dt>Curation notes</dt>
+    <dd>{{ curation.notes|default:"-" }}</dd>
+  </dl>
 </div>
 
 <div class="boxed">
-<h3>Experimental Process</h3>
+  <h3>Experimental Process</h3>
 
-  <dd>{{ curation.experimental_process|default:"-" }}</dd>
+  <p>{{ curation.experimental_process|default:"-" }}</p>
 
   {% if curation.forms_complex %}
-<p>The paper reports that TF forms complex with other proteins for binding with reported sites.</p>
+  <p>The paper reports that TF forms complex with other proteins for binding with reported sites.</p>
+  <p>{{ curation.complex_notes }}</p>
   {% endif %}
 
   {% if curation.chip_info %}
-<dl class="dl-horizontal">  
-  <dt>ChIP assay conditions</dt>
-  <dd>{{ curation.chip_info.assay_conditions }}</dd>
-  <dt>ChIP notes</dt>
-  <dd>{{ curation.chip_info.method_notes }}</dd>
-</dl>
+  <dl class="dl-horizontal">  
+    <dt>ChIP assay conditions</dt>
+    <dd>{{ curation.chip_info.assay_conditions }}</dd>
+    <dt>ChIP notes</dt>
+    <dd>{{ curation.chip_info.method_notes }}</dd>
+  </dl>
+{% endif %}
 </div>
-  {% endif %}
+
 
 <div class="boxed">
   <h3>Transcription Factor Binding Sites</h3>
@@ -67,20 +71,20 @@
   <div class="tab-content">
     <div class="tab-pane" id="reported">
       <pre>
-{% for csi in curation.curation_siteinstance_set.all %}{{ csi.annotated_seq }}
-{% endfor %}</pre>
+        {% for csi in curation.curation_siteinstance_set.all %}
+{{ csi.annotated_seq }}{% endfor %}</pre>
     </div>
     <div class="tab-pane active" id="curated">
       <pre>
-{% for csi in curation.curation_siteinstance_set.all %}{{ csi.site_instance.seq }}
-{% endfor %}</pre>
+        {% for csi in curation.curation_siteinstance_set.all %}
+{{ csi.site_instance.seq }}{% endfor %}</pre>
     </div>
     {% if curation.quantitative_data_format %}
     <div class="tab-pane" id="quantitative_data">
       <p><b>Quantitative data format:</b> {{ curation.quantitative_data_format }}</p>
       <pre>
-{% for csi in curation.curation_siteinstance_set.all %}{{ csi.site_instance.seq }} {{ csi.quantitative_value }}
-{% endfor %}
+        {% for csi in curation.curation_siteinstance_set.all %}{{ csi.site_instance.seq }} {{ csi.quantitative_value }}
+        {% endfor %}
       </pre>
     </div>
     {% endif %}
@@ -90,7 +94,7 @@
 <div class="boxed">
   <h3>Gene Regulation</h3>
   <p>Regulated genes for each binding site are displayed below. Genes that are reported
-  for TF-site mediated regulation are displayed in <span style="color:green">green</span>.
+    for TF-site mediated regulation are displayed in <span style="color:green">green</span>.
     For each indvidual site, experimental techniques used to determine the site are also given.
   </p>
   
@@ -103,21 +107,21 @@
       <th>Experimental techniques</th>
     </thead>
     <tbody>
-    {% with curation_site_instances=curation.curation_siteinstance_set.all %}
-    {% for cs in curation_site_instances %}
-    <tr>
-      <td><span class="sequence">{{ cs.site_instance.seq }}</span></td>
-      <td>
-	{% for regulation in cs.regulation_set.all %}
-	{% if regulation.evidence_type == "exp_verified" %}
-	<a href="http://www.ncbi.nlm.nih.gov/gene/{{ regulation.gene.gene_accession }}">{{ regulation.gene.name }}</a>{% if not forloop.last %},{% endif %}{% endif %}
-	{% endfor %}
-      </td>
-      <td><div>{{ cs.regulation_set.all|regulation_diagram:cs.site_instance }}</div></td>
-      <td>{% for t in cs.experimental_techniques.all %}{{ t.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-    </tr>
-    {% endfor %}
-    {% endwith %}
+      {% with curation_site_instances=curation.curation_siteinstance_set.all %}
+      {% for cs in curation_site_instances %}
+      <tr>
+        <td><span class="sequence">{{ cs.site_instance.seq }}</span></td>
+        <td>
+	      {% for regulation in cs.regulation_set.all %}
+	      {% if regulation.evidence_type == "exp_verified" %}
+	      <a href="http://www.ncbi.nlm.nih.gov/gene/{{ regulation.gene.gene_accession }}">{{ regulation.gene.name }}</a>{% if not forloop.last %},{% endif %}{% endif %}
+	      {% endfor %}
+        </td>
+        <td><div>{{ cs.regulation_set.all|regulation_diagram:cs.site_instance }}</div></td>
+        <td>{% for t in cs.experimental_techniques.all %}{{ t.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+      </tr>
+      {% endfor %}
+      {% endwith %}
     </tbody>
   </table>
 </div>
@@ -127,14 +131,14 @@
 </section>
 
 <script type="text/javascript">
-/*global $,document*/
-$(document).ready(function () {
-    "use strict";
-    $("#sites_tab a").click(function (e) {
-        e.preventDefault();
-        $(this).tab('show');
-    });
-});
+  /*global $,document*/
+  $(document).ready(function () {
+  "use strict";
+  $("#sites_tab a").click(function (e) {
+  e.preventDefault();
+  $(this).tab('show');
+  });
+  });
 </script>
 
 
