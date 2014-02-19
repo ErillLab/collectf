@@ -13,6 +13,8 @@ import templatetags.print_pub
 import session_utils
 from django import forms
 from django.utils.safestring import mark_safe
+from django.contrib import messages
+
 
 def publication_get_form(wiz, form):
     """Construct the form for publication selection step."""
@@ -40,8 +42,18 @@ def genome_get_form(wiz, form):
         form.initial["TF_type"] = c.TF_type
         if c.site_instances.all():
             form.initial["genome_accession"] = c.site_instances.all()[0].genome.genome_accession
+            if len(c.site_instances.all()) == 2:
+                form.initial['genome_accession_1'] = c.site_instances.all()[1].genome.genome_accession
+            if len(c.site_instances.all()) == 3:
+                form.initial['genome_accession_1'] = c.site_instances.all()[2].genome.genome_accession
+            
         # Enter TF accession numbers
-        form.initial["TF_accession"] = c.TF_instances.all()[0]
+        form.initial["TF_accession"] = c.TF_instances.all()[0].protein_accession
+        if len(c.TF_instances.all()) == 2:
+            form.initial["TF_accession_1"] = c.TF_instances.all()[1].protein_accession
+        if len(c.TF_instances.all()) == 3:
+            form.initial["TF_accession_2"] = c.TF_instances.all()[2].protein_accession
+        
         form.initial["TF_species"] = c.TF_species
         form.initial["site_species"] = c.site_species
 
@@ -66,7 +78,12 @@ def techniques_get_form(wiz, form):
     c = session_utils.get(wiz.request.session, 'previously_curated_paper')
     # if selected paper is previously curated, prepopulate experimental techniques
     if c:
-        form.fields['techniques'].initial = [str(t.technique_id) for t in c.experimental_techniques.all()]
+        # get all techniques used in this curation
+        cur_site_insts = models.Curation_SiteInstance.objects.filter(curation=c)
+        techniques = list(set(t.technique_id for csi in cur_site_insts
+                              for t in csi.experimental_techniques.all()))
+        form.fields['techniques'].initial = techniques
+        
         form.fields['experimental_process'].initial = c.experimental_process
         try:
             external_db = models.Curation_ExternalDatabase.objects.get(curation=c)
