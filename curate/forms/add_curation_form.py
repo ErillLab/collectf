@@ -294,6 +294,9 @@ class TechniquesForm(forms.Form):
                                            help_text=help_dict['experimental_process'])
 
     # External database links
+    has_external_db = forms.BooleanField(
+        required=False,
+        label="The manuscript reports high-throughput data from an external database.")
     external_db_type_choices = [(None, "None"),]
     for db in ExternalDatabase.objects.all():
         external_db_type_choices.append((db.ext_database_id, db.ext_database_name))

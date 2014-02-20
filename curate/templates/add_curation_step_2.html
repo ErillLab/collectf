@@ -7,21 +7,19 @@
 <script type="text/javascript">
 
 // collapse external DB type and accession number fields together
-function hide_external_db() {
-    var dom =  $("#id_2-external_db_type").parent().parent();
+var dom =  $("#id_2-external_db_type").parent().parent();
+dom.hide();
+dom.next().hide();
+$("#id_2-has_external_db").change(function() {
     dom.toggle();
     dom.next().toggle();
-    console.log('x');
-    dom.before('<div class=" col-sm-offset-2 col-sm-10 col-lg-offset-2 col-lg-10"><a href="#" onclick="show_external_db();">External DB</div>');
-}
+});
 
-function show_external_db() {
-    var dom =  $("#id_2-external_db_type").parent().parent();
+// collapse complex notes
+dom = $('#id_2-complex_notes').parent().parent().toggle();
+$('#id_2-forms_complex').change(function() {
     dom.toggle();
-    dom.next().toggle();
-}
-
-//xhide_external_db();
+});
 
 </script>
 

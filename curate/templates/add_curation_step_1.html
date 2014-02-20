@@ -57,15 +57,45 @@ function TFAccesssionTypeAhead() {
     });
 }
 
-function addGenomeAccession() {
-    // add genome accession textbox
+function addToggleLink() {
+    // add toggle link to the help text
+    var s = $("#id_1-genome_accession").next().html();
+    var add_text = ' <small><a href="#" onclick="toggleGenomeFields(); return false;">[Toggle extra genome accession fields]</a></small>'
+    $("#id_1-genome_accession").next().html(s + add_text);
+    // same thing for TF accession fields
+    var s = $("#id_1-TF_accession").next().html();
+    var add_text = ' <small><a href="#" onclick="toggleTFFields(); return false;">[Toggle extra TF accession fields]</a></small>'
+    $("#id_1-TF_accession").next().html(s + add_text);
 }
+
+function toggleGenomeFields() {
+    // hide extra genome accession fields
+    $("#id_1-genome_accession_1").closest('.form-group').toggle();
+    $("#id_1-genome_accession_2").closest('.form-group').toggle();
+}
+
+function toggleTFFields() {
+    // hide extra genome accession fields
+    $("#id_1-TF_accession_1").closest('.form-group').toggle();
+    $("#id_1-TF_accession_2").closest('.form-group').toggle();
+}
+
+function hideTFFields() {
+    // hide extra TF accession fields
+    $("#id_1-TF_accession_1").closest('.form-group').hide();
+    $("#id_1-TF_accession_2").closest('.form-group').hide();
+}
+
 
 $(document).ready(function (){
     disableTFSpecies();
     disableSiteSpecies();
     genomeAccessionTypeAhead();
     TFAccesssionTypeAhead();
+    toggleGenomeFields();
+    toggleTFFields();
+    addToggleLink();
+
 });
 
 </script>
