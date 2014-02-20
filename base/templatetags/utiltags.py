@@ -15,6 +15,10 @@ def get_item(dictionary, key):
     return dictionary.get(key)
 
 @register.filter
+def get(o, index):
+    return o[index]
+
+@register.filter
 def get_keys(dictionary):
     """Return all keys of a dictionary."""
     return sorted(dictionary.keys())

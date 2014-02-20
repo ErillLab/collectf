@@ -138,6 +138,12 @@ def create_curation(wiz, genome_dict, techniques_dict, curation_review_dict):
                                NCBI_submission_ready=curation_review_dict['NCBI_submission_ready'],
                                curator=              curator)
     curation.save()
+
+    # If the curation has an associated quantitative data format, add it
+    qformat = session_utils.get(wiz.request.session, 'quantitative_data_format')
+    curation.quantitative_data_format = qformat
+    curation.save()
+    
     # Add TF instances
     for TF_instance in genome_dict['TF_instances']:
         curation.TF_instances.add(TF_instance)

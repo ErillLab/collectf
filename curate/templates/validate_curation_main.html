@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<p>Please select one of the following actions.</p>
+
+<ul class="list">
+  <li><a href="{% url 'curate.validate_curation.view_edit_validate' %}">Edit/validate curation</a></li>
+  <li><a href="{% url 'curate.validate_curation.view_validated_curations' %}">See validated curations</a></li>
+</ul>
+
+{% endblock %}

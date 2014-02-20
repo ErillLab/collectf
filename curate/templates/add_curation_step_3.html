@@ -1,8 +1,10 @@
-{% extends "base.html" %}
+{% extends "add_curation.html" %}
 
-{% block content %}
+{% load bootstrap %}
 
-{% include "add_curation.html" %}
+{% block form %}
+
+{{ wizard.form|bootstrap_horizontal }}
 
 <script type="text/javascript">
 
@@ -24,8 +26,19 @@ function textAreaUpload() {
     });
 }
 
+function enable_qval_format() {
+    $("#id_3-quantitative_data_format").parent().parent().toggle();
+}
 $(document).ready(function (){
     //textAreaUpload();
+    // hide quantitative data by default
+    $('#id_3-quantitative_data_format').parent().parent().hide();
+    // add a toggle button
+    var sites_help_text = $('#id_3-sites').parent().find('p').html();
+    $('#id_3-sites').parent().find('p').html(sites_help_text +
+                                             'If the manuscript reports quantitative values associated with sites,\
+please enter the quantitative data format <a href="#" onclick="enable_qval_format(); return false;"> \
+here.</a>');
 });
 
 </script>

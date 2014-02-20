@@ -203,6 +203,8 @@ class GenomeForm(forms.Form):
     def check_genome_accession_origin(self):
         """Check if all genome accession numbers belong to the same taxonomy ID"""
         cd = self.cleaned_data
+        if 'genome_accession' not in cd:
+            return
         genome_accessions = [cd['genome_accession']]
         if cd.get('genome_accession_1', None):
             genome_accessions.append(cd['genome_accession_1'])
@@ -350,6 +352,10 @@ class SiteEntryForm(forms.Form):
                             label="Sites",
                             help_text=help_dict['sites'])
 
+    quantitative_data_format = forms.CharField(required=False,
+                                               label="Quantitative data format",
+                                               help_text=help_dict['quantitative_data_format'])
+
     def verify_coordinates(self, coor_a, coor_b):
         try:
             x,y = int(coor_a), int(coor_b)
@@ -402,6 +408,7 @@ class SiteEntryForm(forms.Form):
             pass
         else:
             raise forms.ValidationError("Invalid format")
+
         return sites_cd
 
     def verify_only_coordinates_and_values(self, sites_cd):
@@ -416,23 +423,38 @@ class SiteEntryForm(forms.Form):
             raise forms.ValidationError("Invalid input format.")
         return sites_cd
 
+    def check_quantitative_data_format(self, qval_data_format):
+        """Check if the quantitative-data-format is filled."""
+        if not qval_data_format:
+            msg = "The reported sites have associated quantitative values. Please enter the quantitative data format."
+            self._errors["__all__"] = self.error_class([msg])
+
     def clean_sites(self):
         """Validate sites field"""
         cd = self.cleaned_data['sites'].upper()
         lines = [re.split('[\t ]+', line.strip()) for line in re.split('[\r\n]+', cd.strip())]
         sites_cd = '\n'.join(' '.join(wds for wds in line) for line in lines)
+        self.check_qval_data_format = False # by default, don't check the qval data format
         if len(lines[0]) == 1:
             return self.verify_only_sites(sites_cd)
         elif len(lines[0]) == 2:
             if lines[0][0].isalpha():
+                self.check_qval_data_format = True
                 return self.verify_only_sites_and_values(sites_cd)
             else:
                 return self.verify_only_coordinates(sites_cd)
         elif len(lines[0]) == 3:
+            self.check_qval_data_format = True
             return self.verify_only_coordinates_and_values(sites_cd)
 
         # else return validation error
         raise forms.ValidationError("Invalid format.")
+
+    def clean(self):
+        # If the site field contains quantitative data, make sure the format field is filled.
+        if self.check_qval_data_format:
+            self.check_quantitative_data_format(self.cleaned_data.get('quantitative_data_format', None))
+        return self.cleaned_data
 
 class SiteExactMatchForm(forms.Form):
     """Form to select and match reported sites to their equivalents in the

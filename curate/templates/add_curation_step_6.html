@@ -1,11 +1,111 @@
-{% extends "base.html" %}
+{% extends "add_curation.html" %}
 
-{% block content %}
+{% load bootstrap %}
+{% load utiltags %}
 
-{% include "add_curation.html" %}
+{% block form %}
+
+{% comment %}
+This form is not generated using django-bootstrap-form, because the default
+layout is not used. Instead, form fields are displayed as cells of a table.
+{% endcomment %}
+
+{% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        <a class="close" data-dismiss="alert">&times;</a>
+        {% for non_field_error in form.non_field_errors %}
+             {{ non_field_error }}
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% for field in form.hidden_fields %}
+    {{ field }}
+{% endfor %}
+
+<table class="table table-bordered table-striped">
+<thead>
+  <tr>
+    <th><small><a hre="#" onclick="toggleDiagrams(); return false;">Toggle gene diagrams</a></small></th>
+    <th></th>
+    <th colspan="{{ techniques|length }}"><p class="text-center">Experimental techniques</p></th>
+    {% if has_quantitative_data %}
+    <th></th>
+    {% endif %}
+  </tr>
+  <tr>
+    <th>Site <a href="#" onclick="selectAllSites(); return false;"><small>[Select all]</small></a></th>
+    <th>TF-function <a href="#" onclick</th>
+    {% for t in techniques %}
+    <th class="rotate-45">
+        {{ t.name }} <small>[<a href="#" onclick="applyToSelectedSites({{forloop.counter0}}); return false;">Apply to selected</a> /
+          <a href="#" onclick="clearAll({{ forloop.counter0 }}); return false;">Clear all</a>]</small>
+    </th>
+    {% endfor %}
+    {% if has_quantitative_data %}
+    <th>Quantitative value</th>
+    {% endif %}
+  </tr>
+</thead>
+
+<tbody>
+  {% for site in sites %}
+  {% with i=forloop.counter0|slugify %}
+  <tr>
+    <th>{% with i|add:"_site" as field_name %}{{ form|get:field_name|bootstrap }}{% endwith %}</th>
+    <th>{% with i|add:"_TF_function" as field_name %}{{ form|get:field_name|bootstrap_inline }}{% endwith %}</th>
+    {% for t in techniques %}
+    {% with j=forloop.counter0|slugify %}
+    <th>{% with i|add:"_technique_"|add:j as field_name %}{{ form|get:field_name|bootstrap_inline }}{% endwith %}</th>
+    {% endwith %}
+    {% endfor %}
+    {% if has_quantitative_data %}
+    <th>{% with i|add:"_qval" as field_name %}{{ form|get:field_name|bootstrap_inline }}{% endwith %}</th>
+    {% endif %}
+  </tr>
+  {% endwith %}
+  {% endfor %}
+</tbody>
+</table>
 
 <script type="text/javascript">
+function selectAllSites() {
+    var checkboxes = $("[id$='_site']");
+    checkboxes.prop('checked', !checkboxes.prop('checked'));
+}
 
+function applyToSelectedSites(techniqueId) {
+    // Given a technique ID, check checkboxes of selected sites for that technique.
+    var checkboxes = $("[id$='_site']");
+    
+    for(i=0; i<checkboxes.length; i++) {
+        if (checkboxes[i].checked) {
+            var t = i + '_technique_' + techniqueId 
+            console.log('#id_6-' + t);
+            var technique = $('#id_6-' + t );
+            technique.prop('checked', 'checked');
+        }
+    }
+}
+
+function toggleDiagrams() {
+    // toggle gene diagrams
+    $('svg').toggle();
+    $('svg').next().toggle();
+}
+
+function clearAll(techniqueId) {
+    var t = '_technique_' + techniqueId 
+    $("[id$=" + "'" + t + "']").removeAttr('checked');
+}
+$(document).ready(function() {
+    // remove class from all elements
+    $('div').removeClass('form-group');
+    // Add it back to the button
+    $('.btn').parent().parent().addClass('form-group');
+    // Hide gene diagrams by default
+    toggleDiagrams();
+});
 </script>
 
 {% endblock %}

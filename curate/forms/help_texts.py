@@ -91,8 +91,14 @@ site_entry_form = dict(
     a known TF-binding motif. Uncheck if sites are reported solely as DNA fragments shown to be bound by the TF,
     without reporting any specific binding sequences.""",
 
-    sites = """Type either site sequences or coordinates. One site per line.
-    FASTA format is supported for sequence entry mode.""",
+    sites = """Enter the list of sites in FASTA format or type the list of either site
+    sequences or coordinates (one site per line). The sites can be entered in two
+    major formats: sequenced-based (e.g. CTGTTGCACGT) or coordinate-based
+    (e.g. 12312 12323). Optionally, quantitative data (q-val) can also be added
+    to either format. All fields (i.e. site & q-val or coordinates & q-val) must
+    be either space or tab separated.""",
+
+    quantitative_data_format = """Please enter the data format for the quantitative values associated with sites""",
 )
 
 site_exact_match_form = dict()

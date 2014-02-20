@@ -86,6 +86,12 @@ def site_entry_process(wiz, form):
         site.search_exact_match(genomes)
     # save the list of sites
     session_utils.put(wiz.request.session, 'sites', sites)
+    # If any site has quantitative data, mark the curation
+    has_qdata = any(site.qval for site in sites)
+    session_utils.put(wiz.request.session, 'has_quantitative_data', has_qdata)
+    # If any quantitative data format save it
+    qval = form.cleaned_data.get('quantitative_data_format', None)
+    session_utils.put(wiz.request.session, 'quantitative_data_format', qval)
 
 def site_exact_match_process(wiz, form):
     """Post process for site exact match step. Identify the sites that are
@@ -120,22 +126,24 @@ def site_annotation_match_process(wiz, form):
     site are requested from the curator."""
     sites = session_utils.get(wiz.request.session, 'sites')
     techniques = session_utils.get(wiz.request.session, 'techniques')
+    has_qdata = session_utils.get(wiz.request.session, 'has_quantitative_data')
     cd = form.cleaned_data
     # sites are always in order in the list.
     for i,site in enumerate(sites):
         if site.is_matched():
             # Make sure this site is in annotation form
-            assert '%d-site'%i in cd, "Inconsistent site annotation form"
+            assert '%d_site'%i in cd, "Inconsistent site annotation form"
         # Quantitative value
-        q = cd['%d-qval'%i]
-        site.set_qval(float(q) if q else None)
+        if has_qdata:
+            q = cd['%d_qval'%i]
+            site.set_qval(float(q) if q else None)
         # TF function
-        site.set_TF_function(cd['%d-TF-function'%i])
+        site.set_TF_function(cd['%d_TF_function'%i])
         # Experimental techniques
         site.clear_techniques()
         for j,t in enumerate(techniques):
             # Add technique to the site if it is checked.
-            if cd['%d-technique-%d' % (i,j)]:
+            if cd['%d_technique_%d' % (i,j)]:
                 site.add_technique(t)
     # Save sites again
     session_utils.put(wiz.request.session, 'sites', sites)

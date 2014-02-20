@@ -1,3 +1,7 @@
+{% extends "base.html" %}
+
+{% block content %}
+
 {% load bootstrap %}
 
 <div class="progress progress-striped">
@@ -34,7 +38,12 @@
 
     &nbsp;
 
-    {{ wizard.form|bootstrap_horizontal }}
+    <div>
+    {% block form %}
+
+    {% endblock %}
+    </div>
+
 
     <div class="form-group">
       <div class=" col-sm-offset-2 col-sm-10 col-lg-offset-2 col-lg-10">
@@ -47,5 +56,5 @@
   </form>
 </div>
 
-
+{% endblock %}
 

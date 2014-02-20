@@ -28,7 +28,7 @@ descriptions = {
     sorted by affinity to the TF-binding motif.  If the matched position/genes
     do not coincide with reported positions/gene, select the \"No valid match\"
     option.""",
-    '6': """Description goes here.""",
+    '6': """Fill in the information regarding each site.""",
     '7': """Nearby genes are displayed for identified sites. Check all genes for
     which TF-site mediated regulation is reported in the manuscript. Skip this
     step if manuscript does not report gene expression.""",

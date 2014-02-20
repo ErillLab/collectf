@@ -145,18 +145,18 @@ def site_annotation_get_form(wiz, form):
     for i,site in enumerate(sites):
         if site.is_matched():
             # create dummy field for the label
-            form.fields['%d-site' % i] = forms.BooleanField(label=site.seq, required=False)
+            form.fields['%d_site' % i] = forms.BooleanField(label=site.get_match().pprint(), required=False)
             # create quantitative value field
-            form.fields['%d-qval' % i] = forms.FloatField(label='Q-val',
-                                                          required=False,
-                                                          initial=site.qval)
+            if session_utils.get(wiz.request.session, 'has_quantitative_data'):
+                form.fields['%d_qval' % i] = forms.FloatField(label='Q-val',
+                                                              required=False,
+                                                              initial=site.qval)
             # create TF function selection field
-            form.fields['%d-TF-function' % i] = forms.ChoiceField(label='TF function',
+            form.fields['%d_TF_function' % i] = forms.ChoiceField(label='TF function',
                                                                   choices=models.Curation.TF_FUNCTION)
             # create techniques fields (one checkbox for each technique)
             for j,t in enumerate(techniques):
-                form.fields['%d-technique-%d' % (i,j)] = forms.BooleanField(label=t.name,
-                                                                            required=False)
+                form.fields['%d_technique_%d' % (i,j)] = forms.BooleanField(label="", required=False)
             
     return form
 
@@ -178,9 +178,9 @@ def gene_regulation_get_form(wiz, form):
                                                        required=False,
                                                        widget=forms.CheckboxSelectMultiple(),
                                                        help_text = site.get_match().match_diagram)
-    
             if not publication.contains_expression_data:
                 form.fields[i].widget.attrs['disabled'] = 'disabled'
+                
     return form
 
 def curation_review_get_form(wiz, form):

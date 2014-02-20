@@ -9,6 +9,10 @@ urlpatterns += patterns('curate.add_curation',
     url(r'^curation/$', 'curation'),
 )
 
+urlpatterns += patterns('curate.edit_curation',
+    url(r'^edit_curation/(?P<cid>\d+)/$', 'edit_curation'),
+)
+
 urlpatterns += patterns('curate.add_TF',
     url(r'^add_TF/$', 'add_TF'),
     url(r'^add_TF_family/$', 'add_TF_family'),
@@ -16,4 +20,12 @@ urlpatterns += patterns('curate.add_TF',
 
 urlpatterns += patterns('curate.add_technique',
     url(r'^add_technique/$', 'add_technique'),
+)
+
+urlpatterns += patterns('curate.validate_curation',
+    url(r'^validate_home/$', 'home'),
+    url(r'^validate_edit/$', 'view_edit_validate'),
+    url(r'^validate_view_curations/$', 'view_validated_curations'),
+    url(r'^validate_curation/(?P<curation_id>\d+)$', 'validate_curation'),
+    url(r'^validate_curation_edit/(?P<curation_id>\d+)$', 'edit_curation'),
 )

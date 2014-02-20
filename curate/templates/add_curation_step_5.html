@@ -1,8 +1,10 @@
-{% extends "base.html" %}
+{% extends "add_curation.html" %}
 
-{% block content %}
+{% load bootstrap %}
 
-{% include "add_curation.html" %}
+{% block form %}
+
+{{ wizard.form|bootstrap_horizontal }}
 
 <script type="text/javascript">
 </script>

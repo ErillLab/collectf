@@ -21,7 +21,12 @@ def site_soft_match_context_data(wiz):
 
 def site_annotation_context_data(wiz):
     sites = session_utils.get(wiz.request.session, "sites")
-    return {"sites": sites}
+    techniques = session_utils.get(wiz.request.session, "techniques")
+    has_qdat = session_utils.get(wiz.request.session, 'has_quantitative_data')
+    return {"sites": sites,
+            "techniques": techniques,
+            "has_quantitative_data": has_qdat,
+            }
         
 def gene_regulation_context_data(wiz):
     return {}
