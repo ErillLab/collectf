@@ -117,7 +117,7 @@ def site_soft_match_process(wiz, form):
     unmatched if there is no any good candidate in search results."""
     sites = session_utils.get(wiz.request.session, "sites")
     for site_id, match_id in form.cleaned_data.items():
-        site = [site for site in sites if site.key==site_id]
+        site = [site for site in sites if site.key==site_id][0]
         if match_id != "None": # means this site is matched
             site.set_soft_match(match_id)
     # save the list of sites

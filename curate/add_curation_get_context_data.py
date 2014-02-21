@@ -24,7 +24,14 @@ def site_exact_match_context_data(wiz):
     return d
 
 def site_soft_match_context_data(wiz):
-    return {}
+    d = {}
+    # If no soft match, put something to the context data, so that client-side
+    # knows that there is nothing in this page and skip it accordingly.
+    sites = session_utils.get(wiz.request.session, 'sites')
+    if not any(site.is_matched() and not site.get_match().is_exact()
+               for site in sites):
+        d['no_soft_match'] = True
+    return d
 
 def site_annotation_context_data(wiz):
     sites = session_utils.get(wiz.request.session, "sites")

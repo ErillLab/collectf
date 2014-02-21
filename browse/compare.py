@@ -60,7 +60,9 @@ def motif_comparison_post(request, step):
         message = "Please select at least one TF, species and experimental technique to search database."
         messages.add_message(request, messages.ERROR, message)
         return HttpResponseRedirect(reverse(eval('motif_comparison_step%d' % step)))
-    if not cur_site_insts:
+
+    if not cur_site_insts.filter(site_type='motif_associated'):
+        # If there is no motif-associated site, raise error
         message = "No results found for selected TF and species"
         messages.add_message(request, messages.ERROR, message)
         return HttpResponseRedirect(reverse(eval('motif_comparison_step%d' % step)))

@@ -143,7 +143,7 @@ class GenomeForm(forms.Form):
     def clean_TF_accession_helper(self, TF_accession):
         """Check if the entered TF accession number is valid"""
         try:
-            TF_instance =TFInstance.objects.get(protein_accession=TF_accession)
+            TF_instance = TFInstance.objects.get(protein_accession=TF_accession)
         except TFInstance.DoesNotExist:
             TF_record = bioutils.get_TF(TF_accession)
             if not TF_record:
@@ -221,6 +221,8 @@ class GenomeForm(forms.Form):
         """Check if all TF accession fields belong to the same taxonomy ID"""
         try:
             cd = self.cleaned_data
+            if 'TF_accession' not in cd:
+                return 
             TF_accessions = [cd['TF_accession']]
             if cd.get('TF_accession_1', None):
                 TF_accessions.append(cd['TF_accession_1'])

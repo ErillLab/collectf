@@ -142,7 +142,7 @@ class Match:
         s.append("%s<br/>" % seqa)
         s.append(''.join('|' if seqa[i]==seqb[i] else '&nbsp;' for i in range(len(seqa))) + '<br/>')
         s.append('%s %s[%d,%d] (%s)</br>' % (seqb, '+' if self.strand==1 else '-',
-                                             self.start, self.end, self.genome))
+                                             self.start, self.end, self.genome.genome_accession))
         s.append('</span>')
         return mark_safe( ''.join(s))
 

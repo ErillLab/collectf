@@ -147,5 +147,3 @@ def curation(request):
                                    CurationReviewForm,])
     return view(request)
 
-
-
