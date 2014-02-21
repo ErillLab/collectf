@@ -26,7 +26,7 @@ layout is not used. Instead, form fields are displayed as cells of a table.
 <table class="table table-bordered table-striped">
 <thead>
   <tr>
-    <th><small><a hre="#" onclick="toggleDiagrams(); return false;">Toggle gene diagrams</a></small></th>
+    <th>Site</th>
     <th>TF-function</th>
     <th colspan="{{ techniques|length }}"><span>Experimental techniques</span></th>
     {% if has_quantitative_data %}
@@ -34,20 +34,21 @@ layout is not used. Instead, form fields are displayed as cells of a table.
     {% endif %}
   </tr>
   <tr>
-    <th>Site <small> [<a href="#" onclick="selectAllSites(); return false;">Select all</a>]</small></th>
+    <th class="small"> <small> <a href="#" onclick="selectAllSites(); return false;">Select all</a> /
+         <a href="#" onclick="toggleDiagrams(); return false;">Toggle gene diagrams</a></small></th>
     <th class="small">
       <select class="form-control" id="TF_function_selected">
         <option value="ACT">activator</option>
         <option value="REP">repressor</option>
         <option value="N/A">not specified</option>
-      </select>
-      <small> [<a href="#" onclick="applyTFFunctionToSelectedSites(); return false;">Apply to selected</a>]</small>
+      </select><br/>
+      <small> <a href="#" onclick="applyTFFunctionToSelectedSites(); return false;">Apply to selected</a></small>
     </th>
 
     {% for t in techniques %}
     <th class="rotate-45 small">
-        {{ t.name }} <small> [<a href="#" onclick="applyToSelectedSites({{forloop.counter0}}); return false;">Apply to selected</a> /
-          <a href="#" onclick="clearAll({{ forloop.counter0 }}); return false;">Clear all</a>]</small>
+        {{ t.name }} <small> <a href="#" onclick="applyToSelectedSites({{forloop.counter0}}); return false;">Apply to selected</a> /
+          <a href="#" onclick="clearAll({{ forloop.counter0 }}); return false;">Clear all</a></small>
     </th>
     {% endfor %}
     {% if has_quantitative_data %}

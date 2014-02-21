@@ -135,7 +135,7 @@ def curation(request):
     # old_curation key in table, and it will cause trouble.
     if session_utils.has(request.session, 'old_curation'):
         session_utils.remove(request.session, 'old_curation')
-        
+
     view = CurationWizard.as_view([PublicationForm,
                                    GenomeForm,
                                    TechniquesForm,
