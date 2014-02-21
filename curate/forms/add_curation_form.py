@@ -377,7 +377,6 @@ class SiteEntryForm(forms.Form):
         
     def verify_only_sites(self, sites_cd):
         """Clean function to check if all site sequences are valid."""
-        # TODO Fix validation
         try:
             if sites_cd.startswith('>'): # check if it is fasta format
                 site_entry.parse_fasta(sites_cd)
@@ -434,10 +433,15 @@ class SiteEntryForm(forms.Form):
 
     def clean_sites(self):
         """Validate sites field"""
-        cd = self.cleaned_data['sites'].upper()
+        cd = self.cleaned_data['sites'].strip().upper()
+
         lines = [re.split('[\t ]+', line.strip()) for line in re.split('[\r\n]+', cd.strip())]
         sites_cd = '\n'.join(' '.join(wds for wds in line) for line in lines)
         self.check_qval_data_format = False # by default, don't check the qval data format
+        # check if it is fasta
+        
+        if sites_cd[0].startswith('>'):
+            return self.verify_only_sites(sites_cd)
         if len(lines[0]) == 1:
             return self.verify_only_sites(sites_cd)
         elif len(lines[0]) == 2:

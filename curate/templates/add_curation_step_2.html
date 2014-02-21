@@ -18,9 +18,10 @@ $("#id_2-has_external_db").change(function() {
 });
 
 // collapse complex notes
-dom = $('#id_2-complex_notes').parent().parent().toggle();
+dom_2 = $('#id_2-complex_notes').parent().parent();
+dom_2.hide();
 $('#id_2-forms_complex').change(function() {
-    dom.toggle();
+    dom_2.toggle();
 });
 
 </script>

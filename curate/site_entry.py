@@ -7,12 +7,14 @@ any quantitative information. All fields must be separated by space or tab.  """
 
 import re
 import regex
+import StringIO
 from base import bioutils
 from base import misc
 from base import models
 from Bio.SeqFeature import SeqFeature
 from Bio.SeqFeature import FeatureLocation
 from Bio.Graphics import GenomeDiagram
+from Bio import SeqIO
 from reportlab.lib import colors
 from reportlab.lib.units import cm
 from django.utils.safestring import mark_safe
