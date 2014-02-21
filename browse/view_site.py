@@ -23,16 +23,17 @@ def view_site(request, dbxref_id):
 
     # get all curation-site-instance objects overlaps with this one
     all_curation_site_instances = models.Curation_SiteInstance.objects.filter(
-        curation__TF_instances=curation_site_instance.curation.TF_instances,
+        curation__TF_instances__in=curation_site_instance.curation.TF_instances.all(),
         site_instance__genome=curation_site_instance.site_instance.genome,
-        site_type=["motif_associated", "var_motif_associated"]).all()
+        site_type__in=["motif_associated", "var_motif_associated"]).all()
 
     # get all curation_site_instances that overlap with the queried site
     meta_site = metasite.MetaSite(curation_site_instance)
+    
     for csi in all_curation_site_instances:
         if csi==curation_site_instance: continue
         if meta_site.membership_test(csi):
-                meta_site.add_cur_site_inst(csi)
+            meta_site.add_cur_site_inst(csi)
 
     alignment = None
     if len(meta_site.cur_site_insts) > 1:

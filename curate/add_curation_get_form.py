@@ -121,7 +121,7 @@ def site_exact_match_get_form(wiz, form):
     sites = session_utils.get(wiz.request.session, "sites")
     for i,site in enumerate(sites):
         label = site.seq
-        choices = site.populate_match_choices(add_no_valid_opt=True)
+        choices = site.populate_match_choices(True, 'exact_only')
         form.fields[i] = forms.ChoiceField(label=label, choices=choices,
                                             widget=forms.RadioSelect())
         form.fields[i].initial = str(choices[0][0])
@@ -135,7 +135,7 @@ def site_soft_match_get_form(wiz, form):
     for i,site in enumerate(sites):
         if not site.is_matched():
             label = site.seq
-            choices = site.populate_match_choices(add_no_valid_opt=True)
+            choices = site.populate_match_choices(True, 'inexact_only')
             form.fields[i] = forms.ChoiceField(label=label, choices=choices,
                                                widget=forms.RadioSelect())
             form.fields[i].initial = str(choices[0][0])

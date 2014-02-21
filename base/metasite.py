@@ -20,7 +20,7 @@ class MetaSite:
         - enough overlap
         """
         return (self.genome == cur_site_inst.site_instance.genome and
-                self.TF_instances == cur_site_inst.curation.TF_instances.all() and
+                self.TF_instances == list(cur_site_inst.curation.TF_instances.all()) and
                 self.overlap_test(cur_site_inst))
 
     def overlap_test(self, cur_site_inst):
@@ -31,7 +31,7 @@ class MetaSite:
             overlap_len = max(0, min(loca[1], locb[1]) - max(loca[0], locb[0]))
             return float(overlap_len) / (loca[1]-loca[0]+1)
 
-        loca = (delegate.site_instance.start, delegate.site_instance.end)
+        loca = (self.delegate.site_instance.start, self.delegate.site_instance.end)
         locb = (cur_site_inst.site_instance.start, cur_site_inst.site_instance.end)
         overlap_a = get_overlap(loca, locb)
         overlap_b = get_overlap(locb, loca)
@@ -58,7 +58,7 @@ class MetaSite:
         be linked to multiple TF-instance objects, to cover TFs composed of
         several subunits with different accession numbers (e.g. heterodimer such
         as IHF, composed of IHF alpha and beta)."""
-        return self.cur_site_insts[0].curation.TF_instances.all()
+        return list(self.cur_site_insts[0].curation.TF_instances.all())
 
     @property
     def delegate_sequence(self):

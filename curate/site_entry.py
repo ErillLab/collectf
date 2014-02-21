@@ -90,7 +90,7 @@ class Match:
         nearby_genes = ['%s (%s)' % (g.locus_tag, g.name) for g in self.nearby_genes]
         return_str = ""
         if self.is_exact():
-            return_str += ('<span class="sequence"> %s <br/> %s[%d,%d] %s</span>' %
+            return_str += ('<span class="sequence">%s<br/> %s[%d,%d] %s</span>' %
                            (self.seq, '+' if self.strand==1 else '-',
                             self.start, self.end, self.genome.genome_accession))
         else:
@@ -152,20 +152,37 @@ class Match:
 class Site:
     def set_nearby_genes_for_all_matches(self):
         """Find nearby genes for all matches for a site."""
-        for match in self.matches:
+        for match in self.exact_matches:
+            match.set_nearby_genes()
+        for match in self.soft_matches:
             match.set_nearby_genes()
 
-    def populate_match_choices(self, add_no_valid_opt=False):
-        """For a given site and its all matches, populate Django field choices."""
-        choices = [(i, match.pprint()) for (i,match) in enumerate(self.matches)]
+    def populate_match_choices(self, add_no_valid_opt, match_type):
+        """For a given site and its all matches, populate Django field choices.
+        If match_type is 'exact_only', then populate choices for exact matches
+        only. Similarly, if the match_type is 'inexact_only', then populate
+        choices for soft-search matches only."""
+        if match_type == 'exact_only':
+            matches = self.exact_matches
+        elif match_type == 'inexact_only':
+            matches = self.soft_matches
+        else:
+            assert False, "invalid match_type option"
+            
+        choices = [(i, match.pprint()) for (i,match) in enumerate(matches)]
         if add_no_valid_opt:
             choices.append((None, "No valid match."))
         return choices
 
-    def set_match(self, match_id):
-        """Given a match id (one of site's possible matches), match the genome
+    def set_exact_match(self, match_id):
+        """Given a match id (one of site's possible exact matches), match the genome
         location to the binding site reported in the paper"""
-        self.matched = self.matches[int(match_id)]
+        self.matched = self.exact_matches[int(match_id)]
+
+    def set_soft_match(self, match_id):
+        """Given a match id (one of site's possible soft matches), match the genome
+        location to the binding site reported in the paper"""
+        self.matched = self.soft_matches[int(match_id)]
 
     def get_match(self):
         """Return the matched location (Match object)"""
@@ -191,7 +208,6 @@ class Site:
         """Add an experimental technique to the set of techniques used to
         determine the site."""
         self.techniques.append(t)
-
     
 
 class SequenceSite(Site):
@@ -201,15 +217,17 @@ class SequenceSite(Site):
             raise
         self.seq = seq
         self.qval = qval
+        self.exact_matches = []
+        self.soft_matches = []
 
     def __repr__(self):
         return "%s [%.2f]" % (self.seq, self.qval if self.qval else 0)
 
     def search_exact_match(self, genomes):
         """Search the genome and find exact matches on the genome."""
-        self.matches = []
+        self.exact_matches = []
         for genome in genomes:
-            self.matches.extend(self.locate_seq(genome))
+            self.exact_matches.extend(self.locate_seq(genome))
         # find nearby genes for all matches
         self.set_nearby_genes_for_all_matches()
 
@@ -233,9 +251,9 @@ class SequenceSite(Site):
     def search_soft_match(self, genomes, motif=None):
         """Search the genome and find in-exact matches on the genome."""
         # overwrite exact_matches (if any) with soft-search results
-        self.matches = []
+        self.soft_matches = []
         for genome in genomes:
-            self.matches.extend(self.soft_locate_seq(genome))
+            self.soft_matches.extend(self.soft_locate_seq(genome))
         # Find nearby genes for all soft-matches.
         self.set_nearby_genes_for_all_matches()
 
@@ -272,6 +290,8 @@ class CoordinateSite(Site):
         self.start = start
         self.end = end
         self.qval = qval
+        self.exact_matches = []
+        self.soft_matches = []
 
     def search_exact_match(self, genomes):
         """It performs the same job with SequenceSite search_exact_match
@@ -285,10 +305,10 @@ class CoordinateSite(Site):
             if self.start <= self.end:
                 # there is only one match
                 self.seq = genome_sequence[start:end+1]
-                self.matches = [Match(genome, self.seq, self.seq, start, end, 1)]
+                self.exact_matches = [Match(genome, self.seq, self.seq, start, end, 1)]
             else:
                 self.seq = bioutils.reverse_complement(genome_sequence[end:start+1])
-                self.matches = [Match(genome, self.seq, self.seq, end, start, -1)]
+                self.exact_matches = [Match(genome, self.seq, self.seq, end, start, -1)]
                 
         # For all matches, get nearby genes
         self.set_nearby_genes_for_all_matches()
