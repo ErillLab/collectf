@@ -86,6 +86,8 @@ def site_entry_process(wiz, form):
         site.search_exact_match(genomes)
     # save the list of sites
     session_utils.put(wiz.request.session, 'sites', sites)
+    # save the type of lists
+    session_utils.put(wiz.request.session, 'site_type', form.cleaned_data['site_type'])
     # If any site has quantitative data, mark the curation
     has_qdata = any(site.qval for site in sites)
     session_utils.put(wiz.request.session, 'has_quantitative_data', has_qdata)
