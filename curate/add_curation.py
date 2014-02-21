@@ -144,6 +144,15 @@ def curation(request):
                                    SiteSoftMatchForm,
                                    SiteAnnotationForm,
                                    GeneRegulationForm,
-                                   CurationReviewForm,])
+                                   CurationReviewForm,],
+                                  condition_dict = {'5': inexact_match_form_condition})
     return view(request)
+
+def inexact_match_form_condition(wizard):
+    """Check if inexact match form is necessary. If not (i.e. all sites have
+    been matched exactly, hide this step.)"""
+    sites = session_utils.get(wizard.request.session, 'sites')
+    if not sites: return True
+    return any(not site.is_matched() for site in sites)
+
 

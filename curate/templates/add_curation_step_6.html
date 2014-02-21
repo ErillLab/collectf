@@ -34,19 +34,19 @@ layout is not used. Instead, form fields are displayed as cells of a table.
     {% endif %}
   </tr>
   <tr>
-    <th>Site <a href="#" onclick="selectAllSites(); return false;"><small>[Select all]</small></a></th>
+    <th>Site <small> [<a href="#" onclick="selectAllSites(); return false;">Select all</a>]</small></th>
     <th class="small">
       <select class="form-control" id="TF_function_selected">
         <option value="ACT">activator</option>
         <option value="REP">repressor</option>
         <option value="N/A">not specified</option>
       </select>
-      <a href="#" onclick="applyTFFunctionToSelectedSites(); return false;">Apply to selected
+      <small> [<a href="#" onclick="applyTFFunctionToSelectedSites(); return false;">Apply to selected</a>]</small>
     </th>
 
     {% for t in techniques %}
     <th class="rotate-45 small">
-        {{ t.name }} <small>[<a href="#" onclick="applyToSelectedSites({{forloop.counter0}}); return false;">Apply to selected</a> /
+        {{ t.name }} <small> [<a href="#" onclick="applyToSelectedSites({{forloop.counter0}}); return false;">Apply to selected</a> /
           <a href="#" onclick="clearAll({{ forloop.counter0 }}); return false;">Clear all</a>]</small>
     </th>
     {% endfor %}

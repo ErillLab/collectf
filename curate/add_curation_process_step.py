@@ -104,7 +104,7 @@ def site_exact_match_process(wiz, form):
     sites = session_utils.get(wiz.request.session, "sites")
     for site_id, match_id in form.cleaned_data.items():
         if match_id != "None": # means this site is matched
-            sites[site_id].set_match(match_id)
+            sites[site_id].set_exact_match(match_id)
         else: # not matched, perform soft search
             sites[site_id].search_soft_match(genomes)
     # save the list of sites
@@ -117,7 +117,7 @@ def site_soft_match_process(wiz, form):
     sites = session_utils.get(wiz.request.session, "sites")
     for site_id, match_id in form.cleaned_data.items():
         if match_id != "None": # means this site is matched
-            sites[site_id].set_match(match_id)
+            sites[site_id].set_soft_match(match_id)
     # save the list of sites
     session_utils.put(wiz.request.session, "sites", sites)
 
