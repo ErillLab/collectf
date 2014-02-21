@@ -86,3 +86,7 @@ body {
 .rotate-45 {    
 
 }
+
+table {
+    max-width: none;
+}

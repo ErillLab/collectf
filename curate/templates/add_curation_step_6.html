@@ -27,17 +27,25 @@ layout is not used. Instead, form fields are displayed as cells of a table.
 <thead>
   <tr>
     <th><small><a hre="#" onclick="toggleDiagrams(); return false;">Toggle gene diagrams</a></small></th>
-    <th></th>
-    <th colspan="{{ techniques|length }}"><p class="text-center">Experimental techniques</p></th>
+    <th>TF-function</th>
+    <th colspan="{{ techniques|length }}"><span>Experimental techniques</span></th>
     {% if has_quantitative_data %}
     <th></th>
     {% endif %}
   </tr>
   <tr>
     <th>Site <a href="#" onclick="selectAllSites(); return false;"><small>[Select all]</small></a></th>
-    <th>TF-function <a href="#" onclick</th>
+    <th class="small">
+      <select class="form-control" id="TF_function_selected">
+        <option value="ACT">activator</option>
+        <option value="REP">repressor</option>
+        <option value="N/A">not specified</option>
+      </select>
+      <a href="#" onclick="applyTFFunctionToSelectedSites(); return false;">Apply to selected
+    </th>
+
     {% for t in techniques %}
-    <th class="rotate-45">
+    <th class="rotate-45 small">
         {{ t.name }} <small>[<a href="#" onclick="applyToSelectedSites({{forloop.counter0}}); return false;">Apply to selected</a> /
           <a href="#" onclick="clearAll({{ forloop.counter0 }}); return false;">Clear all</a>]</small>
     </th>
@@ -51,9 +59,9 @@ layout is not used. Instead, form fields are displayed as cells of a table.
 <tbody>
   {% for site in sites %}
   {% with i=forloop.counter0|slugify %}
-  <tr>
+  <tr class="small">
     <th>{% with i|add:"_site" as field_name %}{{ form|get:field_name|bootstrap }}{% endwith %}</th>
-    <th>{% with i|add:"_TF_function" as field_name %}{{ form|get:field_name|bootstrap_inline }}{% endwith %}</th>
+    <th >{% with i|add:"_TF_function" as field_name %}{{ form|get:field_name|bootstrap_inline }}{% endwith %}</th>
     {% for t in techniques %}
     {% with j=forloop.counter0|slugify %}
     <th>{% with i|add:"_technique_"|add:j as field_name %}{{ form|get:field_name|bootstrap_inline }}{% endwith %}</th>
@@ -77,13 +85,22 @@ function selectAllSites() {
 function applyToSelectedSites(techniqueId) {
     // Given a technique ID, check checkboxes of selected sites for that technique.
     var checkboxes = $("[id$='_site']");
-    
     for(i=0; i<checkboxes.length; i++) {
         if (checkboxes[i].checked) {
-            var t = i + '_technique_' + techniqueId 
-            console.log('#id_6-' + t);
+            var t = i + '_technique_' + techniqueId;
             var technique = $('#id_6-' + t );
             technique.prop('checked', 'checked');
+        }
+    }
+}
+
+function applyTFFunctionToSelectedSites() {
+    // Apply TF function to the selected sites.
+    var checkboxes = $("[id$='_site']");
+    var v = $("#TF_function_selected").val();
+    for(i=0; i<checkboxes.length; i++) {
+        if (checkboxes[i].checked) {
+            $("#id_6-" + i + '_TF_function').val(v);
         }
     }
 }
@@ -98,11 +115,15 @@ function clearAll(techniqueId) {
     var t = '_technique_' + techniqueId 
     $("[id$=" + "'" + t + "']").removeAttr('checked');
 }
+
+
 $(document).ready(function() {
     // remove class from all elements
     $('div').removeClass('form-group');
     // Add it back to the button
     $('.btn').parent().parent().addClass('form-group');
+    // remove class form-control
+    $('.form-control').removeClass('form-control');
     // Hide gene diagrams by default
     toggleDiagrams();
 });

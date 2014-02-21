@@ -124,6 +124,8 @@ def site_exact_match_get_form(wiz, form):
         choices = site.populate_match_choices(add_no_valid_opt=True)
         form.fields[i] = forms.ChoiceField(label=label, choices=choices,
                                             widget=forms.RadioSelect())
+        form.fields[i].initial = str(choices[0][0])
+            
     return form
 
 def site_soft_match_get_form(wiz, form):
@@ -136,6 +138,7 @@ def site_soft_match_get_form(wiz, form):
             choices = site.populate_match_choices(add_no_valid_opt=True)
             form.fields[i] = forms.ChoiceField(label=label, choices=choices,
                                                widget=forms.RadioSelect())
+            form.fields[i].initial = str(choices[0][0])
     return form
 
 def site_annotation_get_form(wiz, form):

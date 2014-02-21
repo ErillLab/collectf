@@ -90,7 +90,7 @@ class Match:
         nearby_genes = ['%s (%s)' % (g.locus_tag, g.name) for g in self.nearby_genes]
         return_str = ""
         if self.is_exact():
-            return_str += ('<span class="sequence"> %s <br/>%s[%d,%d] %s</span><br/>' %
+            return_str += ('<span class="sequence"> %s <br/> %s[%d,%d] %s</span>' %
                            (self.seq, '+' if self.strand==1 else '-',
                             self.start, self.end, self.genome.genome_accession))
         else:

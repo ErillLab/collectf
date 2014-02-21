@@ -129,6 +129,14 @@ class CurationWizard(SessionWizardView):
 
 @login_required
 def curation(request):
+    """Entry point for the curation."""
+    
+    # If user selects the old curation and then go back, the session will have the
+    # old_curation key in table, and it will cause trouble.
+    if session_utils.has(request.session, 'old_curation'):
+        session_utils.remove(request.session, 'old_curation')
+
+        
     view = CurationWizard.as_view([PublicationForm,
                                    GenomeForm,
                                    TechniquesForm,
@@ -145,5 +153,6 @@ def inexact_match_form_condition(wizard):
     """Check if inexact match form is necessary. If not (i.e. all sites have
     been matched exactly, hide this step.)"""
     sites = session_utils.get(wizard.request.session, 'sites')
+    if not sites: return True
     return any(not site.is_matched() for site in sites)
 

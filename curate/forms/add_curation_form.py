@@ -345,7 +345,8 @@ class SiteEntryForm(forms.Form):
     # type of sites to be entered
     site_type = forms.ChoiceField(choices=Curation_SiteInstance.SITE_TYPE,
                                   required=True,
-                                  label="site type")
+                                  label="site type",
+                                  initial="motif_associated")
 
     sites = forms.CharField(required=True,
                             widget=forms.Textarea,
