@@ -30,7 +30,7 @@ def site_annotation_context_data(wiz):
     sites = session_utils.get(wiz.request.session, "sites")
     techniques = session_utils.get(wiz.request.session, "techniques")
     has_qdat = session_utils.get(wiz.request.session, 'has_quantitative_data')
-    return {"sites": sites,
+    return {"sites": [site for site in sites if site.is_matched()],
             "techniques": techniques,
             "has_quantitative_data": has_qdat,
             }

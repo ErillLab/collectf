@@ -119,12 +119,12 @@ def site_exact_match_get_form(wiz, form):
     form is generated dynamically as the number of exact matches is not
     fixed."""
     sites = session_utils.get(wiz.request.session, "sites")
-    for i,site in enumerate(sites):
+    for site in sites:
         label = site.seq
         choices = site.populate_match_choices(True, 'exact_only')
-        form.fields[i] = forms.ChoiceField(label=label, choices=choices,
-                                            widget=forms.RadioSelect())
-        form.fields[i].initial = str(choices[0][0])
+        form.fields[site.key] = forms.ChoiceField(label=label, choices=choices,
+                                                  widget=forms.RadioSelect())
+        form.fields[site.key].initial = str(choices[0][0])
             
     return form
 
@@ -132,21 +132,23 @@ def site_soft_match_get_form(wiz, form):
     """For sites that are not matched in the previous step (exact match step),
     show soft-search results."""
     sites = session_utils.get(wiz.request.session, "sites")
-    for i,site in enumerate(sites):
-        if not site.is_matched():
+    for site in sites:
+        # Render all site that are not exactly matched in the previous step
+        if not (site.is_matched() and site.get_match().is_exact()):
             label = site.seq
             choices = site.populate_match_choices(True, 'inexact_only')
-            form.fields[i] = forms.ChoiceField(label=label, choices=choices,
-                                               widget=forms.RadioSelect())
-            form.fields[i].initial = str(choices[0][0])
+            form.fields[site.key] = forms.ChoiceField(label=label, choices=choices,
+                                                      widget=forms.RadioSelect())
+            form.fields[site.key].initial = str(choices[0][0])
     return form
 
 def site_annotation_get_form(wiz, form):
     """Annotation step for site instances."""
     sites = session_utils.get(wiz.request.session, 'sites')
     techniques = session_utils.get(wiz.request.session, 'techniques')
-    for i,site in enumerate(sites):
+    for site in sites:
         if site.is_matched():
+            i = site.key
             # create dummy field for the label
             form.fields['%d_site' % i] = forms.BooleanField(label=site.get_match().pprint(), required=False)
             # create quantitative value field
@@ -173,8 +175,9 @@ def gene_regulation_get_form(wiz, form):
     publication = models.Publication.objects.get(pk=pid)
     # Get all site matches
     sites = session_utils.get(wiz.request.session, 'sites')
-    for i,site in enumerate(sites):
+    for site in sites:
         if site.is_matched():
+            i = site.key
             choices = [(g.gene_id, "%s (%s): %s" % (g.locus_tag, g.name, g.description))
                        for g in site.get_match().nearby_genes]
             form.fields[i] = forms.MultipleChoiceField(label=site.seq, choices=choices,

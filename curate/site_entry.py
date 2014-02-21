@@ -90,7 +90,7 @@ class Match:
         nearby_genes = ['%s (%s)' % (g.locus_tag, g.name) for g in self.nearby_genes]
         return_str = ""
         if self.is_exact():
-            return_str += ('<span class="sequence">%s<br/> %s[%d,%d] %s</span>' %
+            return_str += ('<div class="sequence">%s<br/> %s[%d,%d] %s</div>' %
                            (self.seq, '+' if self.strand==1 else '-',
                             self.start, self.end, self.genome.genome_accession))
         else:
@@ -131,7 +131,7 @@ class Match:
                  start=min(map(lambda g: g.start, self.nearby_genes))-150,
                  end=max(map(lambda g: g.end, self.nearby_genes))+150,
                  pagesize=(3*cm, 20*cm))
-        return mark_safe(gdd.write_to_string('svg'))
+        return mark_safe('<div>' + gdd.write_to_string('svg') + '</div>')
 
     def print_alignment(self, seqa, seqb):
         """Given two sequences, pairwise align them and output HTML for curation
@@ -150,6 +150,10 @@ class Match:
         return "%s %s (exact? %s)" % (self.seq, self.reported_seq, self.is_exact())
         
 class Site:
+    @property
+    def key(self):
+        return self._key
+    
     def set_nearby_genes_for_all_matches(self):
         """Find nearby genes for all matches for a site."""
         for match in self.exact_matches:
@@ -190,7 +194,7 @@ class Site:
         return self.matched
 
     def is_matched(self):
-        return hasattr(self, 'matched')
+        return bool(self.matched)
 
     def set_qval(self,qval):
         """Set quantitative value."""
@@ -212,13 +216,15 @@ class Site:
 
 class SequenceSite(Site):
     """Class definition for sites that are initialized with the sequence"""
-    def __init__(self, seq, qval=None):
+    def __init__(self, id, seq, qval=None):
+        self._key = id
         if any(nuc not in 'ACGT' for nuc in seq):
             raise
         self.seq = seq
         self.qval = qval
         self.exact_matches = []
         self.soft_matches = []
+        self.matched = None
 
     def __repr__(self):
         return "%s [%.2f]" % (self.seq, self.qval if self.qval else 0)
@@ -226,6 +232,8 @@ class SequenceSite(Site):
     def search_exact_match(self, genomes):
         """Search the genome and find exact matches on the genome."""
         self.exact_matches = []
+        self.soft_matches = []
+        self.matched = None
         for genome in genomes:
             self.exact_matches.extend(self.locate_seq(genome))
         # find nearby genes for all matches
@@ -252,6 +260,7 @@ class SequenceSite(Site):
         """Search the genome and find in-exact matches on the genome."""
         # overwrite exact_matches (if any) with soft-search results
         self.soft_matches = []
+        self.matched = None
         for genome in genomes:
             self.soft_matches.extend(self.soft_locate_seq(genome))
         # Find nearby genes for all soft-matches.
@@ -286,18 +295,23 @@ class SequenceSite(Site):
 
 class CoordinateSite(Site):
     """Class definition for sites that are initialized using coordinates."""
-    def __init__(self, start, end, qval=None):
+    def __init__(self, id, start, end, qval=None):
+        self._key = id
         self.start = start
         self.end = end
         self.qval = qval
         self.exact_matches = []
         self.soft_matches = []
+        self.matched = None
 
     def search_exact_match(self, genomes):
         """It performs the same job with SequenceSite search_exact_match
         function, which is finding the exact matches in the genome. Since
         coordinates are given here, all this function does is to get the
         corresponding region from the genome."""
+        self.exact_matches = []
+        self.soft_matches = []
+        self.matched = None
         start = self.start
         end = self.end
         for genome in genomes:
@@ -317,12 +331,12 @@ def parse_fasta(text):
     """Parse fasta file and return list of sites"""
     l = SeqIO.parse(StringIO.StringIO(text), 'fasta')
     seqs = [item.seq.tostring() for item in l]
-    return [SequenceSite(seq) for seq in seqs]
+    return [SequenceSite(i,seq) for i,seq in enumerate(seqs)]
 
 def parse_seq(text):
     """Parse text that contains a list of sequences, one per line"""
     seqs = [l.strip() for l in text.split('\n') if l]
-    return [SequenceSite(seq) for seq in seqs]
+    return [SequenceSite(i,seq) for i,seq in enumerate(seqs)]
 
 def parse_seq_with_qval(text):
     """Parse text that contains a list of sequences and associated quantitative
@@ -332,20 +346,20 @@ def parse_seq_with_qval(text):
     seqs = [line.split()[0] for line in lines]
     quantitative_values = map(float, [line.split()[1] for line in lines])
     assert len(seqs) == len(quantitative_values)
-    return [SequenceSite(seq, qval) for (seq,qval) in zip(seqs, quantitative_values)]
+    return [SequenceSite(i, seq, qval) for i,(seq,qval) in enumerate(zip(seqs, quantitative_values))]
 
 def parse_coords(text):
     """Parse text that contains list of coordinates, one per line. Each line
     must contain a pair of numbers, denoting start and end positions for the
     site, respectively."""
     coordinates = [re.split('[\t ]+', line) for line in re.split('[\r\n]+', text)]
-    return [CoordinateSite(int(coord[0]), int(coord[1])) for coord in coordinates]
+    return [CoordinateSite(i, int(coord[0]), int(coord[1])) for i,coord in enumerate(coordinates)]
 
 def parse_coords_with_qval(text):
     """Parse text that contains list of coordinates, one per line. Additionally,
     each line has a quantitative value associated with the coordinates"""
     coordinates = [re.split('[\t ]+', line) for line in re.split('[\r\n]+', text)]
-    return [CoordinateSite(int(coord[0]), int(coord[1]), float(coord[2])) for coord in coordinates]
+    return [CoordinateSite(i, int(coord[0]), int(coord[1]), float(coord[2])) for i,coord in enumerate(coordinates)]
 
 def parse_input(text):
     """Parse text of reported sites.

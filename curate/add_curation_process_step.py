@@ -103,10 +103,11 @@ def site_exact_match_process(wiz, form):
     genomes = session_utils.get(wiz.request.session, "genomes")
     sites = session_utils.get(wiz.request.session, "sites")
     for site_id, match_id in form.cleaned_data.items():
+        site = [site for site in sites if site.key==site_id][0]
         if match_id != "None": # means this site is matched
-            sites[site_id].set_exact_match(match_id)
+            site.set_exact_match(match_id)
         else: # not matched, perform soft search
-            sites[site_id].search_soft_match(genomes)
+            site.search_soft_match(genomes)
     # save the list of sites
     session_utils.put(wiz.request.session, "sites", sites)
             
@@ -116,12 +117,13 @@ def site_soft_match_process(wiz, form):
     unmatched if there is no any good candidate in search results."""
     sites = session_utils.get(wiz.request.session, "sites")
     for site_id, match_id in form.cleaned_data.items():
+        site = [site for site in sites if site.key==site_id]
         if match_id != "None": # means this site is matched
-            sites[site_id].set_soft_match(match_id)
+            site.set_soft_match(match_id)
     # save the list of sites
     session_utils.put(wiz.request.session, "sites", sites)
 
-def site_annotation_match_process(wiz, form):
+def site_annotation_process(wiz, form):
     """In this form, each individual sites (only matched ones) are further
     annotated. For each site, TF-function (activator, repressor, etc.),
     quantitative value (if any) and experimental techniques used to identify
@@ -130,11 +132,15 @@ def site_annotation_match_process(wiz, form):
     techniques = session_utils.get(wiz.request.session, 'techniques')
     has_qdata = session_utils.get(wiz.request.session, 'has_quantitative_data')
     cd = form.cleaned_data
-    # sites are always in order in the list.
-    for i,site in enumerate(sites):
-        if site.is_matched():
-            # Make sure this site is in annotation form
-            assert '%d_site'%i in cd, "Inconsistent site annotation form"
+    for site in sites:
+        i = site.key
+        
+        if not site.is_matched():
+            continue
+
+        # Make sure all matched sites are  in the annotation form
+        assert '%d_site'%i in cd, "Inconsistent site annotation form"
+            
         # Quantitative value
         if has_qdata:
             q = cd['%d_qval'%i]
@@ -157,10 +163,13 @@ def gene_regulation_process(wiz, form):
     paper."""
     cd = form.cleaned_data
     sites = session_utils.get(wiz.request.session, 'sites')
-    for i,site in enumerate(sites):
-        if site.is_matched():
-            # Make sure this site is in annotation form
-            assert i in cd, "Inconsistent gene regulation form."
+    for site in sites:
+        i = site.key
+        if not site.is_matched():
+            continue
+        
+        # Make sure this site is in annotation form
+        assert i in cd, "Inconsistent gene regulation form."
         match = site.get_match()
         match.set_regulated_genes(models.Gene.objects.filter(pk__in=cd[i]))
 

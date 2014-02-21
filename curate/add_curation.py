@@ -87,7 +87,7 @@ class CurationWizard(SessionWizardView):
                     '3': add_curation_process_step.site_entry_process,
                     '4': add_curation_process_step.site_exact_match_process,
                     '5': add_curation_process_step.site_soft_match_process,
-                    '6': add_curation_process_step.site_annotation_match_process,
+                    '6': add_curation_process_step.site_annotation_process,
                     '7': add_curation_process_step.gene_regulation_process,
                     '8': add_curation_process_step.review_curation_process,
         }
@@ -144,15 +144,8 @@ def curation(request):
                                    SiteSoftMatchForm,
                                    SiteAnnotationForm,
                                    GeneRegulationForm,
-                                   CurationReviewForm,],
-                                  condition_dict = {'5': inexact_match_form_condition})
+                                   CurationReviewForm,])
     return view(request)
 
-def inexact_match_form_condition(wizard):
-    """Check if inexact match form is necessary. If not (i.e. all sites have
-    been matched exactly, hide this step.)"""
-    sites = session_utils.get(wizard.request.session, 'sites')
-    if not sites: return True
-    return any(not site.is_matched() for site in sites)
 
 

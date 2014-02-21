@@ -107,8 +107,8 @@ function applyTFFunctionToSelectedSites() {
 
 function toggleDiagrams() {
     // toggle gene diagrams
-    $('svg').toggle();
-    $('svg').next().toggle();
+    $('svg').parent().toggle();
+    $('svg').parent().next().toggle();
 }
 
 function clearAll(techniqueId) {
