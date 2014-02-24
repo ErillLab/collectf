@@ -22,6 +22,7 @@ class Curation(models.Model):
     # TODO remove this when database scheme is updated completely.
     TF_FUNCTION = (("ACT", "activator"),
                    ("REP", "repressor"),
+                   ("DUAL", "dual"),
                    ("N/A", "not specified"))
     
     TF_TYPE = (("MONOMER", "monomer"),
