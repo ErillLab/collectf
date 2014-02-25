@@ -31,12 +31,11 @@ def genome_done(wiz, form_list):
     TF_accession = form.cleaned_data['TF_accession']
     TF_instances = [models.TFInstance.objects.get(protein_accession=TF_accession)]
     # Extra genome accession numbers (if any)
-    tf = form.cleaned_data.get('TF_accession_1', None)
-    if tf: TF_instances.append(models.TFInstance.objects.get(protein_accession=tf))
-    tf = form.cleaned_data.get('TF_accession_2', None)
-    if tf: TF_instances.append(models.TFInstance.objects.get(protein_accession=g))
+    for i in xrange(1, settings.NUMBER_OF_TF_ACCESSION_FIELDS):
+        tf = form.cleaned_data.get('TF_accession_%d' % i, None)
+        if tf: TF_instances.append(models.TFInstance.objects.get(protein_accession=tf))
+            
     assert TF_instances
-
     return dict(
         TF = form.cleaned_data['TF'],
         TF_type = form.cleaned_data['TF_type'],
@@ -50,13 +49,17 @@ def techniques_done(wiz, form_list):
     techniques are linked to site instances in the "site-annotation" step, there
     is no need to get any data from this step, except the overall description."""
     form = head([f for f in form_list if type(f) == TechniquesForm])
-    return dict(
+    d = dict(
         experimental_process = form.cleaned_data['experimental_process'],
         forms_complex = form.cleaned_data['forms_complex'],
         complex_notes = form.cleaned_data['complex_notes'],
         external_db_type = form.cleaned_data['external_db_type'],
         external_db_accession = form.cleaned_data['external_db_accession']
     )
+    for i in xrange(settings.NUMBER_OF_EXTERNAL_DATABASE_FIELDS):
+        d['external_db_type_%d' % i] = form.cleaned_data['external_db_type_%d' % i]
+        d['external_db_accession_%d' % i] = form.cleaned_data['external_db_accession_%d' % i]
+    return d
 
 """The following few steps are related to entering sites and mapping them to
 sequences from the genome. They are carried through the curation using Django

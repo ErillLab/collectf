@@ -13,7 +13,7 @@ from django.contrib import messages
 import session_utils
 import models
 import site_entry
-
+from collectf import settings
 
 def publication_process(wiz, form):
     """Post-process paper selection step."""
@@ -48,10 +48,9 @@ def genome_process(wiz, form):
     # genome with id <genome_accession> should be in db.
     genomes = [models.Genome.objects.get(genome_accession=genome_accession)]
     # Extra genome accession numbers (if any)
-    g = form.cleaned_data.get('genome_accession_1', None)
-    if g: genomes.append(models.Genome.objects.get(genome_accession=g))
-    g = form.cleaned_data.get('genome_accession_2', None)
-    if g: genomes.append(models.Genome.objects.get(genome_accession=g))
+    for i in xrange(1, settings.NUMBER_OF_GENOME_ACCESSION_FIELDS):
+        g = form.cleaned_data.get('genome_accession_%d' % i, None)
+        if g: genomes.append(models.Genome.objects.get(genome_accession=g))
 
     # store genome in session data
     session_utils.put(wiz.request.session, 'genomes', genomes)

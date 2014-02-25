@@ -8,22 +8,26 @@
 
 <script type="text/javascript">
 
-// collapse external DB type and accession number fields together
-var dom =  $("#id_2-external_db_type").parent().parent();
-dom.hide();
-dom.next().hide();
-$("#id_2-has_external_db").change(function() {
-    dom.toggle();
-    dom.next().toggle();
-});
+function externalDBToggle() {
+    // collapse external DB type and accession number fields together
+    var doms =  $("[id^='id_2-external_db_type']");
+    for(var i=0; i<doms.length; i++) {
+        var dom = $(doms[i]).parent().parent();
+        dom.toggle('fast');
+        dom.next().toggle('fast');
+    }
+}
 
-// collapse complex notes
-dom_2 = $('#id_2-complex_notes').parent().parent();
-dom_2.hide();
-$('#id_2-forms_complex').change(function() {
-    dom_2.toggle();
-});
+function complexNotesToggle() {
+    // collapse complex notes
+    var dom_2 = $('#id_2-complex_notes').parent().parent();
+    dom_2.toggle('fast');
+}
 
+externalDBToggle();
+$('#id_2-has_external_db').change(externalDBToggle);
+complexNotesToggle();
+$('#id_2-forms_complex').change(complexNotesToggle);
 // Change the ul style (hide bullet points on the list of experimental techniques)
 $('ul').css('list-style-type', 'none');
 

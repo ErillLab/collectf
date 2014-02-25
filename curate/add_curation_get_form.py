@@ -14,7 +14,7 @@ import session_utils
 from django import forms
 from django.utils.safestring import mark_safe
 from django.contrib import messages
-
+from collectf import settings
 
 def publication_get_form(wiz, form):
     """Construct the form for publication selection step."""
@@ -39,20 +39,16 @@ def genome_get_form(wiz, form):
     # easier for curator.
     if c:
         form.initial["TF"] = c.TF
-        form.initial["TF_type"] = c.TF_type
         if c.site_instances.all():
+            genomes = list(set(site.genome.genome_accession for site in c.site_instances.all()))
             form.initial["genome_accession"] = c.site_instances.all()[0].genome.genome_accession
-            if len(c.site_instances.all()) == 2:
-                form.initial['genome_accession_1'] = c.site_instances.all()[1].genome.genome_accession
-            if len(c.site_instances.all()) == 3:
-                form.initial['genome_accession_1'] = c.site_instances.all()[2].genome.genome_accession
-            
+            for i, g in zip(xrange(1, settings.NUMBER_OF_GENOME_ACCESSION_FIELDS), genomes[1:]):
+                form.initial['genome_accession_%d' % i] = g
+
         # Enter TF accession numbers
         form.initial["TF_accession"] = c.TF_instances.all()[0].protein_accession
-        if len(c.TF_instances.all()) == 2:
-            form.initial["TF_accession_1"] = c.TF_instances.all()[1].protein_accession
-        if len(c.TF_instances.all()) == 3:
-            form.initial["TF_accession_2"] = c.TF_instances.all()[2].protein_accession
+        for i, TF_instance in zip(xrange(1, settings.NUMBER_OF_TF_ACCESSION_FIELDS), c.TF_instances.all()[1:]):
+            form.initial["TF_accession_%d" % i] = TF_instance.protein_accession
         
         form.initial["TF_species"] = c.TF_species
         form.initial["site_species"] = c.site_species
@@ -63,7 +59,7 @@ def genome_get_form(wiz, form):
         the previous curation of the paper. They may differ in this curation, so it is
         best to check that they are correct before proceeding to the next step."""
         messages.warning(wiz.request, mark_safe(msg))
-
+    
     # In addition populate two fields on whether the manuscript contains
     # experimental data and promoter information
     pid = session_utils.get(wiz.request.session, 'publication')

@@ -8,7 +8,7 @@ from curate import site_entry
 import re
 import help_texts
 from django.utils.safestring import mark_safe
-
+from collectf import settings
 
 
 class PublicationForm(forms.Form):
@@ -36,29 +36,41 @@ class GenomeForm(forms.Form):
       specify whether the paper contains expression data and promoter
       information.
       """
+
+    def __init__(self, *args, **kwargs):
+        """Override initialization"""
+        super(GenomeForm, self).__init__(*args, **kwargs)
+        num_genome_fields = settings.NUMBER_OF_GENOME_ACCESSION_FIELDS
+        num_TF_fields = settings.NUMBER_OF_TF_ACCESSION_FIELDS
+        # Extra genome accession fields
+        for i in xrange(1, num_genome_fields):
+            self.fields['genome_accession_%d' % i] = forms.CharField(label="Genome NCBI accession number [%d]" % i,
+                                                                     required=False)
+        # Extra TF accession fields
+        for i in xrange(1, num_TF_fields):
+            self.fields['TF_accession_%d' % i] = forms.CharField(label="TF accession number [%d]" % i,
+                                                                 required=False)
+        # Change the order of fields
+        current_order = self.fields.keyOrder
+        self.fields.keyOrder = (['TF', 'genome_accession'] +
+                                ['genome_accession_%d' % i for i in xrange(1, num_genome_fields)] +
+                                ['site_species_same'] + 
+                                ['TF_accession'] +
+                                ['TF_accession_%d' % i for i in xrange(1, num_TF_fields)] +
+                                ['TF_species_same', 'site_species', 'TF_species'] +
+                                ['contains_promoter_data', 'contains_expression_data'])
     
     help_dict = help_texts.genome_form
     # TF field
     TF = forms.ModelChoiceField(queryset=TF.objects.order_by('name'),
                                 label="TF",
                                 help_text=help_dict['TF'])
-    # TF type (activator, repressor, dual)
-    TF_type = forms.ChoiceField(Curation_SiteInstance.TF_TYPE,
-                                label="TF structure",
-                                help_text=help_dict['TF_type'])
 
     # Genome accession number(s)
     # The last two genome accession fields will be hidden by default, but be
     # able to shown by the curator for data entry.
     genome_accession = forms.CharField(label="Genome NCBI accession number",
                                        help_text=help_dict['genome_accession'])
-    # Extra genome accession fields
-    genome_accession_1 = forms.CharField(label="Genome NCBI accession number [2]",
-                                         help_text=help_dict['genome_accession'],
-                                         required=False)
-    genome_accession_2 = forms.CharField(label="Genome NCBI accession number [3]",
-                                         help_text=help_dict['genome_accession'],
-                                         required=False)
 
     # Checked if site species is the same with the reported genome
     site_species_same = forms.BooleanField(required=False,
@@ -68,13 +80,6 @@ class GenomeForm(forms.Form):
     # TF accession number
     TF_accession = forms.CharField(label="TF accession number",
                                    help_text=help_dict['TF_accession'])
-    # Extra TF accession fields
-    TF_accession_1 = forms.CharField(label="TF accession number[2]",
-                                     help_text=help_dict['TF_accession'],
-                                     required=False)
-    TF_accession_2 = forms.CharField(label="TF accession number[3]",
-                                     help_text=help_dict['TF_accession'],
-                                     required=False)
 
     # Checked if TF species is the same with the reported genome
     TF_species_same = forms.BooleanField(required=False,
@@ -128,18 +133,6 @@ class GenomeForm(forms.Form):
         genome_accession = self.cleaned_data['genome_accession'].strip()
         return self.clean_genome_accession_helper(genome_accession)
 
-    def clean_genome_accession_1(self):
-        """Clean first extra genome accession field"""
-        genome_accession = self.cleaned_data['genome_accession_1'].strip()
-        if genome_accession:
-            return self.clean_genome_accession_helper(genome_accession)
-
-    def clean_genome_accession_2(self):
-        """Clean second extra genome accession field"""
-        genome_accession = self.cleaned_data['genome_accession_2'].strip()
-        if genome_accession:
-            return self.clean_genome_accession_helper(genome_accession)
-
     def clean_TF_accession_helper(self, TF_accession):
         """Check if the entered TF accession number is valid"""
         try:
@@ -160,18 +153,6 @@ class GenomeForm(forms.Form):
         fields (if there are more than one)."""
         TF_accession = self.cleaned_data['TF_accession'].strip()
         return self.clean_TF_accession_helper(TF_accession)
-
-    def clean_TF_accession_1(self):
-        """Clean first extra TF accession field"""
-        TF_accession = self.cleaned_data['TF_accession_1'].strip()
-        if TF_accession:
-            return self.clean_TF_accession_helper(TF_accession)
-
-    def clean_TF_accession_2(self):
-        """Clean second extra TF accession field"""
-        TF_accession = self.cleaned_data['TF_accession_2'].strip()
-        if TF_accession:
-            return self.clean_TF_accession_helper(TF_accession)
 
     def clean_species(self, field):
         """Helper function for clean_TF_species and clean_site_species. When
@@ -205,11 +186,13 @@ class GenomeForm(forms.Form):
         cd = self.cleaned_data
         if 'genome_accession' not in cd:
             return
+        # Check extra genome-accession fields
         genome_accessions = [cd['genome_accession']]
-        if cd.get('genome_accession_1', None):
-            genome_accessions.append(cd['genome_accession_1'])
-        if cd.get('genome_accession_2', None):
-            genome_accessions.append(cd['genome_accession_2'])
+        for i in xrange(1, settings.NUMBER_OF_GENOME_ACCESSION_FIELDS):
+            field_name = 'genome_accession_%d' % i
+            if cd.get(field_name, None):
+                self.clean_genome_accession_helper(cd[field_name].strip())
+                genome_accessions.append(cd[field_name].strip())
         # Get all genomes from the database.
         genomes = [Genome.objects.get(genome_accession=acc) for acc in genome_accessions]
         all_same = lambda items: all(x==items[0] for x in items)
@@ -224,10 +207,11 @@ class GenomeForm(forms.Form):
             if 'TF_accession' not in cd:
                 return 
             TF_accessions = [cd['TF_accession']]
-            if cd.get('TF_accession_1', None):
-                TF_accessions.append(cd['TF_accession_1'])
-            if cd.get('TF_accession_2', None):
-                TF_accessions.append(cd['TF_accession_2'])
+            for i in xrange(settings.NUMBER_OF_TF_ACCESSION_FIELDS):
+                field_name = 'TF_accession_%d' % i
+                if cd.get(field_name, None):
+                    self.clean_TF_accession_helper(cd[field_name].strip())
+                    TF_accessions.append(cd[field_name].strip())
             # Check if all TF accession numbers come from the same organism
             all_same = lambda items: all(x==items[0] for x in items)
             if not all_same([bioutils.TF_accession_to_org_taxon(acc) for acc in TF_accessions]):
@@ -277,9 +261,29 @@ class TechniquesForm(forms.Form):
       to interact with another protein/ligand that influences binding (and
       optionally add notes on that [pop-up]).
       """
+
+
+
+    def __init__(self, *args, **kwargs):
+        """Override initialization"""
+        super(TechniquesForm, self).__init__(*args, **kwargs)
+        help_dict = help_texts.techniques_form
+        num_external_db_fields = settings.NUMBER_OF_EXTERNAL_DATABASE_FIELDS
+        # Extra external-database fields
+        external_db_type_choices = [(None, "None"),]
+        for db in ExternalDatabase.objects.all():
+            external_db_type_choices.append((db.ext_database_id, db.ext_database_name))
+        # Create extra fields
+        for i in xrange(num_external_db_fields):
+            self.fields['external_db_type_%d' % i] = forms.ChoiceField(choices=external_db_type_choices,
+                                                                       required=False,
+                                                                       label="External DB type [%d]" % (i+1),
+                                                                       help_text=help_dict['external_db_type'])
+            self.fields['external_db_accession_%d' % i] = forms.CharField(required=False,
+                                                                          label="External DB accession number [%d]" % (i+1),
+                                                                          help_text=help_dict['external_db_accession'])
     
     help_dict = help_texts.techniques_form
-
     # generate techniques field by getting available techniques from db
     choices = []
     # Used Bootstrap tooltip for experimental technique description
@@ -297,21 +301,11 @@ class TechniquesForm(forms.Form):
                                            label="Experimental process",
                                            help_text=help_dict['experimental_process'])
 
+
     # External database links
     has_external_db = forms.BooleanField(
         required=False,
-        label="The manuscript reports high-throughput data from an external database.")
-    external_db_type_choices = [(None, "None"),]
-    for db in ExternalDatabase.objects.all():
-        external_db_type_choices.append((db.ext_database_id, db.ext_database_name))
-    external_db_type = forms.ChoiceField(choices=external_db_type_choices,
-                                         required=False,
-                                         label="External DB type",
-                                         help_text=help_dict['external_db_type'])
-    
-    external_db_accession = forms.CharField(required=False,
-                                           label="External DB accession number",
-                                           help_text=help_dict['external_db_accession'])
+        label="The manuscript reports high-throughput data from an external database. (You can report up to 5 external resources.)")
     
     # Does TF interact with any other protein/ligand that influences binding?
     forms_complex = forms.BooleanField(required=False,

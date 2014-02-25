@@ -113,3 +113,8 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 # Absolute path to the directory of pickle files that are used.
 # Don't put anything in this directory yourself.
 PICKLE_ROOT = os.path.join(os.path.dirname(os.path.dirname(__file__)), "pickles")
+
+# Curation submission settings
+NUMBER_OF_GENOME_ACCESSION_FIELDS = 5
+NUMBER_OF_TF_ACCESSION_FIELDS = 5
+NUMBER_OF_EXTERNAL_DATABASE_FIELDS = 5
