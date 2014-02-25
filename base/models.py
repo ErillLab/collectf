@@ -18,31 +18,12 @@ class Curation(models.Model):
                         ("TF_not_available", "No comparable TF protein sequence in NCBI"),
                         ("external_submission", "External submission"),
                         ("other", "other reason (specify in notes)"),)
-    
-    # TODO remove this when database scheme is updated completely.
-    TF_FUNCTION = (("ACT", "activator"),
-                   ("REP", "repressor"),
-                   ("DUAL", "dual"),
-                   ("N/A", "not specified"))
-    
-    TF_TYPE = (("MONOMER", "monomer"),
-               ("DIMER", "dimer"),
-               ("TETRAMER", "tetramer"),
-               ("OTHER", "other"),
-               ("N/A", "not specified"))
-    
+
     curation_id = models.AutoField(primary_key=True)
 
     # curation fields
     TF_species = models.CharField(max_length=500)   # species of reported TF
     site_species = models.CharField(max_length=500) # species of reported sites
-    
-    # <Wed Jan 29 2014> TF function is going to be linked directly to
-    # curation_site_instance, allowing a single curation to have associated
-    # site-instances that are repressed or activated.
-    #TF_function = models.CharField(max_length=50, choices=TF_FUNCTION)
-
-    TF_type = models.CharField(max_length=50, choices=TF_TYPE)
     experimental_process = models.TextField(null=True, blank=True)
 
     # Is the TF shown to interact with other protein/ligand that influences
@@ -352,11 +333,19 @@ class Curation_SiteInstance(models.Model):
                    ("REP", "repressor"),
                    ("N/A", "not specified"))
 
+    TF_TYPE = (("MONOMER", "monomer"),
+               ("DIMER", "dimer"),
+               ("TETRAMER", "tetramer"),
+               ("OTHER", "other"),
+               ("N/A", "not specified"))
+
     curation = models.ForeignKey("Curation", null=False)
     site_instance = models.ForeignKey("SiteInstance", null=False)
     site_type = models.CharField(max_length=50, choices=SITE_TYPE)
     annotated_seq = models.TextField(max_length=100000)
 
+    # TF type
+    TF_type = models.CharField(max_length=50, choices=TF_TYPE)
     # TF function
     TF_function = models.CharField(max_length=50, choices=TF_FUNCTION, default="N/A")
     # regulation relation

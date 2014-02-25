@@ -43,7 +43,7 @@ class GenomeForm(forms.Form):
                                 label="TF",
                                 help_text=help_dict['TF'])
     # TF type (activator, repressor, dual)
-    TF_type = forms.ChoiceField(Curation.TF_TYPE,
+    TF_type = forms.ChoiceField(Curation_SiteInstance.TF_TYPE,
                                 label="TF structure",
                                 help_text=help_dict['TF_type'])
 
