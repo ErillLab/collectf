@@ -115,6 +115,7 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 PICKLE_ROOT = os.path.join(os.path.dirname(os.path.dirname(__file__)), "pickles")
 
 # Curation submission settings
-NUMBER_OF_GENOME_ACCESSION_FIELDS = 5
+NUMBER_OF_GENOME_ACCESSION_FIELDS = 8
 NUMBER_OF_TF_ACCESSION_FIELDS = 5
 NUMBER_OF_EXTERNAL_DATABASE_FIELDS = 5
+

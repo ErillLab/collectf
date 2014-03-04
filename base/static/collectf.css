@@ -90,3 +90,9 @@ body {
 table {
     max-width: none;
 }
+
+.popover{
+    display:block !important;
+    max-width: 400px!important;
+    width:auto;
+}

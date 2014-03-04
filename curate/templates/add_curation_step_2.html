@@ -10,18 +10,23 @@
 
 function externalDBToggle() {
     // collapse external DB type and accession number fields together
-    var doms =  $("[id^='id_2-external_db_type']");
+    var doms =  $("[id^='id_2-external_db_accession']");
     for(var i=0; i<doms.length; i++) {
-        var dom = $(doms[i]).parent().parent();
-        dom.toggle('fast');
-        dom.next().toggle('fast');
+        var d = $(doms[i]);
+        console.log(d.val());
+        if (!(d.val())) {
+            d.parent().parent().toggle('fast');
+            d.parent().parent().prev().toggle('fast');
+        }
     }
 }
 
 function complexNotesToggle() {
     // collapse complex notes
-    var dom_2 = $('#id_2-complex_notes').parent().parent();
-    dom_2.toggle('fast');
+    var dom_2 = $('#id_2-complex_notes');
+    if (!dom_2.val()) {
+        dom_2.parent().parent().toggle('fast');
+    }
 }
 
 externalDBToggle();

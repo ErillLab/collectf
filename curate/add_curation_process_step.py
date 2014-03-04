@@ -146,6 +146,8 @@ def site_annotation_process(wiz, form):
             site.set_qval(float(q) if q else None)
         # TF function
         site.set_TF_function(cd['%d_TF_function'%i])
+        # TF_type
+        site.set_TF_type(cd['%d_TF_type' %i])
         # Experimental techniques
         site.clear_techniques()
         for j,t in enumerate(techniques):

@@ -34,8 +34,20 @@ layout is not used. Instead, form fields are displayed as cells of a table.
     {% endif %}
   </tr>
   <tr>
-    <th class="small"> <small> <a href="#" onclick="selectAllSites(); return false;">Select all</a> /
-         <a href="#" onclick="toggleDiagrams(); return false;">Toggle gene diagrams</a></small></th>
+
+    <th class="small"> <small> <a href="#" onclick="selectAllSites(); return false;">Select all</a><!-- /
+         <a href="#" onclick="toggleDiagrams(); return false;">Toggle gene diagrams</a>--></small></th>
+    <th class="small">
+      <select class="form-control" id="TF_type_selected">
+        <option value="MONOMER">monomer</option>
+        <option value="DIMER">dimer</option>
+        <option value="TETRAMER">tetramer</option>
+        <option value="OTHER">other</option>
+        <option value="N/A">not-specified</option>
+      </select><br/>
+      <small> <a href="#" onclick="applyTFTypeToSelectedSites(); return false;">Apply to selected</a></small>
+    </th>
+
     <th class="small">
       <select class="form-control" id="TF_function_selected">
         <option value="ACT">activator</option>
@@ -61,8 +73,9 @@ layout is not used. Instead, form fields are displayed as cells of a table.
   {% for site in sites %}
   {% with i=forloop.counter0|slugify %}
   <tr class="small">
-    <th>{% with i|add:"_site" as field_name %}{{ form|get:field_name|bootstrap }}{% endwith %}</th>
-    <th >{% with i|add:"_TF_function" as field_name %}{{ form|get:field_name|bootstrap_inline }}{% endwith %}</th>
+    <th><div class="sequence-block">{% with i|add:"_site" as field_name %}{{ form|get:field_name|bootstrap }}{% endwith %}</div></th>
+    <th>{% with i|add:"_TF_type" as field_name %}{{ form|get:field_name|bootstrap_inline }}{% endwith %}</th>
+    <th>{% with i|add:"_TF_function" as field_name %}{{ form|get:field_name|bootstrap_inline }}{% endwith %}</th>
     {% for t in techniques %}
     {% with j=forloop.counter0|slugify %}
     <th>{% with i|add:"_technique_"|add:j as field_name %}{{ form|get:field_name|bootstrap_inline }}{% endwith %}</th>
@@ -106,10 +119,33 @@ function applyTFFunctionToSelectedSites() {
     }
 }
 
-function toggleDiagrams() {
-    // toggle gene diagrams
-    $('svg').parent().toggle();
-    $('svg').parent().next().toggle();
+function applyTFTypeToSelectedSites() {
+    // Apply TF function to the selected sites.
+    var checkboxes = $("[id$='_site']");
+    var v = $("#TF_type_selected").val();
+    for(i=0; i<checkboxes.length; i++) {
+        if (checkboxes[i].checked) {
+            $("#id_6-" + i + '_TF_type').val(v);
+        }
+    }
+}
+
+function diagramsOnHover() {
+    // make diagrams to be visible on hover
+    var seqs = $('.sequence');
+
+    for (i=0; i<seqs.length; i++) {
+        var seq = $(seqs[i]);
+        console.log(seq.next());
+        seq.popover({title:'',
+                     content:seq.next().append(seq.next().next()),
+                     html:true,
+                     trigger:'hover',
+                     placement:'right'});
+        seq.popover('show');
+        seq.popover('hide');
+
+    }
 }
 
 function clearAll(techniqueId) {
@@ -126,7 +162,7 @@ $(document).ready(function() {
     // remove class form-control
     $('.form-control').removeClass('form-control');
     // Hide gene diagrams by default
-    toggleDiagrams();
+    diagramsOnHover();
 });
 </script>
 

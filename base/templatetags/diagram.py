@@ -40,5 +40,5 @@ def regulation_diagram(regulations, site_instance):
              fragments=1,
              start=min(map(lambda r: r.gene.start, regulations)) - 150,
              end = max(map(lambda r: r.gene.end, regulations)) + 150,
-             pagesize = (2*cm, 20*cm))
+             pagesize = (2*cm, 12*cm))
     return mark_safe(gdd.write_to_string('svg'))

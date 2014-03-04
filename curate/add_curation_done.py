@@ -38,7 +38,6 @@ def genome_done(wiz, form_list):
     assert TF_instances
     return dict(
         TF = form.cleaned_data['TF'],
-        TF_type = form.cleaned_data['TF_type'],
         TF_species = form.cleaned_data['TF_species'],
         site_species = form.cleaned_data['site_species'],
         TF_instances = TF_instances,
@@ -53,12 +52,11 @@ def techniques_done(wiz, form_list):
         experimental_process = form.cleaned_data['experimental_process'],
         forms_complex = form.cleaned_data['forms_complex'],
         complex_notes = form.cleaned_data['complex_notes'],
-        external_db_type = form.cleaned_data['external_db_type'],
-        external_db_accession = form.cleaned_data['external_db_accession']
     )
     for i in xrange(settings.NUMBER_OF_EXTERNAL_DATABASE_FIELDS):
-        d['external_db_type_%d' % i] = form.cleaned_data['external_db_type_%d' % i]
-        d['external_db_accession_%d' % i] = form.cleaned_data['external_db_accession_%d' % i]
+        d['external_db_type_%d' % i] = form.cleaned_data.get('external_db_type_%d' % i, None)
+        d['external_db_accession_%d' % i] = form.cleaned_data.get('external_db_accession_%d' % i, None)
+        
     return d
 
 """The following few steps are related to entering sites and mapping them to
@@ -131,7 +129,6 @@ def create_curation(wiz, genome_dict, techniques_dict, curation_review_dict):
                                TF_species=           genome_dict['TF_species'],
                                site_species=         genome_dict['site_species'],
                                TF=                   genome_dict['TF'],
-                               TF_type=              genome_dict['TF_type'],
                                experimental_process= techniques_dict['experimental_process'],
                                forms_complex=        techniques_dict['forms_complex'],
                                complex_notes=        techniques_dict['complex_notes'],
@@ -183,6 +180,7 @@ def create_matched_site_instances(wiz, curation, sites, site_type):
                                           annotated_seq=match.reported_seq,
                                           site_type=site_type,
                                           TF_function=site.TF_function,
+                                          TF_type=site.TF_type,
                                           quantitative_value=site.qval)
         cs.save()
         # For each site instance, add experimental technique information
@@ -217,14 +215,15 @@ def edit_curation_check(wiz, form_list):
 
 def add_external_db(techniques_dict, curation):
     """Add external DB references, if any."""
-    external_db_type = techniques_dict.get('external_db_type', None)
-    if external_db_type and external_db_type != 'None':
-        external_db_type = models.ExternalDatabase.objects.get(
-            ext_database_id=techniques_dict['external_db_type'])
-        curation_ext_ref = models.Curation_ExternalDatabase(
-            curation=curation, external_database=external_db_type,
-            accession_number=techniques_dict['external_db_accession'])
-        curation_ext_ref.save()
+    for i in xrange(settings.NUMBER_OF_EXTERNAL_DATABASE_FIELDS):
+        external_db_type = techniques_dict.get('external_db_type_%d' % i, None)
+        if external_db_type and external_db_type != 'None':
+            external_db_type = models.ExternalDatabase.objects.get(
+                ext_database_id=techniques_dict['external_db_type_%d' % i])
+            curation_ext_ref = models.Curation_ExternalDatabase(
+                curation=curation, external_database=external_db_type,
+                accession_number=techniques_dict['external_db_accession_%d' % i])
+            curation_ext_ref.save()
 
 def paper_complete(wiz, curation_review_dict):
     """Mark the paper complete if so"""

@@ -26,9 +26,6 @@
     <dt>Reported site sp.</dt>
     <dd>{{ curation.site_species|default:"-"}}</dd>
 
-    <dt>TF type</dt>
-    <dd>{{ curation.TF_type_verbose|default:"not specified" }} </dd>
-
     <dt>Created by</dt>
     <dd>{{ curation.curator.user.first_name }} {{ curation.curator.user.last_name }}</dd>
     
@@ -105,6 +102,8 @@
       <th>Regulated genes</th>
       <th>Gene diagram</th>
       <th>Experimental techniques</th>
+      <th>TF function</th>
+      <th>TF type</th>
     </thead>
     <tbody>
       {% with curation_site_instances=curation.curation_siteinstance_set.all %}
@@ -119,6 +118,8 @@
         </td>
         <td><div>{{ cs.regulation_set.all|regulation_diagram:cs.site_instance }}</div></td>
         <td>{% for t in cs.experimental_techniques.all %}{{ t.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        <td>{{ cs.TF_function_verbose }}</td>
+        <td>{{ cs.TF_type_verbose }}</td>
       </tr>
       {% endfor %}
       {% endwith %}

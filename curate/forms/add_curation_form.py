@@ -453,6 +453,7 @@ class SiteEntryForm(forms.Form):
 
     def clean(self):
         # If the site field contains quantitative data, make sure the format field is filled.
+        self.check_qval_data_format=False
         if self.check_qval_data_format:
             self.check_quantitative_data_format(self.cleaned_data.get('quantitative_data_format', None))
         return self.cleaned_data

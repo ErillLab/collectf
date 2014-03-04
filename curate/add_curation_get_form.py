@@ -82,11 +82,12 @@ def techniques_get_form(wiz, form):
         
         form.fields['experimental_process'].initial = c.experimental_process
         try:
-            external_db = models.Curation_ExternalDatabase.objects.get(curation=c)
+            external_dbs = models.Curation_ExternalDatabase.objects.filter(curation=c)
+            for i,external_db in enumerate(external_dbs):
+                form.fields['external_db_type_%d'%i].initial = external_db.external_database.ext_database_id
+                form.fields['external_db_accession_%d'%i].initial = external_db.accession_number
         except models.Curation_ExternalDatabase.DoesNotExist:
-            external_db = None
-        form.fields['external_db_type'].initial = external_db.external_database.ext_database_id if external_db else None
-        form.fields['external_db_accession'].initial = external_db.accession_number if external_db else ""
+            pass
         form.fields['forms_complex'].initial = c.forms_complex
         form.fields['complex_notes'].initial = c.complex_notes
     return form
@@ -152,9 +153,12 @@ def site_annotation_get_form(wiz, form):
                 form.fields['%d_qval' % i] = forms.FloatField(label='Q-val',
                                                               required=False,
                                                               initial=site.qval)
+            # create TF type selection field
+            form.fields['%d_TF_type' % i] = forms.ChoiceField(label='TF type',
+                                                              choices=models.Curation_SiteInstance.TF_TYPE)
             # create TF function selection field
             form.fields['%d_TF_function' % i] = forms.ChoiceField(label='TF function',
-                                                                  choices=models.Curation.TF_FUNCTION)
+                                                                  choices=models.Curation_SiteInstance.TF_FUNCTION)
             # create techniques fields (one checkbox for each technique)
             for j,t in enumerate(techniques):
                 form.fields['%d_technique_%d' % (i,j)] = forms.BooleanField(label="", required=False)

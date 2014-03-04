@@ -72,13 +72,24 @@ function addToggleLink() {
 }
 
 function toggleGenomeFields() {
-    // hide extra genome accession fields
-    $("[id^='id_1-genome_accession_']").closest('.form-group').toggle('fast');
+    var genome_accessions = $("[id^='id_1-genome_accession_']");
+    for (i=0; i<genome_accessions.length; i++) {
+        var g = $(genome_accessions[i]);
+        if(!(g.val())) {
+            g.closest('.form-group').toggle('fast');
+        }
+    }
 }
 
 function toggleTFFields() {
     // hide extra genome accession fields
-    $("[id^='id_1-TF_accession_']").closest('.form-group').toggle('fast');
+    var TF_accessions = $("[id^='id_1-TF_accession_']");
+    for (i=0; i<TF_accessions.length; i++) {
+        var t = $(TF_accessions[i]);
+        if (!(t.val())) {
+            t.closest('.form-group').toggle('fast');
+        }
+    }
 }
 
 

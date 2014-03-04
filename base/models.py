@@ -364,6 +364,14 @@ class Curation_SiteInstance(models.Model):
     def __unicode__(self):
         return u'[%d]' % self.pk
 
+    @property
+    def TF_function_verbose(self):
+        return dict(Curation_SiteInstance.TF_FUNCTION)[self.TF_function]
+
+    @property
+    def TF_type_verbose(self):
+        return dict(Curation_SiteInstance.TF_TYPE)[self.TF_type]
+
 class Regulation(models.Model):
     """This table stores the TF regulation of genes. The regulation table links
     two tables: curation_site_instance and gene, to capture the information of

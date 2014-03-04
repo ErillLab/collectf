@@ -86,10 +86,18 @@ class Match:
     def is_exact(self):
         return self.seq == self.reported_seq
     
-    def pprint(self):
+    def pprint(self, diagram_hover=False):
         """Given a match object, make the HTML snippet to display it properly."""
         strand = '+' if self.strand == 1 else '-'
         nearby_genes = ['%s (%s)' % (g.locus_tag, g.name) for g in self.nearby_genes]
+        # Make the diagram and gene function table
+        extra = (self.match_diagram() +
+                '<table class="table table-condensed small">' +
+                '<thead><tr><th>locus tag</th><th>gene name</th><th>function</th></tr></thead>' +
+                '<tbody>')
+        for g in self.nearby_genes:
+            extra += "<tr><td>%s</td><td>%s</td><td>%s</td></tr>" % (g.locus_tag, g.name, g.description)
+        extra += ('</tbody>' + "</table><br/>")
         return_str = ""
         if self.is_exact():
             return_str += ('<div class="sequence">%s<br/> %s[%d,%d] %s</div>' %
@@ -97,15 +105,8 @@ class Match:
                             self.start, self.end, self.genome.genome_accession))
         else:
             return_str += self.print_alignment(self.reported_seq, self.seq)
-            
-        return_str += (self.match_diagram() +
-                        '<table class="table table-condensed">' +
-                        '<thead><tr><th>locus tag</th><th>gene name</th><th>function</th></tr></thead>' +
-                        '<tbody>')
-        for g in self.nearby_genes:
-            return_str += "<tr><td>%s</td><td>%s</td><td>%s</td></tr>" % (g.locus_tag, g.name, g.description)
-        return_str += ('</tbody>' + "</table><br/>")
-        return mark_safe(return_str)
+        
+        return mark_safe(return_str + extra)
 
     def match_diagram(self):
         """This method is called during curation submission. When the reported sites are
@@ -132,7 +133,7 @@ class Match:
         gdd.draw(format='linear', fragments=1,
                  start=min(map(lambda g: g.start, self.nearby_genes))-150,
                  end=max(map(lambda g: g.end, self.nearby_genes))+150,
-                 pagesize=(3*cm, 20*cm))
+                 pagesize=(2*cm, 12*cm))
         return mark_safe('<div>' + gdd.write_to_string('svg') + '</div>')
 
     def print_alignment(self, seqa, seqb):
@@ -205,6 +206,10 @@ class Site:
     def set_TF_function(self, TF_function):
         """Set TF function for the site."""
         self.TF_function = TF_function
+
+    def set_TF_type(self, TF_type):
+        """Set TF type for the site."""
+        self.TF_type = TF_type
 
     def clear_techniques(self):
         """Clear experimental techniques used to determine the site."""
