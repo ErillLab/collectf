@@ -49,9 +49,9 @@
             <li class="dropdown">
               <a href="#" clas="dropdown-toggle" data-toggle="dropdown">Data submission<b class="caret"></b></a>
               <ul class="dropdown-menu">
-                <li><a href="{% url 'curate.add_publication.pubmed_submission' %}">New paper for curation</a></li>
+                <li><a href="{% url 'curate.add_publication.pubmed_submission' %}">New publication</a></li>
                 <li><a href="{% url 'curate.add_curation.curation' %}">New curation</a></li>
-                {# <li><a href="#">New curation (high-throughput)</a></li> #}
+                <li><a href="{% url 'curate.add_curation.high_throughput_curation' %}">New curation (high-throughput)</li>
                 <li class="divider"></li>
                 <li><a href="{% url 'browse.stats.view_all_publications' %}">View all publications</a></li>
                 <li><a href="{% url 'browse.stats.view_all_curations' %}">View all curations</a></li>

@@ -135,6 +135,8 @@ def curation(request):
     # old_curation key in table, and it will cause trouble.
     if session_utils.has(request.session, 'old_curation'):
         session_utils.remove(request.session, 'old_curation')
+    # This is not high-throughput submission
+    session_utils.put(request.session, 'high_throughput_curation', None)
 
     view = CurationWizard.as_view([PublicationForm,
                                    GenomeForm,
@@ -147,6 +149,36 @@ def curation(request):
                                    CurationReviewForm,],
                                    condition_dict = {'5': inexact_match_form_condition})
     return view(request)
+
+@login_required
+def high_throughput_curation(request):
+    """Entry point for high-throughput curation. Curators can check ChIP and
+    other high-throughput methodologies in the regular submission mode, but if
+    they are submitting data that is primarily based on high-throughput binding
+    assays (e.g. ChIP-seq genomic-SELEX, etc.) they are then encouraged to use
+    the high-throughput submission portal. First few steps are identical to the
+    ones in the regular submission portal. In the site-entry step, two types of
+    data are asked: sites and peaks. As in regular submission portal, sites can
+    be either motif-associated, non-motif-associated or
+    variable-motif-associated (e.g. variable spacing, inverting, anything that
+    is not gapless alignment), which can be entered in sequence-based or
+    coordinate-based modes. Below the site box, curators are able to enter peak
+    data (most likely in coordinate mode)."""
+    
+    # This IS high-throughput submission
+    session_utils.put(request.session, 'high_throughput_curation', True)
+
+    view = CurationWizard.as_view([PublicationForm,
+                                   GenomeForm,
+                                   TechniquesForm,
+                                   SiteEntryForm,
+                                   SiteExactMatchForm,
+                                   SiteSoftMatchForm,
+                                   SiteAnnotationForm,
+                                   GeneRegulationForm,
+                                   CurationReviewForm,],
+                                   condition_dict = {'5': inexact_match_form_condition})
+    return view(request)    
 
 def inexact_match_form_condition(wizard):
     """Check if inexact match form is necessary. If not (i.e. all sites have

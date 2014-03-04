@@ -181,6 +181,10 @@ class Site:
             choices.append((None, "No valid match."))
         return choices
 
+    def get_exact_matches(self):
+        """Return all exact matches"""
+        return self.exact_matches
+
     def set_exact_match(self, match_id):
         """Given a match id (one of site's possible exact matches), match the genome
         location to the binding site reported in the paper"""
@@ -219,8 +223,34 @@ class Site:
         """Add an experimental technique to the set of techniques used to
         determine the site."""
         self.techniques.append(t)
-    
 
+    def match_peak_data(self, peaks):
+        """If the curation mode is high-throughput, the list of peaks are read
+        from the 'peaks' field. In case of the quantitative values that are
+        reported in this field, each site in the 'sites' field is attempted to
+        match one of the peaks in the 'peaks' field to link the associated
+        quantitative value"""
+        print 'match_peak_data'
+        # If peaks can not have quantitative value, just skip this function
+        if not peaks[0].qval:
+            return
+        # If not matched to any site in the genome, the site will be saved as
+        # not-annotated. In this case, the quantitative value is not necessary,
+        # so skip it.
+        if not self.matched:
+            return
+        
+        match = self.get_match()
+        for peak in peaks:
+            if hasattr(peak, 'start'): # coordinate-based peaks
+                if min(peak.start, peak.end) <= match.start and max(peak.start, peak.end) >= match.end:
+                    self.qval = peak.qval
+                    break
+            else: # sequence-based peaks
+                if match.seq in peak.seq or bioutils.reverse_complement(match.seq) in peak.seq:
+                    self.qval = peak.qval
+                    break
+        
 class SequenceSite(Site):
     """Class definition for sites that are initialized with the sequence"""
     def __init__(self, id, seq, qval=None):
@@ -299,6 +329,8 @@ class SequenceSite(Site):
 
     def __repr__(self):
         return "%s" % self.seq
+
+
 
 class CoordinateSite(Site):
     """Class definition for sites that are initialized using coordinates."""

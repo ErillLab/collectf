@@ -107,7 +107,13 @@ def site_entry_get_form(wiz, form):
         # Delete session data, if user change any field and then come back,
         # Store users last entered data, instead of populated data.
         session_utils.put(wiz.request.session, "previously_curated_paper", None)
-        
+
+    # if not high-throughput mode, delete related fields
+    if not session_utils.get(wiz.request.session, 'high_throughput_curation'):
+        del form.fields['peaks']
+        del form.fields['assay_conditions']
+        del form.fields['method_notes']
+    
     return form
 
 def site_exact_match_get_form(wiz, form):
@@ -142,6 +148,9 @@ def site_soft_match_get_form(wiz, form):
 def site_annotation_get_form(wiz, form):
     """Annotation step for site instances."""
     sites = session_utils.get(wiz.request.session, 'sites')
+
+
+    
     techniques = session_utils.get(wiz.request.session, 'techniques')
     for site in sites:
         if site.is_matched():

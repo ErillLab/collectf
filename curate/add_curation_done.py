@@ -161,6 +161,10 @@ def create_site_instances(wiz, curation, site_type):
     create_matched_site_instances(wiz, curation, matched_sites, site_type)
     # Create non-matched sites
     create_non_matched_site_instances(wiz, curation, non_matched_sites, site_type)
+    # If there is any peak data, save them as non-motif-associated
+    if session_utils.get(wiz.request.session, 'high_throughput_curation'):
+        peaks = session_utils.get(wiz.request.session, 'peaks')
+        create_peak_site_instances(wiz, curation, peaks)
 
 def create_matched_site_instances(wiz, curation, sites, site_type):
     """Create SiteInstance objects and CurationSiteInstance objects to link them
@@ -201,6 +205,26 @@ def create_non_matched_site_instances(wiz, curation, sites, site_type):
     for site in sites:
         assert not site.is_matched(), "Site is matched."
         models.NotAnnotatedSiteInstance(sequence=site.seq, curation=curation).save()
+
+def create_peak_site_instances(wiz, curation, peaks):
+    """Create peaks as non-motif-associated site instances"""
+    for peak in peaks:
+        if not peak.is_matched(): continue
+        match = peak.get_match()
+        s,_ = models.SiteInstance.objects.get_or_create(genome=match.genome,
+                                                        start=match.start,
+                                                        end=match.end,
+                                                        strand=match.strand,
+                                                        _seq=match.seq)
+        # Create the curation_site_instance object
+        cs = models.Curation_SiteInstance(curation=curation,
+                                          site_instance=s,
+                                          annotated_seq=match.reported_seq,
+                                          site_type='non_motif_associated',
+                                          TF_function='N/A',
+                                          TF_type='N/A',
+                                          quantitative_value=peak.qval)
+        cs.save()
 
 def edit_curation_check(wiz, form_list):
     """If curation view is used for revising a curation, the first step

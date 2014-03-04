@@ -37,7 +37,6 @@ class SiteInstanceAdmin(admin.ModelAdmin):
     ordering = ('-site_id', )
 
 class Curation_SiteInstanceAdmin(admin.ModelAdmin):
-    list_display = ('id', )
     list_filter = ('site_type',)
     filter_horizontal = ("experimental_techniques",)
     ordering = ('-id',)

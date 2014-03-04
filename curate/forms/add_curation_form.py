@@ -341,7 +341,7 @@ class SiteEntryForm(forms.Form):
     # type of sites to be entered
     site_type = forms.ChoiceField(choices=Curation_SiteInstance.SITE_TYPE,
                                   required=True,
-                                  label="site type",
+                                  label="Site type",
                                   initial="motif_associated")
 
     sites = forms.CharField(required=True,
@@ -352,6 +352,11 @@ class SiteEntryForm(forms.Form):
     quantitative_data_format = forms.CharField(required=False,
                                                label="Quantitative data format",
                                                help_text=help_dict['quantitative_data_format'])
+
+    # Following fields will be visible only if the submission is high-throughput
+    peaks = forms.CharField(widget=forms.Textarea, label="Peaks", help_text=help_dict['peaks'])
+    assay_conditions = forms.CharField(label="Assay conditions", help_text=help_dict['assay_conditions'])
+    method_notes = forms.CharField(label="Method notes", help_text=help_dict['method_notes'])
 
     def verify_coordinates(self, coor_a, coor_b):
         try:
@@ -433,7 +438,6 @@ class SiteEntryForm(forms.Form):
         sites_cd = '\n'.join(' '.join(wds for wds in line) for line in lines)
         self.check_qval_data_format = False # by default, don't check the qval data format
         # check if it is fasta
-        
         if sites_cd[0].startswith('>'):
             return self.verify_only_sites(sites_cd)
         if len(lines[0]) == 1:
@@ -451,9 +455,28 @@ class SiteEntryForm(forms.Form):
         # else return validation error
         raise forms.ValidationError("Invalid format.")
 
+    def clean_peaks(self):
+        """Validate peaks field"""
+        cd = self.cleaned_data['peaks'].strip().upper()
+        lines = [re.split('[\t ]+', line.strip()) for line in re.split('[\r\n]+', cd.strip())]
+        peaks_cd = '\n'.join(' '.join(wds for wds in line) for line in lines)
+        self.check_qval_data_format = False # by default, don't check the qval data format
+        if len(lines[0]) == 1: # sequence format
+            return self.verify_only_sites(peaks_cd) # Same process with site verification
+        elif len(lines[0]) == 2: # either coordinate format or sequence with qvals
+            if lines[0][0].isalpha(): # seq with qvals
+                self.check_qval_data_format = True
+                return self.verify_only_sites_and_values(peaks_cd)
+            else:
+                return self.verify_only_coordinates(peaks_cd)
+        elif len(lines[0]) == 3: # coordinates with qval
+            self.check_qval_data_format = True
+            return self.verify_only_coordinates_and_values(peaks_cd)
+        else:
+            raise forms.ValidationError("Invalid format")
+
     def clean(self):
         # If the site field contains quantitative data, make sure the format field is filled.
-        self.check_qval_data_format=False
         if self.check_qval_data_format:
             self.check_quantitative_data_format(self.cleaned_data.get('quantitative_data_format', None))
         return self.cleaned_data

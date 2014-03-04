@@ -362,7 +362,7 @@ class Curation_SiteInstance(models.Model):
     why_obsolete = models.TextField(null=True, blank=True) # explains why this site became obsolete.
 
     def __unicode__(self):
-        return u'[%d]' % self.pk
+        return u'[%d] curation:%d' % (self.pk, self.curation.pk)
 
     @property
     def TF_function_verbose(self):

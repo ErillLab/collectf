@@ -80,15 +80,32 @@ def site_entry_process(wiz, form):
     """Post process site entry step"""
     genomes = session_utils.get(wiz.request.session, "genomes")
     sites = site_entry.parse_input(form.cleaned_data["sites"].strip())
+
     # find exact matches
     for site in sites:
         site.search_exact_match(genomes)
+
+    # If any site has quantitative data, mark the curation
+    has_qdata = any(site.qval for site in sites)
+
+    # If high-throughput get peak data to save them as non-motif-associated data
+    # TODO save them to the DB
+    if session_utils.get(wiz.request.session, 'high_throughput_curation'):
+        peaks = site_entry.parse_input(form.cleaned_data['peaks'].strip())
+        session_utils.put(wiz.request.session, 'peaks', peaks)
+        for peak in peaks:
+            peak.search_exact_match(genomes)
+            # if there is any match, select the first one by default
+            if peak.get_exact_matches():
+                peak.set_exact_match(0)
+        if any(peak.qval for peak in peaks):
+            has_qdata = True
+    
     # save the list of sites
     session_utils.put(wiz.request.session, 'sites', sites)
     # save the type of lists
     session_utils.put(wiz.request.session, 'site_type', form.cleaned_data['site_type'])
-    # If any site has quantitative data, mark the curation
-    has_qdata = any(site.qval for site in sites)
+    # save whether curation has quantitative data
     session_utils.put(wiz.request.session, 'has_quantitative_data', has_qdata)
     # If any quantitative data format save it
     qval = form.cleaned_data.get('quantitative_data_format', None)
@@ -107,6 +124,13 @@ def site_exact_match_process(wiz, form):
             site.set_exact_match(match_id)
         else: # not matched, perform soft search
             site.search_soft_match(genomes)
+
+    # If high-throughput submission, try to match quantitative values in peak data to sites
+    if session_utils.get(wiz.request.session, 'high_throughput_curation'):
+        peaks = session_utils.get(wiz.request.session, 'peaks')
+        for site in sites:
+            site.match_peak_data(peaks)
+            
     # save the list of sites
     session_utils.put(wiz.request.session, "sites", sites)
             
@@ -119,6 +143,13 @@ def site_soft_match_process(wiz, form):
         site = [site for site in sites if site.key==site_id][0]
         if match_id != "None": # means this site is matched
             site.set_soft_match(match_id)
+
+    # If high-throughput submission, try to match quantitative values in peak data to sites
+    if session_utils.get(wiz.request.session, 'high_throughput_curation'):
+        peaks = session_utils.get(wiz.request.session, 'peaks')
+        for site in sites:
+            site.match_peak_data(peaks)
+            
     # save the list of sites
     session_utils.put(wiz.request.session, "sites", sites)
 

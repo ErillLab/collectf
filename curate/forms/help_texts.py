@@ -99,6 +99,17 @@ site_entry_form = dict(
     be either space or tab separated.""",
 
     quantitative_data_format = """Please enter the data format for the quantitative values associated with sites""",
+
+    peaks = """Enter the peak data (in either coordinate or sequence mode). If
+    there is any quantitative data associated with the peak data, they will be
+    automatically mapped to entered sites. Mapped peak intensity values will be
+    displayed for review before curation submission.""",
+
+    assay_conditions = """Describe the conditions of the ChIP experiment that capture the specifics of the in-vivo 
+    setting for cross-linking. Were cells at exponetial-phase? Was the system induced? How were cells grown?""",
+
+    method_notes = """Describe (use copy-paste if appropriate) the ChIP protocol. What antibodies were used? What
+    chip/sequencer and using what parameters? Etc.""",
 )
 
 site_exact_match_form = dict()

@@ -27,10 +27,11 @@ layout is not used. Instead, form fields are displayed as cells of a table.
 <thead>
   <tr>
     <th>Site</th>
+    <th>TF-type</th>
     <th>TF-function</th>
     <th colspan="{{ techniques|length }}"><span>Experimental techniques</span></th>
     {% if has_quantitative_data %}
-    <th></th>
+    <th>Quantitative value</th>
     {% endif %}
   </tr>
   <tr>
@@ -64,7 +65,7 @@ layout is not used. Instead, form fields are displayed as cells of a table.
     </th>
     {% endfor %}
     {% if has_quantitative_data %}
-    <th>Quantitative value</th>
+    <th></th>
     {% endif %}
   </tr>
 </thead>

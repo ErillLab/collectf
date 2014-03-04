@@ -7,6 +7,7 @@ urlpatterns = patterns('curate.add_publication',
 
 urlpatterns += patterns('curate.add_curation',
     url(r'^curation/$', 'curation'),
+    url(r'^high_throughput_curation/$', 'high_throughput_curation'),
 )
 
 urlpatterns += patterns('curate.edit_curation',
