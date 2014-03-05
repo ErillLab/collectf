@@ -6,5 +6,5 @@
 ** TODO NCBI submission                                                :NCBI:
 ** TODO Registration: check if it works
 ** TODO Edit/validate curation                                     :Curation:
-** TODO High-throughput submission                                 :Curation:
+** DONE High-throughput submission                                 :Curation:
 

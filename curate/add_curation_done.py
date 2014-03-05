@@ -66,9 +66,16 @@ instances. All the site-instance data is processed together."""
 
 def site_entry_done(wiz, form_list):
     form = head([f for f in form_list if type(f) == SiteEntryForm])
-    return dict(
+    d = dict(
         site_type = form.cleaned_data['site_type'],
     )
+    # If the curation is high-throughput, capture assay conditions and method notes
+    if session_utils.get(wiz.request.session, 'high_throughput_curation'):
+        d['method_notes'] = form.cleaned_data['method_notes']
+        d['assay_conditions'] = form.cleaned_data['assay_conditions']
+
+    return d
+
 
 def site_exact_match_done(wiz, form_list):
     pass
@@ -249,6 +256,15 @@ def add_external_db(techniques_dict, curation):
                 accession_number=techniques_dict['external_db_accession_%d' % i])
             curation_ext_ref.save()
 
+def add_high_throughput_notes(site_entry_dict, curation):
+    """If the curation is high-throughput submission, save assay conditions and
+    method notes in the database and link it to the curation"""
+    assay_conditions = site_entry_dict['assay_conditions']
+    method_notes = site_entry_dict['method_notes']
+    chip_info = models.ChipInfo(assay_conditions=assay_conditions, method_notes=method_notes)
+    chip_info.save()
+    curation.chip_info = chip_info
+    curation.save()
 def paper_complete(wiz, curation_review_dict):
     """Mark the paper complete if so"""
     # Get publication information
