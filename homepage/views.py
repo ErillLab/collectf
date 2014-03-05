@@ -1,9 +1,12 @@
 from django.shortcuts import render
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-
-
+from django.http import HttpResponseRedirect
+from django.contrib import messages
+from django.core.urlresolvers import reverse
+from django.core.mail import send_mail
 import models
+import base
 import random
 from browse import motif_report
 
@@ -30,6 +33,23 @@ def contribute(request):
 def feedback(request):
     return render_to_response("feedback.html", {},
                               context_instance=RequestContext(request))
+
+def feedback_send_email(request):
+    """Send an email to myself containing a feedback form"""
+    email_address = request.POST['email']
+    type = request.POST['type']
+    comment = request.POST['comment']
+    try:
+        send_mail('CollecTF feedback (%s)' % type,
+                   comment,
+                   email_address,
+                   ['sefa1@umbc.edu', 'collectfdb_umbc.edu',],
+                   fail_silently=False)
+        messages.add_message(request, messages.INFO, "Thanks for the feedback!")
+    except:
+        messages.add_message(request, messages.ERROR, "Something went wrong. Please try again or send your feedback to collectfdb@umbc.edu")
+        
+    return HttpResponseRedirect(reverse(base.views.home))
 
 def stats(request):
     return render_to_response("stats.html", {},

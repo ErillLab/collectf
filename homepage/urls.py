@@ -12,7 +12,7 @@ urlpatterns = patterns('homepage.views',
     url(r'^cite/$', 'cite'),
     url(r'^links/$', 'links'),
     url(r'^acknowledgement/$', 'acknowledgements'),
-    #url(r'^feedback_send_email/$', 'feedback_send_email'),
+    url(r'^feedback_send_email/$', 'feedback_send_email'),
     #url(r'^register/$', 'register_request'),
 )
 
