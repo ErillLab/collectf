@@ -50,7 +50,7 @@ class PubSubmissionFormPreview(FormPreview):
         msg = "The paper was successfully submitted to be curated later."
         p = session_utils.get(request.session, "publication")
         if "assignment" in request.POST: # if assigned to the curator
-            curator = Curator.objects.get(user=request.user)
+            curator,_ = Curator.objects.get_or_create(user=request.user)
             p.assigned_to = curator
 
         if "contains_no_data" in request.POST: # if the paper has no TFBS data

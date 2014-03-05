@@ -19,7 +19,7 @@ from collectf import settings
 def publication_get_form(wiz, form):
     """Construct the form for publication selection step."""
     user = wiz.request.user
-    curator = models.Curator.objects.get(user=user)
+    curator,_ = models.Curator.objects.get_or_create(user=user)
     # select papers assigned to user and not complete
     assigned_pubs = models.Publication.objects.filter(assigned_to=curator,
                                                       curation_complete=False)
@@ -199,4 +199,13 @@ def gene_regulation_get_form(wiz, form):
     return form
 
 def curation_review_get_form(wiz, form):
+    """Get curation review form"""
+    curator = models.Curator.objects.get(user=wiz.request.user)
+    # If curator is not admin, mark curation as requiring validation
+    if not curator.user.is_staff:
+        form.fields['revision_reasons'].initial = 'external_submission'
+        form.fields['revision_reasons'].widget = forms.HiddenInput()
+        form.fields['NCBI_submission_ready'].initial = False
+        form.fields['NCBI_submission_ready'].widget = forms.HiddenInput()
+        
     return form

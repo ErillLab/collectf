@@ -101,7 +101,7 @@
             <li class="navbar-text">logged in as {{user.username}}</li>
             <li><a href="{% url 'base.views.logout' %}" class="navbar-link">Logout</a></li>
             {% else %}
-            <li><a class="navbar-link" href="#">Register</a></li>
+            <li><a class="navbar-link" href="{% url 'registration_register' %}">Register</a></li>
             <li><a class="navbar-link" href="{% url 'base.views.login' %}">Login</a></li>
             {% endif %}
           </ul>

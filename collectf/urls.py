@@ -21,6 +21,7 @@ urlpatterns = patterns('',
     # login/logout
     url(r'^accounts/login/$', base.views.login),
     url(r'^accounts/logout/$', base.views.logout),
+    url(r'^accounts/', include('registration.backends.default.urls')),
 
     # This should be in browseapp urls.py, but since NCBI links cannot be changed, it
     # will serve here.

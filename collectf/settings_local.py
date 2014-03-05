@@ -52,6 +52,7 @@ INSTALLED_APPS = (
     'django_extensions',
     'south',
     'bootstrapform',
+    'registration',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -119,3 +120,5 @@ NUMBER_OF_GENOME_ACCESSION_FIELDS = 8
 NUMBER_OF_TF_ACCESSION_FIELDS = 5
 NUMBER_OF_EXTERNAL_DATABASE_FIELDS = 5
 
+# required for django-registration
+ACCOUNT_ACTIVATION_DAYS = 7

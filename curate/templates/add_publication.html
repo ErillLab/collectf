@@ -13,11 +13,9 @@ relevant data before submitting.</p>
 <form class="form-horizontal" role="form" action="" method="post">{% csrf_token %}
 
   {{ form|bootstrap_horizontal }}
-  <div class="control-group">
-    <div class="controls">
+  <div class="form-group">
       <input type="hidden" name="{{ stage_field }}" value="1"/>
       <input type="submit" class="btn btn-primary btn-block" role="button" value="Preview" />
-    </div>
   </div>
 </form>
 </div>
