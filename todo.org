@@ -4,7 +4,7 @@
 ** TODO Import css/js as submodules
 ** TODO TF/genome fields: add new field one by one                 :Curation:
 ** TODO NCBI submission                                                :NCBI:
-** TODO Registration: check if it works
+** DONE Registration: check if it works
 ** TODO Edit/validate curation                                     :Curation:
 ** DONE High-throughput submission                                 :Curation:
 
