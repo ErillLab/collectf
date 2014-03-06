@@ -7,4 +7,5 @@
 ** DONE Registration: check if it works
 ** TODO Edit/validate curation                                     :Curation:
 ** DONE High-throughput submission                                 :Curation:
+** TODO db backup script                                          :IMPORTANT:
 
