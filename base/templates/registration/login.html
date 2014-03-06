@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% for f in form.non_field_errors %}
+<div class="alert alert-error">
+{{ f }} 
+</div>
+{% endfor %}
+
+<form class="form-signin" action="" method="post">{% csrf_token %}
+  <h2>Please sign in</h2>
+  <input id="id_username" name="username" type="text" class="input-block-level" placeholder="Username">
+  <input id="id_password" name="password" type="password" class="input-block-level" placeholder="Password">
+  <input class="btn btn-large btn-primary" type="submit" value="Sign in" />
+  <input type="hidden" name="next" value="{{ next|escape }}" />
+
+</form>
+
+{% endblock %}
