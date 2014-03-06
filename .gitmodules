@@ -1,3 +1,0 @@
-[submodule "registration"]
-	path = registration
-	url = https://github.com/sefakilic/django-registration
