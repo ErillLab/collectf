@@ -11,6 +11,7 @@ class GenomeAdmin(admin.ModelAdmin):
 # Curation admin view
 class CurationSiteInstanceInline(admin.StackedInline):
     model = Curation_SiteInstance
+    filter_horizontal = ('experimental_techniques',)
     extra = 0
     
 class CurationAdmin(admin.ModelAdmin):

@@ -15,25 +15,25 @@ def update_db():
     cur_site_insts = models.Curation_SiteInstance.objects.all()
     for cur_site_inst in cur_site_insts:
         curation = cur_site_inst.curation
-        #print curation
+        print curation
         # Update TF function
-        # cur_site_inst.TF_function = curation.TF_function
+        cur_site_inst.TF_function = curation.TF_function
         # Update experimental techniques
-        #for exp in curation.experimental_techniques.all():
-        #   cur_site_inst.experimental_techniques.add(exp)
+        for exp in curation.experimental_techniques.all():
+           cur_site_inst.experimental_techniques.add(exp)
         # Update TF type
         cur_site_inst.TF_type = curation.TF_type
-        cur_site_inst.save() # !!!
+        cur_site_inst.save()
     print "all curation-site-intances updated."
 
-    '''
+    
     # Update curation TF instances
     all_curations = models.Curation.objects.all()
     for cur in all_curations:
         cur.TF_instances.add(cur.TF_instance)
         cur.save()
     print "all curations updated."
-    '''
-
+    
+    
 def run():
     update_db()

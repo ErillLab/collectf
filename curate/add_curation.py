@@ -136,7 +136,7 @@ def curation(request):
     if session_utils.has(request.session, 'old_curation'):
         session_utils.remove(request.session, 'old_curation')
     # This is not high-throughput submission
-    session_utils.put(request.session, 'high_throughput_curation', None)
+    session_utils.put(request.session, 'high_throughput_curation', False)
 
     view = CurationWizard.as_view([PublicationForm,
                                    GenomeForm,

@@ -51,8 +51,13 @@ class Curation(models.Model):
     # be changed into a N:N relationship. This will allow to define TFs composed
     # of several subunits with different accession numbers (e.g. heterodimer
     # such as IHF, composed of IHF alpha and beta.)
-    #TF_instance = models.ForeignKey("TFInstance")
+    #TF_instance = models.ForeignKey("TFInstance", related_name='x')
     TF_instances = models.ManyToManyField("TFInstance")
+
+    # to be removed
+    #TF_function = models.CharField(max_length=50)
+    #TF_type = models.CharField(max_length=50)
+    
     
     # <Wed Jan 29 2014> Experimental techniques are now going to be associated
     # directly (N:N) with curation_site_instances, allowing a curation to
@@ -347,7 +352,7 @@ class Curation_SiteInstance(models.Model):
     # TF type
     TF_type = models.CharField(max_length=50, choices=TF_TYPE)
     # TF function
-    TF_function = models.CharField(max_length=50, choices=TF_FUNCTION, default="N/A")
+    TF_function = models.CharField(max_length=50, choices=TF_FUNCTION)
     # regulation relation
     regulates = models.ManyToManyField("Gene", through="Regulation")
     # experimental techniques used to determine the site instance

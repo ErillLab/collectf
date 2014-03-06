@@ -148,9 +148,6 @@ def site_soft_match_get_form(wiz, form):
 def site_annotation_get_form(wiz, form):
     """Annotation step for site instances."""
     sites = session_utils.get(wiz.request.session, 'sites')
-
-
-    
     techniques = session_utils.get(wiz.request.session, 'techniques')
     for site in sites:
         if site.is_matched():
