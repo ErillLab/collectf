@@ -105,6 +105,8 @@ STATICFILES_DIRS = (
     os.path.join(os.path.dirname(os.path.dirname(__file__)), 'browse', 'static'),
 )
 
+STATIC_ROOT = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'sitestatic')
+
 # Redirect to here when logged in
 LOGIN_REDIRECT_URL = '/'
 
