@@ -5,6 +5,7 @@ import math
 import random
 import StringIO
 import matplotlib
+matplotlib.use('Agg') # generate images without having a window appear
 import matplotlib.pyplot as plt
 from base import bioutils
 from matplotlib import rc
