@@ -336,6 +336,7 @@ class Curation_SiteInstance(models.Model):
 
     TF_FUNCTION = (("ACT", "activator"),
                    ("REP", "repressor"),
+                   ("DUAL", "dual"),
                    ("N/A", "not specified"))
 
     TF_TYPE = (("MONOMER", "monomer"),
