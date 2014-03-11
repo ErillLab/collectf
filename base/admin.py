@@ -74,7 +74,7 @@ class TFInstance(admin.ModelAdmin):
     ordering = ('name')
 
 class NCBISubmissionAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'genome_submitted_to', 'submission_time', 'curation_site_instance')
+    list_display = ('pk', 'genome_submitted_to', 'submission_time')
     
 
 def register_rest():

@@ -17,8 +17,17 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
-    $('#id_genomes').addClass('select2');
-    $('.select2').select2();
+    var g = $('#id_genome_accession');
+    g.attr('autocomplete', 'off');
+    $.getJSON("{% url 'browse.json_views.get_genomes' %}", function(data) {
+        var genomes = $.map(data, function(n,i) {
+            return n['genome_accession'] + ' - ' + n['organism'];
+        });
+        g.typeahead({
+            source: genomes,
+            updater: function(item) {return item.split(' ')[0];}
+        });
+    });
 });
 
 </script>

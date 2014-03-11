@@ -37,14 +37,14 @@ def generate_tbl_string(curation_site_instances, test_export):
         # if any of the sites in the meta-site is submitted to NCBI before, skip it.
         ncbi_sites = [csi for csi in meta_site.cur_site_insts
                       if models.NCBISubmission.objects.filter(
-                              genome_submitted_to=genome,
+                              genome_submitted_to=genome.genome_accession,
                               curation_site_instance=csi)]
         if ncbi_sites:
             continue
 
         # Pick up the first site as ncbi_Xref
         if not test_export:
-            n = models.NCBISubmission(genome_submitted_to=genome, curation_site_instance=meta_site.delegate)
+            n = models.NCBISubmission(genome_submitted_to=genome.genome_accession, curation_site_instance=meta_site.delegate)
             n.save()
 
         ncbi_sites.append(meta_site.delegate)
@@ -111,10 +111,20 @@ def export_tbl_view(request):
 
     # For given TF instance and genome, return all site instances in .tbl format
     form = ExportForm(request.POST)
-    form.is_valid()
-    genome = form.cleaned_data['genomes']
+    if not form.is_valid():
+        return render(request, 'ncbi_export.html', {'form':form},
+                      context_instance=RequestContext(request))
+    
+    genome_accession = form.cleaned_data['genome_accession']
+    genome = models.Genome.objects.get(genome_accession=genome_accession)
     test_export = form.cleaned_data['is_test_export']
 
+
+    return generate_zip_response(genome, test_export)
+
+def generate_zip_response(genome, test_export):
+    """Given a genome and the boolean whether if the export is for test
+    purposes, generate a zip file containing asn file."""
     # get all curation_site_instances
     curation_site_instances = models.Curation_SiteInstance.objects.filter(
         site_instance__genome=genome,
@@ -123,7 +133,6 @@ def export_tbl_view(request):
         is_obsolete=False,
         experimental_techniques__preset_function='binding').order_by('curation__TF_instances',
                                                                      'site_instance__start')
-
     if len(curation_site_instances) == 0:
         msg = "No curation found for this genome."
         messages.add_message(request, messages.WARNING, msg)
@@ -131,7 +140,7 @@ def export_tbl_view(request):
 
     collectf_tbl_str = generate_tbl_string(curation_site_instances, test_export)
     genome_asn_str = download_genome_asn(genome.genome_accession)
-    readme_str = generate_readme_string()
+    readme_str = generate_readme_string()    
 
     # create a zip file
     filename = genome.genome_accession.replace('.', '_')
