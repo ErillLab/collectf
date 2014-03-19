@@ -5,10 +5,11 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import login_required
 import models
 import base
 
-@user_passes_test(lambda u: u.is_superuser)
+@login_required
 def add_TF(request):
     """View for adding a TF"""
     if request.method == "POST":
@@ -27,7 +28,7 @@ def add_TF(request):
     return render(request, "add_TF.html", {'form': form},
                   context_instance=RequestContext(request))
 
-@user_passes_test(lambda u: u.is_superuser)
+@login_required
 def add_TF_family(request):
     """View for adding a TF family"""
     if request.method == "POST":

@@ -5,10 +5,11 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import login_required
 import models
 import base
 
-@user_passes_test(lambda u: u.is_superuser)
+@login_required
 def add_technique(request):
     if request.method == "POST":
         form = add_technique_form.AddTechniqueForm(request.POST)
