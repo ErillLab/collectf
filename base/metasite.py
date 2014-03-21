@@ -125,7 +125,7 @@ def create_meta_sites(motif_cur_site_insts, non_motif_cur_site_insts):
     for cur_site_inst in non_motif_cur_site_insts:
         for meta_site in meta_sites:
             if meta_site.membership_test(cur_site_inst):
-                meta_sites.add_cur_site_inst(cur_site_inst)
+                meta_site.add_cur_site_inst(cur_site_inst)
                 break
         else: # It means none of the existing meta-sites are appropriate. In the
               # case of non-motif-associated sites, DO NOT do anything.
