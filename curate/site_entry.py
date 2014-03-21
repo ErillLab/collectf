@@ -35,6 +35,7 @@ class Match:
         self.start = start
         self.end = end
         self.strand = strand
+        self.regulated_genes = []
 
     def set_nearby_genes(self, dist_th=150):
         """Given a match, find the genes nearby.

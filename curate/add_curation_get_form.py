@@ -113,6 +113,13 @@ def site_entry_get_form(wiz, form):
         del form.fields['peaks']
         del form.fields['assay_conditions']
         del form.fields['method_notes']
+        del form.fields['peak_techniques']
+    else: # high-throughput mode
+        # Populate peak techniques
+        techniques = session_utils.get(wiz.request.session, 'techniques')
+        choices = [(t.technique_id, t.name) for t in techniques]
+        form.fields['peak_techniques'].choices = choices
+                        
     
     return form
 

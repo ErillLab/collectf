@@ -89,17 +89,24 @@ def site_entry_process(wiz, form):
     has_qdata = any(site.qval for site in sites)
 
     # If high-throughput get peak data to save them as non-motif-associated data
-    # TODO save them to the DB
     if session_utils.get(wiz.request.session, 'high_throughput_curation'):
         peaks = site_entry.parse_input(form.cleaned_data['peaks'].strip())
-        session_utils.put(wiz.request.session, 'peaks', peaks)
+        techniques = models.ExperimentalTechnique.objects.filter(pk__in=form.cleaned_data['peak_techniques'])
         for peak in peaks:
             peak.search_exact_match(genomes)
             # if there is any match, select the first one by default
             if peak.get_exact_matches():
                 peak.set_exact_match(0)
+            # for each peak add the technique
+            peak.clear_techniques()
+            for t in techniques:
+                peak.add_technique(t)
+                
         if any(peak.qval for peak in peaks):
             has_qdata = True
+
+        session_utils.put(wiz.request.session, 'peaks', peaks)
+
     
     # save the list of sites
     session_utils.put(wiz.request.session, 'sites', sites)

@@ -63,18 +63,23 @@
     {% if curation.quantitative_data_format %}
     <li><a href="#quantitative_data">Site-specific quantitative values</a></li>
     {% endif %}
+    {% if curation.chip_info %} {# if curation has high_throughput data #}
+    <li><a href="#high-throughput">High-throughput data</a></li>
+    {% endif %}
   </ul>
 
   <div class="tab-content">
     <div class="tab-pane" id="reported">
       <pre>
-        {% for csi in curation.curation_siteinstance_set.all %}
-{{ csi.annotated_seq }}{% endfor %}</pre>
+        {# display non-high-throuhput data only #}
+        {% for csi in curation.curation_siteinstance_set.all %}{% if not csi.is_high_throughput %}
+{{ csi.annotated_seq }}{% endif %}{% endfor %}</pre>
     </div>
     <div class="tab-pane active" id="curated">
       <pre>
-        {% for csi in curation.curation_siteinstance_set.all %}
-{{ csi.site_instance.seq }}{% endfor %}</pre>
+        {# display non-high-throuhput data only #}
+        {% for csi in curation.curation_siteinstance_set.all %}{% if not csi.is_high_throughput %}
+{{ csi.site_instance.seq }}{% endif %}{% endfor %}</pre>
     </div>
     {% if curation.quantitative_data_format %}
     <div class="tab-pane" id="quantitative_data">
@@ -82,6 +87,14 @@
       <pre>
         {% for csi in curation.curation_siteinstance_set.all %}{{ csi.site_instance.seq }} {{ csi.quantitative_value }}
         {% endfor %}
+      </pre>
+    </div>
+    {% endif %}
+    {% if curation.chip_info %} {# if curation has high-throughput data #}
+    <div class="tab-pane" id="high-throughput">
+      <pre>
+      {% for csi in curation.curation_siteinstance_set.all %}{% if csi.is_high_throughput %}
+{{ csi.site_instance.seq }} {% if csi.quantitative_value %}{{ csi.quantitative_value }}{% endif %}{% endif %}{% endfor %}
       </pre>
     </div>
     {% endif %}
@@ -108,6 +121,7 @@
     <tbody>
       {% with curation_site_instances=curation.curation_siteinstance_set.all %}
       {% for cs in curation_site_instances %}
+      {% if not cs.is_high_throughput %}
       <tr>
         <td><span class="sequence">{{ cs.site_instance.seq }}</span></td>
         <td>
@@ -121,6 +135,7 @@
         <td>{{ cs.TF_function_verbose }}</td>
         <td>{{ cs.TF_type_verbose }}</td>
       </tr>
+      {% endif %}
       {% endfor %}
       {% endwith %}
     </tbody>

@@ -73,6 +73,7 @@ def site_entry_done(wiz, form_list):
     if session_utils.get(wiz.request.session, 'high_throughput_curation'):
         d['method_notes'] = form.cleaned_data['method_notes']
         d['assay_conditions'] = form.cleaned_data['assay_conditions']
+        d['peak_techniques'] = form.cleaned_data['peak_techniques']
 
     return d
 
@@ -115,6 +116,8 @@ def master_done(wiz, form_list, **kwargs):
     curation = create_curation(wiz, genome_dict, techniques_dict, curation_review_dict)
     # Add external db (if any)
     add_external_db(techniques_dict, curation)
+    # If it is high-throughput submission add ChIP-info notes
+    add_high_throughput_notes(site_entry_dict, curation)
     # Create matched and non-matched site instances and their related regulation objects
     create_site_instances(wiz, curation, site_entry_dict['site_type'])
     # Mark the paper as complete if so
@@ -198,7 +201,7 @@ def create_matched_site_instances(wiz, curation, sites, site_type):
         for t in site.techniques:
             cs.experimental_techniques.add(t)
         cs.save()
-        
+
         # For site instance, add regulation information
         for gene in match.nearby_genes:
             # If a nearby gene is marked as having experimental evidence, it is
@@ -230,8 +233,21 @@ def create_peak_site_instances(wiz, curation, peaks):
                                           site_type='non_motif_associated',
                                           TF_function='N/A',
                                           TF_type='N/A',
-                                          quantitative_value=peak.qval)
+                                          quantitative_value=peak.qval,
+                                          is_high_throughput=True)
         cs.save()
+        # For each peak instance, add the experimental technique information
+        for t in peak.techniques:
+            cs.experimental_techniques.add(t)
+        cs.save()
+
+        # For site instance, add regulation information
+        for gene in match.nearby_genes:
+            # If a nearby gene is marked as having experimental evidence, it is
+            # saved as "experimentally verified", otherwise a nearby gene is
+            # saved as "inferred" regulation.
+            evidence = 'exp_verified' if gene in match.regulated_genes else 'inferred'
+            models.Regulation(curation_site_instance=cs, gene=gene, evidence_type=evidence).save()
 
 def edit_curation_check(wiz, form_list):
     """If curation view is used for revising a curation, the first step
@@ -265,6 +281,7 @@ def add_high_throughput_notes(site_entry_dict, curation):
     chip_info.save()
     curation.chip_info = chip_info
     curation.save()
+    
 def paper_complete(wiz, curation_review_dict):
     """Mark the paper complete if so"""
     # Get publication information

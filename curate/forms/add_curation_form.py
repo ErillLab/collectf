@@ -354,13 +354,17 @@ class SiteEntryForm(forms.Form):
                                                help_text=help_dict['quantitative_data_format'])
 
     # Following fields will be visible only if the submission is high-throughput
-    peaks = forms.CharField(widget=forms.Textarea, label="Peaks", help_text=help_dict['peaks'])
+    peaks = forms.CharField(widget=forms.Textarea, label="High-throughput sequences", help_text=help_dict['peaks'])
     assay_conditions = forms.CharField(label="Assay conditions",
                                        help_text=help_dict['assay_conditions'],
                                        widget=forms.Textarea)
     method_notes = forms.CharField(label="Method notes",
                                    help_text=help_dict['method_notes'],
                                    widget=forms.Textarea)
+    peak_techniques = forms.MultipleChoiceField(label="Techniques used to identify high-throughput data",
+                                                help_text=help_dict['peak_techniques'],
+                                                choices=(),
+                                                widget=forms.CheckboxSelectMultiple)
 
     def verify_coordinates(self, coor_a, coor_b):
         try:

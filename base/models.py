@@ -363,6 +363,9 @@ class Curation_SiteInstance(models.Model):
     # site instance may have a quantitative value (e.g. peak intensity).
     quantitative_value = models.FloatField(null=True, blank=True)
 
+    # If it is a high-throughput sequence, put a tag
+    is_high_throughput = models.BooleanField(default=False)
+
     # NCBI submission related
     is_obsolete = models.BooleanField(null=False, default=False, blank=True)
     why_obsolete = models.TextField(null=True, blank=True) # explains why this site became obsolete.
@@ -461,7 +464,7 @@ class ChipInfo(models.Model):
     method_notes = models.TextField()
 
     def __unicode__(self):
-        return u'[%d] PMID: %s' % (self.chip_info_id, self.curation_set.all()[0].publication.pmid)
+        return u'[%d] %s' % (self.chip_info_id, self.assay_conditions[:20])
 
 class ExternalDatabase(models.Model):
     """Sometimes, authors choose to upload additional data (i.e. DNA-array data

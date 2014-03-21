@@ -107,11 +107,18 @@ site_entry_form = dict(
     automatically mapped to entered sites. Mapped peak intensity values will be
     displayed for review before curation submission.""",
 
-    assay_conditions = """Describe the conditions of the ChIP experiment that capture the specifics of the in-vivo 
-    setting for cross-linking. Were cells at exponetial-phase? Was the system induced? How were cells grown?""",
+    assay_conditions = """Describe the conditions of the high-throughput
+    experiment that capture the specifics of the in-vivo setting for
+    cross-linking. Were cells at exponetial-phase? Was the system induced? How
+    were cells grown?""",
 
-    method_notes = """Describe (use copy-paste if appropriate) the ChIP protocol. What antibodies were used? What
-    chip/sequencer and using what parameters? Etc.""",
+    method_notes = """Describe (use copy-paste if appropriate) the
+    high-throughput protocol. What antibodies were used? What chip/sequencer and
+    using what parameters? Etc.""",
+
+    peak_techniques = """Select all techniques that have been used to identify
+    high-throughput data. Note that selected techniques are for peaks only. You will be able to
+    select used experimental techniques for each binding site, individually.""",
 )
 
 site_exact_match_form = dict()
