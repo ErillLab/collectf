@@ -81,7 +81,7 @@ def assign_papers(modeladmin, request, queryset):
 assign_papers.short_description = "Assign selected papers to a curator"
 
 class PublicationAdmin(admin.ModelAdmin):
-    list_display = ('publication_id', 'pmid', 'title', 'assigned_to')
+    list_display = ('publication_id', 'pmid', 'title', 'assigned_to', 'submission_notes')
     list_filter = ('assigned_to', 'curation_complete', 'reported_TF', 'reported_species')
     search_fields = ('pmid',)
     actions = [assign_papers]
