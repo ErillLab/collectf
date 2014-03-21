@@ -355,8 +355,12 @@ class SiteEntryForm(forms.Form):
 
     # Following fields will be visible only if the submission is high-throughput
     peaks = forms.CharField(widget=forms.Textarea, label="Peaks", help_text=help_dict['peaks'])
-    assay_conditions = forms.CharField(label="Assay conditions", help_text=help_dict['assay_conditions'])
-    method_notes = forms.CharField(label="Method notes", help_text=help_dict['method_notes'])
+    assay_conditions = forms.CharField(label="Assay conditions",
+                                       help_text=help_dict['assay_conditions'],
+                                       widget=forms.Textarea)
+    method_notes = forms.CharField(label="Method notes",
+                                   help_text=help_dict['method_notes'],
+                                   widget=forms.Textarea)
 
     def verify_coordinates(self, coor_a, coor_b):
         try:
