@@ -98,7 +98,9 @@ site_entry_form = dict(
     to either format. All fields (i.e. site & q-val or coordinates & q-val) must
     be either space or tab separated.""",
 
-    quantitative_data_format = """Please enter the data format for the quantitative values associated with sites""",
+    quantitative_data_format = """If the manuscript reports quantitative values
+    associated with sites, please enter the quantitative data format here. If
+    not, you can leave this field empty.""",
 
     peaks = """Enter the peak data (in either coordinate or sequence mode). If
     there is any quantitative data associated with the peak data, they will be
