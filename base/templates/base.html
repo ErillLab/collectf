@@ -64,6 +64,10 @@
                 <li><a href="{% url 'curate.add_curation.curation' %}">New curation</a></li>
                 <li><a href="{% url 'curate.add_curation.high_throughput_curation' %}">New curation (high-throughput)</li>
                 <li class="divider"></li>
+                <li><a href="{% url 'curate.add_TF.add_TF' %}">Add TF</a></li>
+                <li><a href="{% url 'curate.add_TF.add_TF_family' %}">Add TF family</a></li>
+                <li><a href="{% url 'curate.add_technique.add_technique' %}">Add experimental tecnhique</a></li>
+                <li class="divider"></li>
                 <li><a href="{% url 'browse.stats.view_all_publications' %}">View all publications</a></li>
                 <li><a href="{% url 'browse.stats.view_all_curations' %}">View all curations</a></li>
                 <li><a href="{% url 'homepage.views.stats' %}">Curation statistics</a></li>
@@ -76,10 +80,6 @@
               <ul class="dropdown-menu">
                 <li><a href="{% url 'admin:index' %}">Admin page</a></li>
                 <li><a href="{% url 'browse.stats.update_stats' %}">Update statistics</a></li>
-                <li class="divider"></li>
-                <li><a href="{% url 'curate.add_TF.add_TF' %}">Add TF</a></li>
-                <li><a href="{% url 'curate.add_TF.add_TF_family' %}">Add TF family</a></li>
-                <li><a href="{% url 'curate.add_technique.add_technique' %}">Add experimental tecnhique</a></li>
                 <li class="divider"></li>
                 <!--
                 <li><a href="{% url 'curate.validate_curation.view_edit_validate' %}">Edit/validate curations</a></li>
