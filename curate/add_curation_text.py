@@ -16,9 +16,9 @@ descriptions = {
     '1': """This step collects information on the transcription factor (TF), the
     specific strains reported in the manuscript and the NCBI GenBank sequences
     that reported sites and TF will be mapped onto.""",
-    '2': """Select the experimental techniques and the describe the basic
-    experimental procedure used to verify binding/expression of the sites
-    reported in this curation.""",
+    '2': """Select experimental techniques used to verify binding/expression of
+    the sites reported in the curation. Provide a summary of the basic
+    experimental procedure used to demonstrate binding/expression""",
     '3': '', # filled dynamically
     '4': """For each reported site, all exact matches in the chosen genome are
     listed. If a reported site does not have any exact matches, or the matched
