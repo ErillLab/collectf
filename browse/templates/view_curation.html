@@ -85,7 +85,7 @@
     <div class="tab-pane" id="quantitative_data">
       <p><b>Quantitative data format:</b> {{ curation.quantitative_data_format }}</p>
       <pre>
-        {% for csi in curation.curation_siteinstance_set.all %}{{ csi.site_instance.seq }} {{ csi.quantitative_value }}
+        {% for csi in curation.curation_siteinstance_set.all %}{% if not csi.is_high_throughput %}{{ csi.site_instance.seq }} {{ csi.quantitative_value }}{% endif %}
         {% endfor %}
       </pre>
     </div>
