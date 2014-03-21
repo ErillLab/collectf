@@ -117,7 +117,8 @@ def master_done(wiz, form_list, **kwargs):
     # Add external db (if any)
     add_external_db(techniques_dict, curation)
     # If it is high-throughput submission add ChIP-info notes
-    add_high_throughput_notes(site_entry_dict, curation)
+    if session_utils.get(wiz.request.session, 'high_throughput_curation'):
+        add_high_throughput_notes(site_entry_dict, curation)
     # Create matched and non-matched site instances and their related regulation objects
     create_site_instances(wiz, curation, site_entry_dict['site_type'])
     # Mark the paper as complete if so
