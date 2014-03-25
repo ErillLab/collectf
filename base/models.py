@@ -182,6 +182,9 @@ class Genome(models.Model):
             value = self.genome_sequence.sequence
             value = str(value) # no need for unicode, less memory usage
             cache.set(key, value)
+
+            cache.set('testing', '3')
+            print cache.get('testing')
         ret = cache.get(key)
         assert ret
         return ret

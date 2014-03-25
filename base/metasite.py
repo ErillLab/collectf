@@ -40,16 +40,19 @@ class MetaSite:
     def add_cur_site_inst(self, cur_site_inst):
         """Add a new curation-site-instance object to the meta-site"""
         self.cur_site_insts.append(cur_site_inst)
+        if hasattr(self, '_techniques'):
+            del self._techniques
+        if hasattr(self, '_regulations'):
+            del self._regulations
+        if hasattr(self, '_curations'):
+            del self._curations
 
     @property
     def genome(self):
         """Return genome of curation-site-instances."""
-        return self.cur_site_insts[0].site_instance.genome
-
-    @property
-    def genome_accession(self):
-        """Return the genome accession number."""
-        return self.genome.genome_accession
+        if not hasattr(self, '_genome'):
+            self._genome = self.cur_site_insts[0].site_instance.genome
+        return self._genome
 
     @property
     def TF_instances(self):
@@ -58,11 +61,15 @@ class MetaSite:
         be linked to multiple TF-instance objects, to cover TFs composed of
         several subunits with different accession numbers (e.g. heterodimer such
         as IHF, composed of IHF alpha and beta)."""
-        return list(self.cur_site_insts[0].curation.TF_instances.all())
+        if not hasattr(self, '_TF_instances'):
+           self._TF_instances =  list(self.cur_site_insts[0].curation.TF_instances.all())
+        return self._TF_instances
 
     @property
     def delegate_sequence(self):
-        return self.cur_site_insts[0].site_instance.seq
+        if not hasattr(self, '_delegate_sequence'):
+           self._delegate_sequence = self.cur_site_insts[0].site_instance.seq
+        return self._delegate_sequence
 
     @property
     def delegate(self):
@@ -78,29 +85,35 @@ class MetaSite:
     def curations(self):
         """Return the list of curations for all curation-site-instance objects
         in the meta-site."""
-        return list(set([csi.curation for csi in self.cur_site_insts]))
+        if not hasattr(self, '_curations'):
+            self._curations = list(set([csi.curation for csi in self.cur_site_insts]))
+        return self._curations
 
     @property
     def techniques(self):
         """Return the list of techniques that have been used to identify sites
         in the meta-site."""
-        all_techniques = models.ExperimentalTechnique.objects.all()
-        return all_techniques.filter(curation_siteinstance__in=self.cur_site_insts)
+        if not hasattr(self, '_techniques'):
+            all_techniques = models.ExperimentalTechnique.objects.all()
+            self._techniques = all_techniques.filter(curation_siteinstance__in=self.cur_site_insts)
+        return self._techniques
 
     @property
     def regulations(self):
         """Collapse regulation information of all curation-site-instances into a
         single unit. For a single gene, there may be more than one regulation
         information."""
-        regulations = models.Regulation.objects.filter(curation_site_instance__in=self.cur_site_insts)
-        regs_exp_verified  = regulations.filter(evidence_type="exp_verified")
-        regs_inferred      = regulations.filter(evidence_type="inferred")
-        genes_exp_verified = regs_exp_verified.values_list("gene", flat=True)
-        genes_inferred     = regs_inferred.values_list("gene", flat=True)
-        return ([reg for i,(gene,reg) in enumerate(zip(genes_exp_verified, regs_exp_verified))
-                 if gene not in genes_exp_verified[:i]] +
-                [reg for i,(gene,reg) in enumerate(zip(genes_inferred, regs_inferred))
-                 if gene not in genes_inferred[:i] and gene not in genes_exp_verified])
+        if not hasattr(self, '_regulations'):
+            regulations = models.Regulation.objects.filter(curation_site_instance__in=self.cur_site_insts)
+            regs_exp_verified  = regulations.filter(evidence_type="exp_verified")
+            regs_inferred      = regulations.filter(evidence_type="inferred")
+            genes_exp_verified = regs_exp_verified.values_list("gene", flat=True)
+            genes_inferred     = regs_inferred.values_list("gene", flat=True)
+            self._regulations = ([reg for i,(gene,reg) in enumerate(zip(genes_exp_verified, regs_exp_verified))
+                                  if gene not in genes_exp_verified[:i]] +
+                                  [reg for i,(gene,reg) in enumerate(zip(genes_inferred, regs_inferred))
+                                  if gene not in genes_inferred[:i] and gene not in genes_exp_verified])
+        return self._regulations
 
 
 def create_meta_sites(motif_cur_site_insts, non_motif_cur_site_insts):
@@ -109,6 +122,7 @@ def create_meta_sites(motif_cur_site_insts, non_motif_cur_site_insts):
     motif-associated ones and integrate non-motif ones into them. In addition,
     integrate the experimental evidence, regulation information and curation
     information into the meta-site"""
+    print 'create_meta_sites'
     meta_sites = []
     # create meta-sites using motif-associated curation-site-instances
     for cur_site_inst in motif_cur_site_insts:
@@ -130,6 +144,7 @@ def create_meta_sites(motif_cur_site_insts, non_motif_cur_site_insts):
         else: # It means none of the existing meta-sites are appropriate. In the
               # case of non-motif-associated sites, DO NOT do anything.
               pass
-        
+
+    print 'leaving create_meta_sites'
     return meta_sites
       
