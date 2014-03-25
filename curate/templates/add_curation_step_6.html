@@ -138,7 +138,6 @@ function diagramsOnHover() {
 
     for (i=0; i<seqs.length; i++) {
         var seq = $(seqs[i]);
-        console.log(seq.next());
         seq.popover({title:'',
                      content:seq.next().append(seq.next().next()),
                      html:true,
@@ -156,6 +155,8 @@ function clearAll(techniqueId) {
 }
 
 
+var lastChecked = null;
+
 $(document).ready(function() {
     // remove class from all elements
     $('div').removeClass('form-group');
@@ -165,6 +166,25 @@ $(document).ready(function() {
     $('.form-control').removeClass('form-control');
     // Hide gene diagrams by default
     diagramsOnHover();
+    // shift select multiple checkboxes
+    var checkboxes = $('[id^=id_6-][id$=_site]');
+    console.log(checkboxes);
+    $(checkboxes).click(function(e) {
+        console.log(lastChecked);
+        if (!lastChecked) {
+            lastChecked = this;
+            return;
+        }
+        if (e.shiftKey) {
+            var start = $(checkboxes).index(this);
+            var end = $(checkboxes).index(lastChecked);
+            console.log(start + ' ' + end);
+            $(checkboxes.slice(Math.min(start, end), Math.max(start, end)+1)).prop('checked', $(lastChecked).is(':checked'));
+        }
+        lastChecked = this;
+        console.log(lastChecked)
+    });
+
 });
 </script>
 
