@@ -103,8 +103,8 @@
 
 		        {% for meta_site in report.meta_sites %}
 		        <tr>
-                  {% with g=meta_site.genome_accession %}
-		          <td class="genome"><a href="http://www.ncbi.nlm.nih.gov/nuccore/?term={{ g }}"><span class="fixed-width">{{ g }}</span></a></td>
+                  {% with g=meta_site.genome %}
+		          <td class="genome"><a href="http://www.ncbi.nlm.nih.gov/nuccore/?term={{ g.genome_accession }}"><span class="fixed-width">{{ g.genome_accession }}</span></a></td>
 		          {% endwith %}
 		          {% with TF_instances=meta_site.TF_instances%}
 		          <td class="TF">
