@@ -137,14 +137,21 @@ def search_post(request):
         cur_site_insts = search_post_helper(request)
         # make reports
         reports = motif_report.make_reports(cur_site_insts)
+        # make ensemble reports
+        ensemble_report = motif_report.make_ensemble_report(cur_site_insts)
         if not reports:
             # If no results found, go back to the search page.
             message = "No search results that match your search criteria."
             return raise_validation_error(message)
 
         return render_to_response("view_reports.html",
-                                  {"reports": [report.generate_view_reports_dict()
-                                               for report in reports]},
+                                  {
+                                      "reports": [report.generate_view_reports_dict()
+                                                  for report in reports],
+                                      "ensemble_report": ensemble_report.generate_view_reports_dict(),
+                                      "cur_site_insts": ','.join(map(lambda x: str(x.pk), cur_site_insts))
+
+                                  },
                                                context_instance=RequestContext(request))
     except:
         message = "Please select at least one TF, species and experimental technique to search database."

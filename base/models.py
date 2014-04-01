@@ -357,6 +357,7 @@ class Curation_SiteInstance(models.Model):
     TF_type = models.CharField(max_length=50, choices=TF_TYPE)
     # TF function
     TF_function = models.CharField(max_length=50, choices=TF_FUNCTION)
+
     # regulation relation
     regulates = models.ManyToManyField("Gene", through="Regulation")
     # experimental techniques used to determine the site instance
@@ -470,7 +471,7 @@ class ChipInfo(models.Model):
         return u'[%d] %s' % (self.chip_info_id, self.assay_conditions[:20])
 
 class ExternalDatabase(models.Model):
-    """Sometimes, authors choose to upload additional data (i.e. DNA-array data
+    """Sometimes, authors choose to upload additional data (e.g. DNA-array data
     or gene expression data) to a database. To capture that information, on the
     submission process the curator is asked to provide the external database
     name and the accession number of the specific data reported. This table
