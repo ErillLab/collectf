@@ -136,6 +136,7 @@ class GenomeForm(forms.Form):
     def clean_TF_accession_helper(self, TF_accession):
         """Check if the entered TF accession number is valid"""
         try:
+            TF_accession = TF_accession.split('.')[0]
             TF_instance = TFInstance.objects.get(protein_accession=TF_accession)
         except TFInstance.DoesNotExist:
             TF_record = bioutils.get_TF(TF_accession)
@@ -152,6 +153,7 @@ class GenomeForm(forms.Form):
         and add to the CollecTF . Do the validity check for all TF accession
         fields (if there are more than one)."""
         TF_accession = self.cleaned_data['TF_accession'].strip()
+        
         return self.clean_TF_accession_helper(TF_accession)
 
     def clean_species(self, field):
