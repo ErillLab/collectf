@@ -30,7 +30,10 @@ def view_reports(request):
     # get motif-associated and non-motif-associated curation-site-instances and make reports
     cur_site_insts = models.Curation_SiteInstance.objects.filter(pk__in=cur_site_inst_ids)
     reports = motif_report.make_reports(cur_site_insts)
-    ensemble_report = motif_report.make_ensemble_report(cur_site_insts)
+    # combine reports into ensemble report
+    ensemble_report = motif_report.merge_reports(reports)
+    #ensemble_report = motif_report.make_ensemble_report(cur_site_insts)
+    
     return render_to_response("view_reports.html",
                               {
                                   "reports": [report.generate_view_reports_dict()

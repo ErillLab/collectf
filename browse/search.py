@@ -156,3 +156,4 @@ def search_post(request):
     except:
         message = "Please select at least one TF, species and experimental technique to search database."
         return raise_validation_error(message)
+

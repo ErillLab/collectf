@@ -178,13 +178,10 @@ class Genome(models.Model):
         """Get genome sequence from the cache."""
         key = "genome-sequence-%s" % self.genome_accession
         if not cache.has_key(key):
-            print "Key %s not in cache, retrieving from the database." % key
+            #print "Key %s not in cache, retrieving from the database." % key
             value = self.genome_sequence.sequence
             value = str(value) # no need for unicode, less memory usage
             cache.set(key, value)
-
-            cache.set('testing', '3')
-            print cache.get('testing')
         ret = cache.get(key)
         assert ret
         return ret

@@ -23,6 +23,12 @@ def generate_tbl_string(curation_site_instances, test_export):
     # Create meta-sites
     motif_associated = curation_site_instances.filter(site_type="motif_associated")
     non_motif_associated = curation_site_instances.filter(site_type="non_motif_associated")
+
+    # group sites by TF instances and create meta-site for each group,
+    # individually.  This saves us to check TF instance of each
+    # curation-site-instance object in the create_meta_site method.
+    # TODO
+    
     meta_sites = metasite.create_meta_sites(motif_associated, non_motif_associated)
 
     # header
@@ -118,8 +124,6 @@ def export_tbl_view(request):
     genome_accession = form.cleaned_data['genome_accession']
     genome = models.Genome.objects.get(genome_accession=genome_accession)
     test_export = form.cleaned_data['is_test_export']
-
-
     return generate_zip_response(genome, test_export)
 
 def generate_zip_response(genome, test_export):

@@ -19,8 +19,8 @@ class MetaSite:
         - the same genome
         - enough overlap
         """
-        return (self.genome == cur_site_inst.site_instance.genome and
-                self.TF_instances == list(cur_site_inst.curation.TF_instances.all()) and
+        return (#self.genome == cur_site_inst.site_instance.genome and
+                #self.TF_instances == list(cur_site_inst.curation.TF_instances.all()) and
                 self.overlap_test(cur_site_inst))
 
     def overlap_test(self, cur_site_inst):
@@ -122,7 +122,7 @@ def create_meta_sites(motif_cur_site_insts, non_motif_cur_site_insts):
     motif-associated ones and integrate non-motif ones into them. In addition,
     integrate the experimental evidence, regulation information and curation
     information into the meta-site"""
-    print 'create_meta_sites'
+
     meta_sites = []
     # create meta-sites using motif-associated curation-site-instances
     for cur_site_inst in motif_cur_site_insts:
@@ -145,6 +145,5 @@ def create_meta_sites(motif_cur_site_insts, non_motif_cur_site_insts):
               # case of non-motif-associated sites, DO NOT do anything.
               pass
 
-    print 'leaving create_meta_sites'
     return meta_sites
       
