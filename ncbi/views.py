@@ -23,14 +23,25 @@ def generate_tbl_string(curation_site_instances, test_export):
     # Create meta-sites
     motif_associated = curation_site_instances.filter(site_type="motif_associated")
     non_motif_associated = curation_site_instances.filter(site_type="non_motif_associated")
-
     # group sites by TF instances and create meta-site for each group,
     # individually.  This saves us to check TF instance of each
     # curation-site-instance object in the create_meta_site method.
-    # TODO
     
-    meta_sites = metasite.create_meta_sites(motif_associated, non_motif_associated)
-
+    # Get all TF-instances/species values for all curation-site-instances
+    vals = motif_associated.values_list('curation__TF_instances',
+                                        'site_instance__genome')\
+                           .distinct()
+    vals = list(set(vals))
+    # Find meta-sites for each group of curation-site-instances separately
+    meta_sites = []
+    for (TF_instances, genome) in vals:
+        # Filter motif/non-motif associated sites specific to this TF and genome
+        filtered_m = motif_associated.filter(curation__TF_instances=TF_instances,
+                                             site_instance__genome=genome)
+        filtered_nm = non_motif_associated.filter(curation__TF_instances=TF_instances,
+                                                  site_instance__genome=genome)
+        meta_sites.extend(metasite.create_meta_sites(filtered_m, filtered_nm))
+    
     # header
     tbl_str += ('>Feature\tgi|%(gi)s|ref|%(accession)s\n' %
                 {'gi': curation_site_instances[0].site_instance.genome.gi,
