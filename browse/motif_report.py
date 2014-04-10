@@ -232,6 +232,6 @@ def merge_reports(reports):
     ensemble = MotifReport(all_motif_csi, all_non_motif_csi)
     # instead of computing meta-sites again, set them using existing meta-site
     # collection from individual reports
-    ensemble.set_meta_sites([r.get_meta_sites() for r in reports])
+    ensemble.set_meta_sites([ms for r in reports for ms in r.get_meta_sites()])
     return ensemble
     
