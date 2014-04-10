@@ -144,15 +144,18 @@ def search_post(request):
             message = "No search results that match your search criteria."
             return raise_validation_error(message)
 
-        return render_to_response("view_reports.html",
+        return render_to_response("search_results.html",
                                   {
-                                      "reports": [report.generate_view_reports_dict()
-                                                  for report in reports],
-                                      "ensemble_report": ensemble_report.generate_view_reports_dict(),
-                                      "cur_site_insts": ','.join(map(lambda x: str(x.pk), cur_site_insts))
-
+                                      'title': "",
+                                      'description': """Search results can be
+                                      seen as individual reports (one report per
+                                      TF/species) or as ensemble reports
+                                      (multiple TF/species). """,
+                                      'all_cur_site_insts': [pk for report in reports
+                                                             for pk in report.get_all_cur_site_insts_ids()],
+                                      'reports': [report.generate_browse_result_dict() for report in reports],
                                   },
-                                               context_instance=RequestContext(request))
+                                  context_instance = RequestContext(request))
     except:
         message = "Please select at least one TF, species and experimental technique to search database."
         return raise_validation_error(message)
