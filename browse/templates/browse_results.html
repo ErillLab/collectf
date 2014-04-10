@@ -10,11 +10,12 @@
   {% if all_cur_site_insts %} 
   {# put view_all link #}
   <p>
-    <a class="block_before_load" href="#" onclick="$('#view_all').submit(); return false;">
+    <a class="block_before_load" href="#"  onclick="$('#view_all').submit(); return false;">
       Combined report
     </a>
   </p>
-  <form style="display:inline;" method="post" action="{% url 'browse.view_reports.view_reports' %}" id="view_all" action="">
+  <form style="display:inline;" method="post" action="{% url 'browse.view_reports.view_reports' %}" id="view_all" action=""
+        target="_blank">
     {% comment %}
     Hidden input listing all motif-associated-curation-site-instance and
     non-motif-associated curation-site-instance-ids
@@ -38,11 +39,12 @@
         <td>{{ report.species_name }}</td>
         {% with form_id=report.TF_name|slugify|add:'_'|add:report.species_name|slugify %}
         <td>
-	      <a class="block_before_load" href="#" onclick="$('#{{ form_id }}').submit(); return false;">
+	      <a class="" href="#" onclick="$('#{{ form_id }}').submit(); return false;">
             view
           </a>
 	      <form style="display:inline;" method="post"
-                action="{% url 'browse.view_reports.view_reports' %}" id="{{ form_id }}" action="post">
+                action="{% url 'browse.view_reports.view_reports' %}" id="{{ form_id }}" action="post"
+                target="_blank">
             {% csrf_token %}
 	        <input type="hidden" name="csi_list"
                    value="{% for csi_pk in report.cur_site_insts %}{{ csi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}">

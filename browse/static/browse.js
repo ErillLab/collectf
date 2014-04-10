@@ -83,9 +83,5 @@ function getReportLinksTF(type, id) {
 }
 
 $(document).ready(function () {
-    $(document).on('click', 'a.block_before_load', function (ev) {
-        ev.preventDefault();
-        $.blockUI();
-        window.location = $(this).attr('href');
-    });
+
 });

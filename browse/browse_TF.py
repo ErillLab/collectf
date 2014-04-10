@@ -42,6 +42,6 @@ def get_results_TF(request, type_, id):
                               {'title': name,
                                'description': desc,
                                'all_cur_site_insts': [pk for report in reports
-                                                      for pk in report.get_all_cur_site_insts()],
+                                                      for pk in report.get_all_cur_site_insts_ids()],
                                'reports': [report.generate_browse_result_dict() for report in reports],},
                                 context_instance=RequestContext(request))
