@@ -76,7 +76,7 @@ def greet(request):
                          organism = random_record.species_name,
                          genome_accession = random_record.genome_accession,
                          aligned_sites = random_record.align_sites(),
-                         cur_site_insts = random_record.get_all_cur_site_insts(),
+                         cur_site_insts = random_record.get_all_cur_site_insts_ids(),
                     )
 
     return render_to_response("greet.html", {'random_rec': template_dict},

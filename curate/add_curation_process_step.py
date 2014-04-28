@@ -18,7 +18,7 @@ from collectf import settings
 def publication_process(wiz, form):
     """Post-process paper selection step."""
     pubid = form.cleaned_data['pub']
-    session_utils.put(wiz.request.session, 'publication', pubid)
+    session_utils.put(wiz.request.session, 'publication', int(pubid))
 
     if form.cleaned_data["no_data"]:
         # mark paper as having no data

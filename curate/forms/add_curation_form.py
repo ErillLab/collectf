@@ -299,7 +299,6 @@ class TechniquesForm(forms.Form):
                                            widget = forms.CheckboxSelectMultiple())
 
     experimental_process = forms.CharField(widget=forms.Textarea,
-                                           required=False,
                                            label="Experimental process",
                                            help_text=help_dict['experimental_process'])
 
@@ -487,7 +486,7 @@ class SiteEntryForm(forms.Form):
 
     def clean(self):
         # If the site field contains quantitative data, make sure the format field is filled.
-        if self.check_qval_data_format:
+        if 'sites' in self.cleaned_data and self.check_qval_data_format:
             self.check_quantitative_data_format(self.cleaned_data.get('quantitative_data_format', None))
         return self.cleaned_data
 
