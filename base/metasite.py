@@ -14,18 +14,21 @@ class MetaSite:
         self.add_cur_site_inst(curation_site_instance)
 
     def membership_test(self, cur_site_inst):
-        """Check if a curation-site-instance object is appropriate for the meta-site. It should have
-        - the same collection of TF-instance(s)
-        - the same genome
-        - enough overlap
-        """
-        return (#self.genome == cur_site_inst.site_instance.genome and
-                #self.TF_instances == list(cur_site_inst.curation.TF_instances.all()) and
-                self.overlap_test(cur_site_inst))
+        """Check if a curation-site-instance object is appropriate for the
+        meta-site. Based on the type of cur_site_inst object, perform
+        motif_associated_overlap_test or non_motif_associated_overlap_test"""
+        if cur_site_inst.site_type == 'motif_associated':
+            return self.motif_associated_overlap_test(cur_site_inst)
+        elif cur_site_inst.site_type == 'non_motif_associated':
+            return self.non_motif_associated_overlap_test(cur_site_inst)
+        else:
+            return False
 
-    def overlap_test(self, cur_site_inst):
+    def motif_associated_overlap_test(self, cur_site_inst):
         """Given a curation-site-instance object, check if the meta-site and the
-        curation-site-instance overlaps enough."""
+        curation-site-instance overlaps enough. The new site-instance is
+        included into this meta-site if the overlap between new site and the
+        delegate site is more than 75%"""
         def get_overlap(loca, locb):
             """Given two locations, return the overlap ratio."""
             overlap_len = max(0, min(loca[1], locb[1]) - max(loca[0], locb[0]))
@@ -36,6 +39,19 @@ class MetaSite:
         overlap_a = get_overlap(loca, locb)
         overlap_b = get_overlap(locb, loca)
         return (overlap_a + overlap_b) / 2.0 >= 0.75
+
+    def non_motif_associated_overlap_test(self, cur_site_inst):
+        """Given a non-motif-associated curation-site-instance object, determine
+        if it overlaps enough with this meta-site to be considered as a member
+        of it. In case of enough overlap, the evidence from non-motif-associated
+        site is integrated into the meta-site. The criteria is full overlap
+        between the delegate-site (motif-associated one) and the target
+        site-instance (non-motif_associated one)"""
+
+        loca = (cur_site_inst.site_instance.start, cur_site_inst.site_instance.end)
+        locb = (self.delegate.site_instance.start, self.delegate.site_instance.end)
+        return (min(loca[0], loca[1]) <= min(locb[0], locb[1]) and
+                max(loca[0], loca[1]) >= max(locb[0], locb[1]))
 
     def add_cur_site_inst(self, cur_site_inst):
         """Add a new curation-site-instance object to the meta-site"""
@@ -136,13 +152,17 @@ def create_meta_sites(motif_cur_site_insts, non_motif_cur_site_insts):
             meta_sites.append(MetaSite(cur_site_inst))
 
     # integrate non-motif-associated curation-site-instances
+    print 'looking for non-motif'
     for cur_site_inst in non_motif_cur_site_insts:
+        print 'non_motif'
         for meta_site in meta_sites:
             if meta_site.membership_test(cur_site_inst):
                 meta_site.add_cur_site_inst(cur_site_inst)
+                print 'match!!'
                 break
         else: # It means none of the existing meta-sites are appropriate. In the
               # case of non-motif-associated sites, DO NOT do anything.
+              print 'no match'
               pass
 
     return meta_sites

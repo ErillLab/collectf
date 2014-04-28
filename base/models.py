@@ -371,8 +371,8 @@ class Curation_SiteInstance(models.Model):
     is_obsolete = models.BooleanField(null=False, default=False, blank=True)
     why_obsolete = models.TextField(null=True, blank=True) # explains why this site became obsolete.
 
-    def __unicode__(self):
-        return u'[%d] curation:%d' % (self.pk, self.curation.pk)
+    def __unicode__(self): return u'[%d] curation:%d TF:%s species:%s' %\
+        (self.pk, self.curation.pk, self.curation.TF, self.site_instance.genome)
 
     @property
     def TF_function_verbose(self):

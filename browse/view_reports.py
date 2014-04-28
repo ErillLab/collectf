@@ -23,13 +23,20 @@ def view_reports(request):
 
     cur_site_inst_ids = request.POST["csi_list"].strip().split(',')
 
+    # get all curation-site-instances
+    cur_site_insts = models.Curation_SiteInstance.objects.filter(pk__in=cur_site_inst_ids)
+
     # integrate non-motif: if True, the experimental evidence and regulation
     # information from non-motif associated sites are integrated into the report
     integrate_non_motif = bool("integrate_non_motif" in request.POST)
 
-    # get motif-associated and non-motif-associated curation-site-instances and make reports
-    cur_site_insts = models.Curation_SiteInstance.objects.filter(pk__in=cur_site_inst_ids)
-    reports = motif_report.make_reports(cur_site_insts)
+    # Check if non-motif site integration is requested
+    if integrate_non_motif:
+        reports = motif_report.make_reports(cur_site_insts)
+    else:
+        # if not, exclude non-motif-associated sites before generating reports
+        reports = motif_report.make_reports(cur_site_insts.exclude(site_type='non_motif_associated'))
+
     # combine reports into ensemble report
     ensemble_report = motif_report.merge_reports(reports)
     #ensemble_report = motif_report.make_ensemble_report(cur_site_insts)
@@ -39,7 +46,8 @@ def view_reports(request):
                                   "reports": [report.generate_view_reports_dict()
                                               for report in reports],
                                   "ensemble_report": ensemble_report.generate_view_reports_dict(),
-                                  "cur_site_insts": ','.join(map(lambda x: str(x.pk), cur_site_insts))
+                                  "cur_site_insts": ','.join(map(lambda x: str(x.pk), cur_site_insts)),
+                                  "integrate_non_motif": integrate_non_motif,
                               },
                               context_instance=RequestContext(request))
 

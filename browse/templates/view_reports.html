@@ -21,19 +21,12 @@
 	    </form>
       </li>
       {% else %}
-      <li class="dropdown">
-	    <a href="#" data-toggle="dropdown" class="dropdown-toggle">Non-motif-associated sites
-	      <b class="caret"></b></a>
-	    <ul class="dropdown-menu">
-	      <li>
-	        <a class="block_before_load" href="#" onclick="$('#integrate_non_motif_2').submit();">Integrate non-motif-associated sites</a>
-	        <form action="{% url 'browse.view_reports.view_reports' %}" method="post" style="display:inline;" id="integrate_non_motif_2">{% csrf_token %}
-              <input type="hidden" name="csi_list" value="{{ cur_site_insts }}" />
-	          <input type="hidden" name="integrate_non_motif" value="integrate_non_motif"/>
-	        </form>
-	      </li>
-	      <!--<li><a href="#report_non_motif" data-toggle="tab">View non-motif-associated sites only</a></li>-->
-	    </ul>
+      <li>
+	    <a class="block_before_load" href="#" onclick="$('#integrate_non_motif_2').submit();">Integrate non-motif-associated sites</a>
+	    <form action="{% url 'browse.view_reports.view_reports' %}" method="post" style="display:inline;" id="integrate_non_motif_2">{% csrf_token %}
+          <input type="hidden" name="csi_list" value="{{ cur_site_insts }}" />
+	      <input type="hidden" name="integrate_non_motif" value="integrate_non_motif"/>
+	    </form>
       </li>
       {% endif %}
       <li><a href="#export" data-toggle="tab">Export data</a></li>
