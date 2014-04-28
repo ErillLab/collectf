@@ -152,17 +152,13 @@ def create_meta_sites(motif_cur_site_insts, non_motif_cur_site_insts):
             meta_sites.append(MetaSite(cur_site_inst))
 
     # integrate non-motif-associated curation-site-instances
-    print 'looking for non-motif'
     for cur_site_inst in non_motif_cur_site_insts:
-        print 'non_motif'
         for meta_site in meta_sites:
             if meta_site.membership_test(cur_site_inst):
                 meta_site.add_cur_site_inst(cur_site_inst)
-                print 'match!!'
                 break
         else: # It means none of the existing meta-sites are appropriate. In the
               # case of non-motif-associated sites, DO NOT do anything.
-              print 'no match'
               pass
 
     return meta_sites
