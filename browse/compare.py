@@ -178,7 +178,8 @@ def levenshtein_measure(motif_a, motif_b):
     boxplot = fig2img(plt.gcf())
     plt.hist([a_vs_a, a_vs_b, b_vs_b], bins=15,
              label=[r'$M_a$ vs $M_a$', r'$M_a$ vs $M_b$', r'$M_b$ vs $M_b$'],
-             color=["#FFCC33", "#006699", "#FF6633"])
+             #color=["#FFCC33", "#006699", "#FF6633"]
+             )
     plt.ylabel('frequency of site-pairs')
     plt.xlabel('Levenshtein distance')
     plt.legend()
