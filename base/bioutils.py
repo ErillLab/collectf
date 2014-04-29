@@ -158,7 +158,7 @@ def weblogo(sequences):
     al = to_fasta(sequences)
     from subprocess import Popen, PIPE, STDOUT
     p = Popen(['/usr/local/bin/weblogo', '-F', 'png', '-s', 'LARGE', '-c', 'classic', '--errorbars', 'YES'],
-              stdout=PIPE, stdin=PIPE, stderr=PIPE)
+              stdout=PIPE, stdin=PIPE, stderr=PIPE, close_fds=True)
     stdout_data, stderr_data = p.communicate(input=al)
     return stdout_data
 
