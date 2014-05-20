@@ -300,7 +300,7 @@ class SequenceSite(Site):
         self.soft_matches = []
         self.matched = None
         for genome in genomes:
-            self.soft_matches.extend(self.soft_locate_seq(genome, motif))
+            self.soft_matches.extend(self.soft_locate_seq(genome))
         # Find nearby genes for all soft-matches.
         self.set_nearby_genes_for_all_matches()
 
