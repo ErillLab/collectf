@@ -45,15 +45,11 @@
   </small>
 </h2>
 
-  <div class="accordion" id="form-description">
-    <div class="accordion-body collapse" id="form-description-collapse">
-      <p>{{ form_description }}</p>
-    </div>
-  </div>    
-
-
-
-<legend></legend>
+<div class="accordion" id="form-description">
+  <div class="accordion-body collapse" id="form-description-collapse">
+    <p class="lead">{{ form_description }}</p>
+  </div>
+</div>   
 
 <div class="boxed">
   <form method="post" action="" class="form-horizontal">  {% csrf_token %}
