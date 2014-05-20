@@ -27,6 +27,12 @@ def publication_get_form(wiz, form):
     choices = [(p.publication_id, mark_safe("%s" % (templatetags.print_pub.print_pub(p))))
                for p in assigned_pubs]
     form.fields["pub"].choices = choices
+    # External submitters shouldn't see "This paper contains no data" checkbox
+    # on their paper list, assuming that they are submitting on a paper they
+    # uploaded and which contains data.
+    if not curator.user.is_staff:
+        form.fields['no_data'].initial = False
+        form.fields['no_data'].widget = forms.HiddenInput()
     return form
 
 
