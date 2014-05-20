@@ -331,7 +331,7 @@ class Curation_SiteInstance(models.Model):
     # TODO - explain site types.
     SITE_TYPE = (('motif_associated', "motif associated"),
                  ('non_motif_associated', "non-motif associated"),
-                 ('var_motif_associated', "variable spaced motif associated"))
+                 ('var_motif_associated', "variable motif associated"))
 
     TF_FUNCTION = (("ACT", "activator"),
                    ("REP", "repressor"),
