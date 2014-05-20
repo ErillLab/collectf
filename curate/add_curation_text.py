@@ -7,7 +7,7 @@ titles = {
     '3': "Reported sites",
     '4': "Exact site matches",
     '5': "Inexact site matches",
-    '6': "Site Anntotation",
+    '6': "Site Annotation",
     '7': "Gene regulation (experimental support)",
     '8': "Curation information"
 }
