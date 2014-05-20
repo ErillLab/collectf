@@ -37,8 +37,20 @@
 
 <h2>
   {{ form_title }}
-  <p><small>{{ form_description }}</small></p>
+  <small>
+    <a href="#form-description-collapse" data-toggle="collapse"
+       data-parent="form-description">
+      [toggle help]
+    </a>
+  </small>
 </h2>
+
+  <div class="accordion" id="form-description">
+    <div class="accordion-body collapse" id="form-description-collapse">
+      <p>{{ form_description }}</p>
+    </div>
+  </div>    
+
 
 
 <legend></legend>
