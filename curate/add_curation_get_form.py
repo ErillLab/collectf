@@ -33,6 +33,7 @@ def publication_get_form(wiz, form):
     if not curator.user.is_staff:
         form.fields['no_data'].initial = False
         form.fields['no_data'].widget = forms.HiddenInput()
+
     return form
 
 

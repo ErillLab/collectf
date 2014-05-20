@@ -5,11 +5,13 @@
 {% load bootstrap %}
 {% load staticfiles %}
 
+{% if wizard.steps.step1 == 1 %}
 <div class="alert alert-block alert-info">
   <button type="button" class="close" data-dismiss="alert">x</button>
+  <h2>Welcome to the CollecTF curation wizard.</h2>
   <p>
-    During the curation wizard, please do <i> not</i> use "Back" or "Forward"
-    button of your browser. Instead, use the navigation buttons built at the end
+    Please do not use "Back" or "Forward" button of your browser during the
+    submission process. Instead, please use the navigation buttons at the bottom
     of the page.
   </p>
   <p>
@@ -20,8 +22,8 @@
     <a href="{% url 'homepage.views.feedback'%}" target="_blank"> let us
     know</a>!
   </p>
-
 </div>
+{% endif %}
 
 <div class="progress progress-striped">
   <div class="progress-bar progress-bar-info" role="progressbar"
