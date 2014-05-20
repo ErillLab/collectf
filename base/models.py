@@ -16,8 +16,7 @@ class Curation(models.Model):
     REVISION_REASONS = (("genome_not_available", "No comparable genome in NCBI"),
                         ("in_progress", "Matching genome still in progress"),
                         ("TF_not_available", "No comparable TF protein sequence in NCBI"),
-                        ("external_submission", "External submission"),
-                        ("other", "other reason (specify in notes)"),)
+                        ("other", "Other reason (specify in notes)"),)
 
     curation_id = models.AutoField(primary_key=True)
 
