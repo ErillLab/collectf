@@ -48,25 +48,32 @@ genome_form = dict(
     reported in this curation.""",
 
     genome_accession = """Paste the NCBI GenBank genome accession number for the species closest to the
-    reported species/strain.""",
+    reported species/strain. You can add more than one chromosome. """,
 
-    TF_species_same = '',
+    TF_species_same = """
+    Check if the reported strain and selected RefSeq strain are same.""",
 
-    site_species_same = '',
+    site_species_same = """
+    Check if the reported strain and selected RefSeq strain are same for the TF.
+    """,
 
-    TF_accession = """Paste the NCBI TF protein accession number for the species closest to the reported
-    species/strain.""",
+    TF_accession = """Paste the NCBI TF protein accession number for the species closest to the
+    reported species/strain. You can add more than one TF.""",
 
-    TF_species = """Type the full name of the species/strain the TF belongs to as reported in the
-    manuscript.""",
+    TF_species = """If the work you are reporting uses a strain different from the selected RefSeq
+genome, please type/paste the original strain. This allows us to keep track of the
+correspondence between reported and mapped strains.""",
 
-    site_species = """Type the full name of the species/strain in which the sites are reported in the
-    manuscript.""",
+    site_species = """If the work you are reporting uses a strain different from the selected RefSeq
+genome, please type/paste the original strain. This allows us to keep track
+of the correspondence between reported and mapped strains.""",
 
-    contains_promoter_data = "The paper provides experimental data on the structure and sequence of a TF-regulated promoter",
+    contains_promoter_data = """Check if the paper provides experimental data on the structure and sequence of a
+TF-regulated promoter""",
 
-    contains_expression_data = "The paper provides experimental support for TF-mediated regulation of genes",
-)
+    contains_expression_data = """Check if the paper provides experimental support for TF-mediated regulation of
+    genes.  Please make sure that this field is checked if you plan to report
+    differential gene expression associated with TF activity.""")
 
 techniques_form = dict(
     techniques = """Select as many as apply to sites reported in this submission. Hover over any technique to see the

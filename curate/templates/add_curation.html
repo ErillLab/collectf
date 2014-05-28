@@ -29,14 +29,16 @@
   <div class="progress-bar progress-bar-info" role="progressbar"
        aria-valnow="{{ wizard.steps.step1 }}"
        aria-valmin="0"
-       aria-valmax="{{ wizard.steps.count }}"
+       aria-valmax="{{ wizard.steps.step1 }}"
        style="width:{% widthratio wizard.steps.step1 wizard.steps.count 100%}%">
-    <span class=""> Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}</span>
+    <span class=""> Step {{ wizard.steps.current }} of {{ wizard.steps.count }}</span>
   </div>
 </div>
 
+{% with step=wizard.steps.current|slugify %}
+{% with fname="curation_step_"|add:step|add:"_title.html" %}
 <h2>
-  {{ form_title }}
+  {% include fname %}
   <small>
     <a href="#form-description-collapse" data-toggle="collapse"
        data-parent="form-description">
@@ -44,12 +46,16 @@
     </a>
   </small>
 </h2>
+{% endwith %}
 
+{% with fname="curation_step_"|add:step|add:"_description.html" %}
 <div class="accordion" id="form-description">
   <div class="accordion-body collapse" id="form-description-collapse">
-    <p class="">{{ form_description }}</p>
+    {% include fname %}
   </div>
-</div>   
+</div>  
+{% endwith %}
+{% endwith %}
 
 <div class="boxed">
   <form method="post" action="" class="form-horizontal">  {% csrf_token %}

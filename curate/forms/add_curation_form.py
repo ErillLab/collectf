@@ -74,17 +74,17 @@ class GenomeForm(forms.Form):
 
     # Checked if site species is the same with the reported genome
     site_species_same = forms.BooleanField(required=False,
-                                           label="""This is the exact same
-                                           strain as reported in the manuscript
-                                           for the sites.""")
+        label="""This is the exact same strain as reported
+        in the manuscript for the sites.""",
+        help_text=help_dict['site_species_same'])
     # TF accession number
     TF_accession = forms.CharField(label="TF accession number",
                                    help_text=help_dict['TF_accession'])
 
     # Checked if TF species is the same with the reported genome
     TF_species_same = forms.BooleanField(required=False,
-                                         label="""This is the exact same
-                                         strain as reported in the manuscript for the TF.""")
+        label="""This is the exact same strain as reported in the manuscript for the TF.""",
+        help_text=help_dict['TF_species_same'])
 
     site_species = forms.CharField(label="Organism TF binding sites are reported in",
                                    required=False,
