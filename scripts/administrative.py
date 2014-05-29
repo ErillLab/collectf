@@ -13,17 +13,18 @@ def get_TFs():
 
 def add_pubs_from_csv(filename):
     """Batch publication submission"""
-    import pandas as pd
-    df = pd.read_csv(filename, sep=',') # read as Pandas data frame
-    for i, row in df.iterrows():
-        print row.PMID, row.TF, row.Strain
+    with open(filename) as f:
+        df = [line.strip().split(',') for line in f.readlines()[1:]]
+        
+    for row in df:
+        print row[0], row[1], row[2]
         try:
-            p = models.Publication.objects.get(pmid=row.PMID)
+            p = models.Publication.objects.get(pmid=row[0])
         except models.Publication.DoesNotExist:
-            pubrec = base.bioutils.get_pubmed(row.PMID)
-            cd = dict(pmid=row.PMID,
-                      reported_TF=row.TF.strip(),
-                      reported_species=row.Strain.strip(),
+            pubrec = base.bioutils.get_pubmed(row[0])
+            cd = dict(pmid=row[0],
+                      reported_TF=row[1].strip(),
+                      reported_species=row[2].strip(),
                       contains_promoter_data=False,
                       contains_expression_data=False,
                       submission_notes="")
