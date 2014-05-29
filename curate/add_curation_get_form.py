@@ -30,7 +30,7 @@ def publication_get_form(wiz, form):
     # External submitters shouldn't see "This paper contains no data" checkbox
     # on their paper list, assuming that they are submitting on a paper they
     # uploaded and which contains data.
-    if not curator.user.is_staff:
+    if curator.type == "external":
         form.fields['no_data'].initial = False
         form.fields['no_data'].widget = forms.HiddenInput()
 
