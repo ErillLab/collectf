@@ -61,14 +61,14 @@ def get_gene_annotation(id_list):
     summary objects."""
     epost_result = Entrez.read(Entrez.epost("gene", id=','.join(id_list)))
 
-    # Occasionally, when CollecTF tries to retrieve all gene summaries, NCBI refuses
-    # to return all them. There must be some sort of limit for a query. Therefore,
-    # the gene list summary query is chunked into 1000 gene pieces.
-    
-    # Edit: After several different ways to fix it, the best way is breaking up the
-    # list into batches of size 1000 AND retry if any batch fails for some reason.
+    # Occasionally, when CollecTF tries to retrieve all gene summaries, NCBI
+    # refuses to return all them. There must be some sort of limit for a
+    # query. Therefore, the gene list summary query is chunked into 1000 gene
+    # pieces.
+    # Edit: After several different ways to fix it, the best way is breaking up
+    # the list into batches of size 1000 AND retry if any batch fails for some
+    # reason.
     runtime_error = 0  # number of runtime errors during Entrez esummary
-    
     while runtime_error < 10:  # if runtime error is consistent, there is no
                                # point trying again
         try:
