@@ -70,6 +70,7 @@ def search_post_helper(request):
         return models.TF.objects.filter(pk__in=TF_input)
 
     def get_species_input():
+        print request.POST.getlist('species_input')
         species_input = [x for x in request.POST.getlist('species_input') if x != 'on']
         if not species_input:
             raise
@@ -156,7 +157,8 @@ def search_post(request):
                                       'reports': [report.generate_browse_result_dict() for report in reports],
                                   },
                                   context_instance = RequestContext(request))
-    except:
+    except RuntimeError as e:
+        print e
         message = "Please select at least one TF, species and experimental technique to search database."
         return raise_validation_error(message)
 

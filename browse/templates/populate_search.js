@@ -6,8 +6,8 @@
 var tf_data = {
     'child': [
 	    {% for TF_family in TF_families %}
-	    {
-	        'text': '{{ TF_family.name }}',
+	    {	
+        'text': '{{ TF_family.name }}',
 	        'child': [
 		        {% for TF in TF_family.tf_set.all %}
 		        {
@@ -26,45 +26,38 @@ var species_data = {
 	    {% for phylum in phyla %}
 	    {
 	        'text': '{{ phylum.name }}',
+            'value': '{{ phylum.pk }}',
 	        'child': [
 		        {% for class_ in phylum.taxonomy_set.all %}
 		        {
 		            'text': '{{ class_.name }}',
+                    'value': '{{ class_.pk }}',
 		            'child': [
 			            {% for order in class_.taxonomy_set.all %}
 			            {
 			                'text': '{{ order.name }}',
+                            'value': '{{ order.pk }}',
 			                'child': [
 				                {% for family in order.taxonomy_set.all %}
 				                {
 				                    'text': '{{ family.name }}',
-				                    {% with genera=family.taxonomy_set.all %}
-				                    {% if genera %}
+                                    'value': '{{ family.pk }}',
 				                    'child': [
-					                    {% for genus in genera %}
+					                    {% for genus in family.taxonomy_set.all %}
 					                    {
 					                        'text': '{{ genus.name }}',
-					                        {% with species_all=genus.taxonomy_set.all %}
-					                        {% if species_all %}
+                                            'value': '{{ genus.pk }}',
 					                        'child': [
-						                        {% for species in species_all %}
+						                        {% for species in genus.taxonomy_set.all %}
 						                        {
 						                            'text': '{{ species.name }}',
 						                            'value': '{{ species.pk }}'
 						                        }{% if not forloop.last %},{% endif %}
-						                        {% endfor %}
+                                                {% endfor %}
 					                        ]
-					                        {% else %}
-					                        'value': '{{ genus.pk }}'
-					                        {% endif %}
-					                        {% endwith %}
 					                    }{% if not forloop.last %},{% endif %}
 					                    {% endfor %}
 				                    ]
-				                    {% else %}
-				                    'value': '{{ family.pk }}'
-				                    {% endif %}
-				                    {% endwith %}
 				                }{% if not forloop.last %},{% endif %}
 				                {% endfor %}
 			                ]
