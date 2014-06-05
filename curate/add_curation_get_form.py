@@ -56,7 +56,7 @@ def genome_get_form(wiz, form):
         form.initial["TF_accession"] = c.TF_instances.all()[0].protein_accession
         for i, TF_instance in zip(xrange(1, settings.NUMBER_OF_TF_ACCESSION_FIELDS), c.TF_instances.all()[1:]):
             form.initial["TF_accession_%d" % i] = TF_instance.protein_accession
-        
+
         form.initial["TF_species"] = c.TF_species
         form.initial["site_species"] = c.site_species
 
@@ -66,7 +66,7 @@ def genome_get_form(wiz, form):
         the previous curation of the paper. They may differ in this curation, so it is
         best to check that they are correct before proceeding to the next step."""
         messages.warning(wiz.request, mark_safe(msg))
-    
+
     # In addition populate two fields on whether the manuscript contains
     # experimental data and promoter information
     pid = session_utils.get(wiz.request.session, 'publication')
@@ -86,7 +86,7 @@ def techniques_get_form(wiz, form):
         techniques = list(set(t.technique_id for csi in cur_site_insts
                               for t in csi.experimental_techniques.all()))
         form.fields['techniques'].initial = techniques
-        
+
         form.fields['experimental_process'].initial = c.experimental_process
         try:
             external_dbs = models.Curation_ExternalDatabase.objects.filter(curation=c)
@@ -126,8 +126,8 @@ def site_entry_get_form(wiz, form):
         techniques = session_utils.get(wiz.request.session, 'techniques')
         choices = [(t.technique_id, t.name) for t in techniques]
         form.fields['peak_techniques'].choices = choices
-                        
-    
+
+
     return form
 
 def site_exact_match_get_form(wiz, form):
@@ -142,7 +142,7 @@ def site_exact_match_get_form(wiz, form):
         form.fields[site.key] = forms.ChoiceField(label=label, choices=choices,
                                                   widget=forms.RadioSelect())
         form.fields[site.key].initial = str(choices[0][0])
-            
+
     return form
 
 def site_soft_match_get_form(wiz, form):
@@ -167,7 +167,9 @@ def site_annotation_get_form(wiz, form):
         if site.is_matched():
             i = site.key
             # create dummy field for the label
-            form.fields['%d_site' % i] = forms.BooleanField(label=site.get_match().pprint(), required=False)
+            label = site.get_match().pprint()
+            form.fields['%d_site' % i] = forms.BooleanField(label=label,
+                                                            required=False)
             # create quantitative value field
             if session_utils.get(wiz.request.session, 'has_quantitative_data'):
                 form.fields['%d_qval' % i] = forms.FloatField(label='Q-val',
@@ -182,7 +184,7 @@ def site_annotation_get_form(wiz, form):
             # create techniques fields (one checkbox for each technique)
             for j,t in enumerate(techniques):
                 form.fields['%d_technique_%d' % (i,j)] = forms.BooleanField(label="", required=False)
-            
+
     return form
 
 def gene_regulation_get_form(wiz, form):
@@ -206,7 +208,7 @@ def gene_regulation_get_form(wiz, form):
                                                        help_text = site.get_match().match_diagram)
             if not publication.contains_expression_data:
                 form.fields[i].widget.attrs['disabled'] = 'disabled'
-                
+
     return form
 
 def curation_review_get_form(wiz, form):
@@ -217,5 +219,5 @@ def curation_review_get_form(wiz, form):
         form.fields['NCBI_submission_ready'].initial = False
         form.fields['NCBI_submission_ready'].widget = forms.HiddenInput()
         form.fields['confidence'].widget = forms.HiddenInput()
-        
+
     return form

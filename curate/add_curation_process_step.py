@@ -29,7 +29,7 @@ def publication_process(wiz, form):
         paper.save()
         session_utils.put(wiz.request.session, "paper_contains_no_data", True)
         return
-    
+
     # If paper is previously curated, populate genome and TF information form
     # search DB if there is any curation object belonging to this publication
     p = models.Publication.objects.get(publication_id=pubid)
@@ -58,7 +58,7 @@ def genome_process(wiz, form):
     # store site species in session data
     session_utils.put(wiz.request.session, 'site_species', form.cleaned_data['site_species'])
     session_utils.put(wiz.request.session, 'TF_species', form.cleaned_data['TF_species'])
-    
+
     # Set manuscript-related fields (contains_experimental_data and
     # contains_promoter_data). Actually, these fields are defined during adding
     # publication process, but the user is given a chance to edit these fields
@@ -68,14 +68,14 @@ def genome_process(wiz, form):
     p.contains_promoter_data = form.cleaned_data["contains_promoter_data"]
     p.contains_expression_data = form.cleaned_data["contains_expression_data"]
     p.save()
-    
+
 
 def techniques_process(wiz, form):
     """Post-process experimental techniques step."""
     techniques = models.ExperimentalTechnique.objects.filter(pk__in=form.cleaned_data['techniques'])
     # save selected techniques (to be used in site-annotation step)
     session_utils.put(wiz.request.session, 'techniques', techniques)
-  
+
 def site_entry_process(wiz, form):
     """Post process site entry step"""
     genomes = session_utils.get(wiz.request.session, "genomes")
@@ -101,13 +101,13 @@ def site_entry_process(wiz, form):
             peak.clear_techniques()
             for t in techniques:
                 peak.add_technique(t)
-                
+
         if any(peak.qval for peak in peaks):
             has_qdata = True
 
         session_utils.put(wiz.request.session, 'peaks', peaks)
 
-    
+
     # save the list of sites
     session_utils.put(wiz.request.session, 'sites', sites)
     # save the type of lists
@@ -126,37 +126,39 @@ def site_exact_match_process(wiz, form):
     genomes = session_utils.get(wiz.request.session, "genomes")
     sites = session_utils.get(wiz.request.session, "sites")
     for site_id, match_id in form.cleaned_data.items():
-        site = [site for site in sites if site.key==site_id][0]
+        site = [site for site in sites if site.key == site_id][0]
         if match_id != "None": # means this site is matched
             site.set_exact_match(match_id)
         else: # not matched, perform soft search
             site.search_soft_match(genomes)
 
-    # If high-throughput submission, try to match quantitative values in peak data to sites
+    # If high-throughput submission, try to match quantitative values in peak
+    # data to sites
     if session_utils.get(wiz.request.session, 'high_throughput_curation'):
         peaks = session_utils.get(wiz.request.session, 'peaks')
         for site in sites:
             site.match_peak_data(peaks)
-            
+
     # save the list of sites
     session_utils.put(wiz.request.session, "sites", sites)
-            
+
 def site_soft_match_process(wiz, form):
     """In this form, soft-search results are processed, user matched all of
     sites to any appropriate sequence found in the genome. Some sites might be
     unmatched if there is no any good candidate in search results."""
     sites = session_utils.get(wiz.request.session, "sites")
     for site_id, match_id in form.cleaned_data.items():
-        site = [site for site in sites if site.key==site_id][0]
+        site = [site for site in sites if site.key == site_id][0]
         if match_id != "None": # means this site is matched
             site.set_soft_match(match_id)
 
-    # If high-throughput submission, try to match quantitative values in peak data to sites
+    # If high-throughput submission, try to match quantitative values in peak
+    # data to sites
     if session_utils.get(wiz.request.session, 'high_throughput_curation'):
         peaks = session_utils.get(wiz.request.session, 'peaks')
         for site in sites:
             site.match_peak_data(peaks)
-            
+
     # save the list of sites
     session_utils.put(wiz.request.session, "sites", sites)
 
@@ -171,13 +173,13 @@ def site_annotation_process(wiz, form):
     cd = form.cleaned_data
     for site in sites:
         i = site.key
-        
+
         if not site.is_matched():
             continue
 
         # Make sure all matched sites are  in the annotation form
         assert '%d_site'%i in cd, "Inconsistent site annotation form"
-            
+
         # Quantitative value
         if has_qdata:
             q = cd['%d_qval'%i]
@@ -194,7 +196,7 @@ def site_annotation_process(wiz, form):
                 site.add_technique(t)
     # Save sites again
     session_utils.put(wiz.request.session, 'sites', sites)
-    
+
 def gene_regulation_process(wiz, form):
     """Prior to this form all matches sites are processed to identify nearby
     genes. In this step, nearby genes are displayed and asked to the curator to
@@ -206,7 +208,7 @@ def gene_regulation_process(wiz, form):
         i = site.key
         if not site.is_matched():
             continue
-        
+
         # Make sure this site is in annotation form
         assert i in cd, "Inconsistent gene regulation form."
         match = site.get_match()

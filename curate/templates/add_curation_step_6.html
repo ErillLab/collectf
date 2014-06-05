@@ -73,7 +73,7 @@ layout is not used. Instead, form fields are displayed as cells of a table.
 
 <tbody>
   {% for site in sites %}
-  {% with i=forloop.counter0|slugify %}
+  {% with i=site.key|slugify %}
   <tr class="small">
     <th><div class="sequence-block">{% with i|add:"_site" as field_name %}{{ form|get:field_name|bootstrap }}{% endwith %}</div></th>
     <th>{% with i|add:"_TF_type" as field_name %}{{ form|get:field_name|bootstrap_inline }}{% endwith %}</th>

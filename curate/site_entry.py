@@ -157,7 +157,7 @@ class Site:
     @property
     def key(self):
         return self._key
-    
+
     def set_nearby_genes_for_all_matches(self):
         """Find nearby genes for all matches for a site."""
         for match in self.exact_matches:
@@ -176,7 +176,7 @@ class Site:
             matches = self.soft_matches
         else:
             assert False, "invalid match_type option"
-            
+
         choices = [(i, match.pprint()) for (i,match) in enumerate(matches)]
         if add_no_valid_opt:
             choices.append((None, "No valid match."))
@@ -187,13 +187,13 @@ class Site:
         return self.exact_matches
 
     def set_exact_match(self, match_id):
-        """Given a match id (one of site's possible exact matches), match the genome
-        location to the binding site reported in the paper"""
+        """Given a match id (one of site's possible exact matches), match the
+        genome location to the binding site reported in the paper"""
         self.matched = self.exact_matches[int(match_id)]
 
     def set_soft_match(self, match_id):
-        """Given a match id (one of site's possible soft matches), match the genome
-        location to the binding site reported in the paper"""
+        """Given a match id (one of site's possible soft matches), match the
+        genome location to the binding site reported in the paper"""
         self.matched = self.soft_matches[int(match_id)]
 
     def get_match(self):
@@ -204,7 +204,7 @@ class Site:
     def is_matched(self):
         return bool(self.matched)
 
-    def set_qval(self,qval):
+    def set_qval(self, qval):
         """Set quantitative value."""
         self.qval = qval
 
@@ -240,7 +240,7 @@ class Site:
         # so skip it.
         if not self.matched:
             return
-        
+
         match = self.get_match()
         for peak in peaks:
             if hasattr(peak, 'start'): # coordinate-based peaks
