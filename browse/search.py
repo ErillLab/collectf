@@ -157,8 +157,7 @@ def search_post(request):
                                       'reports': [report.generate_browse_result_dict() for report in reports],
                                   },
                                   context_instance = RequestContext(request))
-    except RuntimeError as e:
-        print e
+    except:
         message = "Please select at least one TF, species and experimental technique to search database."
         return raise_validation_error(message)
 
