@@ -64,12 +64,16 @@ def export_base(meta_sites):
                                   'site_instance__genome__genome_accession',
                                   'site_instance__genome__organism').distinct()
         assert len(values)==1, values
+
+        # select one of the motif associated sites as delegate
+        delegate = [site for site in meta_site
+                    if site.site_type=='motif_associated'][0]
         values = values[0]
-        values['start_pos'] = meta_site[0].site_instance.start+1
-        values['end_pos'] = meta_site[0].site_instance.end+1
-        values['strand'] = meta_site[0].site_instance.strand
-        values['seq'] = meta_site[0].site_instance.seq
-        values['mode'] = meta_site[0].TF_function
+        values['start_pos'] = delegate.site_instance.start+1
+        values['end_pos'] = delegate.site_instance.end+1
+        values['strand'] = delegate.site_instance.strand
+        values['seq'] = delegate.site_instance.seq
+        values['mode'] = delegate.TF_function
         rows.append(values)
     return rows
 
