@@ -69,8 +69,8 @@ def export_base(meta_sites):
         delegate = [site for site in meta_site
                     if site.site_type=='motif_associated'][0]
         values = values[0]
-        values['start_pos'] = delegate.site_instance.start+1
-        values['end_pos'] = delegate.site_instance.end+1
+        values['start_pos'] = delegate.site_instance.start
+        values['end_pos'] = delegate.site_instance.end
         values['strand'] = delegate.site_instance.strand
         values['seq'] = delegate.site_instance.seq
         values['mode'] = delegate.TF_function
