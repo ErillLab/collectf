@@ -36,18 +36,18 @@ def export_sites(request):
         'PSFM-transfac': {'format':'TRANSFAC'},
         'PSFM-raw-fasta': {'format': 'raw_fasta'},
         }
-                          
+
     for opt in export_options:
         if opt in request.POST:
             export_format = opt
             break
     else: assert False, "invalid export option"
-    
+
     # Given the list of curation-site-instance objects,
     curation_site_id_groups = request.POST.getlist('site_id')
     meta_sites = [models.Curation_SiteInstance.objects.filter(pk__in=id_group.split('|'))
                   for id_group in curation_site_id_groups]
-    
+
     response = HttpResponse(content_type='application/download')
     # call corresponding export function
     response["Content-Disposition"] = \
@@ -63,12 +63,13 @@ def export_base(meta_sites):
                                   'curation__TF_instances__protein_accession',
                                   'site_instance__genome__genome_accession',
                                   'site_instance__genome__organism').distinct()
-        assert len(values)==1
+        assert len(values)==1, values
         values = values[0]
         values['start_pos'] = meta_site[0].site_instance.start+1
         values['end_pos'] = meta_site[0].site_instance.end+1
         values['strand'] = meta_site[0].site_instance.strand
         values['seq'] = meta_site[0].site_instance.seq
+        values['mode'] = meta_site[0].TF_function
         rows.append(values)
     return rows
 
@@ -99,6 +100,7 @@ tsv_header = tsv_sep.join(['TF',
                            'site_end',
                            'site_strand',
                            'sequence',
+                           'mode',
                            'experimental_evidence',
                            'regulated genes (locus_tags)'
                            ])
@@ -123,6 +125,7 @@ def export_tsv(meta_sites, **kwargs):
                                       row['end_pos'],
                                       row['strand'],
                                       row['seq'],
+                                      row['mode'],
                                       ' | '.join((','.join(t.name for t in evidence) + ' [PMID:%s]' % pmid)
                                                  for evidence,pmid in zip(experimental_evidence, pmids)),
                                       ', '.join(reg.gene.locus_tag for reg in regulated_genes),
@@ -146,6 +149,7 @@ def export_tsv_raw(meta_sites, **kwargs):
                                           csi.site_instance.end,
                                           csi.site_instance.strand,
                                           csi.site_instance.seq,
+                                          csi.TF_function,
                                           ', '.join(t.name for t in csi.experimental_techniques.all()) + \
                                                                        ' [PMID:%s]' % csi.curation.publication.pmid,
                                           ','.join(r.gene.locus_tag for r in models.Regulation.objects.filter(evidence_type="exp_verified")\
@@ -169,7 +173,7 @@ def export_arff(meta_sites, **kwargs):
     arff_lines.append('@ATTRIBUTE TF_binding_site_sequence STRING')
 
     arff_lines.append('@DATA')
-    
+
     rows = export_base(meta_sites)
     for i,row in enumerate(rows):
         arff_lines.append(','.join([row['curation__TF__name'],
@@ -189,7 +193,7 @@ def export_PSFM(meta_sites, **kwargs):
     aligned = bioutils.run_lasagna([m[0].site_instance for m in meta_sites])
     motif = bioutils.build_motif(aligned)
     consensus = bioutils.degenerate_consensus(motif)
-    
+
     TF_name= ','.join(set(row['curation__TF__name'] for row in rows))
     sp = ','.join(set('_'.join(row['site_instance__genome__organism'].split()) for row in rows))
     lines = []
@@ -217,5 +221,5 @@ def export_PSFM(meta_sites, **kwargs):
                                          motif.counts['G'][po],
                                          motif.counts['T'][po])
                      for po in range(motif.length))
-        
+
     return '\n'.join(lines)

@@ -18,11 +18,27 @@ class MetaSite:
         meta-site. Based on the type of cur_site_inst object, perform
         motif_associated_overlap_test or non_motif_associated_overlap_test"""
         if cur_site_inst.site_type == 'motif_associated':
-            return self.motif_associated_overlap_test(cur_site_inst)
+            return (self.motif_associated_overlap_test(cur_site_inst) and
+                    self.genome_test(cur_site_inst) and
+                    self.TF_instances_test(cur_site_inst))
         elif cur_site_inst.site_type == 'non_motif_associated':
-            return self.non_motif_associated_overlap_test(cur_site_inst)
+            return (self.non_motif_associated_overlap_test(cur_site_inst) and
+                    self.genome_test(cur_site_inst) and
+                    self.TF_instances_test(cur_site_inst))
         else:
             return False
+
+    def TF_instances_test(self, cur_site_inst):
+        """Check if two curation site instances have the same set of TF
+        instances. Perform this after location overlap test since this takes
+        more time and we want to eliminate as many candidates as possible via
+        overlap test"""
+        return set(self.TF_instances) == set(cur_site_inst.TF_instances)
+
+    def genome_test(self, cur_site_inst):
+        """Check if two curation site instances have the same genome"""
+        return True # guaranteed to have same genome
+        return self.genome == cur_site_inst.genome
 
     def motif_associated_overlap_test(self, cur_site_inst):
         """Given a curation-site-instance object, check if the meta-site and the
@@ -33,6 +49,7 @@ class MetaSite:
             """Given two locations, return the overlap ratio."""
             overlap_len = max(0, min(loca[1], locb[1]) - max(loca[0], locb[0]))
             return float(overlap_len) / (loca[1]-loca[0]+1)
+
 
         loca = (self.delegate.site_instance.start, self.delegate.site_instance.end)
         locb = (cur_site_inst.site_instance.start, cur_site_inst.site_instance.end)
@@ -67,7 +84,7 @@ class MetaSite:
     def genome(self):
         """Return genome of curation-site-instances."""
         if not hasattr(self, '_genome'):
-            self._genome = self.cur_site_insts[0].site_instance.genome
+            self._genome = self.cur_site_insts[0].genome
         return self._genome
 
     @property
@@ -78,7 +95,7 @@ class MetaSite:
         several subunits with different accession numbers (e.g. heterodimer such
         as IHF, composed of IHF alpha and beta)."""
         if not hasattr(self, '_TF_instances'):
-           self._TF_instances =  list(self.cur_site_insts[0].curation.TF_instances.all())
+           self._TF_instances =  self.cur_site_insts[0].TF_instances
         return self._TF_instances
 
     @property
@@ -162,4 +179,3 @@ def create_meta_sites(motif_cur_site_insts, non_motif_cur_site_insts):
               pass
 
     return meta_sites
-      

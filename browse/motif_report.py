@@ -113,12 +113,8 @@ class MotifReport:
         """Create meta-sites from curation-site-instances."""
         if not hasattr(self, 'meta_sites'):
             # Compute them here.
-            sys.stdout.write('creating meta sites...')
-            sys.stdout.flush()
             self.meta_sites = metasite.create_meta_sites(self.m_cur_site_insts,
                                                          self.nm_cur_site_insts)
-            sys.stdout.write('\t [done]\n')
-            
         return self.meta_sites
 
     def set_meta_sites(self, meta_sites):

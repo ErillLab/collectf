@@ -381,6 +381,15 @@ class Curation_SiteInstance(models.Model):
     def TF_type_verbose(self):
         return dict(Curation_SiteInstance.TF_TYPE)[self.TF_type]
 
+    @property
+    def TF_instances(self):
+        """Return the list of TF instance accession numbers bound to it."""
+        return self.curation.TF_instances.values_list('protein_accession', flat=True)
+
+    @property
+    def genome(self):
+        return self.site_instance.genome.genome_accession
+
 class Regulation(models.Model):
     """This table stores the TF regulation of genes. The regulation table links
     two tables: curation_site_instance and gene, to capture the information of
