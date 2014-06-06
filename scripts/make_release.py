@@ -19,8 +19,8 @@ def make_new_release():
             meta_sites_query_set.append(qset)
 
 
-    tsv_raw = export.export_tsv_raw(meta_sites_query_set)
-    with open('collectf_export_2.tsv', 'w') as f:
+    tsv_raw = export.export_tsv(meta_sites_query_set)
+    with open('collectf_export.tsv', 'w') as f:
         f.write(tsv_raw)
 
 
