@@ -45,24 +45,26 @@ class Match:
         find in the next <dist_th> base-pair."""
         genes = self.genome.get_genes()
         # make sure all genes are sorted by start position
-        assert all(ga.start <= gb.start for ga,gb in zip(genes, genes[1:]))
+        assert all(ga.start <= gb.start for ga, gb in zip(genes, genes[1:]))
         left_genes = filter(lambda g: g.end < self.start, genes)
         right_genes = filter(lambda g: g.start > self.end, genes)
         # genes overlap with site
         nearby_genes = genes[len(left_genes):len(genes)-len(right_genes)]
         # left
         if left_genes:
-            ngi, nearby_gene = min(enumerate(left_genes), key=lambda x: dist(x[1], self))
+            ngi, nearby_gene = min(enumerate(left_genes),
+                                   key=lambda x: dist(x[1], self))
             if nearby_gene.strand == -1:
                 nearby_genes.append(nearby_gene)
                 while (ngi > 0 and
-                       left_genes[ngi-1].strand==-1 and
+                       left_genes[ngi-1].strand == -1 and
                        dist(left_genes[ngi-1], left_genes[ngi]) < dist_th):
                     nearby_genes.append(left_genes[ngi-1])
                     ngi -= 1
         # right
         if right_genes:
-            ngi, nearby_gene = min(enumerate(right_genes), key=lambda x: dist(x[1], self))
+            ngi, nearby_gene = min(enumerate(right_genes),
+                                   key=lambda x: dist(x[1], self))
             if nearby_gene.strand == 1:
                 nearby_genes.append(nearby_gene)
                 while (ngi < len(right_genes)-1 and
@@ -86,11 +88,13 @@ class Match:
 
     def is_exact(self):
         return self.seq == self.reported_seq
-    
+
     def pprint(self, diagram_hover=False):
-        """Given a match object, make the HTML snippet to display it properly."""
+        """Given a match object, make the HTML snippet to display it
+        properly."""
         strand = '+' if self.strand == 1 else '-'
-        nearby_genes = ['%s (%s)' % (g.locus_tag, g.name) for g in self.nearby_genes]
+        nearby_genes = ['%s (%s)' % (g.locus_tag, g.name)
+                        for g in self.nearby_genes]
         # Make the diagram and gene function table
         extra = (self.match_diagram() +
                 '<table class="table table-condensed small">' +
@@ -102,38 +106,42 @@ class Match:
         return_str = ""
         if self.is_exact():
             return_str += ('<div class="sequence">%s<br/> %s[%d,%d] %s</div>' %
-                           (self.seq, '+' if self.strand==1 else '-',
-                            self.start, self.end, self.genome.genome_accession))
+                           (self.seq, '+' if self.strand == 1 else '-',
+                            self.start+1, self.end+1,
+                            self.genome.genome_accession))
         else:
             return_str += self.print_alignment(self.reported_seq, self.seq)
-        
+
         return mark_safe(return_str + extra)
 
     def match_diagram(self):
-        """This method is called during curation submission. When the reported sites are
-        given, they are searched in the genome and matched are displayed. For display,
-        site match diagram is created and presented."""
+        """This method is called during curation submission. When the reported
+        sites are given, they are searched in the genome and matched are
+        displayed. For display, site match diagram is created and presented."""
         gdd = GenomeDiagram.Diagram("Site match diagram")
         gdt_features = gdd.new_track(1, greytrack=False)
         gds_features = gdt_features.new_set()
         # draw genes
         for gene in self.nearby_genes:
-            feature = SeqFeature(FeatureLocation(gene.start, gene.end), strand=gene.strand)
+            feature = SeqFeature(FeatureLocation(gene.start+1, gene.end+1),
+                                 strand=gene.strand)
             gds_features.add_feature(feature,
                                      name=gene.name,
                                      label=True,
                                      label_size=10,
-                                     label_angle= 0 if gene.strand==1 else 180,
+                                     label_angle=0 if gene.strand == 1 else 180,
                                      label_position='middle',
                                      sigil='ARROW',
                                      arrowshaft_height=1.0,
                                      color=colors.lightblue)
         # draw binding site
-        feature = SeqFeature(FeatureLocation(self.start,self.end), strand=self.strand)
-        gds_features.add_feature(feature, color=colors.red, name='site', label=False, label_size=12)
+        feature = SeqFeature(FeatureLocation(self.start+1, self.end+1),
+                             strand=self.strand)
+        gds_features.add_feature(feature, color=colors.red, name='site',
+                                 label=False, label_size=12)
         gdd.draw(format='linear', fragments=1,
-                 start=min(map(lambda g: g.start, self.nearby_genes))-150,
-                 end=max(map(lambda g: g.end, self.nearby_genes))+150,
+                 start=min(map(lambda g: g.start+1, self.nearby_genes))-150,
+                 end=max(map(lambda g: g.end+1, self.nearby_genes))+150,
                  pagesize=(2*cm, 12*cm))
         return mark_safe('<div>' + gdd.write_to_string('svg') + '</div>')
 
@@ -152,7 +160,7 @@ class Match:
 
     def __repr__(self):
         return "%s %s (exact? %s)" % (self.seq, self.reported_seq, self.is_exact())
-        
+
 class Site:
     @property
     def key(self):
@@ -177,7 +185,7 @@ class Site:
         else:
             assert False, "invalid match_type option"
 
-        choices = [(i, match.pprint()) for (i,match) in enumerate(matches)]
+        choices = [(i, match.pprint()) for (i, match) in enumerate(matches)]
         if add_no_valid_opt:
             choices.append((None, "No valid match."))
         return choices
@@ -251,7 +259,7 @@ class Site:
                 if match.seq in peak.seq or bioutils.reverse_complement(match.seq) in peak.seq:
                     self.qval = peak.qval
                     break
-        
+
 class SequenceSite(Site):
     """Class definition for sites that are initialized with the sequence"""
     def __init__(self, id, seq, qval=None):
@@ -282,7 +290,7 @@ class SequenceSite(Site):
         matches = (self._locate_seq_strand(genome, 1) +
                    self._locate_seq_strand(genome, -1))
         return matches
-    
+
     def _locate_seq_strand(self, genome, strand):
         """Search the site sequence only in one strand of the genome."""
         genome_seq = genome.get_sequence()
@@ -331,8 +339,6 @@ class SequenceSite(Site):
     def __repr__(self):
         return "%s" % self.seq
 
-
-
 class CoordinateSite(Site):
     """Class definition for sites that are initialized using coordinates."""
     def __init__(self, id, start, end, qval=None):
@@ -363,7 +369,7 @@ class CoordinateSite(Site):
             else:
                 self.seq = bioutils.reverse_complement(genome_sequence[end:start+1])
                 self.exact_matches = [Match(genome, self.seq, self.seq, end, start, -1)]
-                
+
         # For all matches, get nearby genes
         self.set_nearby_genes_for_all_matches()
 
@@ -392,14 +398,18 @@ def parse_coords(text):
     """Parse text that contains list of coordinates, one per line. Each line
     must contain a pair of numbers, denoting start and end positions for the
     site, respectively."""
-    coordinates = [re.split('[\t ]+', line) for line in re.split('[\r\n]+', text)]
-    return [CoordinateSite(i, int(coord[0]), int(coord[1])) for i,coord in enumerate(coordinates)]
+    coordinates = [re.split('[\t ]+', line)
+                   for line in re.split('[\r\n]+', text)]
+    return [CoordinateSite(i, int(coord[0])-1, int(coord[1])-1)
+            for i, coord in enumerate(coordinates)]
 
 def parse_coords_with_qval(text):
     """Parse text that contains list of coordinates, one per line. Additionally,
     each line has a quantitative value associated with the coordinates"""
-    coordinates = [re.split('[\t ]+', line) for line in re.split('[\r\n]+', text)]
-    return [CoordinateSite(i, int(coord[0]), int(coord[1]), float(coord[2])) for i,coord in enumerate(coordinates)]
+    coordinates = [re.split('[\t ]+', line)
+                   for line in re.split('[\r\n]+', text)]
+    return [CoordinateSite(i, int(coord[0])-1, int(coord[1])-1, float(coord[2]))
+            for i, coord in enumerate(coordinates)]
 
 def parse_input(text):
     """Parse text of reported sites.

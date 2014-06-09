@@ -40,10 +40,10 @@ def publication_get_form(wiz, form):
 def genome_get_form(wiz, form):
     """Construct the form for genome and TF selection step."""
     c = session_utils.get(wiz.request.session, "previously_curated_paper")
-    # If selected publication is the one most recently curated, the related curation
-    # should be in object c. Otherwise, c = None.  If so, populate "Genome and TF
-    # information" form fields from the previously submitted curation to make things
-    # easier for curator.
+    # If selected publication is the one most recently curated, the related
+    # curation should be in object c. Otherwise, c = None.  If so, populate
+    # "Genome and TF information" form fields from the previously submitted
+    # curation to make things easier for curator.
     if c:
         form.initial["TF"] = c.TF
         if c.site_instances.all():

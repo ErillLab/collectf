@@ -69,8 +69,8 @@ def export_base(meta_sites):
         delegate = [site for site in meta_site
                     if site.site_type=='motif_associated'][0]
         values = values[0]
-        values['start_pos'] = delegate.site_instance.start
-        values['end_pos'] = delegate.site_instance.end
+        values['start_pos'] = delegate.site_instance.start+1
+        values['end_pos'] = delegate.site_instance.end+1
         values['strand'] = delegate.site_instance.strand
         values['seq'] = delegate.site_instance.seq
         values['mode'] = delegate.TF_function
@@ -149,8 +149,8 @@ def export_tsv_raw(meta_sites, **kwargs):
                                           csi.curation.TF_instances.all()[0].protein_accession,
                                           csi.site_instance.genome.genome_accession,
                                           csi.site_instance.genome.organism,
-                                          csi.site_instance.start,
-                                          csi.site_instance.end,
+                                          csi.site_instance.start+1,
+                                          csi.site_instance.end+1,
                                           csi.site_instance.strand,
                                           csi.site_instance.seq,
                                           csi.TF_function,

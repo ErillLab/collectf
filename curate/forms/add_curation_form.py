@@ -15,8 +15,10 @@ class PublicationForm(forms.Form):
     """Form for publication selection step.  In this step, the user is asked to
     select one of the papers assigned to him/her."""
     ht = help_texts.publication_form
-    pub = forms.ChoiceField(widget=forms.RadioSelect(), label="Publications", help_text=ht['pub'])
-    no_data = forms.BooleanField(label="This paper contains no data.", required=False, help_text=ht['no_data'])
+    pub = forms.ChoiceField(widget=forms.RadioSelect(),
+                            label="Publications", help_text=ht['pub'])
+    no_data = forms.BooleanField(label="This paper contains no data.",
+                                 required=False, help_text=ht['no_data'])
 
 
 class GenomeForm(forms.Form):
@@ -54,12 +56,12 @@ class GenomeForm(forms.Form):
         current_order = self.fields.keyOrder
         self.fields.keyOrder = (['TF', 'genome_accession'] +
                                 ['genome_accession_%d' % i for i in xrange(1, num_genome_fields)] +
-                                ['site_species_same'] + 
+                                ['site_species_same'] +
                                 ['TF_accession'] +
                                 ['TF_accession_%d' % i for i in xrange(1, num_TF_fields)] +
                                 ['TF_species_same', 'site_species', 'TF_species'] +
                                 ['contains_promoter_data', 'contains_expression_data'])
-    
+
     help_dict = help_texts.genome_form
     # TF field
     TF = forms.ModelChoiceField(queryset=TF.objects.order_by('name'),
@@ -88,7 +90,7 @@ class GenomeForm(forms.Form):
 
     site_species = forms.CharField(label="Organism TF binding sites are reported in",
                                    required=False,
-                                   help_text=help_dict['site_species'])   
+                                   help_text=help_dict['site_species'])
 
     TF_species = forms.CharField(label="Organism of origin for reported TF",
                                  required=False,
@@ -153,7 +155,7 @@ class GenomeForm(forms.Form):
         and add to the CollecTF . Do the validity check for all TF accession
         fields (if there are more than one)."""
         TF_accession = self.cleaned_data['TF_accession'].strip()
-        
+
         return self.clean_TF_accession_helper(TF_accession)
 
     def clean_species(self, field):
@@ -168,7 +170,7 @@ class GenomeForm(forms.Form):
             msg = "Invalid genome accession number"
             self._errors[field] = self.error_class([msg])
         return genome.organism
-        
+
     def clean_TF_species(self):
         """Clean TF_species field. If TF_species_same field is selected, assign
         species data to the cleaned data. In that case, it is important that
@@ -207,7 +209,7 @@ class GenomeForm(forms.Form):
         try:
             cd = self.cleaned_data
             if 'TF_accession' not in cd:
-                return 
+                return
             TF_accessions = [cd['TF_accession']]
             for i in xrange(settings.NUMBER_OF_TF_ACCESSION_FIELDS):
                 field_name = 'TF_accession_%d' % i
@@ -237,7 +239,7 @@ class GenomeForm(forms.Form):
         # Check if all TF accession numbers come from the same taxon
         self.check_TF_accession_origin()
         return cd
-    
+
 class TechniquesForm(forms.Form):
     """Form to enter experimental techniques used to identify TFBS.
 
@@ -264,8 +266,6 @@ class TechniquesForm(forms.Form):
       optionally add notes on that [pop-up]).
       """
 
-
-
     def __init__(self, *args, **kwargs):
         """Override initialization"""
         super(TechniquesForm, self).__init__(*args, **kwargs)
@@ -284,7 +284,7 @@ class TechniquesForm(forms.Form):
             self.fields['external_db_accession_%d' % i] = forms.CharField(required=False,
                                                                           label="External DB accession number [%d]" % (i+1),
                                                                           help_text=help_dict['external_db_accession'])
-    
+
     help_dict = help_texts.techniques_form
     # generate techniques field by getting available techniques from db
     choices = []
@@ -307,12 +307,12 @@ class TechniquesForm(forms.Form):
     has_external_db = forms.BooleanField(
         required=False,
         label="The manuscript reports high-throughput data from an external database. (You can report up to 5 external resources.)")
-    
+
     # Does TF interact with any other protein/ligand that influences binding?
     forms_complex = forms.BooleanField(required=False,
                                        label="""The manuscript reports that TF forms complex
                                        with other proteins for binding with reported sites""")
-    
+
     complex_notes = forms.CharField(widget=forms.Textarea, required=False,
                                     label="Notes",
                                     help_text=help_dict['complex_notes'])
@@ -321,22 +321,24 @@ class SiteEntryForm(forms.Form):
     """Form for reporting sites.
 
     Curators are first asked to specify whether the sites are: motif associated
-    [MA], variable motif associated (e.g. variable spacing, inverting... anything
-    that is not gapless alignment) [VMA] or non-motif associated (no specific
-    sequence pattern has been determined as the binding motif) [NMA].
-    
-    Curators are later asked to enter the sites. They can do this in two major
-    formats: (1) Sequence-based (e.g. CTGTTGCACGT) (2) Coordinate-based (e.g. 12312	12323)
-    
-    If the user has not checked "This is the same strand used in the paper" in the
-    first page, the system will ask the user to verify that the coordinates they
-    enter refer to the NCBI strand.
+    [MA], variable motif associated (e.g. variable spacing,
+    inverting... anything that is not gapless alignment) [VMA] or non-motif
+    associated (no specific sequence pattern has been determined as the binding
+    motif) [NMA].
 
-    - Curators can also add quantitative data to either format. 
+    Curators are later asked to enter the sites. They can do this in two major
+    formats: (1) Sequence-based (e.g. CTGTTGCACGT) (2) Coordinate-based
+    (e.g. 12312 12323)
+
+    If the user has not checked "This is the same strand used in the paper" in
+    the first page, the system will ask the user to verify that the coordinates
+    they enter refer to the NCBI strand.
+
+    - Curators can also add quantitative data to either format.
     - All fields must be separated by either space or tab
-    - The system will recognize the entry format and the presence of quantitative
-    data once Next is clicked. If there is quantitative data, the system will
-    prompt the user for a brief description of the field.
+    - The system will recognize the entry format and the presence of
+    quantitative data once Next is clicked. If there is quantitative data, the
+    system will prompt the user for a brief description of the field.
     """
     help_dict = help_texts.site_entry_form
     # type of sites to be entered
@@ -369,9 +371,10 @@ class SiteEntryForm(forms.Form):
 
     def verify_coordinates(self, coor_a, coor_b):
         try:
-            x,y = int(coor_a), int(coor_b)
-            if x <= 0 or y <= 0: return None
-            return x,y
+            x, y = int(coor_a), int(coor_b)
+            if x <= 0 or y <= 0:
+                return None
+            return x, y
         except ValueError:
             return None
 
@@ -382,7 +385,7 @@ class SiteEntryForm(forms.Form):
             return x
         except ValueError:
             return None
-        
+
     def verify_only_sites(self, sites_cd):
         """Clean function to check if all site sequences are valid."""
         try:
@@ -523,7 +526,7 @@ class SiteAnnotationForm(forms.Form):
     def clean(self):
         # TODO Check if at least one experimental techniques is selected for each site.
         return self.cleaned_data
-    
+
 
 class GeneRegulationForm(forms.Form):
     """This form is displayed after SiteSoftMatchForm. After the user selects
@@ -541,7 +544,7 @@ class CurationReviewForm(forms.Form):
     """Form to review all the data entered so far. The last step to submit
     curation."""
     help_dict = help_texts.curation_review_form
-    
+
     choices = ((None, "None"),) + Curation.REVISION_REASONS
     revision_reasons = forms.ChoiceField(choices=choices,
                                          label="Revision required",
@@ -554,7 +557,7 @@ class CurationReviewForm(forms.Form):
     NCBI_submission_ready = forms.BooleanField(required=False,
                                                label="Curation is ready to submit to NCBI.",
                                                help_text=help_dict['NCBI_submission_ready'])
-                                               
+
     paper_complete = forms.BooleanField(required=False,
                                         label="Curation for this paper is complete.",
                                         help_text=help_dict['paper_complete'])
@@ -563,7 +566,7 @@ class CurationReviewForm(forms.Form):
                             required=False,
                             label="Notes",
                             help_text=help_dict['notes'])
-    
+
     confirm = forms.BooleanField(required=True,
                                  label="I want to submit this curation",
                                  help_text=help_dict['confirm'])
