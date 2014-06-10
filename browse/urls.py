@@ -5,7 +5,7 @@ urlpatterns = patterns('browse.browse_tax',
     (r'get_results_tax/(?P<taxid>\d+)$', 'get_results_taxonomy'),
 )
 
-urlpatterns += patterns('browse.browse_TF',
+urlpatterns += patterns('browse.browse_TF',   # addd
     (r'browse_tf/$', 'browse_TF'),
     (r'get_results_tf/(?P<type_>\w+)/(?P<id>\d+)/$', 'get_results_TF'),
 )
