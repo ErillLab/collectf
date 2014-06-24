@@ -215,7 +215,7 @@ def curation_review_get_form(wiz, form):
     """Get curation review form"""
     curator = models.Curator.objects.get(user=wiz.request.user)
     # If curator is not admin, mark curation as requiring validation
-    if not curator.user.is_staff:
+    if curator.curator_type == "external":
         form.fields['NCBI_submission_ready'].initial = False
         form.fields['NCBI_submission_ready'].widget = forms.HiddenInput()
         form.fields['confidence'].widget = forms.HiddenInput()
