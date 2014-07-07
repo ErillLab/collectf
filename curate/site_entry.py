@@ -112,7 +112,10 @@ class Match:
         else:
             return_str += self.print_alignment(self.reported_seq, self.seq)
 
-        return mark_safe(return_str + extra)
+        if diagram_hover:
+            return mark_safe(return_str + extra)
+
+        return mark_safe(return_str)
 
     def match_diagram(self):
         """This method is called during curation submission. When the reported
@@ -165,6 +168,8 @@ class Site:
     @property
     def key(self):
         return self._key
+
+
 
     def set_nearby_genes_for_all_matches(self):
         """Find nearby genes for all matches for a site."""
@@ -252,11 +257,13 @@ class Site:
         match = self.get_match()
         for peak in peaks:
             if hasattr(peak, 'start'): # coordinate-based peaks
-                if min(peak.start, peak.end) <= match.start and max(peak.start, peak.end) >= match.end:
+                if (min(peak.start, peak.end) <= match.start and
+                    max(peak.start, peak.end) >= match.end):
                     self.qval = peak.qval
                     break
             else: # sequence-based peaks
-                if match.seq in peak.seq or bioutils.reverse_complement(match.seq) in peak.seq:
+                if (match.seq in peak.seq or
+                    bioutils.reverse_complement(match.seq) in peak.seq):
                     self.qval = peak.qval
                     break
 
@@ -274,6 +281,9 @@ class SequenceSite(Site):
 
     def __repr__(self):
         return "%s [%.2f]" % (self.seq, self.qval if self.qval else 0)
+
+    def pprint(self):
+        return mark_safe('<span class="sequence">%s</span>' % self.seq)
 
     def search_exact_match(self, genomes):
         """Search the genome and find exact matches on the genome."""

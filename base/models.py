@@ -29,7 +29,7 @@ class Curation(models.Model):
     # binding?
     forms_complex = models.BooleanField()
     complex_notes = models.TextField(null=True, blank=True)
-    
+
     # curation meta information
     notes = models.TextField(blank=True)
     confidence = models.BooleanField()              # is curation confident?
@@ -56,13 +56,13 @@ class Curation(models.Model):
     # to be removed
     #TF_function = models.CharField(max_length=50)
     #TF_type = models.CharField(max_length=50)
-    
-    
+
+
     # <Wed Jan 29 2014> Experimental techniques are now going to be associated
     # directly (N:N) with curation_site_instances, allowing a curation to
     # contain curation_site_instances that have different associated techniques.
     #experimental_techniques = models.ManyToManyField("ExperimentalTechnique", related_name='curation')
-    
+
     site_instances = models.ManyToManyField("SiteInstance", through="Curation_SiteInstance")
 
     # ChIP link (NULL if curation is not from ChIP paper
@@ -80,7 +80,7 @@ class Curation(models.Model):
         d = dict(list)
         if key in d: return d[key]
         return None
-    
+
     def TF_function_verbose(self):
         return self._get_display(self.TF_function, self.TF_FUNCTION)
 
@@ -93,7 +93,7 @@ class Curator(models.Model):
 
     CURATOR_TYPE = (("internal", "internal"),
                     ("external", "external"))
-    
+
     curator_id = models.AutoField(primary_key=True)
     user = models.OneToOneField(User) # extend Django's user model
     curator_type = models.CharField(max_length=20, choices=CURATOR_TYPE, default="external")
@@ -106,11 +106,11 @@ class Publication(models.Model):
     authors, title etc. It also has fields on whether it has promoter/expression
     data and reported TF/species that might be useful when the paper is
     curated"""
-    
+
     PUBLICATION_TYPE = (("pubmed", "Pubmed article"),
                         ("nonpubmed", "Non-pubmed article"),
                         ("nonpublished", "Non-published data"))
-    
+
     publication_id = models.AutoField(primary_key=True)
     publication_type = models.CharField(max_length=20, choices=PUBLICATION_TYPE)
     pmid = models.CharField(max_length=30, null=True, blank=True) # null if not PubMed article
@@ -130,7 +130,7 @@ class Publication(models.Model):
     assigned_to = models.ForeignKey("Curator", null=True, blank=True)
     reported_TF = models.CharField(max_length=100, null=True, blank=True)
     reported_species = models.CharField(max_length=100, null=True, blank=True)
-    
+
     def __unicode__(self):
         return u'[%s] PMID: %s, TF: %s, species: %s,assigned to: %s' % \
                (self.publication_id, self.pmid, self.reported_TF,
@@ -139,10 +139,10 @@ class Publication(models.Model):
 class Gene(models.Model):
     """Gene table containing position/strand on the genome, locus tag, accession
     number, etc."""
-    
+
     STRAND = ((1, "Top strand"),
               (-1, "Bottom strand"))
-    
+
     gene_id = models.AutoField(primary_key=True)
     gene_accession = models.CharField(max_length=30, null=True, blank=True)
     genome = models.ForeignKey("Genome")
@@ -160,16 +160,17 @@ class Genome(models.Model):
     """Genome table"""
     GENOME_TYPE = (("chromosome", "chromosome"),
                    ("plasmid", "plasmid"))
-    
+
     genome_id = models.AutoField(primary_key=True)
     genome_accession = models.CharField(max_length=20, unique=True)
-    genome_sequence = models.OneToOneField("GenomeSequence", null=False, blank=False)
+    genome_sequence = models.OneToOneField("GenomeSequence", null=False,
+                                           blank=False)
     GC_content = models.FloatField()
     gi = models.CharField(max_length=50, null=False)
     chromosome = models.CharField(max_length=10, null=False)
     organism = models.CharField(max_length=500, null=False)
     taxonomy = models.ForeignKey('Taxonomy')
-    
+
     def __unicode__(self):
         return self.genome_accession + ' ' + self.organism
 
@@ -191,42 +192,44 @@ class Genome(models.Model):
         if not cache.has_key(key):
             print "Key %s not in cache, retrieving from the database." % key
             value = Gene.objects.filter(genome=self).order_by('start')
-            cache.set(key,value)
+            cache.set(key, value)
         ret = cache.get(key)
         assert ret
         return ret
-        
+
 
 class GenomeSequence(models.Model):
     """Genome sequence table. It contains only sequence. Initially it was a part
     of genome table, but moved to a separate table for fast access to the genome
     table when the sequence is not necessary"""
     sequence = models.TextField(editable=False)
-    
+
     def __unicode__(self):
         return '%s' % self.genome
 
 class Taxonomy(models.Model):
     """Taxonomy table stores the phylogeny in the database."""
     taxonomy_id = models.CharField(max_length=20, unique=True)
-    rank = models.CharField(max_length=20, choices=(('phylum', 'phylum'),
-                                                    ('class', 'class'),
-                                                    ('order', 'order'),
-                                                    ('family', 'family'),
-                                                    ('genus', 'genus'),
-                                                    ('species', 'species')), null=False)
+    rank = models.CharField(max_length=20,
+                            choices=(('phylum', 'phylum'),
+                                     ('class', 'class'),
+                                     ('order', 'order'),
+                                     ('family', 'family'),
+                                     ('genus', 'genus'),
+                                     ('species', 'species')),
+                            null=False)
     name = models.CharField(max_length=100)
     parent = models.ForeignKey('self', null=True)
-    
+
     def __unicode__(self):
         return '[%s] %s (%s)' % (str(self.taxonomy_id), self.name, self.rank)
-    
+
     def get_order(self):
         order = None
         x = self
-        while (x.rank != 'order' and x.parent):
+        while x.rank != 'order' and x.parent:
             x = x.parent
-        if x.rank=='order':
+        if x.rank == 'order':
             return x
 
     class Meta:
@@ -241,7 +244,7 @@ class TF(models.Model):
 
     def __unicode__(self):
         return u'%s [family: %s]' % (self.name, self.family.name)
-    
+
     class Meta:
         verbose_name_plural = "TFs"
 
@@ -253,7 +256,7 @@ class TFFamily(models.Model):
 
     def __unicode__(self):
         return u'%s' % self.name
-    
+
     class Meta:
         verbose_name = "TF family"
         verbose_name_plural = "TF families"
@@ -270,7 +273,7 @@ class TFInstance(models.Model):
 
     class Meta:
         verbose_name = "TF instance"
-        
+
 class SiteInstance(models.Model):
     """The binding site model. Contains position/strand, which genome it is in
     etc."""
@@ -283,7 +286,7 @@ class SiteInstance(models.Model):
     # sequence, 0 index too.)
     end = models.IntegerField()
     # genome strand (1 or -1)
-    strand = models.IntegerField(choices=Gene.STRAND) 
+    strand = models.IntegerField(choices=Gene.STRAND)
 
     def __unicode__(self):
         return u'%s [%s]' % (self.site_id, self._seq)
@@ -306,7 +309,7 @@ class SiteInstance(models.Model):
 
     def get_genome_sequence(self):
         return self.genome.get_sequence()
-    
+
 
     @property
     def seq(self):
@@ -321,7 +324,7 @@ class SiteInstance(models.Model):
     @property
     def seq_lower(self):
         return str(self.seq).lower()
- 
+
 class Curation_SiteInstance(models.Model):
     """Through model between Curation and SiteInstance models. A specific
     binding site is unique (it is just start/end and strand afterall), but it
@@ -358,7 +361,7 @@ class Curation_SiteInstance(models.Model):
     regulates = models.ManyToManyField("Gene", through="Regulation")
     # experimental techniques used to determine the site instance
     experimental_techniques = models.ManyToManyField("ExperimentalTechnique")
-    
+
     # If the paper reports sites that are identified by ChIP-based methods, each
     # site instance may have a quantitative value (e.g. peak intensity).
     quantitative_value = models.FloatField(null=True, blank=True)
@@ -368,7 +371,8 @@ class Curation_SiteInstance(models.Model):
 
     # NCBI submission related
     is_obsolete = models.BooleanField(null=False, default=False, blank=True)
-    why_obsolete = models.TextField(null=True, blank=True) # explains why this site became obsolete.
+    why_obsolete = models.TextField(null=True, blank=True)
+    # explains why this site became obsolete.
 
     def __unicode__(self): return u'[%d] curation:%d TF:%s species:%s' %\
         (self.pk, self.curation.pk, self.curation.TF, self.site_instance.genome)
@@ -398,10 +402,10 @@ class Regulation(models.Model):
     regulation in the paper, saying that TF x up/down-regulates gene y, the
     evidence type is "exp-verified". Otherwise, all genes in the operon of which
     the site is upstream, are labeled as "inferred"."""
-    
+
     EVIDENCE_TYPE = (("exp_verified", "experimentally verified"),
                      ("inferred", "inferred"))
-    
+
     curation_site_instance = models.ForeignKey("Curation_SiteInstance")
     gene = models.ForeignKey("Gene")
     evidence_type = models.CharField(max_length=20, choices=EVIDENCE_TYPE)
@@ -413,17 +417,37 @@ class Regulation(models.Model):
                 self.evidence_type)
 
 class NotAnnotatedSiteInstance(models.Model):
-    """For some curations, the binding site that is reported in the paper can not be
-    matched to any sequence in the reference genome for some reason (e.g. the
-    reported genome is not available in RefSeq). Therefore, it is stored as
-    not-annotated site instance which basically holds the reported sequence and
-    a link to the curation table."""
+    """For some curations, the binding site that is reported in the paper can
+    not be matched to any sequence in the reference genome for some reason
+    (e.g. the reported genome is not available in RefSeq). Therefore, it is
+    stored as not-annotated site instance which basically holds the reported
+    sequence and a link to the curation table."""
     sequence = models.TextField(max_length=100000)
     curation = models.ForeignKey("Curation")
-    
+
+    # TF type
+    TF_type = models.CharField(max_length=50,
+                               choices=Curation_SiteInstance.TF_TYPE,
+                               null=True)
+    # TF function
+    TF_function = models.CharField(max_length=50,
+                                   choices=Curation_SiteInstance.TF_FUNCTION,
+                                   null=True)
+
+    # experimental techniques used to determine the site instance
+    experimental_techniques = models.ManyToManyField("ExperimentalTechnique")
+
+    # If the paper reports sites that are identified by ChIP-based methods, each
+    # site instance may have a quantitative value (e.g. peak intensity).
+    quantitative_value = models.FloatField(null=True, blank=True)
+
+    # If it is a high-throughput sequence, put a tag
+    is_high_throughput = models.BooleanField(default=False)
+
+
     def __unicode__(self):
-        return u'%s [%s]' % (self.id, self.sequence)  
-    
+        return u'%s [%s]' % (self.id, self.sequence)
+
 class ExperimentalTechnique(models.Model):
     """The table of experimental techniques. Each binding site is identified
     experimentally using a set of techniques. Curation of each site should have
@@ -431,15 +455,16 @@ class ExperimentalTechnique(models.Model):
     determined. This table contains all the experimental techniques that can be
     used for TFBS identification, along with their description, type (used to
     show binding/expression or just in-silico)."""
-    
+
     FUNCTION_CATEGORIES = (("binding", "Detection of binding"),
                            ("expression", "Assessment of expression"),
                            ("insilico", "In-silico prediction"))
-    
+
     technique_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     description = models.TextField()
-    preset_function = models.CharField(max_length=50, choices=FUNCTION_CATEGORIES, null=True)
+    preset_function = models.CharField(max_length=50,
+                                       choices=FUNCTION_CATEGORIES, null=True)
     categories = models.ManyToManyField("ExperimentalTechniqueCategory")
 
     def __unicode__(self):
@@ -459,7 +484,7 @@ class ExperimentalTechniqueCategory(models.Model):
 
     def __unicode__(self):
         return u'[%d] %s' % (self.category_id, self.name)
-    
+
     class Meta:
         verbose_name_plural = "experimental technique categories"
 
@@ -486,7 +511,7 @@ class ExternalDatabase(models.Model):
     ext_database_name = models.CharField(max_length=50, null=False, unique=True)
     ext_database_descripton = models.CharField(max_length=500)
     ext_database_url_format = models.CharField(max_length=500)
-    
+
     def __unicode__(self):
         return u'%s' % self.ext_database_name
 
@@ -497,7 +522,7 @@ class Curation_ExternalDatabase(models.Model):
     curation = models.ForeignKey(Curation)
     external_database = models.ForeignKey(ExternalDatabase)
     accession_number = models.CharField(max_length=500, null=False)
-    
+
     def __unicode__(self):
         return u'curation: %d - xref: %s [%s]' % (self.curation.curation_id,
                                                   self.external_database.ext_database_name,
@@ -510,6 +535,6 @@ class NCBISubmission(models.Model):
     submission_time = models.DateTimeField(auto_now_add=True)
     genome_submitted_to = models.CharField(max_length=50)
     curation_site_instance = models.ForeignKey('Curation_SiteInstance')
-    
+
     class Meta:
         verbose_name = 'NCBI Submission'

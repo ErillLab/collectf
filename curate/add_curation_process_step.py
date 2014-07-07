@@ -180,8 +180,8 @@ def site_annotation_process(wiz, form):
     for site in sites:
         i = site.key
 
-        if not site.is_matched():
-            continue
+        #if not site.is_matched():
+            #continue
 
         # Make sure all matched sites are  in the annotation form
         assert '%d_site'%i in cd, "Inconsistent site annotation form"

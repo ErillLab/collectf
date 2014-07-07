@@ -164,10 +164,11 @@ def site_annotation_get_form(wiz, form):
     sites = session_utils.get(wiz.request.session, 'sites')
     techniques = session_utils.get(wiz.request.session, 'techniques')
     for site in sites:
-        if site.is_matched():
+        if site.is_matched() or True:
             i = site.key
             # create dummy field for the label
-            label = site.get_match().pprint()
+            label = (site.get_match().pprint() if site.is_matched()
+                     else site.pprint())
             form.fields['%d_site' % i] = forms.BooleanField(label=label,
                                                             required=False)
             # create quantitative value field
@@ -202,10 +203,13 @@ def gene_regulation_get_form(wiz, form):
             i = site.key
             choices = [(g.gene_id, "%s (%s): %s" % (g.locus_tag, g.name, g.description))
                        for g in site.get_match().nearby_genes]
-            form.fields[i] = forms.MultipleChoiceField(label=site.seq, choices=choices,
-                                                       required=False,
-                                                       widget=forms.CheckboxSelectMultiple(),
-                                                       help_text = site.get_match().match_diagram)
+            form.fields[i] = forms.MultipleChoiceField(
+                label=site.get_match().pprint(),
+                choices=choices,
+                required=False,
+                widget=forms.CheckboxSelectMultiple(),
+                help_text=site.get_match().match_diagram)
+
             if not publication.contains_expression_data:
                 form.fields[i].widget.attrs['disabled'] = 'disabled'
 

@@ -48,6 +48,10 @@ class Curation_SiteInstanceAdmin(admin.ModelAdmin):
     filter_horizontal = ("experimental_techniques",)
     ordering = ('-id',)
 
+class NotAnnotatedSiteInstanceAdmin(admin.ModelAdmin):
+    filter_horizontal = ('experimental_techniques',)
+    ordering = ('-id',)
+    
 class BatchAssignForm(forms.Form):
     _selected_action = forms.CharField(widget=forms.MultipleHiddenInput)
     curator = forms.ModelChoiceField(Curator.objects)
@@ -138,6 +142,7 @@ admin.site.register(Curator, CuratorAdmin)
 admin.site.register(Curation, CurationAdmin)
 admin.site.register(SiteInstance, SiteInstanceAdmin)
 admin.site.register(Curation_SiteInstance, Curation_SiteInstanceAdmin)
+admin.site.register(NotAnnotatedSiteInstance, NotAnnotatedSiteInstanceAdmin)
 admin.site.register(Publication, PublicationAdmin)
 admin.site.register(ExperimentalTechnique, ExperimentalTechniqueAdmin)
 admin.site.register(Gene, GeneAdmin)

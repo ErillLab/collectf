@@ -66,7 +66,7 @@ class CurationWizard(SessionWizardView):
         form = super(CurationWizard, self).get_form(step, data, files)
         if step == None:
             step = self.steps.current
-        
+
         handlers = {'0': add_curation_get_form.publication_get_form, # functions
                     '1': add_curation_get_form.genome_get_form,
                     '2': add_curation_get_form.techniques_get_form,
@@ -81,7 +81,8 @@ class CurationWizard(SessionWizardView):
 
     def process_step(self, form):
         """After each step, post-process data."""
-        handlers = {'0': add_curation_process_step.publication_process, # functions
+        # functions
+        handlers = {'0': add_curation_process_step.publication_process,
                     '1': add_curation_process_step.genome_process,
                     '2': add_curation_process_step.techniques_process,
                     '3': add_curation_process_step.site_entry_process,
@@ -108,7 +109,7 @@ class CurationWizard(SessionWizardView):
         data. Afterwards, this function is called and it redirects to the
         homepage with the message about the action that was performed.
         """
-        
+
         form = form or self.get_form()
         context = self.get_context_data(form=form, **kwargs)
 
@@ -119,7 +120,7 @@ class CurationWizard(SessionWizardView):
             # clear session data
             session_utils.clear(self.request.session)
             return HttpResponseRedirect(reverse(base.views.home))
-        
+
         return self.render_to_response(context)
 
     def done(self, form_list, **kwargs):
@@ -130,7 +131,7 @@ class CurationWizard(SessionWizardView):
 @login_required
 def curation(request):
     """Entry point for the curation."""
-    
+
     # If user selects the old curation and then go back, the session will have the
     # old_curation key in table, and it will cause trouble.
     if session_utils.has(request.session, 'old_curation'):
@@ -164,7 +165,7 @@ def high_throughput_curation(request):
     is not gapless alignment), which can be entered in sequence-based or
     coordinate-based modes. Below the site box, curators are able to enter peak
     data (most likely in coordinate mode)."""
-    
+
     # This IS high-throughput submission
     session_utils.put(request.session, 'high_throughput_curation', True)
 
@@ -178,7 +179,7 @@ def high_throughput_curation(request):
                                    GeneRegulationForm,
                                    CurationReviewForm,],
                                    condition_dict = {'5': inexact_match_form_condition})
-    return view(request)    
+    return view(request)
 
 def inexact_match_form_condition(wizard):
     """Check if inexact match form is necessary. If not (i.e. all sites have
@@ -187,4 +188,3 @@ def inexact_match_form_condition(wizard):
     if sites and all(site.is_matched() and site.get_match().is_exact() for site in sites):
         return False
     return True
-
