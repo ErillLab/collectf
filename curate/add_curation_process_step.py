@@ -36,7 +36,8 @@ def publication_process(wiz, form):
     # Check if the publication is previously curated
     cs = models.Curation.objects.filter(publication=p)
     if cs.count() >= 1:
-        session_utils.put(wiz.request.session, "previously_curated_paper", cs[0])
+        session_utils.put(wiz.request.session, "previously_curated_paper",
+                          cs[0])
     else:
         session_utils.put(wiz.request.session, "previously_curated_paper", None)
 
@@ -56,8 +57,10 @@ def genome_process(wiz, form):
     session_utils.put(wiz.request.session, 'genomes', genomes)
 
     # store site species in session data
-    session_utils.put(wiz.request.session, 'site_species', form.cleaned_data['site_species'])
-    session_utils.put(wiz.request.session, 'TF_species', form.cleaned_data['TF_species'])
+    session_utils.put(wiz.request.session, 'site_species',
+                      form.cleaned_data['site_species'])
+    session_utils.put(wiz.request.session, 'TF_species',
+                      form.cleaned_data['TF_species'])
 
     # Set manuscript-related fields (contains_experimental_data and
     # contains_promoter_data). Actually, these fields are defined during adding
@@ -72,7 +75,8 @@ def genome_process(wiz, form):
 
 def techniques_process(wiz, form):
     """Post-process experimental techniques step."""
-    techniques = models.ExperimentalTechnique.objects.filter(pk__in=form.cleaned_data['techniques'])
+    techniques = models.ExperimentalTechnique.objects.filter(
+        pk__in=form.cleaned_data['techniques'])
     # save selected techniques (to be used in site-annotation step)
     session_utils.put(wiz.request.session, 'techniques', techniques)
 
@@ -91,7 +95,8 @@ def site_entry_process(wiz, form):
     # If high-throughput get peak data to save them as non-motif-associated data
     if session_utils.get(wiz.request.session, 'high_throughput_curation'):
         peaks = site_entry.parse_input(form.cleaned_data['peaks'].strip())
-        techniques = models.ExperimentalTechnique.objects.filter(pk__in=form.cleaned_data['peak_techniques'])
+        techniques = models.ExperimentalTechnique.objects.filter(
+            pk__in=form.cleaned_data['peak_techniques'])
         for peak in peaks:
             peak.search_exact_match(genomes)
             # if there is any match, select the first one by default
@@ -111,7 +116,8 @@ def site_entry_process(wiz, form):
     # save the list of sites
     session_utils.put(wiz.request.session, 'sites', sites)
     # save the type of lists
-    session_utils.put(wiz.request.session, 'site_type', form.cleaned_data['site_type'])
+    session_utils.put(wiz.request.session, 'site_type',
+                      form.cleaned_data['site_type'])
     # save whether curation has quantitative data
     session_utils.put(wiz.request.session, 'has_quantitative_data', has_qdata)
     # If any quantitative data format save it
@@ -190,9 +196,9 @@ def site_annotation_process(wiz, form):
         site.set_TF_type(cd['%d_TF_type' %i])
         # Experimental techniques
         site.clear_techniques()
-        for j,t in enumerate(techniques):
+        for j, t in enumerate(techniques):
             # Add technique to the site if it is checked.
-            if cd['%d_technique_%d' % (i,j)]:
+            if cd['%d_technique_%d' % (i, j)]:
                 site.add_technique(t)
     # Save sites again
     session_utils.put(wiz.request.session, 'sites', sites)
