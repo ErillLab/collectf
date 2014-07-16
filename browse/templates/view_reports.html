@@ -98,12 +98,12 @@
 		        {% for meta_site in report.meta_sites %}
 		        <tr>
                   {% with g=meta_site.genome %}
-		          <td class="genome"><a href="http://www.ncbi.nlm.nih.gov/nuccore/?term={{ g.genome_accession }}"><span class="fixed-width">{{ g.genome_accession }}</span></a></td>
+		          <td class="genome"><a href="http://www.ncbi.nlm.nih.gov/nuccore/?term={{ g }}"><span class="fixed-width">{{ g }}</span></a></td>
 		          {% endwith %}
 		          {% with TF_instances=meta_site.TF_instances%}
 		          <td class="TF">
                     {% for TF_instance in TF_instances %}
-                    {% with acc=TF_instance.protein_accession %}
+                    {% with acc=TF_instance %}
                     <a href="http://www.ncbi.nlm.nih.gov/protein/?term={{ acc }}"><span class="fixed-width">{{ acc }}</span></a>
                     {% if not forloop.last %}, {% endif %}
                     {% endwith %}
