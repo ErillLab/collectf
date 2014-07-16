@@ -26,7 +26,7 @@ def generate_tbl_string(curation_site_instances, test_export):
     # group sites by TF instances and create meta-site for each group,
     # individually.  This saves us to check TF instance of each
     # curation-site-instance object in the create_meta_site method.
-    
+
     # Get all TF-instances/species values for all curation-site-instances
     vals = motif_associated.values_list('curation__TF_instances',
                                         'site_instance__genome')\
@@ -41,7 +41,7 @@ def generate_tbl_string(curation_site_instances, test_export):
         filtered_nm = non_motif_associated.filter(curation__TF_instances=TF_instances,
                                                   site_instance__genome=genome)
         meta_sites.extend(metasite.create_meta_sites(filtered_m, filtered_nm))
-    
+
     # header
     tbl_str += ('>Feature\tgi|%(gi)s|ref|%(accession)s\n' %
                 {'gi': curation_site_instances[0].site_instance.genome.gi,
@@ -51,39 +51,48 @@ def generate_tbl_string(curation_site_instances, test_export):
     genome = meta_sites[0].genome
     # write each protein_bind feature
     for meta_site in meta_sites:
-        # if any of the sites in the meta-site is submitted to NCBI before, skip it.
+        # if any of the sites in the meta-site is submitted to NCBI before, skip
+        # it.
         ncbi_sites = [csi for csi in meta_site.cur_site_insts
                       if models.NCBISubmission.objects.filter(
-                              genome_submitted_to=genome.genome_accession,
+                              genome_submitted_to=genome,
                               curation_site_instance=csi)]
         if ncbi_sites:
             continue
 
         # Pick up the first site as ncbi_Xref
         if not test_export:
-            n = models.NCBISubmission(genome_submitted_to=genome.genome_accession, curation_site_instance=meta_site.delegate)
+            n = models.NCBISubmission(genome_submitted_to=genome,
+                                      curation_site_instance=meta_site.delegate)
             n.save()
 
         ncbi_sites.append(meta_site.delegate)
-        start, end = meta_site.delegate.site_instance.start+1, meta_site.delegate.site_instance.end+1
+        start, end = (meta_site.delegate.site_instance.start+1,
+                      meta_site.delegate.site_instance.end+1)
         if meta_site.delegate.site_instance.strand == -1:
-            start,end = end,start
+            start, end = end,start
 
-        tbl_str += ('%d\t%d\tprotein_bind' % (start,end) + '\n')
-        tbl_str += ('\t\t\tbound_moiety\t%s\n' % meta_site.delegate.curation.TF.name)
-        tbl_str += ('\t\t\tnote\tTranscription factor binding site for %s\n' % meta_site.delegate.curation.TF_instances.all()[0].name)
+        tbl_str += ('%d\t%d\tprotein_bind' % (start, end) + '\n')
+        tbl_str += ('\t\t\tbound_moiety\t%s\n' %
+                    meta_site.delegate.curation.TF.name)
+        tbl_str += ('\t\t\tnote\tTranscription factor binding site for %s\n' %
+                    meta_site.delegate.curation.TF_instances.all()[0].name)
         # write experimental evidences
         experiments = {}
         for exp in models.ExperimentalTechnique.objects.filter(preset_function__in=['binding', 'expression']):
-            filtered_csis = [csi for csi in meta_site.cur_site_insts if exp in csi.experimental_techniques.all()]
-            experiments[exp] = list(set([csi.curation.publication.pmid for csi in filtered_csis]))
-        for exp,pmids in experiments.items():
+            filtered_csis = [csi for csi in meta_site.cur_site_insts
+                             if exp in csi.experimental_techniques.all()]
+            experiments[exp] = list(set([csi.curation.publication.pmid
+                                         for csi in filtered_csis]))
+        for exp, pmids in experiments.items():
             if not pmids: continue
-            tbl_str += ('\t\t\texperiment\t%s [PMID: %s]\n' % (exp.name, ', '.join(pmids)))
+            tbl_str += ('\t\t\texperiment\t%s [PMID: %s]\n' %
+                        (exp.name, ', '.join(pmids)))
         # write regulation note
-        evidence4regulation = set([reg.gene.locus_tag for csi in meta_site.cur_site_insts
+        evidence4regulation = set([reg.gene.locus_tag
+                                   for csi in meta_site.cur_site_insts
                                    for reg in csi.regulation_set.all()
-                                   if reg.evidence_type=="exp_verified"])
+                                   if reg.evidence_type == "exp_verified"])
         if evidence4regulation:
             tbl_str += ('\t\t\tnote\tEvidence of regulation for: %s\n' % (', '.join(evidence4regulation)))
         # write dbxref
@@ -131,7 +140,7 @@ def export_tbl_view(request):
     if not form.is_valid():
         return render(request, 'ncbi_export.html', {'form':form},
                       context_instance=RequestContext(request))
-    
+
     genome_accession = form.cleaned_data['genome_accession']
     genome = models.Genome.objects.get(genome_accession=genome_accession)
     test_export = form.cleaned_data['is_test_export']
@@ -155,7 +164,7 @@ def generate_zip_response(genome, test_export):
 
     collectf_tbl_str = generate_tbl_string(curation_site_instances, test_export)
     genome_asn_str = download_genome_asn(genome.genome_accession)
-    readme_str = generate_readme_string()    
+    readme_str = generate_readme_string()
 
     # create a zip file
     filename = genome.genome_accession.replace('.', '_')

@@ -204,7 +204,7 @@ def gene_regulation_get_form(wiz, form):
             choices = [(g.gene_id, "%s (%s): %s" % (g.locus_tag, g.name, g.description))
                        for g in site.get_match().nearby_genes]
             form.fields[i] = forms.MultipleChoiceField(
-                label=site.get_match().pprint(),
+                label=site.get_match().pprint(False),
                 choices=choices,
                 required=False,
                 widget=forms.CheckboxSelectMultiple(),

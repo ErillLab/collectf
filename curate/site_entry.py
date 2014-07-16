@@ -89,7 +89,7 @@ class Match:
     def is_exact(self):
         return self.seq == self.reported_seq
 
-    def pprint(self, diagram_hover=False):
+    def pprint(self, diagram_hover=True):
         """Given a match object, make the HTML snippet to display it
         properly."""
         strand = '+' if self.strand == 1 else '-'
