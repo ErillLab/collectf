@@ -7,24 +7,14 @@
 
 <div id="report_table" class="boxed">
   {% if reports %}
-  {% if all_cur_site_insts %} 
   {# put view_all link #}
   <p>
-    <a class="block_before_load" href="#"  onclick="$('#view_all').submit(); return false;">
+    <a class="block_before_load"
+       href="{% url 'browse.view_reports.view_reports' tax_param_type tax_param tf_param_type tf_param tech_param_type tech_param 0 %}"
+       target="_blank">
       Combined report
     </a>
   </p>
-  <form style="display:inline;" method="post" action="{% url 'browse.view_reports.view_reports' %}" id="view_all" action=""
-        target="_blank">
-    {% comment %}
-    Hidden input listing all motif-associated-curation-site-instance and
-    non-motif-associated curation-site-instance-ids
-    {% endcomment %}
-    {% csrf_token %}
-    <input type="hidden" name="csi_list"
-           value="{% for csi in all_cur_site_insts %}{{ csi }}{% if not forloop.last %},{% endif %}{% endfor %}">
-  </form>
-  {% endif %}
 
   <table class="table table-condensed table-striped">
     <thead>
@@ -35,22 +25,12 @@
     <tbody>
       {% for report in reports %}
       <tr>
-        <td>{{ report.TF_name }}</td>
-        <td>{{ report.species_name }}</td>
-        {% with form_id=report.TF_name|slugify|add:'_'|add:report.species_name|slugify %}
+        <td>{{ report.TF.name }}</td>
+        <td>{{ report.species.name }}</td>
         <td>
-	      <a class="" href="#" onclick="$('#{{ form_id }}').submit(); return false;">
-            view
-          </a>
-	      <form style="display:inline;" method="post"
-                action="{% url 'browse.view_reports.view_reports' %}" id="{{ form_id }}" action="post"
-                target="_blank">
-            {% csrf_token %}
-	        <input type="hidden" name="csi_list"
-                   value="{% for csi_pk in report.cur_site_insts %}{{ csi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}">
-	      </form>
+          <a target="_blank"
+             href="{% url 'browse.view_reports.view_reports' 'species' report.species.pk 'tf' report.TF.pk tech_param_type tech_param 0 %}">view</a>
         </td>
-        {% endwith %}
       </tr>
       {% endfor %}
     </tbody>

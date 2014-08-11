@@ -3,55 +3,66 @@ reports. Given a collection of motif-associated and non-motif-associated
 curation-site-instance objects, they are grouped by TF and species and rendered
 properly."""
 
-from django.shortcuts import render
 from django.shortcuts import render_to_response
-from django.http import HttpResponse
-from django.http import HttpResponseRedirect
 from django.template import RequestContext
-from django.core.urlresolvers import reverse
-import base
-import models
-import motif_report
+from django.http import Http404
+import browse.models as models
+import browse.motif_report as motif_report
+import browse.browse_tax as browse_tax
+import browse.browse_TF as browse_TF
+import browse.browse_tech as browse_tech
 
-def view_reports(request):
-    """Handler for the post request, performed on browse by TF/species/technique
-    page. Given the list of motif-associated and non-motif-associated
-    curation-site-instance ids, they are grouped by TF and species, and
-    rendered"""
-    # make sure that it is a POST request
-    if not request.POST: return HttpResponseRedirect(reverse(base.views.home))
+def view_reports(request, tax_param_type, tax_param,
+                 tf_param_type, tf_param,
+                 tech_param_type, tech_param,
+                 integrate_non_motif):
 
-    cur_site_inst_ids = request.POST["csi_list"].strip().split(',')
+    """Given an organism and a TF, find all sites and make reports out of
+    them.
 
-    # get all curation-site-instances
-    cur_site_insts = models.Curation_SiteInstance.objects.filter(pk__in=cur_site_inst_ids)
+    tax_param_type:  all/group/species
+    tax_param:       id of the taxonomy object
+    tf_param_type:   all/family/tf
+    tf_param:        id of the TF/TF_family object
+    tech_param_type: all/binding/expression/binding_category/expression_category
+    integrate_non_motif: 1 to integrate non-motif-associated data, 0 otherwise
+    """
 
-    # integrate non-motif: if True, the experimental evidence and regulation
-    # information from non-motif associated sites are integrated into the report
-    integrate_non_motif = bool("integrate_non_motif" in request.POST)
+    orgs = browse_tax.get_species(tax_param_type, tax_param)
+    tfs = browse_TF.get_TFs(tf_param_type, tf_param)
+    _, _, techs = browse_tech.get_techniques(tech_param_type, tech_param)
 
-    # Check if non-motif site integration is requested
-    if integrate_non_motif:
-        reports = motif_report.make_reports(cur_site_insts)
-    else:
-        # if not, exclude non-motif-associated sites before generating reports
-        reports = motif_report.make_reports(cur_site_insts.exclude(site_type='non_motif_associated'))
+    cur_site_insts = models.Curation_SiteInstance.objects.filter(
+        site_instance__genome__taxonomy__in=orgs,
+        site_instance__curation__TF__in=tfs,
+        experimental_techniques__in=techs,
+    )
 
-    # combine reports into ensemble report
-    ensemble_report = motif_report.merge_reports(reports)
-    #ensemble_report = motif_report.make_ensemble_report(cur_site_insts)
-    
-    return render_to_response("view_reports.html",
-                              {
-                                  "reports": [report.generate_view_reports_dict()
-                                              for report in reports],
-                                  "ensemble_report": ensemble_report.generate_view_reports_dict(),
-                                  "cur_site_insts": ','.join(map(lambda x: str(x.pk), cur_site_insts)),
-                                  "integrate_non_motif": integrate_non_motif,
-                              },
+    # Exclude non-motif-associated sites here, it can be integrated if user
+    # wants to do so
+    if integrate_non_motif != 1:
+        cur_site_insts = \
+            cur_site_insts.exclude(site_type='non_motif_associated')
+
+    reports = motif_report.make_reports(cur_site_insts)
+    # Combine reports
+    ensemble_report = motif_report.make_ensemble_report(cur_site_insts)
+
+    if integrate_non_motif not in ['0', '1']:
+        raise Http404
+    switched_integrate = 1 if integrate_non_motif == '0' else 0
+
+    return render_to_response('view_reports.html',
+                              dict(reports=[report.generate_view_reports_dict()
+                                            for report in reports],
+                                   ensemble_report=
+                                   ensemble_report.generate_view_reports_dict(),
+                                   tax_param_type=tax_param_type,
+                                   tax_param=tax_param,
+                                   tf_param_type=tf_param_type,
+                                   tf_param=tf_param,
+                                   tech_param_type=tech_param_type,
+                                   tech_param=tech_param,
+                                   integrate_non_motif=switched_integrate),
                               context_instance=RequestContext(request))
 
-
-    
-    
-    

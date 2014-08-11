@@ -10,7 +10,7 @@
       <li>  
 	    <div class="node {% if fam.tf_set.all %}expandable{% endif %}">
 	      <i class=""></i>
-	      <a href="" onclick="getReportLinksTF('TF_family', {{ fam.TF_family_id }}); return false;">{{ fam.name }}</a>
+	      <a href="" onclick="getReportLinksTF('family', {{ fam.TF_family_id }}); return false;">{{ fam.name }}</a>
 	    </div>
 	
 	    <ul class="list-unstyled">
@@ -18,7 +18,7 @@
 	      <li>
 	        <div class="node">
 	          <i class=""></i>
-      	      <a href="" onclick="getReportLinksTF('TF', {{ TF.TF_id }}); return false;">{{ TF.name }}</a>
+      	      <a href="" onclick="getReportLinksTF('tf', {{ TF.TF_id }}); return false;">{{ TF.name }}</a>
 	        </div>
 	      </li>
 	      {% endfor %}

@@ -1,13 +1,10 @@
 """This file contains the view functions for browsing by TF"""
 
-from django.shortcuts import render
 from django.shortcuts import render_to_response
-from django.http import HttpResponse
-from django.http import HttpResponseRedirect
 from django.template import RequestContext
-import models
-import Queue
-import motif_report
+from django.shortcuts import get_object_or_404, get_list_or_404
+import browse.models as models
+import browse.motif_report as motif_report
 
 def browse_TF(request):
     """View function for browse by TF. Returns the TF tree"""
@@ -15,33 +12,51 @@ def browse_TF(request):
     return render_to_response('browse_TF.html', {'TF_families': TF_families},
                               context_instance=RequestContext(request))
 
-def get_results_TF(request, type_, id):
+def get_TFs(tf_type, tf_id):
+    """Given a TF or family, return that TF or all TFs in that family"""
+    tf_objs = models.TF.objects
+    tfs = None
+    if tf_type == 'all':
+        tfs = tf_objs.all()
+    elif tf_type == 'family':
+        tf_family = get_object_or_404(models.TFFamily, TF_family_id=tf_id)
+        tfs = get_list_or_404(models.TF, family=tf_family)
+    elif tf_type == 'tf':
+        tfs = get_list_or_404(models.TF, TF_id=tf_id)
+    return tfs
+
+def get_results_TF(request, type_, id_):
     """GIven the type (TF or TF family) and the id of the object, return query
     results and list TF/species that have binding site data for the selected TF
     or TF family."""
-    if type_ == 'TF':
-        TFs = [models.TF.objects.get(TF_id=id)]
+    if type_ == 'tf':
         name = TFs[0].name
         desc = TFs[0].description
-    elif type_ == 'TF_family':
+    elif type_ == 'family':
         # Get all TFs under that family
-        TF_family = models.TFFamily.objects.get(TF_family_id=id)
-        TFs = models.TF.objects.filter(family=TF_family).all()
+        TF_family = get_object_or_404(models.TFFamily, TF_family_id=id_)
         name = TF_family.name
         desc = TF_family.description
 
+    TFs = get_TFs(type_, id_)
     # get all curation-site-instance objects for browsed TFs
     assert TFs
-    cur_site_insts = models.Curation_SiteInstance.objects.filter(
-        curation__TF__in=TFs)
+    cur_site_insts = models.Curation_SiteInstance.objects.\
+                     filter(curation__TF__in=TFs)
 
     # generate all reports
     reports = motif_report.make_reports(cur_site_insts)
 
     return render_to_response("browse_results.html",
-                              {'title': name,
-                               'description': desc,
-                               'all_cur_site_insts': [pk for report in reports
-                                                      for pk in report.get_all_cur_site_insts_ids()],
-                               'reports': [report.generate_browse_result_dict() for report in reports],},
-                                context_instance=RequestContext(request))
+                              dict(title=name,
+                                   description=desc,
+                                   reports=[report.generate_browse_result_dict()
+                                            for report in reports],
+                                   tax_param_type='all',
+                                   tax_param=-1,
+                                   tf_param_type=type_,
+                                   tf_param=id_,
+                                   tech_param_type='all',
+                                   tech_param=-1),
+                              context_instance=RequestContext(request))
+

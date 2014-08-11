@@ -9,26 +9,23 @@ def make_new_release():
     """Make a release file of the entire database.
     """
     all_csis = models.Curation_SiteInstance.objects.all()
-    motif_assoc = all_csis.filter(site_type='motif_associated')
-    non_moitf_assoc = all_csis.filter(site_type='non_motif_associated')
-    # group sites by TF and genome
-    vals = motif_assoc.values_list('curation__TF_instances',
-                                   'site_instance__genome')\
-                      .distinct()\
-                      .order_by('curation__TF__name',
-                                'site_instance__genome')
+    reports = motif_report.make_distinct_reports(all_csis)
+    # get the list of meta sites where each meta site is a list of
+    # Curation_SiteInstance ids
+    meta_site_id_lists = [[csi.id for csi in ms.cur_site_insts]
+                          for report in reports
+                          for ms in report.get_meta_sites()]
 
-    meta_sites = []
-    for (TF_instances, genome) in vals:
-        meta_sites.append(models.Curation_SiteInstance.objects.filter(
-            curation__TF_instances=TF_instances,
-            site_instance__genome=genome))
+    
+    meta_sites = [models.Curation_SiteInstance.objects.filter(pk__in=ms_id_list)
+                  for ms_id_list in meta_site_id_lists]
 
     tsv_raw = export.export_tsv(meta_sites)
+    
     with open('collectf_export.tsv', 'w') as f:
         f.write(tsv_raw)
 
-
-
 def run():
     make_new_release()
+
+    

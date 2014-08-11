@@ -1,13 +1,13 @@
-from django.shortcuts import render
+"""Main views"""
+
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
-from django.contrib import messages
 from django.core.urlresolvers import reverse
 import django.contrib.auth.views
 import homepage.views
-import bioutils
+
 
 def home(request):
     if request.user.is_authenticated():

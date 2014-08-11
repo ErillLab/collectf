@@ -63,7 +63,10 @@ def export_base(meta_sites):
                                   'curation__TF_instances__protein_accession',
                                   'site_instance__genome__genome_accession',
                                   'site_instance__genome__organism').distinct()
-        assert len(values)==1, values
+        #assert len(values)==1, values
+        if len(values) > 1:
+            print values
+            continue
 
         # select one of the motif associated sites as delegate
         delegate = [site for site in meta_site

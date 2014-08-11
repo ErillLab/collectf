@@ -14,17 +14,10 @@
 
 <p class="lead">
   A record from CollecTF
-  <a class="block_before_load" href="#" onclick="$('#view_all').submit(); return false;">
+  <a href="{% url 'browse.view_reports.view_reports' 'species' random_rec.species.pk 'tf' random_rec.TF.pk 'all' -1 0 %}">
     <small>View full record</small>
   </a>
 </p>
-
-<form style="display:inline;" method="post" action="{% url 'browse.view_reports.view_reports' %}" id="view_all">
-  {% csrf_token %}
-  <input type="hidden"
-         name="csi_list"
-         value="{% for csi_pk in random_rec.cur_site_insts %}{{ csi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}">
-</form>
 
 <div class="">
   <table class="table table-striped table-condensed">

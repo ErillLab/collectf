@@ -1,10 +1,10 @@
+"""Model definitions"""
+
 from django.db import models
 from django.contrib.auth.models import User
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes import generic
 from django.core.cache import cache
-import sys
-import bioutils
+import base.bioutils as bioutils
+import Queue
 
 # Create your models here.
 class Curation(models.Model):
@@ -13,10 +13,14 @@ class Curation(models.Model):
     etc. It also keeps some meta-information about the curation, such as whether
     it requires revision, ready for NCBI submission, validation status, etc."""
     # choices
-    REVISION_REASONS = (("genome_not_available", "No comparable genome in NCBI"),
-                        ("in_progress", "Matching genome still in progress"),
-                        ("TF_not_available", "No comparable TF protein sequence in NCBI"),
-                        ("other", "Other reason (specify in notes)"),)
+    REVISION_REASONS = (("genome_not_available",
+                         "No comparable genome in NCBI"),
+                        ("in_progress",
+                         "Matching genome still in progress"),
+                        ("TF_not_available",
+                         "No comparable TF protein sequence in NCBI"),
+                        ("other",
+                         "Other reason (specify in notes)"),)
 
     curation_id = models.AutoField(primary_key=True)
 
@@ -33,9 +37,12 @@ class Curation(models.Model):
     # curation meta information
     notes = models.TextField(blank=True)
     confidence = models.BooleanField()              # is curation confident?
-    NCBI_submission_ready = models.BooleanField()   # is ready to submit to NCBI?
-    requires_revision = models.CharField(max_length=20, choices=REVISION_REASONS, null=True, blank=True)
-    validated_by = models.ForeignKey("Curator", null=True, blank=True, related_name="validated_by")
+    NCBI_submission_ready = models.BooleanField() # is ready to submit to NCBI?
+    requires_revision = models.CharField(max_length=20,
+                                         choices=REVISION_REASONS,
+                                         null=True, blank=True)
+    validated_by = models.ForeignKey("Curator", null=True, blank=True,
+                                     related_name="validated_by")
 
     # time stamps
     created = models.DateTimeField(auto_now_add=True)
@@ -61,9 +68,11 @@ class Curation(models.Model):
     # <Wed Jan 29 2014> Experimental techniques are now going to be associated
     # directly (N:N) with curation_site_instances, allowing a curation to
     # contain curation_site_instances that have different associated techniques.
-    #experimental_techniques = models.ManyToManyField("ExperimentalTechnique", related_name='curation')
+    #experimental_techniques = models.ManyToManyField("ExperimentalTechnique",
+    #                                                 related_name='curation')
 
-    site_instances = models.ManyToManyField("SiteInstance", through="Curation_SiteInstance")
+    site_instances = models.ManyToManyField("SiteInstance",
+                                            through="Curation_SiteInstance")
 
     # ChIP link (NULL if curation is not from ChIP paper
     chip_info = models.ForeignKey("ChipInfo", null=True, blank=True)
@@ -96,7 +105,8 @@ class Curator(models.Model):
 
     curator_id = models.AutoField(primary_key=True)
     user = models.OneToOneField(User) # extend Django's user model
-    curator_type = models.CharField(max_length=20, choices=CURATOR_TYPE, default="external")
+    curator_type = models.CharField(max_length=20, choices=CURATOR_TYPE,
+                                    default="external")
 
     def __unicode__(self):
         return u'%s' % self.user
@@ -113,7 +123,9 @@ class Publication(models.Model):
 
     publication_id = models.AutoField(primary_key=True)
     publication_type = models.CharField(max_length=20, choices=PUBLICATION_TYPE)
-    pmid = models.CharField(max_length=30, null=True, blank=True) # null if not PubMed article
+    pmid = models.CharField(max_length=30, null=True, blank=True)
+    # null if not PubMed article
+    
     authors = models.CharField(max_length=1000)
     title = models.CharField(max_length=1000)
     journal = models.CharField(max_length=1000)
@@ -232,6 +244,22 @@ class Taxonomy(models.Model):
         if x.rank == 'order':
             return x
 
+    def get_all_species(self):
+        """Return all species of the phylogeny subtree where this object is the
+        root of the tree. Return all leaves (species)."""
+        all_species = []
+        Q = Queue.Queue()
+        Q.put(self)
+        while not Q.empty():
+            node = Q.get()
+            children = node.taxonomy_set.all()
+            if children:
+                for c in children:
+                    Q.put(c)
+            else:
+                all_species.append(node)
+        return all_species
+
     class Meta:
         verbose_name_plural = 'taxonomies'
 
@@ -278,7 +306,8 @@ class SiteInstance(models.Model):
     """The binding site model. Contains position/strand, which genome it is in
     etc."""
     site_id = models.AutoField(primary_key=True)
-    _seq = models.TextField(max_length=100000) # redundant info, kept for sanity check
+    # redundant info, kept for sanity check
+    _seq = models.TextField(max_length=100000)
     genome = models.ForeignKey("Genome")
     # genome start position (0 index)
     start = models.IntegerField()
@@ -293,7 +322,7 @@ class SiteInstance(models.Model):
 
     def to_fasta(self):
         desc = "%s %s(%d, %d)" % (self.genome.genome_accession,
-                                  '+' if self.strand==1 else '-',
+                                  '+' if self.strand == 1 else '-',
                                   self.start,
                                   self.end)
         seq = self.seq
@@ -309,7 +338,6 @@ class SiteInstance(models.Model):
 
     def get_genome_sequence(self):
         return self.genome.get_sequence()
-
 
     @property
     def seq(self):
@@ -388,7 +416,8 @@ class Curation_SiteInstance(models.Model):
     @property
     def TF_instances(self):
         """Return the list of TF instance accession numbers bound to it."""
-        return self.curation.TF_instances.values_list('protein_accession', flat=True)
+        return self.curation.TF_instances.values_list('protein_accession',
+                                                      flat=True)
 
     @property
     def genome(self):
@@ -413,7 +442,8 @@ class Regulation(models.Model):
     def __unicode__(self):
         return 'curation_id: %s gene: %s, site_id: %s, type: %s' % \
                (self.curation_site_instance.curation.curation_id,
-                self.gene.name, self.curation_site_instance.site_instance.site_id,
+                self.gene.name,
+                self.curation_site_instance.site_instance.site_id,
                 self.evidence_type)
 
 class NotAnnotatedSiteInstance(models.Model):
@@ -524,9 +554,11 @@ class Curation_ExternalDatabase(models.Model):
     accession_number = models.CharField(max_length=500, null=False)
 
     def __unicode__(self):
-        return u'curation: %d - xref: %s [%s]' % (self.curation.curation_id,
-                                                  self.external_database.ext_database_name,
-                                                  self.accession_number)
+        return (u'curation: %d - xref: %s [%s]' %
+                (self.curation.curation_id,
+                 self.external_database.ext_database_name,
+                 self.accession_number))
+
 class NCBISubmission(models.Model):
     """The curated data in CollecTF is integrated into NCBI RefSeq database
        through periodic genome-specific submissions. This internal table keeps

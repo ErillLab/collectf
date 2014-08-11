@@ -13,23 +13,22 @@
     <ul class="nav nav-pills">
       <li class="active"><a href="#split_view" data-toggle="tab">Split view</a></li>
       <li><a href="#ensemble_view" data-toggle="tab">Ensemble view</a></li>
-      {% if integrate_non_motif %}
+      {% if integrate_non_motif == 0 %}
       <li>
-	    <a class="block_before_load" href="#" onclick="$('#integrate_non_motif').submit();">Motif-associated sites only</a>
-	    <form action="{% url 'browse.view_reports.view_reports' %}" method="post" style="display:inline;" id="integrate_non_motif">{% csrf_token %}
-          <input type="hidden" name="csi_list" value="{{ cur_site_insts }}" />
-	    </form>
+	    <a class="block_before_load" 
+           href="{% url 'browse.view_reports.view_reports' tax_param_type tax_param tf_param_type tf_param tech_param_type tech_param 0 %}">
+          Motif-associated sites only
+        </a>
       </li>
       {% else %}
       <li>
-	    <a class="block_before_load" href="#"
-	    onclick="$('#integrate_non_motif_2').submit();">Integrate evidence from non-motif-associated sites</a>
-	    <form action="{% url 'browse.view_reports.view_reports' %}" method="post" style="display:inline;" id="integrate_non_motif_2">{% csrf_token %}
-          <input type="hidden" name="csi_list" value="{{ cur_site_insts }}" />
-	      <input type="hidden" name="integrate_non_motif" value="integrate_non_motif"/>
-	    </form>
+	    <a class="block_before_load"
+           href="{% url 'browse.view_reports.view_reports' tax_param_type tax_param tf_param_type tf_param tech_param_type tech_param 1 %}">
+          Integrate evidence from non-motif-associated sites
+        </a>
       </li>
       {% endif %}
+
       <li><a href="#export" data-toggle="tab">Export data</a></li>
     </ul>
   </div>

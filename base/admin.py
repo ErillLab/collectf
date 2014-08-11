@@ -23,7 +23,7 @@ class CurationAdmin(admin.ModelAdmin):
     def PMID(self, obj):
         return obj.publication.pmid
     filter_horizontal = ('TF_instances',)
-    list_display = ('curation_id', 'TF_species', 'PMID',
+    list_display = ('curation_id', 'TF_species', 'PMID', 'TF',
                     'curator', 'validated_by')
     list_filter = ('curator', 'NCBI_submission_ready', 'requires_revision')
     ordering = ('-curation_id',)

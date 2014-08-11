@@ -23,8 +23,8 @@ urlpatterns = patterns('',
     url(r'^accounts/logout/$', base.views.logout),
     url(r'^accounts/', include('registration.backends.default.urls')),
 
-    # This should be in browseapp urls.py, but since NCBI links cannot be changed, it
-    # will serve here.
+    # This should be in browseapp urls.py, but since NCBI links cannot be
+    # changed, it will serve here.
     url(r'^expsite_(?P<dbxref_id>\w+)$', browse.view_site.view_site),
     url(r'^EXPSITE_(?P<dbxref_id>\w+)$', browse.view_site.view_site),
 )

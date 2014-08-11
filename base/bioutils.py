@@ -10,6 +10,7 @@ from Bio.SeqUtils import GC
 from base64 import b64encode
 import models
 import lasagna
+from subprocess import Popen, PIPE, STDOUT
 
 Entrez.email = "sefa1@umbc.edu"
 
@@ -155,8 +156,7 @@ def to_fasta(seqs):
 def weblogo(sequences):
     """Given a collection of site sequences, generate the sequence logo, using
     weblogo program that is locally installed."""
-    al = to_fasta(sequences)
-    from subprocess import Popen, PIPE, STDOUT
+    al = to_fasta(sequences)    
     p = Popen(['/usr/local/bin/weblogo', '-F', 'png', '-s', 'LARGE', '-c', 'classic', '--errorbars', 'YES'],
               stdout=PIPE, stdin=PIPE, stderr=PIPE, close_fds=True)
     stdout_data, stderr_data = p.communicate(input=al)

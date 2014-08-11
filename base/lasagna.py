@@ -1,11 +1,10 @@
-"""
-LASAGNA Python implementation
+"""LASAGNA Python implementation
 http://biogrid.engr.uconn.edu/lasagna_search/
 
-LASAGNA-Search: an integrated web tool for transcription factor binding site search and visualization
-Chih Lee, and Chun-Hsi Huang
-BioTechniques, Vol. 54, No. 3, March 2013, pp. 141-153
-doi 10.2144/000113999
+LASAGNA-Search: an integrated web tool for transcription factor binding site
+search and visualization Chih Lee, and Chun-Hsi Huang BioTechniques, Vol. 54,
+No. 3, March 2013, pp. 141-153 doi 10.2144/000113999
+
 """
 
 import gzip
