@@ -402,6 +402,10 @@ class Curation_SiteInstance(models.Model):
     why_obsolete = models.TextField(null=True, blank=True)
     # explains why this site became obsolete.
 
+    # a TF could recognize more than one motif per species. This variable holds
+    # which motif it is for this binding site
+    motif_id = models.IntegerField(default=1, null=False, blank=False)
+
     def __unicode__(self): return u'[%d] curation:%d TF:%s species:%s' %\
         (self.pk, self.curation.pk, self.curation.TF, self.site_instance.genome)
 
