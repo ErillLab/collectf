@@ -5,4 +5,3 @@ binding sites in the Bacteria domain.
 
 This repository contains the source code for the database and web interface.
 
-The documentation is available at https://github.com/sefakilic/collecTF/wiki
