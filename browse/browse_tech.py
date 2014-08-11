@@ -41,7 +41,7 @@ def get_techniques(tech_type, tech_id):
 
     tech_objs = models.ExperimentalTechnique.objects
 
-    name, desc, techniques = (None, None, None)
+    title, desc, techniques = (None, None, None)
     if tech_type == 'all':
         techniques = tech_objs.all()
     elif tech_type in ['binding', 'expression']:
@@ -71,7 +71,7 @@ def get_techniques(tech_type, tech_id):
         title = techniques[0].name
         desc = techniques[0].description
 
-    return name, desc, techniques
+    return title, desc, techniques
 
 def get_results_tech(request, type_, id_):
     """Given a technique category and an id describing that category object,

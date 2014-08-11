@@ -8,6 +8,7 @@ from django.http import HttpResponseRedirect
 from collectf import settings
 import models
 import pickle
+from browse.motif_report import make_reports
 
 DBSTATS_PICKLE_FILE = os.path.join(settings.PICKLE_ROOT, "collectf_dbstats.pickle")
 
@@ -104,4 +105,12 @@ def view_all_publications(request):
     all_pubs = models.Publication.objects.all().order_by('-pmid')
     return render_to_response("view_all_publication.html",
                               {"publications": all_pubs},
+                              context_instance=RequestContext(request))
+
+def list_all_motifs(request):
+    """Handler function to list all motifs in the database."""
+    all_csis = models.Curation_SiteInstance.objects.all()
+    reports = make_reports(all_csis)
+    return render_to_response("list_motifs.html",
+                              {'reports': reports},
                               context_instance=RequestContext(request))

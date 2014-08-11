@@ -49,6 +49,7 @@ urlpatterns += patterns(
     url(r'^view_all_curations/$', 'view_all_curations'),
     url(r'^view_all_publications/$', 'view_all_publications'),
     url(r'^update_stats/$', 'update_stats'),
+    url(r'^list_all_motifs/$', 'list_all_motifs'),
 )
 
 urlpatterns += patterns(

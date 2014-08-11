@@ -29,6 +29,9 @@ def get_results_TF(request, type_, id_):
     """GIven the type (TF or TF family) and the id of the object, return query
     results and list TF/species that have binding site data for the selected TF
     or TF family."""
+
+    TFs = get_TFs(type_, id_)
+
     if type_ == 'tf':
         name = TFs[0].name
         desc = TFs[0].description
@@ -38,7 +41,6 @@ def get_results_TF(request, type_, id_):
         name = TF_family.name
         desc = TF_family.description
 
-    TFs = get_TFs(type_, id_)
     # get all curation-site-instance objects for browsed TFs
     assert TFs
     cur_site_insts = models.Curation_SiteInstance.objects.\
