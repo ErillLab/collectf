@@ -157,7 +157,7 @@ def weblogo(sequences):
     """Given a collection of site sequences, generate the sequence logo, using
     weblogo program that is locally installed."""
     al = to_fasta(sequences)    
-    p = Popen(['/usr/local/bin/weblogo', '-F', 'png', '-s', 'LARGE', '-c', 'classic', '--errorbars', 'YES'],
+    p = Popen(['/usr/bin/weblogo', '-F', 'png', '-s', 'LARGE', '-c', 'classic', '--errorbars', 'YES'],
               stdout=PIPE, stdin=PIPE, stderr=PIPE, close_fds=True)
     stdout_data, stderr_data = p.communicate(input=al)
     return stdout_data
