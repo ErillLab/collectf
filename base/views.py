@@ -7,6 +7,7 @@ from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 import django.contrib.auth.views
 import homepage.views
+import base.bioutils as bioutils
 
 
 def home(request):
