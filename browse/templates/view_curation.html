@@ -11,13 +11,15 @@
       {{ pub.title }};{{ pub.authors }};{{ pub.journal }} {{pub.publication_date}};
       {{pub.volume}}({{pub.issue}}):{{pub.pages}}
       {% endwith %}
-      <a href="http://www.ncbi.nlm.nih.gov/pubmed/?term={{ curation.publication.pmid }}">[{{ curation.publication.pmid }}]</a>
+      <a href="http://www.ncbi.nlm.nih.gov/pubmed/?term={{ curation.publication.pmid }}" target="_blank">
+        [{{ curation.publication.pmid }}]
+      </a>
     </dd>
 
     <dt>TF</dt>
     <dd>{{ curation.TF.name }} 
 
-      {% for TF_instance in curation.TF_instances.all %}<a href="http://www.ncbi.nlm.nih.gov/protein/?term={{ TF_instance.protein_accession }}">
+      {% for TF_instance in curation.TF_instances.all %}<a href="http://www.ncbi.nlm.nih.gov/protein/?term={{ TF_instance.protein_accession }}" target="_blank">
         [{{ TF_instance.protein_accession }}]</a>{% if not forloop.last %}, {% endif %}{% endfor %}</dd>
 
     <dt>Reported TF sp.</dt>
@@ -125,7 +127,7 @@
         <td>
 	      {% for regulation in cs.regulation_set.all %}
 	      {% if regulation.evidence_type == "exp_verified" %}
-	      <a href="http://www.ncbi.nlm.nih.gov/gene/{{ regulation.gene.gene_accession }}">{{ regulation.gene.name }}</a>{% if not forloop.last %},{% endif %}{% endif %}
+	      <a href="http://www.ncbi.nlm.nih.gov/gene/{{ regulation.gene.gene_accession }}" target="_blank">{{ regulation.gene.name }}</a>{% if not forloop.last %},{% endif %}{% endif %}
 	      {% endfor %}
         </td>
         <td><div>{{ cs.regulation_set.all|regulation_diagram:cs.site_instance }}</div></td>

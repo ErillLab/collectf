@@ -10,10 +10,10 @@
   <dt>dbxref</dt>
   <dd>{{ dbxref }}</dd>
   <dt>Genome</dt>
-  <dd><a href="http://www.ncbi.nlm.nih.gov/nuccore/?term={{ head_csi.site_instance.genome.genome_accession }}">
+  <dd><a href="http://www.ncbi.nlm.nih.gov/nuccore/?term={{ head_csi.site_instance.genome.genome_accession }}" target="_blank">
       {{ head_csi.site_instance.genome.genome_accession }}</a> (<i>{{ head_csi.site_instance.genome.taxonomy.name }}</i>)</dd>
   <dt>TF</dt>
-  <dd><a href="http://www.ncbi.nlm.nih.gov/protein/?term={{ head_csi.curation.TF_instances.all.0.name }}">
+  <dd><a href="http://www.ncbi.nlm.nih.gov/protein/?term={{ head_csi.curation.TF_instances.all.0.name }}" target="_blank">
       {{ head_csi.curation.TF_instances.all.0.name }}</a> ({{ head_csi.curation.TF.name }})</dd>
 </dl>
 </section>
@@ -35,13 +35,13 @@
     <tr>
       <td><span class="sequence">{{ csi.site_instance.seq }}</span></td>
       <td><span class="fixed-width">{% if csi.site_instance.strand == 1%}+{% else %}-{% endif %}[{{ csi.site_instance.start|add:1 }},{{ csi.site_instance.end|add:1 }}]</span></td>
-      <td><a href="http://www.ncbi.nlm.nih.gov/pubmed/?term={{ csi.curation.publication.pmid }}">{{ csi.curation.publication.pmid }}</a></td>
+      <td><a href="http://www.ncbi.nlm.nih.gov/pubmed/?term={{ csi.curation.publication.pmid }}" target="_blank">{{ csi.curation.publication.pmid }}</a></td>
       <td>
 	{% for tech in csi.experimental_techniques.all %}
 	{{ tech.name }}{% if not forloop.last %}, {% endif %}
 	{% endfor %}
       </td>
-      <td><a href="{% url 'browse.view_curation.view_curation' csi.curation.curation_id %}">[{{ csi.curation.curation_id }}]</a></td>
+      <td><a href="{% url 'browse.view_curation.view_curation' csi.curation.curation_id %}" target="_blank">[{{ csi.curation.curation_id }}]</a></td>
     </tr>
     {% endfor %}
   </tbody>
@@ -81,7 +81,7 @@ for TF-site mediated regulation are displayed in green.
   <tbody>
     {% for regulation in regulations %}
     <tr>
-      <td><a href="http://www.ncbi.nlm.nih.gov/gene/{{ regulation.gene.gene_accession }}">{{ regulation.gene.name }}</a></td>
+      <td><a href="http://www.ncbi.nlm.nih.gov/gene/{{ regulation.gene.gene_accession }}" target="_blank">{{ regulation.gene.name }}</a></td>
       <td>{{ regulation.gene.locus_tag }}</td>
       <td>{{ regulation.gene.description }}</td>
     </tr>

@@ -58,7 +58,7 @@
 	      <div class="tab-pane" id="{{TF_name}}_{{sp_name}}_aligned">
 	        <p>Sites are listed after the alignment process. For alignment of
 	          variable-length binding
-	          sites, <a href="http://www.biomedcentral.com/1471-2105/14/108/">LASAGNA</a>
+	          sites, <a href="http://www.biomedcentral.com/1471-2105/14/108/" target="_blank">LASAGNA</a>
 	          is used.
 	        </p>
 	        <pre>
@@ -97,20 +97,26 @@
 		        {% for meta_site in report.meta_sites %}
 		        <tr>
                   {% with g=meta_site.genome %}
-		          <td class="genome"><a href="http://www.ncbi.nlm.nih.gov/nuccore/?term={{ g }}"><span class="fixed-width">{{ g }}</span></a></td>
+		          <td class="genome"><a href="http://www.ncbi.nlm.nih.gov/nuccore/?term={{ g }}" target="_blank">
+                      <span class="fixed-width">{{ g }}</span>
+                  </a></td>
 		          {% endwith %}
 		          {% with TF_instances=meta_site.TF_instances%}
 		          <td class="TF">
                     {% for TF_instance in TF_instances %}
                     {% with acc=TF_instance %}
-                    <a href="http://www.ncbi.nlm.nih.gov/protein/?term={{ acc }}"><span class="fixed-width">{{ acc }}</span></a>
+                    <a href="http://www.ncbi.nlm.nih.gov/protein/?term={{ acc }}" target="_blank">
+                      <span class="fixed-width">{{ acc }}</span>
+                    </a>
                     {% if not forloop.last %}, {% endif %}
                     {% endwith %}
                     {% endfor %}
                   </td>
 		          {% endwith %}
 
-		          <td><a href="{% url 'browse.view_site.view_site' meta_site.delegate.pk|id2dbxref_hex_only %}"><span class="sequence">{{ meta_site.delegate_sequence }}</span></a></td>
+		          <td><a href="{% url 'browse.view_site.view_site' meta_site.delegate.pk|id2dbxref_hex_only %}" target="_blank">
+                      <span class="sequence">{{ meta_site.delegate_sequence }}</span>
+                  </a></td>
 		          
 		          <td class="techniques">
 		            {% for tech in meta_site.techniques %}
@@ -120,7 +126,7 @@
 		          
 		          <td class="diagram">
 		            {% for reg in meta_site.regulations %}
-		            <a href="http://www.ncbi.nlm.nih.gov/gene/{{ reg.gene.gene_accession }}">
+		            <a href="http://www.ncbi.nlm.nih.gov/gene/{{ reg.gene.gene_accession }}" target="_blank">
 		              <span class="fixed-width {% if reg.evidence_type == "exp_verified" %} exp_verified_reg {% endif %}">
 			            {{reg.gene.name}} [{{ reg.gene.locus_tag }}]</span></a>{% if not forloop.last %},{% endif %}
 		            {% endfor %}
@@ -134,7 +140,7 @@
 
 		          <td>{% for cur in meta_site.curations %}
 		            <span class="fixed-width">
-		              <a href="{% url 'browse.view_curation.view_curation' cur.curation_id %}">[{{cur.curation_id}}]</a>{% if not forloop.last %}, {% endif %}
+		              <a href="{% url 'browse.view_curation.view_curation' cur.curation_id %}" target="_blank">[{{cur.curation_id}}]</a>{% if not forloop.last %}, {% endif %}
 		            </span>
 		            {% endfor %}
 		          </td>
@@ -175,7 +181,7 @@
 	      <div class="tab-pane" id="ensemble_view_aligned">
 	        <p>Sites are listed after the alignment process. For alignment of
 	          variable-length binding
-	          sites, <a href="http://www.biomedcentral.com/1471-2105/14/108/">LASAGNA</a>
+	          sites, <a href="http://www.biomedcentral.com/1471-2105/14/108/" target="_blank">LASAGNA</a>
 	          is used.
 	        </p>
 	        <pre>
