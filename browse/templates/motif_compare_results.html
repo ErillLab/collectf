@@ -167,7 +167,7 @@
                 <td>{{ report.species_name }}</td>
                 {% with form_id=report.TF_name|slugify|add:'_'|add:report.species_name|slugify %}
 	            <td><a href="#" onclick="$('#{{ form_id }}').submit();">view</a>
-	              <form action="{% url 'browse.view_reports.view_reports' %}"
+	              <form action="{% url 'browse.view_reports.view_reports_by_id_list' %}"
 	                method="post" style="display:inline;" id={{ form_id }} target="_blank">{% csrf_token %}
 	                <input type="hidden" name="csi_list" value="{% for csi in report.cur_site_insts %}{{ csi }}{% if not forloop.last %},{% endif %}{% endfor %}"/>
 	              </form>
@@ -194,7 +194,7 @@
 
                 {% with form_id=report.TF_name|slugify|add:'_'|add:report.species_name|slugify %}
 	            <td><a href="#" onclick="$('#{{ form_id }}').submit();">view</a>
-	              <form action="{% url 'browse.view_reports.view_reports' %}"
+	              <form action="{% url 'browse.view_reports.view_reports_by_id_list' %}"
 	                method="post" style="display:inline;" id={{ form_id }} target="_blank">{% csrf_token %}
 	                <input type="hidden" name="csi_list" value="{% for csi in report.cur_site_insts %}{{ csi }}{% if not forloop.last %},{% endif %}{% endfor %}"/>
 	              </form>

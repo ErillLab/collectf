@@ -81,7 +81,7 @@ def view_reports_by_id_list(request):
 
     reports = motif_report.make_reports(cur_site_insts)
     ensemble_report = motif_report.make_ensemble_report(cur_site_insts)
-    
+
     return render_to_response('view_reports_by_id_list.html',
                               dict(reports=[report.generate_view_reports_dict()
                                             for report in reports],
