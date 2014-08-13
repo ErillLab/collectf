@@ -167,7 +167,8 @@ class MotifReport:
         just before rendering the template."""
         return {
             'TF': self.TF,
-            'species': self.species
+            'species': self.species,
+            'cur_site_insts': self.get_all_cur_site_insts_ids(),
         }
 
     def generate_view_reports_dict(self):

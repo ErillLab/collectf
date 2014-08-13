@@ -66,3 +66,29 @@ def view_reports(request, tax_param_type, tax_param,
                                    integrate_non_motif=switched_integrate),
                               context_instance=RequestContext(request))
 
+def view_reports_by_id_list(request):
+    """Given a collection of curation-site-instance ids with a post request,
+    group them by TF/species and return the reports"""
+    cur_site_insts = models.Curation_SiteInstance.objects.filter(
+        pk__in=request.POST['csi_list'].strip().split(',')
+    )
+
+    integrate_non_motif = bool('integrate_non_motif' in request.POST)
+
+    if not integrate_non_motif:
+        cur_site_insts =\
+            cur_site_insts.exclude(site_type='non_motif_associated')
+
+    reports = motif_report.make_reports(cur_site_insts)
+    ensemble_report = motif_report.make_ensemble_report(cur_site_insts)
+    
+    return render_to_response('view_reports_by_id_list.html',
+                              dict(reports=[report.generate_view_reports_dict()
+                                            for report in reports],
+                                   ensemble_report=
+                                   ensemble_report.generate_view_reports_dict(),
+                                   cur_site_insts=','.join(
+                                       map(lambda csi: '%d'%csi.pk,
+                                           cur_site_insts)),
+                                   integrate_non_motif=integrate_non_motif),
+                              context_instance=RequestContext(request))

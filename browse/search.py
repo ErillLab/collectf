@@ -1,15 +1,13 @@
 """This file contains views for search function."""
-from django.shortcuts import render
+
 from django.shortcuts import render_to_response
-from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.template import RequestContext
 from django.db.models import Q
-import models
-import operator
-import motif_report
+import browse.models as models
+import browse.motif_report as motif_report
 
 def search(request):
     """Handler for search view.  If it is GET request, the page with the list of
@@ -23,7 +21,7 @@ def search(request):
 def search_get(request):
     """Render the page that allows the user to select TFs, species and
     techniques to filter TFBSs"""
-    binding,expression,insilico = get_all_techniques()
+    binding, expression, insilico = get_all_techniques()
     return render_to_response("search_.html",
                               {'TF_families': get_TF_families(),
                                'phyla': get_all_phyla(),
@@ -48,21 +46,24 @@ def get_all_techniques():
     insilico_techniques = {}
     all_categories = models.ExperimentalTechniqueCategory.objects.all()
     for category in all_categories:
-        techs = models.ExperimentalTechnique.objects.filter(categories=category).order_by('name')
-        binding_techniques[category.name] = techs.filter(preset_function='binding')
-        expression_techniques[category.name] = techs.filter(preset_function='expression')
-        insilico_techniques[category.name] = techs.filter(preset_function='insilico')
+        techs = models.ExperimentalTechnique.objects.filter(
+            categories=category).order_by('name')
+        binding_techniques[category.name] =\
+                techs.filter(preset_function='binding')
+        expression_techniques[category.name] =\
+                techs.filter(preset_function='expression')
+        insilico_techniques[category.name] =\
+                techs.filter(preset_function='insilico')
     # remove empty keys
-    binding_techniques = dict((x,y) for (x,y) in binding_techniques.items() if y)
-    expression_techniques = dict((x,y) for (x,y) in expression_techniques.items() if y)
-    insilico_techniques = dict((x,y) for (x,y) in insilico_techniques.items() if y)
+    remove_empty_keys = lambda d: dict((x, y) for x, y in d.items() if y)
+    binding_techniques = remove_empty_keys(binding_techniques)
+    expression_techniques = remove_empty_keys(expression_techniques)
+    insilico_techniques = remove_empty_keys(insilico_techniques)
     return binding_techniques, expression_techniques, insilico_techniques
 
 def search_post_helper(request):
     """Handler for search_post requests. Given request, get motif- and
     non-motif-associated sites from database and render the results."""
-
-
     def get_TF_input():
         TF_input = [x for x in request.POST.getlist('tf_input') if x != 'on']
         if not TF_input:
@@ -70,20 +71,26 @@ def search_post_helper(request):
         return models.TF.objects.filter(pk__in=TF_input)
 
     def get_species_input():
-        print request.POST.getlist('species_input')
-        species_input = [x for x in request.POST.getlist('species_input') if x != 'on']
+        species_input = [x for x in request.POST.getlist('species_input')
+                         if x != 'on']
         if not species_input:
             raise
         return models.Taxonomy.objects.filter(pk__in=species_input)
 
     def get_technique_input():
         # Get category inputs
-        cat_input_1 = [x for x in request.POST.getlist('cat_input_1') if x != 'on']
-        cat_input_2 = [x for x in request.POST.getlist('cat_input_2') if x != 'on']
-        cat_input_3 = [x for x in request.POST.getlist('cat_input_3') if x != 'on']
-        techniques1 = models.ExperimentalTechnique.objects.filter(pk__in=cat_input_1)
-        techniques2 = models.ExperimentalTechnique.objects.filter(pk__in=cat_input_2)
-        techniques3 = models.ExperimentalTechnique.objects.filter(pk__in=cat_input_3)
+        cat_input_1 = [x for x in request.POST.getlist('cat_input_1')
+                       if x != 'on']
+        cat_input_2 = [x for x in request.POST.getlist('cat_input_2')
+                       if x != 'on']
+        cat_input_3 = [x for x in request.POST.getlist('cat_input_3')
+                       if x != 'on']
+        techniques1 = models.ExperimentalTechnique.objects.filter(
+            pk__in=cat_input_1)
+        techniques2 = models.ExperimentalTechnique.objects.filter(
+            pk__in=cat_input_2)
+        techniques3 = models.ExperimentalTechnique.objects.filter(
+            pk__in=cat_input_3)
         if not (techniques1 or techniques2 or techniques3):
             raise
         return (techniques1, techniques2, techniques3)
@@ -146,18 +153,18 @@ def search_post(request):
             return raise_validation_error(message)
 
         return render_to_response("search_results.html",
-                                  {
-                                      'title': "",
-                                      'description': """Search results can be
-                                      seen as individual reports (one report per
-                                      TF/species) or as ensemble reports
-                                      (multiple TF/species). """,
-                                      'all_cur_site_insts': [pk for report in reports
-                                                             for pk in report.get_all_cur_site_insts_ids()],
-                                      'reports': [report.generate_browse_result_dict() for report in reports],
+                                  {'title': "",
+                                   'description': """Search results can be seen
+                                   as individual reports (one report per
+                                   TF/species) or as ensemble reports (multiple
+                                   TF/species). """,
+                                   'all_cur_site_insts': [pk for report in reports
+                                                          for pk in report.get_all_cur_site_insts_ids()],
+                                   'reports': [report.generate_browse_result_dict() for report in reports],
                                   },
-                                  context_instance = RequestContext(request))
-    except:
-        message = "Please select at least one TF, species and experimental technique to search database."
+                                  context_instance=RequestContext(request))
+    except RuntimeError as e:
+        message = """Please select at least one TF, species and experimental
+        technique to search database."""
         return raise_validation_error(message)
 
