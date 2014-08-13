@@ -82,35 +82,41 @@ class GenomeForm(forms.Form):
                                        help_text=help_dict['genome_accession'])
 
     # Checked if site species is the same with the reported genome
-    site_species_same = forms.BooleanField(required=False,
-        label="""This is the exact same strain as reported
-        in the manuscript for the sites.""",
+    site_species_same = forms.BooleanField(
+        required=False,
+        label="""This is the exact same strain as reported in the manuscript for
+        the sites.""",
         help_text=help_dict['site_species_same'])
     # TF accession number
     TF_accession = forms.CharField(label="TF accession number",
                                    help_text=help_dict['TF_accession'])
 
     # Checked if TF species is the same with the reported genome
-    TF_species_same = forms.BooleanField(required=False,
-        label="""This is the exact same strain as reported in the manuscript for the TF.""",
+    TF_species_same = forms.BooleanField(
+        required=False,
+        label="""This is the exact same strain as reported in the manuscript for
+        the TF.""",
         help_text=help_dict['TF_species_same'])
 
-    site_species = forms.CharField(label="Organism TF binding sites are reported in",
-                                   required=False,
-                                   help_text=help_dict['site_species'])
+    site_species = forms.CharField(
+        label="Organism TF binding sites are reported in",
+        required=False,
+        help_text=help_dict['site_species'])
 
     TF_species = forms.CharField(label="Organism of origin for reported TF",
                                  required=False,
                                  help_text=help_dict['TF_species'])
 
     # manuscript fields edit.
-    contains_promoter_data = forms.BooleanField(required=False,
-                                                label="The manuscript contains promoter information",
-                                                help_text=help_dict['contains_promoter_data'])
+    contains_promoter_data = forms.BooleanField(
+        required=False,
+        label="The manuscript contains promoter information",
+        help_text=help_dict['contains_promoter_data'])
 
-    contains_expression_data = forms.BooleanField(required=False,
-                                                  label="The manuscript contains expression data",
-                                                  help_text=help_dict['contains_expression_data'])
+    contains_expression_data = forms.BooleanField(
+        required=False,
+        label="The manuscript contains expression data",
+        help_text=help_dict['contains_expression_data'])
 
     def clean_genome_accession_helper(self, genome_accession):
         """Check if the entered genome accession number is valid"""
@@ -118,6 +124,10 @@ class GenomeForm(forms.Form):
             msg = """Please enter RefSeq accession number with the version
             number."""
             raise forms.ValidationError(msg)
+        if not genome_accession.startswith('NC_'):
+            msg = "RefSeq genome accession number should start with 'NC_'"
+            raise forms.ValidationError(msg)
+
         try: # to retrieve genome from database
             g = Genome.objects.get(genome_accession=genome_accession)
         except Genome.DoesNotExist: # try to retrieve it from NCBI database
@@ -152,6 +162,10 @@ class GenomeForm(forms.Form):
         """Check if the entered TF accession number is valid"""
         try:
             TF_accession = TF_accession.split('.')[0]
+            if not (TF_accession.startswith('NP_') or
+                    TF_accession.startswith('YP_')):
+                msg = """TF accession number must start with 'NP_' or 'YP_'."""
+                raise forms.ValidationError(msg)
             TF_instance = TFInstance.objects.get(protein_accession=TF_accession)
         except TFInstance.DoesNotExist:
             TF_record = bioutils.get_TF(TF_accession)
