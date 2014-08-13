@@ -132,9 +132,7 @@ class GenomeForm(forms.Form):
                 raise forms.ValidationError(msg)
             # At this point, things should be fine, the next step is to create
             # genome object and genes.
-            try:
-                create_object.make_genome(genome_record, strain_tax)
-            except:
+            if not create_object.make_genome(genome_record, strain_tax):
                 msg = """Can't retrieve genome or list of genes.
                 Does the genome have a RefSeq accession number?"""
                 raise forms.ValidationError(msg)

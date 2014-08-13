@@ -75,17 +75,21 @@ def make_genome(genome_record, strain_tax):
     genome_sequence = GenomeSequence.objects.create(
         sequence=genome_record.seq.tostring())
     # create genome object
-    g = Genome(genome_accession=genome_record.id,
-               genome_sequence=genome_sequence,
-               GC_content=gc,
-               gi=genome_record.annotations['gi'],
-               organism=genome_record.annotations['organism'],
-               chromosome=chromosome,
-               taxonomy=p)
+    genome = Genome(genome_accession=genome_record.id,
+                    genome_sequence=genome_sequence,
+                    GC_content=gc,
+                    gi=genome_record.annotations['gi'],
+                    organism=genome_record.annotations['organism'],
+                    chromosome=chromosome,
+                    taxonomy=p)
 
-    genes = make_all_genes(genome_record, g)
-    g.save()
-    _ = [gene.save() for gene in genes]
+    genes = bioutils.get_genes(genome_record)
+    if genes:
+        genome.save()
+        _ = [Gene(genome=genome, **gene) for gene in genes]
+        return genome
+    return None
+
 
 
 def make_all_genes(genome_record, genome_obj):
