@@ -8,9 +8,9 @@ https://docs.djangoproject.com/en/1.6/ref/contrib/formtools/form-wizard/#django.
 
 """
 
-import models
-import templatetags.print_pub
-import session_utils
+import curate.models as models
+import curate.templatetags.print_pub as print_pub
+import curate.session_utils as session_utils
 from django import forms
 from django.utils.safestring import mark_safe
 from django.contrib import messages
@@ -19,12 +19,12 @@ from collectf import settings
 def publication_get_form(wiz, form):
     """Construct the form for publication selection step."""
     user = wiz.request.user
-    curator,_ = models.Curator.objects.get_or_create(user=user)
+    curator, _ = models.Curator.objects.get_or_create(user=user)
     # select papers assigned to user and not complete
     assigned_pubs = models.Publication.objects.filter(assigned_to=curator,
                                                       curation_complete=False)
     # put them in form choices, populate form field
-    choices = [(p.publication_id, mark_safe("%s" % (templatetags.print_pub.print_pub(p))))
+    choices = [(p.publication_id, mark_safe("%s" % (print_pub.print_pub(p))))
                for p in assigned_pubs]
     form.fields["pub"].choices = choices
     # External submitters shouldn't see "This paper contains no data" checkbox
@@ -47,14 +47,17 @@ def genome_get_form(wiz, form):
     if c:
         form.initial["TF"] = c.TF
         if c.site_instances.all():
-            genomes = list(set(site.genome.genome_accession for site in c.site_instances.all()))
-            form.initial["genome_accession"] = c.site_instances.all()[0].genome.genome_accession
+            genomes = list(set(site.genome.genome_accession
+                               for site in c.site_instances.all()))
+            form.initial["genome_accession"] = c.site_instances.all()[0].\
+                                               genome.genome_accession
             for i, g in zip(xrange(1, settings.NUMBER_OF_GENOME_ACCESSION_FIELDS), genomes[1:]):
                 form.initial['genome_accession_%d' % i] = g
 
         # Enter TF accession numbers
         form.initial["TF_accession"] = c.TF_instances.all()[0].protein_accession
-        for i, TF_instance in zip(xrange(1, settings.NUMBER_OF_TF_ACCESSION_FIELDS), c.TF_instances.all()[1:]):
+        for i, TF_instance in zip(xrange(1, settings.NUMBER_OF_TF_ACCESSION_FIELDS),
+                                  c.TF_instances.all()[1:]):
             form.initial["TF_accession_%d" % i] = TF_instance.protein_accession
 
         form.initial["TF_species"] = c.TF_species
@@ -62,9 +65,10 @@ def genome_get_form(wiz, form):
 
         msg = """
         <h4>Warning!</h4> It seems that the paper you selected is previously
-        curated. For convenience, fields in this form are automatically filled based on
-        the previous curation of the paper. They may differ in this curation, so it is
-        best to check that they are correct before proceeding to the next step."""
+        curated. For convenience, fields in this form are automatically filled
+        based on the previous curation of the paper. They may differ in this
+        curation, so it is best to check that they are correct before proceeding
+        to the next step."""
         messages.warning(wiz.request, mark_safe(msg))
 
     # In addition populate two fields on whether the manuscript contains
@@ -79,7 +83,8 @@ def genome_get_form(wiz, form):
 def techniques_get_form(wiz, form):
     """Construct the form for experiemental techniques step."""
     c = session_utils.get(wiz.request.session, 'previously_curated_paper')
-    # if selected paper is previously curated, prepopulate experimental techniques
+    # if selected paper is previously curated, prepopulate experimental
+    # techniques
     if c:
         # get all techniques used in this curation
         cur_site_insts = models.Curation_SiteInstance.objects.filter(curation=c)
@@ -201,7 +206,8 @@ def gene_regulation_get_form(wiz, form):
     for site in sites:
         if site.is_matched():
             i = site.key
-            choices = [(g.gene_id, "%s (%s): %s" % (g.locus_tag, g.name, g.description))
+            choices = [(g.gene_id, "%s (%s): %s" %
+                        (g.locus_tag, g.name, g.description))
                        for g in site.get_match().nearby_genes]
             form.fields[i] = forms.MultipleChoiceField(
                 label=site.get_match().pprint(False),
@@ -223,5 +229,4 @@ def curation_review_get_form(wiz, form):
         form.fields['NCBI_submission_ready'].initial = False
         form.fields['NCBI_submission_ready'].widget = forms.HiddenInput()
         form.fields['confidence'].widget = forms.HiddenInput()
-
     return form

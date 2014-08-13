@@ -81,8 +81,8 @@ class MotifReport:
         This function should be called only if all curation-site-instance
         objects have the same TF accession numbers."""
         get_TF = lambda csi: csi.curation.TF_instances.all()[0]
-        assert all(get_TF(self.m_cur_site_insts[0]) == get_TF(x)
-                   for x in self.m_cur_site_insts)
+        #assert all(get_TF(self.m_cur_site_insts[0]) == get_TF(x)
+        #           for x in self.m_cur_site_insts)
         return str(get_TF(self.m_cur_site_insts[0]).protein_accession)
 
     @property

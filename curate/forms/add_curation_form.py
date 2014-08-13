@@ -46,21 +46,28 @@ class GenomeForm(forms.Form):
         num_TF_fields = settings.NUMBER_OF_TF_ACCESSION_FIELDS
         # Extra genome accession fields
         for i in xrange(1, num_genome_fields):
-            self.fields['genome_accession_%d' % i] = forms.CharField(label="Genome NCBI accession number [%d]" % i,
-                                                                     required=False)
+            self.fields['genome_accession_%d' % i] = forms.CharField(
+                label="Genome NCBI accession number [%d]" % i,
+                required=False)
         # Extra TF accession fields
         for i in xrange(1, num_TF_fields):
-            self.fields['TF_accession_%d' % i] = forms.CharField(label="TF accession number [%d]" % i,
-                                                                 required=False)
+            self.fields['TF_accession_%d' % i] = forms.CharField(
+                label="TF accession number [%d]" % i,
+                required=False)
         # Change the order of fields
         current_order = self.fields.keyOrder
         self.fields.keyOrder = (['TF', 'genome_accession'] +
-                                ['genome_accession_%d' % i for i in xrange(1, num_genome_fields)] +
+                                ['genome_accession_%d' % i
+                                 for i in xrange(1, num_genome_fields)] +
                                 ['site_species_same'] +
                                 ['TF_accession'] +
-                                ['TF_accession_%d' % i for i in xrange(1, num_TF_fields)] +
-                                ['TF_species_same', 'site_species', 'TF_species'] +
-                                ['contains_promoter_data', 'contains_expression_data'])
+                                [('TF_accession_%d' % i)
+                                 for i in xrange(1, num_TF_fields)] +
+                                ['TF_species_same',
+                                 'site_species',
+                                 'TF_species'] +
+                                ['contains_promoter_data',
+                                 'contains_expression_data'])
 
     help_dict = help_texts.genome_form
     # TF field
@@ -108,7 +115,8 @@ class GenomeForm(forms.Form):
     def clean_genome_accession_helper(self, genome_accession):
         """Check if the entered genome accession number is valid"""
         if '.' not in genome_accession:
-            msg = "Please enter RefSeq accession number with the version number."
+            msg = """Please enter RefSeq accession number with the version
+            number."""
             raise forms.ValidationError(msg)
         try: # to retrieve genome from database
             g = Genome.objects.get(genome_accession=genome_accession)
@@ -116,22 +124,29 @@ class GenomeForm(forms.Form):
             genome_record = bioutils.get_genome(genome_accession)
             strain_tax = bioutils.get_organism_taxon(genome_record)
             if not genome_record:
-                msg = "Can not fetch genome record from NCBI. Check accession number."
+                msg = """Can not fetch genome record from NCBI.
+                Check accession number."""
                 raise forms.ValidationError(msg)
             if not strain_tax:
                 msg = "Can not fetch strain taxonomy information."
                 raise forms.ValidationError(msg)
-            # At this point, things should be fine, the next step is to create genome object and genes.
-            create_object.make_genome(genome_record, strain_tax)
-            create_object.make_all_genes(genome_record)
+            # At this point, things should be fine, the next step is to create
+            # genome object and genes.
+            try:
+                create_object.make_genome(genome_record, strain_tax)
+            except:
+                msg = """Can't retrieve genome or list of genes.
+                Does the genome have a RefSeq accession number?"""
+                raise forms.ValidationError(msg)
+
         return genome_accession
 
     def clean_genome_accession(self):
         """Clean genome accession fields. Check if they are valid. If they are
-        valid and not available in the database, download genome sequences and list
-        of genes from NCBI database and add them to the CollecTF database. Do
-        the validity check for all genome accession fields (if there are more
-        than one)."""
+        valid and not available in the database, download genome sequences and
+        list of genes from NCBI database and add them to the CollecTF
+        database. Do the validity check for all genome accession fields (if
+        there are more than one)."""
         genome_accession = self.cleaned_data['genome_accession'].strip()
         return self.clean_genome_accession_helper(genome_accession)
 
@@ -143,7 +158,8 @@ class GenomeForm(forms.Form):
         except TFInstance.DoesNotExist:
             TF_record = bioutils.get_TF(TF_accession)
             if not TF_record:
-                msg = "Can not fetch protein record from NCBI. Check accession number."
+                msg = """Can not fetch protein record from NCBI. Check accession
+                number."""
                 raise forms.ValidationError(msg)
             # Create TF instance object
             create_object.make_TF_instance(TF_record)
@@ -176,17 +192,20 @@ class GenomeForm(forms.Form):
         species data to the cleaned data. In that case, it is important that
         clean_genome is called BEFORE clean_TF_species, because the genome is
         needed to extract species information."""
-        return (self.clean_species('TF_species') if self.cleaned_data['TF_species_same']
+        return (self.clean_species('TF_species')
+                if self.cleaned_data['TF_species_same']
                 else self.cleaned_data['TF_species'])
 
     def clean_site_species(self):
         """Clean site_species field. If site_species_same field is selected,
         assign species data to the cleaned data."""
-        return (self.clean_species('site_species') if self.cleaned_data['site_species_same']
+        return (self.clean_species('site_species')
+                if self.cleaned_data['site_species_same']
                 else self.cleaned_data['site_species'])
 
     def check_genome_accession_origin(self):
-        """Check if all genome accession numbers belong to the same taxonomy ID"""
+        """Check if all genome accession numbers belong to the same taxonomy
+        ID"""
         cd = self.cleaned_data
         if 'genome_accession' not in cd:
             return
@@ -198,8 +217,9 @@ class GenomeForm(forms.Form):
                 self.clean_genome_accession_helper(cd[field_name].strip())
                 genome_accessions.append(cd[field_name].strip())
         # Get all genomes from the database.
-        genomes = [Genome.objects.get(genome_accession=acc) for acc in genome_accessions]
-        all_same = lambda items: all(x==items[0] for x in items)
+        genomes = [Genome.objects.get(genome_accession=acc)
+                   for acc in genome_accessions]
+        all_same = lambda items: all(x == items[0] for x in items)
         if not all_same([genome.organism for genome in genomes]):
             msg = "Genome accession numbers are not from the same taxonomy ID."
             self._errors['genome_accession'] = self.error_class([msg])
@@ -217,12 +237,14 @@ class GenomeForm(forms.Form):
                     self.clean_TF_accession_helper(cd[field_name].strip())
                     TF_accessions.append(cd[field_name].strip())
             # Check if all TF accession numbers come from the same organism
-            all_same = lambda items: all(x==items[0] for x in items)
-            if not all_same([bioutils.TF_accession_to_org_taxon(acc) for acc in TF_accessions]):
+            all_same = lambda items: all(x == items[0] for x in items)
+            if not all_same([bioutils.TF_accession_to_org_taxon(acc)
+                             for acc in TF_accessions]):
                 msg = "TF accession numbers are not from the same taxonomy ID."
                 self._errors['TF_accession'] = self.error_class([msg])
         except:
-            msg = "Failed to validate TF accession numbers (can not fetch records from NCBI)"
+            msg = """Failed to validate TF accession numbers (can not fetch
+            records from NCBI)"""
             self._errors['TF_accession'] = self.error_class([msg])
 
     def clean(self):
@@ -274,16 +296,19 @@ class TechniquesForm(forms.Form):
         # Extra external-database fields
         external_db_type_choices = [(None, "None"),]
         for db in ExternalDatabase.objects.all():
-            external_db_type_choices.append((db.ext_database_id, db.ext_database_name))
+            external_db_type_choices.append((db.ext_database_id,
+                                             db.ext_database_name))
         # Create extra fields
         for i in xrange(num_external_db_fields):
-            self.fields['external_db_type_%d' % i] = forms.ChoiceField(choices=external_db_type_choices,
-                                                                       required=False,
-                                                                       label="External DB type [%d]" % (i+1),
-                                                                       help_text=help_dict['external_db_type'])
-            self.fields['external_db_accession_%d' % i] = forms.CharField(required=False,
-                                                                          label="External DB accession number [%d]" % (i+1),
-                                                                          help_text=help_dict['external_db_accession'])
+            self.fields['external_db_type_%d' % i] = \
+                forms.ChoiceField(choices=external_db_type_choices,
+                                  required=False,
+                                  label="External DB type [%d]" % (i+1),
+                                  help_text=help_dict['external_db_type'])
+            self.fields['external_db_accession_%d' % i] = \
+                forms.CharField(required=False,
+                                label="External DB accession number [%d]" % (i+1),
+                                help_text=help_dict['external_db_accession'])
 
     help_dict = help_texts.techniques_form
     # generate techniques field by getting available techniques from db
@@ -292,11 +317,13 @@ class TechniquesForm(forms.Form):
     description_markup = u'<span data-container="body" data-toggle="popover" title="%s" data-content="%s">%s</span>'
     for t in ExperimentalTechnique.objects.order_by('name'):
         choices.append((t.technique_id,
-                        mark_safe(description_markup % (t.name, t.description, t.name))))
-    techniques = forms.MultipleChoiceField(choices = choices,
-                                           label = "Techniques",
+                        mark_safe(description_markup % (t.name,
+                                                        t.description,
+                                                        t.name))))
+    techniques = forms.MultipleChoiceField(choices=choices,
+                                           label="Techniques",
                                            help_text=help_dict['techniques'],
-                                           widget = forms.CheckboxSelectMultiple())
+                                           widget=forms.CheckboxSelectMultiple())
 
     experimental_process = forms.CharField(widget=forms.Textarea,
                                            label="Experimental process",
@@ -306,12 +333,14 @@ class TechniquesForm(forms.Form):
     # External database links
     has_external_db = forms.BooleanField(
         required=False,
-        label="The manuscript reports high-throughput data from an external database. (You can report up to 5 external resources.)")
+        label="""The manuscript reports high-throughput data from an external
+        database. (You can report up to 5 external resources.)""")
 
     # Does TF interact with any other protein/ligand that influences binding?
     forms_complex = forms.BooleanField(required=False,
-                                       label="""The manuscript reports that TF forms complex
-                                       with other proteins for binding with reported sites""")
+                                       label="""The manuscript reports that TF
+                                       forms complex with other proteins for
+                                       binding with reported sites""")
 
     complex_notes = forms.CharField(widget=forms.Textarea, required=False,
                                     label="Notes",
@@ -357,17 +386,20 @@ class SiteEntryForm(forms.Form):
                                                help_text=help_dict['quantitative_data_format'])
 
     # Following fields will be visible only if the submission is high-throughput
-    peaks = forms.CharField(widget=forms.Textarea, label="High-throughput sequences", help_text=help_dict['peaks'])
+    peaks = forms.CharField(widget=forms.Textarea,
+                            label="High-throughput sequences",
+                            help_text=help_dict['peaks'])
     assay_conditions = forms.CharField(label="Assay conditions",
                                        help_text=help_dict['assay_conditions'],
                                        widget=forms.Textarea)
     method_notes = forms.CharField(label="Method notes",
                                    help_text=help_dict['method_notes'],
                                    widget=forms.Textarea)
-    peak_techniques = forms.MultipleChoiceField(label="Techniques used to identify high-throughput data",
-                                                help_text=help_dict['peak_techniques'],
-                                                choices=(),
-                                                widget=forms.CheckboxSelectMultiple)
+    peak_techniques = forms.MultipleChoiceField(
+        label="Techniques used to identify high-throughput data",
+        help_text=help_dict['peak_techniques'],
+        choices=(),
+        widget=forms.CheckboxSelectMultiple)
 
     def verify_coordinates(self, coor_a, coor_b):
         try:
@@ -401,7 +433,8 @@ class SiteEntryForm(forms.Form):
 
     def verify_only_coordinates(self, sites_cd):
         """Clean function to check if all coordinates are valid"""
-        coordinates = [re.split('[\t ]+', line) for line in re.split('[\r\n]+', sites_cd)]
+        coordinates = [re.split('[\t ]+', line)
+                       for line in re.split('[\r\n]+', sites_cd)]
 
         msg = "Invalid coordinate format."
         for instance in coordinates:
@@ -439,16 +472,19 @@ class SiteEntryForm(forms.Form):
     def check_quantitative_data_format(self, qval_data_format):
         """Check if the quantitative-data-format is filled."""
         if not qval_data_format:
-            msg = "The reported sites have associated quantitative values. Please enter the quantitative data format."
+            msg = """The reported sites have associated quantitative
+            values. Please enter the quantitative data format."""
             self._errors["__all__"] = self.error_class([msg])
 
     def clean_sites(self):
         """Validate sites field"""
         cd = self.cleaned_data['sites'].strip().upper()
 
-        lines = [re.split('[\t ]+', line.strip()) for line in re.split('[\r\n]+', cd.strip())]
+        lines = [re.split('[\t ]+', line.strip())
+                 for line in re.split('[\r\n]+', cd.strip())]
         sites_cd = '\n'.join(' '.join(wds for wds in line) for line in lines)
-        self.check_qval_data_format = False # by default, don't check the qval data format
+        # by default, don't check the qval data format
+        self.check_qval_data_format = False
         # check if it is fasta
         if sites_cd[0].startswith('>'):
             return self.verify_only_sites(sites_cd)
@@ -470,12 +506,16 @@ class SiteEntryForm(forms.Form):
     def clean_peaks(self):
         """Validate peaks field"""
         cd = self.cleaned_data['peaks'].strip().upper()
-        lines = [re.split('[\t ]+', line.strip()) for line in re.split('[\r\n]+', cd.strip())]
+        lines = [re.split('[\t ]+', line.strip())
+                 for line in re.split('[\r\n]+', cd.strip())]
         peaks_cd = '\n'.join(' '.join(wds for wds in line) for line in lines)
-        self.check_qval_data_format = False # by default, don't check the qval data format
+        # by default, don't check the qval data format
+        self.check_qval_data_format = False
         if len(lines[0]) == 1: # sequence format
-            return self.verify_only_sites(peaks_cd) # Same process with site verification
-        elif len(lines[0]) == 2: # either coordinate format or sequence with qvals
+            # Same process with site verification
+            return self.verify_only_sites(peaks_cd)
+        elif len(lines[0]) == 2:
+            # either coordinate format or sequence with qvals
             if lines[0][0].isalpha(): # seq with qvals
                 self.check_qval_data_format = True
                 return self.verify_only_sites_and_values(peaks_cd)
@@ -488,9 +528,11 @@ class SiteEntryForm(forms.Form):
             raise forms.ValidationError("Invalid format")
 
     def clean(self):
-        # If the site field contains quantitative data, make sure the format field is filled.
+        # If the site field contains quantitative data, make sure the format
+        # field is filled.
         if 'sites' in self.cleaned_data and self.check_qval_data_format:
-            self.check_quantitative_data_format(self.cleaned_data.get('quantitative_data_format', None))
+            self.check_quantitative_data_format(
+                self.cleaned_data.get('quantitative_data_format', None))
         return self.cleaned_data
 
 class SiteExactMatchForm(forms.Form):
@@ -510,7 +552,8 @@ class SiteSoftMatchForm(forms.Form):
     pass
 
 class SiteAnnotationForm(forms.Form):
-    """In this form, the user is asked to fill the information regarding each site. In particular, the user can:
+    """In this form, the user is asked to fill the information regarding each
+    site. In particular, the user can:
     - visualize again site information, including chromosome,
     - toggle the graphical view (off by default)
     - edit the qualitative values
@@ -524,7 +567,8 @@ class SiteAnnotationForm(forms.Form):
     (https://docs.djangoproject.com/en/1.6/topics/forms/formsets/).
     """
     def clean(self):
-        # TODO Check if at least one experimental techniques is selected for each site.
+        # TODO Check if at least one experimental techniques is selected for
+        # each site.
         return self.cleaned_data
 
 

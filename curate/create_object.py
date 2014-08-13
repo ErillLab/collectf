@@ -13,15 +13,15 @@ def make_pub(pubrec, cd):
     pmid = cd.get("pmid", None)  # None if not pubmed publication
     url ="http://www.ncbi.nlm.nih.gov/pubmed?term=%s" % pmid if pmid else cd['URL']
     publication_type = "pubmed" if pmid else "nonpubmed"
-    p = Publication(publication_type = publication_type,
+    p = Publication(publication_type=publication_type,
                     pmid=pmid,
-                    authors = ', '.join(pubrec.get("AuthorList")), 
-                    journal = pubrec.get("FullJournalName"),
-                    title = unicode(pubrec.get("Title")),
-                    publication_date = pubrec.get("PubDate"),
-                    volume = pubrec.get("Volume"),
-                    issue = pubrec.get("Issue"),
-                    pages = pubrec.get("Pages"),
+                    authors=', '.join(pubrec.get("AuthorList")),
+                    journal=pubrec.get("FullJournalName"),
+                    title=unicode(pubrec.get("Title")),
+                    publication_date=pubrec.get("PubDate"),
+                    volume=pubrec.get("Volume"),
+                    issue=pubrec.get("Issue"),
+                    pages=pubrec.get("Pages"),
                     url=url,
                     pdf=None,
                     reported_TF=cd["reported_TF"],
@@ -47,7 +47,8 @@ def create_taxonomy(genome_record):
     record['LineageEx'].append({'Rank': records[0]['Rank'],
                                 'ScientificName': records[0]['ScientificName'],
                                 'TaxId': records[0]['TaxId']})
-    # The lineage that NCBI returns seems already sorted, but to be safe, sort it here.
+    # The lineage that NCBI returns seems already sorted, but to be safe, sort
+    # it here.
     lineage = []
     for rank in ['phylum', 'class', 'order', 'family', 'genus', 'species']:
         r = filter(lambda x: x['Rank']==rank, record['LineageEx'])
@@ -67,31 +68,34 @@ def make_genome(genome_record, strain_tax):
     create a models.Genome object."""
     gc = bioutils.GC(genome_record.seq)  # GC content
     p = create_taxonomy(genome_record) # create all taxonomy
-    assert genome_record.features[0].type=='source'
+    assert genome_record.features[0].type == 'source'
     q = genome_record.features[0].qualifiers
     chromosome = q['chromosome'][0] if 'chromosome' in q else ''
     # create genome sequence object
-    genome_sequence = GenomeSequence.objects.create(sequence=genome_record.seq.tostring())
+    genome_sequence = GenomeSequence.objects.create(
+        sequence=genome_record.seq.tostring())
     # create genome object
     g = Genome(genome_accession=genome_record.id,
-               genome_sequence = genome_sequence,
+               genome_sequence=genome_sequence,
                GC_content=gc,
                gi=genome_record.annotations['gi'],
                organism=genome_record.annotations['organism'],
                chromosome=chromosome,
                taxonomy=p)
-    g.save()
 
-def make_all_genes(genome_record):
+    genes = make_all_genes(genome_record, g)
+    g.save()
+    _ = [gene.save() for gene in genes]
+
+
+def make_all_genes(genome_record, genome_obj):
     """Given genome record from NCBI database, create gene objects for all genes
     in the genome."""
     genes = bioutils.get_genes(genome_record)
-    genome = Genome.objects.get(genome_accession=genome_record.id)
+    #genome = Genome.objects.get(genome_accession=genome_record.id)
     assert genome, "Genome does not exist"
-    for g in genes:
-        Gene(genome=genome, **g).save()
+    return [Gene(genome=genome_obj, **g) for g in genes]
 
-        
 def make_TF_instance(TF_rec):
     """Given the TF record, create the TF object in the database."""
     tf = TFInstance(protein_accession=TF_rec.name,
