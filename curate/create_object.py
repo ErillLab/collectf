@@ -62,7 +62,7 @@ def create_taxonomy(genome_record):
                                              name=item['ScientificName'],
                                              parent=p)
     return p
-    
+
 def make_genome(genome_record, strain_tax):
     """Given the genome record (BioPython object) that is fetched from the NCBI,
     create a models.Genome object."""
@@ -93,7 +93,6 @@ def make_all_genes(genome_record, genome_obj):
     in the genome."""
     genes = bioutils.get_genes(genome_record)
     #genome = Genome.objects.get(genome_accession=genome_record.id)
-    assert genome, "Genome does not exist"
     return [Gene(genome=genome_obj, **g) for g in genes]
 
 def make_TF_instance(TF_rec):

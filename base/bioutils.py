@@ -30,7 +30,8 @@ def get_pubmed(pmid):
 def get_genome(accession):
     """Retrieve genome record from NCBI database."""
     try:
-        h = Entrez.efetch(db='nuccore', id=accession, retmode='gbwithparts', rettype='text')
+        h = Entrez.efetch(db='nuccore', id=accession,
+                          retmode='gbwithparts', rettype='text')
         seq_record = SeqIO.read(h, 'gb')
         h.close()
         return seq_record
@@ -40,7 +41,8 @@ def get_genome(accession):
 def get_TF(accession):
     """Retrieve transcription factor from NCBI database."""
     try:
-        h = Entrez.efetch(db='protein', id=accession, retmode='text', rettype='gb')
+        h = Entrez.efetch(db='protein', id=accession,
+                          retmode='text', rettype='gb')
         seq_record = SeqIO.read(h, 'gb')
         h.close()
         return seq_record
@@ -57,9 +59,10 @@ def get_gene_id(feature):
     return gene_id
 
 def get_gene_annotation(id_list):
-    """Annotates Entrez Gene ids using Bio.Entrez, in particular epost (to submit the
-    data to NCBI) and esummary to retrieve the information. Returns a list gene
-    summary objects."""
+    """Annotates Entrez Gene ids using Bio.Entrez, in particular epost (to submit
+    the data to NCBI) and esummary to retrieve the information. Returns a list
+    gene summary objects.
+    """
     epost_result = Entrez.read(Entrez.epost("gene", id=','.join(id_list)))
 
     # Occasionally, when CollecTF tries to retrieve all gene summaries, NCBI
@@ -89,31 +92,33 @@ def get_gene_annotation(id_list):
 
 def get_genes(genome_rec):
     """Given a genome record object, get list of all genes."""
-    genes = [] # return list of genes
-    # Use Entrez post method, because get method has limitation on url length
-    # use Epost to post list of ids first
-    # get gene ids
-    gene_features = [f for f in genome_rec.features if f.type == 'gene']
-    gids = [get_gene_id(f) for f in gene_features]
-    
-    recs = []
-    chunk_size = 1000
-    for start in xrange(0, len(gids), chunk_size):
-        end = min(len(gids), start+chunk_size)
-        #print gids[start:end]
-        recs = recs + get_gene_annotation(gids[start:end])
-        
-    # two sources of gene data: Entrez epost and gene features from genome record
-    for gid, feat, rec in zip(gids, gene_features, recs):
-        assert rec['Id'] == gid
-        genes.append({'gene_accession': gid,
-                      'name': rec['Name'],
-                      'description': rec['Description'],
-                      'start': feat.location.start.position,
-                      'end': feat.location.end.position,
-                      'strand': feat.strand,
-                      'locus_tag': ','.join(feat.qualifiers['locus_tag'])})
-    return genes
+    try:
+        genes = [] # return list of genes
+        # Use Entrez post method, because get method has limitation on url length
+        # use Epost to post list of ids first
+        # get gene ids
+        gene_features = [f for f in genome_rec.features if f.type == 'gene']
+        gids = [get_gene_id(f) for f in gene_features]
+
+        recs = []
+        chunk_size = 1000
+        for start in xrange(0, len(gids), chunk_size):
+            end = min(len(gids), start+chunk_size)
+            #print gids[start:end]
+            recs = recs + get_gene_annotation(gids[start:end])
+
+        # two sources of gene data: Entrez epost and gene features from genome
+        # record
+        for gid, feat, rec in zip(gids, gene_features, recs):
+            assert rec['Id'] == gid
+            genes.append({'gene_accession': gid,
+                          'name': rec['Name'],
+                          'description': rec['Description'],
+                          'start': feat.location.start.position,
+                          'end': feat.location.end.position,
+                          'strand': feat.strand,
+                          'locus_tag': ','.join(feat.qualifiers['locus_tag'])})
+        return genes
 
 def get_org_name(genome_record):
     """Given genome record from NCBI db, get organism name."""
