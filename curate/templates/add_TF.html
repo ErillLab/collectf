@@ -3,6 +3,10 @@
 {% block content %}
 {% load bootstrap %}
 
+<p>
+If the TF family is not listed, you can add new one
+<a href="{% url 'curate.add_TF.add_TF_family' %}">here</a>.</p>
+
 <form class="form-horizontal" method="post" action="">{% csrf_token %}
 
 {{ form|bootstrap_horizontal }}
