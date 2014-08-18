@@ -59,10 +59,9 @@ def get_gene_id(feature):
     return gene_id
 
 def get_gene_annotation(id_list):
-    """Annotates Entrez Gene ids using Bio.Entrez, in particular epost (to submit
-    the data to NCBI) and esummary to retrieve the information. Returns a list
-    gene summary objects.
-    """
+    """Annotates Entrez Gene ids using Bio.Entrez, in particular epost (to
+    submit the data to NCBI) and esummary to retrieve the information. Returns a
+    list gene summary objects.  """
     epost_result = Entrez.read(Entrez.epost("gene", id=','.join(id_list)))
 
     # Occasionally, when CollecTF tries to retrieve all gene summaries, NCBI
@@ -137,14 +136,15 @@ def get_organism_taxon(genome_record):
     return tax_id
 
 def TF_accession_to_org_taxon(TF_accession):
-    """Given a TF accession number, find the organism taxonomy id using Elink utility"""
+    """Given a TF accession number, find the organism taxonomy id using Elink
+    utility"""
     TF_record = get_TF(TF_accession)
     if not TF_record:
         raise RuntimeError # raise exception if the TF record can not be fetched
     # Get taxonomy id using Entrez elink utility
     gi = TF_record.annotations['gi']
     r = Entrez.read(Entrez.elink(db='taxonomy', dbfrom='protein',
-                    id=gi, linkname='protein_taxonomy'))
+                                 id=gi, linkname='protein_taxonomy'))
     assert len(r) == 1
     tax_id = r[0]['LinkSetDb'][0]['Link'][0]['Id']
     return tax_id
@@ -153,15 +153,16 @@ def to_fasta(seqs):
     """Given a collection of sequences, put them into the FASTA format. It is
     used for weblogo generation."""
     str = ""
-    for i,inst in enumerate(seqs):
+    for i, inst in enumerate(seqs):
         str = str + ">instance%d\n"%i + inst + "\n"
     return str
 
 def weblogo(sequences):
     """Given a collection of site sequences, generate the sequence logo, using
     weblogo program that is locally installed."""
-    al = to_fasta(sequences)    
-    p = Popen(['/usr/bin/weblogo', '-F', 'png', '-s', 'LARGE', '-c', 'classic', '--errorbars', 'YES'],
+    al = to_fasta(sequences)
+    p = Popen(['/usr/bin/weblogo', '-F', 'png', '-s', 'LARGE', '-c', 'classic',
+               '--errorbars', 'YES'],
               stdout=PIPE, stdin=PIPE, stderr=PIPE, close_fds=True)
     stdout_data, stderr_data = p.communicate(input=al)
     return stdout_data
@@ -169,11 +170,11 @@ def weblogo(sequences):
 def weblogo_deprecated(sequences, format="PNG"):
     """
     Weblogo generation (deprecated).
-    
+
     It uses the Berkeley weblogo service to download and save a weblogo of
     itself, requires an internet connection. It has been replaced with the
     system call that runs weblogo locally.
-    
+
     The parameters from **kwds are passed directly to the weblogo server.
     """
     import urllib
@@ -181,14 +182,16 @@ def weblogo_deprecated(sequences, format="PNG"):
 
     # if all sequences don't have the same length, apply LASAGNA
     # use LASAGNA to align sites
-    aligned, idxAligned, strands = lasagna.LASAGNA(map(lambda s: str(s.lower()), sequences), 0)
+    aligned, idxAligned, strands = \
+        lasagna.LASAGNA(map(lambda s: str(s.lower()), sequences), 0)
     trimmed = lasagna.TrimAlignment(aligned) if len(aligned) > 1 else aligned
     trimmed = [s.upper() for s in trimmed]
-    
-    assert all(len(seq) == len(trimmed[0]) for seq in trimmed), "sequences do not have the same length"
+
+    assert (all(len(seq) == len(trimmed[0]) for seq in trimmed),
+            "sequences do not have the same length")
 
     al = to_fasta(trimmed)
-    
+
     url = 'http://weblogo.berkeley.edu/logo.cgi'
     values = {'sequence' : al,
               'format' : format,
@@ -222,11 +225,11 @@ def weblogo_deprecated(sequences, format="PNG"):
               'color6' : 'orange',
               'color1' : 'black',
               }
-    
+
     data = urllib.urlencode(values)
     req = urllib2.Request(url, data)
     response = urllib2.urlopen(req)
-    im=response.read()
+    im = response.read()
     return im
 
 def weblogo_uri(sequences):
@@ -235,13 +238,12 @@ def weblogo_uri(sequences):
     image_data = weblogo_deprecated(sequences)
     encoded = b64encode(image_data)
     mime = "image/png"
-    return ("data:" + mime + ';' + "base64," + encoded)
+    return "data:" + mime + ';' + "base64," + encoded
 
 def run_lasagna(site_instances, trim=True):
-    """Given a list of models.SiteInstance objects, run LASAGNA algorithm and return the
-    aligned sequences. Here is the link to the paper:
-    http://www.biomedcentral.com/1471-2105/14/108
-    """
+    """Given a list of models.SiteInstance objects, run LASAGNA algorithm and
+    return the aligned sequences. Here is the link to the paper:
+    http://www.biomedcentral.com/1471-2105/14/108 """
 
 
     sites = [x.seq_lower for x in site_instances]
@@ -253,7 +255,8 @@ def run_lasagna(site_instances, trim=True):
 
     # If asked for non-trimmed, the gaps in the alignment should be recovered
     # using genome sequence
-    assert map(int, idxAligned) == range(len(idxAligned)), "lasagna sites are not sorted"
+    assert (map(int, idxAligned) == range(len(idxAligned)),
+            "lasagna sites are not sorted")
     # batch fetch of genomes from the database
     queryset = models.SiteInstance.objects.filter(pk__in=[x.pk for x in site_instances])
     site_genome_dict = dict(v for v in queryset.values_list("site_id", "genome").distinct())
@@ -268,13 +271,13 @@ def run_lasagna(site_instances, trim=True):
 def extend_site(site_instance, genome_seq, n=250):
     """Extend the site instance sequence by n bases both sides."""
     seq = genome_seq[site_instance.start-n: site_instance.end+n+1]
-    return (seq if site_instance.strand==1 else reverse_complement(seq))
+    return seq if site_instance.strand == 1 else reverse_complement(seq)
 
 def fill_gaps(site_instance, aligned_site, aligned_strand):
     """Fill the gaps in the alignment."""
     genome_seq = site_instance.get_genome_sequence()
     seq = site_instance.seq
-    original_seq = seq if aligned_strand=='+' else reverse_complement(seq)
+    original_seq = seq if aligned_strand == '+' else reverse_complement(seq)
     num_left_gaps = 0
     num_right_gaps = 0
     # count left and right gaps
@@ -283,7 +286,8 @@ def fill_gaps(site_instance, aligned_site, aligned_strand):
     while aligned_site[-num_right_gaps-1] == '-':
         num_right_gaps += 1
     # check if correct
-    assert '-' * num_left_gaps + str(original_seq) + '-'*num_right_gaps == aligned_site
+    assert ('-' * num_left_gaps + str(original_seq) +
+            '-'*num_right_gaps == aligned_site)
     # extend site
     n = max(num_left_gaps, num_right_gaps)
     # extend to both sides
@@ -296,7 +300,8 @@ def fill_gaps(site_instance, aligned_site, aligned_strand):
     else:
         recovered_site = extended_site[n-num_left_gaps: num_right_gaps-n]
     # some checks
-    assert len(recovered_site) == len(aligned_site), '%s %d' % (str(site_instance), n)
+    assert (len(recovered_site) == len(aligned_site),
+            '%s %d' % (str(site_instance), n))
     assert recovered_site in extended_site
     return str(recovered_site)
 
@@ -314,7 +319,8 @@ def build_motif(seqs):
     return m
 
 def score_sequence(motif, sequence):
-    """Given Biopython motif object and a sequence match, return PWM score of the match"""
+    """Given Biopython motif object and a sequence match, return PWM score of
+    the match"""
     return motif.score_hit(sequence, position=0)
 
 
@@ -352,7 +358,7 @@ def degenerate_consensus(motif):
             key = nucleotides[0]
         elif 4*sum(counts[:2]) > 3*sum(counts):
             key = "".join(sorted(nucleotides[:2]))
-        elif counts[3]==0:
+        elif counts[3] == 0:
             key = "".join(sorted(nucleotides[:3]))
         else:
             key = "ACGT"
