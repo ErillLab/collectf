@@ -84,9 +84,10 @@ def make_genome(genome_record, strain_tax):
                     taxonomy=p)
 
     genes = bioutils.get_genes(genome_record)
+    print genes
     if genes:
         genome.save()
-        _ = [Gene(genome=genome, **gene) for gene in genes]
+        _ = [Gene(genome=genome, **gene).save() for gene in genes]
         return genome
     return None
 
