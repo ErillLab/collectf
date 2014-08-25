@@ -15,6 +15,7 @@ from django import forms
 from django.utils.safestring import mark_safe
 from django.contrib import messages
 from collectf import settings
+from base import bioutils
 
 def publication_get_form(wiz, form):
     """Construct the form for publication selection step."""
@@ -112,13 +113,37 @@ def site_entry_get_form(wiz, form):
         # pick any curation_site_instance object for this curation
         try:
             curation_site_instance = models.Curation_SiteInstance.objects.filter(curation=c).all()[:1].get()
-            #form.fields['is_motif_associated'].initial = curation_site_instance.is_motif_associated
             form.fields['site_type'].initial = curation_site_instance.site_type
         except:
             pass
         # Delete session data, if user change any field and then come back,
         # Store users last entered data, instead of populated data.
         session_utils.put(wiz.request.session, "previously_curated_paper", None)
+
+    # populate motifs for the curator to map sites to one of them.
+    genomes = session_utils.get(wiz.request.session, 'genomes')
+    TF_instances = session_utils.get(wiz.request.session, 'TF_instances')
+    csis = models.Curation_SiteInstance.objects.filter(
+        site_type='motif_associated',
+        site_instance__genome__in=genomes,
+        curation__TF_instances=TF_instances)
+    # add motifs as site_type choices
+    site_type_choices = []
+    motif_ids = csis.values_list('motif_id', flat=True).distinct()
+    for motif_id in motif_ids:
+        seqs = [csi.site_instance.seq
+                for csi in csis.filter(motif_id=motif_id)]
+        weblogo = mark_safe("<img src='%s'" % bioutils.weblogo_uri(seqs))
+        site_type_choices.append((motif_id, weblogo))
+
+    # add non-motif-associated and variable-motif-associated
+    site_type_choices.append((max(motif_ids)+1, 'new motif'))
+    site_type_choices.append(('non_motif_associated',
+                              'non-motif associated'))
+    site_type_choices.append(('var_motif_associated',
+                              'variable motif associated'))
+
+    form.fields['site_type'].choices = site_type_choices
 
     # if not high-throughput mode, delete related fields
     if not session_utils.get(wiz.request.session, 'high_throughput_curation'):

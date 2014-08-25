@@ -51,10 +51,22 @@ def genome_process(wiz, form):
     # Extra genome accession numbers (if any)
     for i in xrange(1, settings.NUMBER_OF_GENOME_ACCESSION_FIELDS):
         g = form.cleaned_data.get('genome_accession_%d' % i, None)
-        if g: genomes.append(models.Genome.objects.get(genome_accession=g))
+        if g:
+            genomes.append(models.Genome.objects.get(genome_accession=g))
 
     # store genome in session data
     session_utils.put(wiz.request.session, 'genomes', genomes)
+
+    # store TF accessions in session data
+    protein_accessions = [form.cleaned_data['TF_accession']]
+    # Extra TF accessions (if any)
+    for i in xrange(1, settings.NUMBER_OF_TF_ACCESSION_FIELDS):
+        t = form.cleaned_data.get('TF_accession_%d' % i, None)
+        if t:
+            protein_accessions.append(t)
+    TF_instances = models.TFInstance.objects.filter(
+        protein_accession__in=protein_accessions)
+    session_utils.put(wiz.request.session, 'TF_instances', TF_instances)
 
     # store site species in session data
     session_utils.put(wiz.request.session, 'site_species',

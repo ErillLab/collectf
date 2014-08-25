@@ -1,5 +1,6 @@
-"""For each step of the curation submission, return the step-specific context data."""
-import session_utils
+"""For each step of the curation submission, return the step-specific context
+data."""
+import curate.session_utils as session_utils
 from base import bioutils
 
 def publication_context_data(wiz):
@@ -19,7 +20,7 @@ def site_exact_match_context_data(wiz):
     sites = session_utils.get(wiz.request.session, 'sites')
     site_type = session_utils.get(wiz.request.session, 'site_type')
     d = {}
-    if site_type in ['motif_associated', 'var_motif_associated'] and len(sites)>1:
+    if (site_type not in ['non_motif_associated', 'var_motif_associated'] and (len(sites)>1)):
         d['weblogo_img'] = bioutils.weblogo_uri([site.seq for site in sites])
     return d
 

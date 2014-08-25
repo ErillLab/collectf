@@ -172,12 +172,24 @@ def create_site_instances(wiz, curation, site_type):
     # Create matched Curation_SiteInstances
     create_matched_site_instances(wiz, curation, matched_sites, site_type)
     # Create non-matched sites
-    create_non_matched_site_instances(wiz, curation, non_matched_sites,
-                                      site_type)
+    create_non_matched_site_instances(wiz, curation, non_matched_sites)
     # If there is any peak data, save them as non-motif-associated
     if session_utils.get(wiz.request.session, 'high_throughput_curation'):
         peaks = session_utils.get(wiz.request.session, 'peaks')
         create_peak_site_instances(wiz, curation, peaks)
+
+def get_site_type_and_motif_id(site_type):
+    """The site_type field on curation wizard is used to figure out site type
+    and motif id.
+
+    If the site_type is selected as var_motif_associated or
+    non_motif_associated, the sites are marked as variable motif associated and
+    non-motif associated, respectively. If a motif is selected, sites are marked
+    as motif-associated and the motif id is set accordingly."""
+    if site_type in ['var_motif_associated', 'non_motif_associated']:
+        return site_type, -1    # motif id is not important any more
+
+    return 'motif_associated', int(site_type)
 
 def create_matched_site_instances(wiz, curation, sites, site_type):
     """Create SiteInstance objects and CurationSiteInstance objects to link them
@@ -192,10 +204,12 @@ def create_matched_site_instances(wiz, curation, sites, site_type):
                                                          strand=match.strand,
                                                          _seq=match.seq)
         # Create Curation_SiteInstance object
+        site_type, motif_id = get_site_type_and_motif_id(site_type)
         cs = models.Curation_SiteInstance(curation=curation,
                                           site_instance=s,
                                           annotated_seq=match.reported_seq,
                                           site_type=site_type,
+                                          motif_id=motif_id,
                                           TF_function=site.TF_function,
                                           TF_type=site.TF_type,
                                           quantitative_value=site.qval)
@@ -213,7 +227,7 @@ def create_matched_site_instances(wiz, curation, sites, site_type):
             evidence = 'exp_verified' if gene in match.regulated_genes else 'inferred'
             models.Regulation(curation_site_instance=cs, gene=gene, evidence_type=evidence).save()
 
-def create_non_matched_site_instances(wiz, curation, sites, site_type):
+def create_non_matched_site_instances(wiz, curation, sites):
     """Create not matched site instances as NotAnnotatedSiteInstance objects."""
     for site in sites:
         assert not site.is_matched(), "Site is matched."
@@ -249,6 +263,7 @@ def create_matched_peaks(wiz, curation, peaks):
                                           site_instance=s,
                                           annotated_seq=match.reported_seq,
                                           site_type='non_motif_associated',
+                                          motif_id=-1,
                                           TF_function='N/A',
                                           TF_type='N/A',
                                           quantitative_value=peak.qval,

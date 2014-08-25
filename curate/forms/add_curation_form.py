@@ -382,11 +382,19 @@ class SiteEntryForm(forms.Form):
     system will prompt the user for a brief description of the field.
     """
     help_dict = help_texts.site_entry_form
-    # type of sites to be entered
-    site_type = forms.ChoiceField(choices=Curation_SiteInstance.SITE_TYPE,
+    # Type of sites to be entered
+    # The curator is able to choose one of the available motifs or create a new
+    # one. Sites can also be curated as either variable-motif-associated or
+    # non-motif-associated.
+    # To be populated dynamically
+    site_type = forms.ChoiceField(choices=(), widget=forms.RadioSelect,
                                   required=True,
-                                  label="Site type",
-                                  initial="motif_associated")
+                                  label="Site type")
+    
+    # site_type = forms.ChoiceField(choices=Curation_SiteInstance.SITE_TYPE,
+    #                               required=True,
+    #                               label="Site type",
+    #                               initial="motif_associated")
 
     sites = forms.CharField(required=True,
                             widget=forms.Textarea,

@@ -359,7 +359,6 @@ class Curation_SiteInstance(models.Model):
     might be determined in multiple papers. This table links curation and site
     instance tables and provides some additional information"""
 
-    # TODO - explain site types.
     SITE_TYPE = (('motif_associated', "motif associated"),
                  ('non_motif_associated', "non-motif associated"),
                  ('var_motif_associated', "variable motif associated"))
@@ -404,7 +403,7 @@ class Curation_SiteInstance(models.Model):
 
     # a TF could recognize more than one motif per species. This variable holds
     # which motif it is for this binding site
-    motif_id = models.IntegerField(default=1, null=False, blank=False)
+    motif_id = models.IntegerField(default=-1, null=False, blank=False)
 
     def __unicode__(self): return u'[%d] curation:%d TF:%s species:%s' %\
         (self.pk, self.curation.pk, self.curation.TF, self.site_instance.genome)

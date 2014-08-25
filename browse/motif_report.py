@@ -20,7 +20,8 @@ class MotifReport:
         self.m_cur_site_insts = m_cur_site_insts
         self.nm_cur_site_insts = nm_cur_site_insts
 
-    def set_non_motif_curation_site_instances(self,non_motif_curation_site_insts):
+    def set_non_motif_curation_site_instances(self,
+                                              non_motif_curation_site_insts):
         """Add some non-motif-associated curation-site-instances into the motif
         report object."""
         self.nm_cur_site_insts = non_motif_curation_site_insts
