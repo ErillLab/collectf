@@ -232,7 +232,8 @@ def make_reports(cur_site_insts):
         nm_csis = cur_site_insts.filter(curation__TF=TF,
                                         site_instance__genome__taxonomy=species,
                                         site_type="non_motif_associated")
-        var_csis = cur_site_insts.filter(curation__TF_instances=tf_insts,
+        var_csis = cur_site_insts.filter(curation__TF=TF,
+                                         site_instance__genome__taxonomy=species,
                                          site_type='var_motif_associated')
 
         # generate a report only if there is at least one
