@@ -172,11 +172,18 @@ class MotifReport:
     def get_all_non_motif_cur_site_insts_ids(self):
         return [x.pk for x in self.nm_cur_site_insts]
 
+    def get_all_var_motif_cur_site_insts(self):
+        return self.var_cur_site_insts.all()
+
+    def get_all_motif_cur_site_insts_ids(self):
+        return [x.pk for x in self.var_cur_site_insts]
+
     def get_all_cur_site_insts(self):
         """Return all curation-site-instance objects (both motif associated and
         non-motif associated)."""
         return (self.get_all_motif_cur_site_insts() |
-                self.get_all_non_motif_cur_site_insts())
+                self.get_all_non_motif_cur_site_insts() |
+                self.get_all_var_motif_cur_site_insts())
 
     def get_all_cur_site_insts_ids(self):
         return [x.pk for x in self.get_all_cur_site_insts()]
