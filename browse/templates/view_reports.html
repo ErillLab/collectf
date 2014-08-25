@@ -103,7 +103,7 @@
               <table class="table table-bordered">
                 {% for id,sites in report.motifs.items %}
                 <tr>
-                  <td>Motif {{ id }}</td>
+                  <td>[{{ id }}]</td>
                   <td>
                     <img src="" class="weblogo_img"
                          site_data={% for site in sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}>
