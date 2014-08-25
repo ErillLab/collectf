@@ -279,7 +279,8 @@ def make_ensemble_report(cur_site_insts):
     non_motif_associated = cur_site_insts.filter(site_type="non_motif_associated")
     var_motif_associated = cur_site_insts.filter(site_type="var_motif_associated")
     if motif_associated:
-        return MotifReport(motif_associated, non_motif_associated)
+        return MotifReport(motif_associated, non_motif_associated,
+                           var_motif_associated)
 
 def merge_reports(reports):
     """Merge a collection of reports, without recomputing meta-sites. This
