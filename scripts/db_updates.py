@@ -33,7 +33,16 @@ def update_db():
         cur.TF_instances.add(cur.TF_instance)
         cur.save()
     print "all curations updated."
-    
-    
+
+def update_motif_ids():
+    for cur_site_inst in models.Curation_SiteInstance.objects.all():
+        if cur_site_inst.site_type == 'motif_associated':
+            cur_site_inst.motif_id = 0
+        else:
+            cur_site_inst.motif_id = -1
+
+        cur_site_inst.save()
+
+
 def run():
-    update_db()
+    update_motif_ids()
