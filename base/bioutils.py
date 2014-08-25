@@ -263,7 +263,6 @@ def run_lasagna(site_instances, trim=True):
     recovered = [fill_gaps(site_instance, aligned_site, aligned_strand)
                  for (site_instance, aligned_site, aligned_strand) in
                  zip(site_instances, aligned, strands)]
-
     return recovered
 
 

@@ -131,13 +131,15 @@ def site_entry_get_form(wiz, form):
     site_type_choices = []
     motif_ids = csis.values_list('motif_id', flat=True).distinct()
     for motif_id in motif_ids:
-        seqs = [csi.site_instance.seq
-                for csi in csis.filter(motif_id=motif_id)]
-        weblogo = mark_safe("<img src='%s'" % bioutils.weblogo_uri(seqs))
+        sites = [csi.site_instance
+                 for csi in csis.filter(motif_id=motif_id)]
+        weblogo = mark_safe("<img src='%s'" %
+                            bioutils.weblogo_uri(bioutils.run_lasagna(sites)))
         site_type_choices.append((motif_id, weblogo))
 
     # add non-motif-associated and variable-motif-associated
-    site_type_choices.append((max(motif_ids)+1, 'new motif'))
+    site_type_choices.append((max(motif_ids)+1 if motif_ids else 0,
+                              'new motif'))
     site_type_choices.append(('non_motif_associated',
                               'non-motif associated'))
     site_type_choices.append(('var_motif_associated',
