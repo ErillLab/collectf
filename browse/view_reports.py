@@ -44,7 +44,7 @@ def view_reports(request, tax_param_type, tax_param,
         cur_site_insts = \
             cur_site_insts.exclude(site_type='non_motif_associated')
 
-    reports = motif_report.make_reports(cur_site_insts)
+    reports = motif_report.make_distinct_reports(cur_site_insts)
     # Combine reports
     ensemble_report = motif_report.make_ensemble_report(cur_site_insts)
 
@@ -79,7 +79,7 @@ def view_reports_by_id_list(request):
         cur_site_insts =\
             cur_site_insts.exclude(site_type='non_motif_associated')
 
-    reports = motif_report.make_reports(cur_site_insts)
+    reports = motif_report.make_distinct_reports(cur_site_insts)
     ensemble_report = motif_report.make_ensemble_report(cur_site_insts)
 
     return render_to_response('view_reports_by_id_list.html',

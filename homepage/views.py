@@ -73,7 +73,7 @@ def greet(request):
     It grabs a random motif from the database to display on the main page."""
     random_record = get_random_motif()
     template_dict = dict(TF_name=random_record.TF_name,
-                         TF_accession=random_record.TF_accession,
+                         TF_accession=random_record.TF_accessions[0],
                          TF=random_record.TF,
                          species=random_record.species,
                          organism=random_record.species_name,

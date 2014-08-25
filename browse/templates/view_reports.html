@@ -37,25 +37,28 @@
     <div class="tab-pane active" id="split_view">
       {% for report in reports %}
       <div class="boxed">
-	    <h3>{{ report.TF_name }} binding site collection of <i>{{ report.species_name }}</i></h3>
+	    <h3>{{ report.TF_name }} ({% for acc in report.TF_accessions %}<a href="http://www.ncbi.nlm.nih.gov/protein/?term={{acc}}" target="_blank"><span class="fixed-width">{{acc}}</span></a>{% if not forloop.last %}, {% endif %}{% endfor %})
+          binding site collection of 
+          <i>{{ report.species_name }}</i> (<a href="http://www.ncbi.nlm.nih.gov/nuccore/?term={{report.genome_accession}}" target="_blank"><span class="fixed-width">{{report.genome_accession}}</span></a>)
+        </h3>
 	    {% with sp_name=report.species_name|slugify  TF_name=report.TF_name|slugify %}
 	    <ul class="nav nav-tabs" id="sites_tab">
-	      <li><a href="#{{TF_name}}_{{sp_name}}_unaligned" data-toggle="tab">Binding sites</a></li>
-	      <li><a href="#{{TF_name}}_{{sp_name}}_aligned" data-toggle="tab">Aligned binding sites</a></li>
-	      <li class="active"><a href="#{{TF_name}}_{{sp_name}}_weblogo" data-toggle="tab">Sequence logo</a></li>
-	      <li><a href="#{{TF_name}}_{{sp_name}}_detail" data-toggle="tab">Detailed view</a></li>
+	      <li><a href="#{{report.id}}_unaligned" data-toggle="tab">Binding sites</a></li>
+	      <li><a href="#{{report.id}}_aligned" data-toggle="tab">Aligned binding sites</a></li>
+	      <li class="active"><a href="#{{report.id}}_weblogo" data-toggle="tab">Sequence logo</a></li>
+	      <li><a href="#{{report.id}}_detail" data-toggle="tab">Detailed view</a></li>
 	    </ul>
 
 
 	    <div class="tab-content">
-	      <div class="tab-pane" id="{{TF_name}}_{{sp_name}}_unaligned">
+	      <div class="tab-pane" id="{{report.id}}_unaligned">
 	        <p>Sites are listed as curated.</p>
 	        <pre>
 	          {% for meta_site in report.meta_sites %}
 {{ meta_site.cur_site_insts.0.site_instance.seq }}{% endfor %}
 	        </pre>
 	      </div>
-	      <div class="tab-pane" id="{{TF_name}}_{{sp_name}}_aligned">
+	      <div class="tab-pane" id="{{report.id}}_aligned">
 	        <p>Sites are listed after the alignment process. For alignment of
 	          variable-length binding
 	          sites, <a href="http://www.biomedcentral.com/1471-2105/14/108/" target="_blank">LASAGNA</a>
@@ -66,15 +69,15 @@
 {{ site }}{% endfor %}
 	        </pre>
 	      </div>
-	      <div class="tab-pane active" id="{{TF_name}}_{{sp_name}}_weblogo">
+	      <div class="tab-pane active" id="{{report.id}}_weblogo">
 	        <p>To generate the weblogo, aligned binding sites are used.</p>
 	        <div class="">
-	          <img src="" class="weblogo_img" id="{{TF_name}}_{{sp_name}}_weblogo"
+	          <img src="" class="weblogo_img" id="{{report.id}}_weblogo"
                    site_data={% for site in report.aligned_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}>
 	        </div>
 
 	      </div>
-	      <div class="tab-pane" id="{{TF_name}}_{{sp_name}}_detail">
+	      <div class="tab-pane" id="{{report.id}}_detail">
 	        <p>For the selected transcription
 	          factor and species, the list of curated binding sites in the database are displayed
 	          below. The binding site is displayed as red bar. Genes that are reported to be
@@ -192,7 +195,7 @@
 	      <div class="tab-pane active" id="ensemble_view_weblogo">
 	        <p>To generate the weblogo, aligned binding sites are used.</p>
 	        <div class="">
-	          <img src="" class="weblogo_img" id="{{TF_name}}_{{sp_name}}_weblogo" site_data={% for site in ensemble_report.aligned_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}>
+	          <img src="" class="weblogo_img" id="{{report.id}}_weblogo" site_data={% for site in ensemble_report.aligned_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}>
 	        </div>
 	      </div>
 	    </div>

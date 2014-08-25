@@ -76,12 +76,13 @@ class MotifReport:
         return self.m_cur_site_insts[0].curation.TF
 
     @property
-    def TF_accession(self):
+    def TF_accessions(self):
         """Return the TF accession number.
         This function should be called only if all curation-site-instance
         objects have the same TF accession numbers."""
-        get_TF = lambda csi: csi.curation.TF_instances.all()[0]
-        return str(get_TF(self.m_cur_site_insts[0]).protein_accession)
+        get_TF = lambda csi: csi.curation.TF_instances.all()
+        return [str(TF_inst.protein_accession)
+                for TF_inst in get_TF(self.m_cur_site_insts[0])]
 
     @property
     def species_name(self):
@@ -99,7 +100,6 @@ class MotifReport:
         This function should be called only when all curation-site-instance
         objects have the same genome accession number."""
         get_genome = lambda csi: csi.site_instance.genome
-        assert self.genome_accession_check()
         return str(get_genome(self.m_cur_site_insts[0]).genome_accession)
 
     def align_sites(self):
@@ -175,6 +175,9 @@ class MotifReport:
         return {
             'TF_name': self.TF_name,
             'species_name': self.species_name,
+            'TF_accessions': self.TF_accessions,
+            'genome_accession': self.genome_accession,
+            'id': id(self),
             'meta_sites': self.get_meta_sites(),
             'aligned_sites': self.align_sites(),
             'cur_site_insts': self.get_all_cur_site_insts_ids(),
