@@ -11,8 +11,8 @@ from base import metasite
 import sys
 
 class MotifReport:
-    def __init__(self, m_cur_site_insts, nm_cur_site_insts=[],
-                 var_cur_site_insts=[]):
+    def __init__(self, m_cur_site_insts, nm_cur_site_insts,
+                 var_cur_site_insts):
         """Given a collection of motif-associated and non-motif-associated
         curation site instances, create the report object. The constructor also
         checks if all curation_site_instance objects have the same TF and
@@ -277,6 +277,7 @@ def make_ensemble_report(cur_site_insts):
     and generate a report."""
     motif_associated = cur_site_insts.filter(site_type="motif_associated")
     non_motif_associated = cur_site_insts.filter(site_type="non_motif_associated")
+    var_motif_associated = cur_site_insts.filter(site_type="var_motif_associated")
     if motif_associated:
         return MotifReport(motif_associated, non_motif_associated)
 
