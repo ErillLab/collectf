@@ -17,7 +17,8 @@ class MetaSite:
         """Check if a curation-site-instance object is appropriate for the
         meta-site. Based on the type of cur_site_inst object, perform
         motif_associated_overlap_test or non_motif_associated_overlap_test"""
-        if cur_site_inst.site_type == 'motif_associated':
+        if cur_site_inst.site_type in ['motif_associated',
+                                       'var_motif_associated']:
             return (self.motif_associated_overlap_test(cur_site_inst) and
                     self.genome_test(cur_site_inst) and
                     self.TF_instances_test(cur_site_inst) and
