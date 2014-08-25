@@ -58,7 +58,7 @@ def export_sites(request):
 def export_base(meta_sites):
     """Base function for export. Called by format-specific export functions."""
     rows = []
-    for i,meta_site in enumerate(meta_sites):
+    for i, meta_site in enumerate(meta_sites):
         values = meta_site.values('curation__TF__name',
                                   'curation__TF_instances__protein_accession',
                                   'site_instance__genome__genome_accession',
@@ -69,8 +69,7 @@ def export_base(meta_sites):
             continue
 
         # select one of the motif associated sites as delegate
-        delegate = [site for site in meta_site
-                    if site.site_type=='motif_associated'][0]
+        delegate = meta_site.delegate
         values = values[0]
         values['start_pos'] = delegate.site_instance.start+1
         values['end_pos'] = delegate.site_instance.end+1
