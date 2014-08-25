@@ -69,7 +69,8 @@ def export_base(meta_sites):
             continue
 
         # select one of the motif associated sites as delegate
-        delegate = meta_site.delegate
+        delegate = [site for site in meta_site
+                    if site.site_type != 'non_motif_associated'][0]
         values = values[0]
         values['start_pos'] = delegate.site_instance.start+1
         values['end_pos'] = delegate.site_instance.end+1

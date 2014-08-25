@@ -1,4 +1,3 @@
-# <2014-01-29 Wed>
 
 This file explains the way that submission process (and pretty much everything
 else) was updated. It will be used as a guide when deploying all changes to the

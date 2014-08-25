@@ -1,5 +1,5 @@
 
-** Dependencies
+# Dependencies
 CollecTF is built on top of following libraries/tools 
 - Python 2.7
 - python-mysqldb
@@ -10,7 +10,7 @@ CollecTF is built on top of following libraries/tools
   - django-extensions: mainly for =sqldiff= which reports the differences
     between the actual database and the Django models.
   - South: for database changes that =syncdb= can not handle.
-  - [[https://github.com/tzangms/django-bootstrap-form][django-bootstrap-form]]: to render forms with Bootstrap
+  - [django-bootstrap-form](https://github.com/tzangms/django-bootstrap-form): to render forms with Bootstrap
   - regex: a Python regualar expression module
 
 

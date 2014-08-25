@@ -244,20 +244,15 @@ def make_distinct_reports(cur_site_insts):
     rather than grouping curation_site_instances by TF and species names, it
     groups them by accession numbers."""
     tf_species = cur_site_insts.values_list(
-        'curation__TF_instances__protein_accession',
-        'site_instance__genome')\
-        .distinct().order_by('curation__TF__name', 'site_instance__genome')
+        'curation__TF_instances__protein_accession').distinct()
 
     reports = []
-    for (tf_insts, species) in tf_species:
+    for (tf_insts) in tf_species:
         m_csis = cur_site_insts.filter(curation__TF_instances=tf_insts,
-                                       site_instance__genome=species,
                                        site_type='motif_associated')
         nm_csis = cur_site_insts.filter(curation__TF_instances=tf_insts,
-                                        site_instance__genome=species,
                                         site_type='non_motif_associated')
         var_csis = cur_site_insts.filter(curation__TF_instances=tf_insts,
-                                         site_instance__genome=species,
                                          site_type='var_motif_associated')
 
         # generate only if there is at least one motif-associated site
