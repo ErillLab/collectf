@@ -8,11 +8,13 @@ same organism).
 """
 import base
 from base import metasite
+import base.models as models
 import sys
 
 class MotifReport:
-    def __init__(self, m_cur_site_insts, nm_cur_site_insts,
-                 var_cur_site_insts):
+    def __init__(self, m_cur_site_insts,
+                 nm_cur_site_insts=models.Curation_SiteInstance.objects.none(),
+                 var_cur_site_insts= models.Curation_SiteInstance.objects.none()):
         """Given a collection of motif-associated and non-motif-associated
         curation site instances, create the report object. The constructor also
         checks if all curation_site_instance objects have the same TF and
