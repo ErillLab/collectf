@@ -17,7 +17,6 @@ class MotifReport:
         checks if all curation_site_instance objects have the same TF and
         species"""
         # make sure that the list is not empty
-        assert m_cur_site_insts
         self.m_cur_site_insts = m_cur_site_insts
         self.nm_cur_site_insts = nm_cur_site_insts
 
@@ -81,8 +80,6 @@ class MotifReport:
         This function should be called only if all curation-site-instance
         objects have the same TF accession numbers."""
         get_TF = lambda csi: csi.curation.TF_instances.all()[0]
-        #assert all(get_TF(self.m_cur_site_insts[0]) == get_TF(x)
-        #           for x in self.m_cur_site_insts)
         return str(get_TF(self.m_cur_site_insts[0]).protein_accession)
 
     @property
@@ -243,7 +240,8 @@ def make_ensemble_report(cur_site_insts):
     and generate a report."""
     motif_associated = cur_site_insts.filter(site_type="motif_associated")
     non_motif_associated = cur_site_insts.filter(site_type="non_motif_associated")
-    return MotifReport(motif_associated, non_motif_associated)
+    if motif_associated:
+        return MotifReport(motif_associated, non_motif_associated)
 
 def merge_reports(reports):
     """Merge a collection of reports, without recomputing meta-sites. This
