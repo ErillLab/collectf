@@ -71,10 +71,19 @@
 	      </div>
 	      <div class="tab-pane active" id="{{report.id}}_weblogo">
 	        <p>To generate the weblogo, aligned binding sites are used.</p>
-	        <div class="">
-	          <img src="" class="weblogo_img" id="{{report.id}}_weblogo"
-                   site_data={% for site in report.aligned_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}>
-	        </div>
+            <div class="">
+              <table class="table table-bordered">
+              {% for id,sites in report.motifs.items %}
+              <tr>
+                <td>Motif {{ id }}</td>
+                <td>
+              <img src="" class="weblogo_img"
+                   site_data={% for site in sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}>
+                </td>
+              </tr>
+              {% endfor %}
+              </table>
+            </div>
 
 	      </div>
 	      <div class="tab-pane" id="{{report.id}}_detail">
@@ -89,6 +98,7 @@
 		        <tr>
 		          <th class="genome">Genome[<a href="#" class="" onclick="hideCol('genome');">x</a>]</th>
 		          <th class="TF">TF[<a href="#" class="" onclick="hideCol('TF');">x</a>]</th>
+                  <th class="motif_id">Motif id[<a href="#" class="" onclick="hideCol('motif_id');">x</a>]</th>
 		          <th>Site sequence</th>
 		          <th class="techniques">Experimental techniques[<a href="#" onclick="hideCol('techniques');">x</a>]</th>
 		          <th class="diagram">Gene regulation [<a href="" id="regulation_diagram_switch"><small>Toggle diagrams</small></a>][<a href="#" onclick="hideCol('diagram');">x</a>]</th>
@@ -116,6 +126,8 @@
                     {% endfor %}
                   </td>
 		          {% endwith %}
+
+                  <td class="motif_id">[{{ meta_site.motif_id }}]</td>
 
 		          <td><a href="{% url 'browse.view_site.view_site' meta_site.delegate.pk|id2dbxref_hex_only %}" target="_blank">
                       <span class="sequence">{{ meta_site.delegate_sequence }}</span>
@@ -312,6 +324,7 @@
   // hide 'genome' and 'TF' columns in the table
   hideCol('genome');
   hideCol('TF');
+  hideCol('motif_id');
 
   });
 </script>

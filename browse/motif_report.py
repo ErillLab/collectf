@@ -106,12 +106,20 @@ class MotifReport:
         """Align all binding sites using Lasagna"""
         # make sure meta-sites are computed beforehand.
         self.get_meta_sites()
-
-        sys.stdout.write('aligning sites...')
-        sys.stdout.flush()
-        r = base.bioutils.run_lasagna([x.delegate_site_instance for x in self.meta_sites])
-        sys.stdout.write('\t [done]\n')
+        r = base.bioutils.run_lasagna([x.delegate_site_instance
+                                       for x in self.meta_sites])
         return r
+
+    def get_motifs(self):
+        motif_ids = self.get_all_motif_cur_site_insts().\
+                    values_list('motif_id', flat=True).distinct()
+        motifs = {}
+        for motif_id in motif_ids:
+            meta_sites = [meta_site for meta_site in self.meta_sites
+                          if meta_site.motif_id == motif_id]
+            motifs[motif_id] = base.bioutils.run_lasagna(
+                [x.delegate_site_instance for x in meta_sites])
+        return motifs
 
     def get_meta_sites(self):
         """Create meta-sites from curation-site-instances."""
@@ -180,6 +188,7 @@ class MotifReport:
             'id': id(self),
             'meta_sites': self.get_meta_sites(),
             'aligned_sites': self.align_sites(),
+            'motifs': self.get_motifs(),
             'cur_site_insts': self.get_all_cur_site_insts_ids(),
         }
 
@@ -220,8 +229,9 @@ def make_distinct_reports(cur_site_insts):
     """This function works similar to -make_reports_. The difference is that
     rather than grouping curation_site_instances by TF and species names, it
     groups them by accession numbers."""
-    tf_species = cur_site_insts.values_list('curation__TF_instances__protein_accession',
-                                            'site_instance__genome')\
+    tf_species = cur_site_insts.values_list(
+        'curation__TF_instances__protein_accession',
+        'site_instance__genome')\
         .distinct().order_by('curation__TF__name', 'site_instance__genome')
 
     reports = []

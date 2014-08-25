@@ -20,7 +20,8 @@ class MetaSite:
         if cur_site_inst.site_type == 'motif_associated':
             return (self.motif_associated_overlap_test(cur_site_inst) and
                     self.genome_test(cur_site_inst) and
-                    self.TF_instances_test(cur_site_inst))
+                    self.TF_instances_test(cur_site_inst) and
+                    self.motif_id_test(cur_site_inst))
         elif cur_site_inst.site_type == 'non_motif_associated':
             return (self.non_motif_associated_overlap_test(cur_site_inst) and
                     self.genome_test(cur_site_inst) and
@@ -39,6 +40,10 @@ class MetaSite:
         """Check if two curation site instances have the same genome"""
         return True # guaranteed to have same genome
         return self.genome == cur_site_inst.genome
+
+    def motif_id_test(self, cur_site_inst):
+        """Check if two site instances belong to the same motif"""
+        return self.motif_id == cur_site_inst.motif_id
 
     def motif_associated_overlap_test(self, cur_site_inst):
         """Given a curation-site-instance object, check if the meta-site and the
@@ -99,6 +104,13 @@ class MetaSite:
         return self._TF_instances
 
     @property
+    def motif_id(self):
+        """Return the motif id of its curation-site-instances. A TF may have
+        multiple motifs for the same species and this field is used to identify
+        the specific motif that the binding site belongs to."""
+        return self.cur_site_insts[0].motif_id
+
+    @property
     def delegate_sequence(self):
         if not hasattr(self, '_delegate_sequence'):
            self._delegate_sequence = self.cur_site_insts[0].site_instance.seq
@@ -149,7 +161,9 @@ class MetaSite:
         return self._regulations
 
 
-def create_meta_sites(motif_cur_site_insts, non_motif_cur_site_insts):
+def create_meta_sites(motif_cur_site_insts,
+                      non_motif_cur_site_insts,
+                      var_motif_cur_site_insts=None):
     """Given a collection of motif-associated curation-site-instances and
     non-motif associated curation-site-instances, create meta-sites from
     motif-associated ones and integrate non-motif ones into them. In addition,
@@ -167,6 +181,15 @@ def create_meta_sites(motif_cur_site_insts, non_motif_cur_site_insts):
         else: # It means none of the existing meta-sites are appropriate. Create
               # a new meta-site
             meta_sites.append(MetaSite(cur_site_inst))
+
+    if var_motif_cur_site_insts:
+        for cur_site_inst in var_motif_cur_site_insts:
+            for meta_site in meta_sites:
+                if meta_site.membership_test(cur_site_inst):
+                    meta_site.add_cur_site_inst(cur_site_inst)
+                    break
+            else:
+                meta_sites.append(MetaSite(cur_site_inst))
 
     # integrate non-motif-associated curation-site-instances
     for cur_site_inst in non_motif_cur_site_insts:
