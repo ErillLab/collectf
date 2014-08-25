@@ -82,7 +82,7 @@ def view_reports_by_id_list(request):
     reports = motif_report.make_distinct_reports(cur_site_insts)
     ensemble_report = motif_report.make_ensemble_report(cur_site_insts)
 
-    return render_to_response('view_reports_by_id_list.html',
+    return render_to_response('view_reports.html',
                               dict(reports=[report.generate_view_reports_dict()
                                             for report in reports],
                                    ensemble_report=
@@ -90,5 +90,6 @@ def view_reports_by_id_list(request):
                                    cur_site_insts=','.join(
                                        map(lambda csi: '%d'%csi.pk,
                                            cur_site_insts)),
-                                   integrate_non_motif=integrate_non_motif),
+                                   integrate_non_motif=integrate_non_motif,
+                                   by_id=True),
                               context_instance=RequestContext(request))

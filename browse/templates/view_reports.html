@@ -9,6 +9,33 @@
 
   {% if reports %}
 
+  {% if by_id %}
+  <div>
+    <ul class="nav nav-pills">
+      <li class="active"><a href="#split_view" data-toggle="tab">Split view</a></li>
+      <li><a href="#ensemble_view" data-toggle="tab">Ensemble view</a></li>
+      {% if integrate_non_motif %}
+      <li>
+	    <a class="block_before_load" href="#" onclick="$('#integrate_non_motif').submit();">Motif-associated sites only</a>
+	    <form action="{% url 'browse.view_reports.view_reports_by_id_list' %}" method="post" style="display:inline;" id="integrate_non_motif">{% csrf_token %}
+          <input type="hidden" name="csi_list" value="{{ cur_site_insts }}" />
+	    </form>
+      </li>
+      {% else %}
+      <li>
+	    <a class="block_before_load" href="#"
+	       onclick="$('#integrate_non_motif_2').submit();">Integrate evidence from non-motif-associated sites</a>
+	    <form action="{% url 'browse.view_reports.view_reports_by_id_list' %}" method="post" style="display:inline;" id="integrate_non_motif_2">{% csrf_token %}
+          <input type="hidden" name="csi_list" value="{{ cur_site_insts }}" />
+	      <input type="hidden" name="integrate_non_motif" value="integrate_non_motif"/>
+	    </form>
+      </li>
+      {% endif %}
+      <li><a href="#export" data-toggle="tab">Export data</a></li>
+    </ul>
+  </div>
+
+  {% else %}
   <div>
     <ul class="nav nav-pills">
       <li class="active"><a href="#split_view" data-toggle="tab">Split view</a></li>
@@ -33,6 +60,7 @@
     </ul>
   </div>
 
+  {% endif %}
   <div class="tab-content">
     <div class="tab-pane active" id="split_view">
       {% for report in reports %}
@@ -55,7 +83,7 @@
 	        <p>Sites are listed as curated.</p>
 	        <pre>
 	          {% for meta_site in report.meta_sites %}
-{{ meta_site.cur_site_insts.0.site_instance.seq }}{% endfor %}
+              {{ meta_site.cur_site_insts.0.site_instance.seq }}{% endfor %}
 	        </pre>
 	      </div>
 	      <div class="tab-pane" id="{{report.id}}_aligned">
@@ -66,22 +94,22 @@
 	        </p>
 	        <pre>
 	          {% for site in report.aligned_sites %}
-{{ site }}{% endfor %}
+              {{ site }}{% endfor %}
 	        </pre>
 	      </div>
 	      <div class="tab-pane active" id="{{report.id}}_weblogo">
 	        <p>To generate the weblogo, aligned binding sites are used.</p>
             <div class="">
               <table class="table table-bordered">
-              {% for id,sites in report.motifs.items %}
-              <tr>
-                <td>Motif {{ id }}</td>
-                <td>
-              <img src="" class="weblogo_img"
-                   site_data={% for site in sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}>
-                </td>
-              </tr>
-              {% endfor %}
+                {% for id,sites in report.motifs.items %}
+                <tr>
+                  <td>Motif {{ id }}</td>
+                  <td>
+                    <img src="" class="weblogo_img"
+                         site_data={% for site in sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}>
+                  </td>
+                </tr>
+                {% endfor %}
               </table>
             </div>
 
@@ -108,7 +136,7 @@
 	          <tbody>
 
 		        {% for meta_site in report.meta_sites %}
-		        <tr>
+		        <tr {% if meta_site.site_type == 'var_motif_associated' %} class="warning" {% else %}class="info"{% endif %}>
                   {% with g=meta_site.genome %}
 		          <td class="genome"><a href="http://www.ncbi.nlm.nih.gov/nuccore/?term={{ g }}" target="_blank">
                       <span class="fixed-width">{{ g }}</span>
@@ -164,7 +192,6 @@
 
 	          </tbody>
 	        </table>
-
 	      </div>
 	    </div>
 	    {% endwith %}
@@ -190,7 +217,7 @@
 	        <p>Sites are listed as curated.</p>
 	        <pre>
 	          {% for meta_site in ensemble_report.meta_sites %}
-{{ meta_site.cur_site_insts.0.site_instance.seq }}{% endfor %}
+              {{ meta_site.cur_site_insts.0.site_instance.seq }}{% endfor %}
 	        </pre>
 	      </div>
 	      <div class="tab-pane" id="ensemble_view_aligned">
@@ -201,7 +228,7 @@
 	        </p>
 	        <pre>
 	          {% for site in ensemble_report.aligned_sites %}
-{{ site }}{% endfor %}
+              {{ site }}{% endfor %}
 	        </pre>
 	      </div>
 	      <div class="tab-pane active" id="ensemble_view_weblogo">

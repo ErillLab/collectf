@@ -111,6 +111,12 @@ class MetaSite:
         return self.cur_site_insts[0].motif_id
 
     @property
+    def site_type(self):
+        """Return the site type of the meta-site. The site type is the site
+        type of the delegate site."""
+        return self.cur_site_insts[0].site_type
+
+    @property
     def delegate_sequence(self):
         if not hasattr(self, '_delegate_sequence'):
            self._delegate_sequence = self.cur_site_insts[0].site_instance.seq

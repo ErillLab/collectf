@@ -11,7 +11,8 @@ from base import metasite
 import sys
 
 class MotifReport:
-    def __init__(self, m_cur_site_insts, nm_cur_site_insts=[]):
+    def __init__(self, m_cur_site_insts, nm_cur_site_insts=[],
+                 var_cur_site_insts=[]):
         """Given a collection of motif-associated and non-motif-associated
         curation site instances, create the report object. The constructor also
         checks if all curation_site_instance objects have the same TF and
@@ -19,6 +20,7 @@ class MotifReport:
         # make sure that the list is not empty
         self.m_cur_site_insts = m_cur_site_insts
         self.nm_cur_site_insts = nm_cur_site_insts
+        self.var_cur_site_insts = var_cur_site_insts
 
     def set_non_motif_curation_site_instances(self,
                                               non_motif_curation_site_insts):
@@ -33,6 +35,9 @@ class MotifReport:
                    for csi in self.m_cur_site_insts)
         assert all(head.curation.TF == csi.curation.TF
                    for csi in self.nm_cur_site_insts)
+        assert all(head.curation.TF == csi.curation.TF
+                   for csi in self.var_cur_site_insts)
+        
 
     def species_check(self):
         """Check if all curation_site_instance objects have the same species"""
@@ -41,6 +46,8 @@ class MotifReport:
                    for csi in self.m_cur_site_insts)
         assert all(head.site_instance.genome.taxonomy == csi.site_instance.genome.taxonomy
                    for csi in self.nm_cur_site_insts)
+        assert all(head.site_instance.genome.taxonomy == csi.site_instance.genome.taxonomy
+                   for csi in self.var_cur_site_insts)
 
     def TF_accession_check(self):
         """Check if all curation-site-instances have the same TF-instance.
@@ -52,7 +59,9 @@ class MotifReport:
         return (all(head.curation.TF_instances == csi.curation.TF_instances
                     for csi in self.m_cur_site_insts) and
                 all(head.curation.TF_instances == csi.curation.TF_instances
-                    for csi in self.nm_cur_site_insts))
+                    for csi in self.nm_cur_site_insts) and
+                all(head.curation.TF_instances == csi.curation.TF_instances
+                    for csi in self.var_cur_site_insts))
 
     def genome_accession_check(self):
         """Check if all curation-site-instances have the same
@@ -62,7 +71,9 @@ class MotifReport:
         return (all(head.site_instance.genome == csi.site_instance.genome
                     for csi in self.m_cur_site_insts) and
                 all(head.site_instance.genome == csi.site_instance.genome
-                    for csi in self.nm_cur_site_insts))
+                    for csi in self.nm_cur_site_insts) and
+                all(head.site_instance.genome == csi.site_instance.genome
+                    for csi in self.var_cur_site_insts))
 
     @property
     def TF_name(self):
@@ -106,8 +117,9 @@ class MotifReport:
         """Align all binding sites using Lasagna"""
         # make sure meta-sites are computed beforehand.
         self.get_meta_sites()
-        r = base.bioutils.run_lasagna([x.delegate_site_instance
-                                       for x in self.meta_sites])
+        r = base.bioutils.run_lasagna(
+            [x.delegate_site_instance for x in self.meta_sites
+             if x.site_type == 'motif_associated'])
         return r
 
     def get_motifs(self):
@@ -125,8 +137,10 @@ class MotifReport:
         """Create meta-sites from curation-site-instances."""
         if not hasattr(self, 'meta_sites'):
             # Compute them here.
-            self.meta_sites = metasite.create_meta_sites(self.m_cur_site_insts,
-                                                         self.nm_cur_site_insts)
+            self.meta_sites = metasite.create_meta_sites(
+                self.m_cur_site_insts,
+                self.nm_cur_site_insts,
+                self.var_cur_site_insts)
         return self.meta_sites
 
     def set_meta_sites(self, meta_sites):
@@ -242,9 +256,13 @@ def make_distinct_reports(cur_site_insts):
         nm_csis = cur_site_insts.filter(curation__TF_instances=tf_insts,
                                         site_instance__genome=species,
                                         site_type='non_motif_associated')
+        var_csis = cur_site_insts.filter(curation__TF_instances=tf_insts,
+                                         site_instance__genome=species,
+                                         site_type='var_motif_associated')
+
         # generate only if there is at least one motif-associated site
         if m_csis:
-            reports.append(MotifReport(m_csis, nm_csis))
+            reports.append(MotifReport(m_csis, nm_csis, var_csis))
 
     return reports
 
