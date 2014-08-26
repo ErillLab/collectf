@@ -1,3 +1,4 @@
+
 """=done= method in Django wizard-view specifies what should happen when the
 data for every form is submitted and validated.
 
@@ -204,11 +205,11 @@ def create_matched_site_instances(wiz, curation, sites, site_type):
                                                          strand=match.strand,
                                                          _seq=match.seq)
         # Create Curation_SiteInstance object
-        site_type, motif_id = get_site_type_and_motif_id(site_type)
+        stype, motif_id = get_site_type_and_motif_id(site_type)
         cs = models.Curation_SiteInstance(curation=curation,
                                           site_instance=s,
                                           annotated_seq=match.reported_seq,
-                                          site_type=site_type,
+                                          site_type=stype,
                                           motif_id=motif_id,
                                           TF_function=site.TF_function,
                                           TF_type=site.TF_type,

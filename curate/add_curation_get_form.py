@@ -34,7 +34,6 @@ def publication_get_form(wiz, form):
     if curator.curator_type == "external":
         form.fields['no_data'].initial = False
         form.fields['no_data'].widget = forms.HiddenInput()
-
     return form
 
 
@@ -110,12 +109,6 @@ def site_entry_get_form(wiz, form):
     c = session_utils.get(wiz.request.session, 'previously_curated_paper')
     # if paper is previously curated, prepopulate fields
     if c:
-        # pick any curation_site_instance object for this curation
-        try:
-            curation_site_instance = models.Curation_SiteInstance.objects.filter(curation=c).all()[:1].get()
-            form.fields['site_type'].initial = curation_site_instance.site_type
-        except:
-            pass
         # Delete session data, if user change any field and then come back,
         # Store users last entered data, instead of populated data.
         session_utils.put(wiz.request.session, "previously_curated_paper", None)
