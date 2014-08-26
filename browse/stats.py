@@ -10,7 +10,8 @@ import models
 import pickle
 from browse.motif_report import make_reports
 
-DBSTATS_PICKLE_FILE = os.path.join(settings.PICKLE_ROOT, "collectf_dbstats.pickle")
+DBSTATS_PICKLE_FILE = os.path.join(settings.PICKLE_ROOT,
+                                   "collectf_dbstats.pickle")
 
 def curator_roster(request):
     """Get the list of curators."""
@@ -25,21 +26,22 @@ def experimental_techniques(request):
                   "experimental_techniques.html",
                   {'techs': exp_techniques},
                   context_instance=RequestContext(request))
-        
+
 def release_history(request):
     """Get release history"""
     return render(request, "release_history.html")
 
 def publication_complete_ratio():
     """Return the percentage of publication completed."""
-    return (models.Publication.objects.filter(curation_complete=True).count() * 100.0 /
-            models.Publication.objects.count())
+    return (models.Publication.objects.filter(curation_complete=True).count() *
+            100.0 / models.Publication.objects.count())
 
 def num_curations_and_sites():
-    """Return the number of curations and sites for each pair of TF and species"""
+    """Return the number of curations and sites for each pair of TF and
+    species"""
     all_TFs = models.TF.objects.all()
     all_species = models.Taxonomy.objects.filter(rank='species')
-    
+
     num_curations = {}
     num_sites = {}
     for TF in all_TFs:
@@ -47,6 +49,7 @@ def num_curations_and_sites():
         num_sites[TF.name] = {}
         for species in all_species:
             cur_site_insts = models.Curation_SiteInstance.objects.filter(
+                site_type__in=['motif_associated', 'var_motif_associated'],
                 site_instance__genome__taxonomy=species,
                 curation__TF=TF)
             num_cur = cur_site_insts.values('curation').distinct().count()
@@ -65,18 +68,17 @@ def update_stats(request):
     all_species_ids = models.Genome.objects.values_list("taxonomy", flat=True).distinct()
     all_species = models.Taxonomy.objects.filter(pk__in=all_species_ids)
     num_curations, num_sites = num_curations_and_sites()
-    d = dict(
-        num_TFs = all_TFs.count(),
-        num_species = all_species.count(),
-        num_curations = models.Curation.objects.count(),
-        num_sites = models.SiteInstance.objects.count(),
-        num_publications = models.Publication.objects.count(),
-        pub_completed = '%.1f' % publication_complete_ratio(),
-        num_curations_by_TF_species = num_curations,
-        num_sites_by_TF_species = num_sites,
-        TFs = sorted([tf.name for tf in all_TFs]),
-        species = sorted([sp.name for sp in all_species])
-    )
+    d = dict(num_TFs=all_TFs.count(),
+             num_species=all_species.count(),
+             num_curations=models.Curation.objects.count(),
+             num_sites=models.SiteInstance.objects.count(),
+             num_publications=models.Publication.objects.count(),
+             pub_completed='%.1f' % publication_complete_ratio(),
+             num_curations_by_TF_species=num_curations,
+             num_sites_by_TF_species=num_sites,
+             TFs=sorted([tf.name for tf in all_TFs]),
+             species=sorted([sp.name for sp in all_species]))
+
     pickle.dump(d, open(DBSTATS_PICKLE_FILE, 'w'))
 
     message = "Database statistics updated successfully."
