@@ -67,14 +67,14 @@ def search_post_helper(request):
     def get_TF_input():
         TF_input = [x for x in request.POST.getlist('tf_input') if x != 'on']
         if not TF_input:
-            raise
+            raise RuntimeError()
         return models.TF.objects.filter(pk__in=TF_input)
 
     def get_species_input():
         species_input = [x for x in request.POST.getlist('species_input')
                          if x != 'on']
         if not species_input:
-            raise
+            raise RuntimeError()
         return models.Taxonomy.objects.filter(pk__in=species_input)
 
     def get_technique_input():
@@ -92,7 +92,7 @@ def search_post_helper(request):
         techniques3 = models.ExperimentalTechnique.objects.filter(
             pk__in=cat_input_3)
         if not (techniques1 or techniques2 or techniques3):
-            raise
+            raise RuntimeError()
         return (techniques1, techniques2, techniques3)
 
     def techniques_to_Q(techniques):
