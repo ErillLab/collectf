@@ -20,4 +20,13 @@ $(function () {
             $(this).css('padding-left', '20px');
             $(this).parent().children('ul').css('padding-left', '20px');
     });
+    $('#toggle_all').on('click', function() {
+        $('.node').each(function() {
+            $(this).next().toggle(200);
+            if ($(this).hasClass('expandable')) {
+                $(this).children('i').toggleClass('fa fa-angle-down');
+                $(this).children('i').toggleClass('fa fa-angle-right');
+            }
+        });
+    });
 });
