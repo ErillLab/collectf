@@ -1,4 +1,4 @@
-* CollecTF
+# CollecTF
 
 CollecTF (http://collectf.umbc.edu) is a database of transcription factor
 binding sites in the Bacteria domain.
