@@ -31,8 +31,5 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     'curate.validate_curation',
     url(r'^validate_home/$', 'home'),
-    url(r'^validate_edit/$', 'view_edit_validate'),
-    url(r'^validate_view_curations/$', 'view_validated_curations'),
     url(r'^validate_curation/(?P<curation_id>\d+)$', 'validate_curation'),
-    url(r'^validate_curation_edit/(?P<curation_id>\d+)$', 'edit_curation'),
 )

@@ -2,11 +2,74 @@
 
 {% block content %}
 
-<p>Please select one of the following actions.</p>
+<div class="container">
 
-<ul class="list">
-  <li><a href="{% url 'curate.validate_curation.view_edit_validate' %}">Edit/validate curation</a></li>
-  <li><a href="{% url 'curate.validate_curation.view_validated_curations' %}">See validated curations</a></li>
-</ul>
+<h3>External Curations</h3>
+
+<table class="table table-bordered table-condensed table-hover">
+  <thead>
+    <tr>
+      <th>Curation id</th>
+      <th>Curator</th>
+      <th>PMID</th>
+      <th>TF</th>
+      <th>Species</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for curation in curations %}
+  {% if curation.curator.curator_type == "external" %}
+  <tr class="{% if curation.validated_by %} success {% else %} danger {% endif %}">
+    <td><a href="{% url 'browse.view_curation.view_curation' curation.pk %}">{{ curation.pk }}</td>
+    <td>{% with curator=curation.curator.user %}{{ curator.first_name }} {{ curator.last_name }}{% endwith %}</td>
+    <td>{{ curation.publication.pmid }}</td>
+    <td>{{ curation.TF.name }}</td>
+    <td>{{ curation.site_instances.all.0.genome.taxonomy.name }}</td>
+    <td>{% if curation.validated_by %} validated by {{ curation.validated_by }} 
+      {% else %} <a href="{% url 'curate.validate_curation.validate_curation' curation.pk %}">validate</a>
+      {% endif %}
+    </td>
+  </tr>
+  {% endif %}
+  {% endfor %}
+  </tbody>
+</table>
+
+
+<h3>Internal Curations</h3>
+
+<table class="table table-bordered table-condensed table-hover">
+  <thead>
+    <tr>
+      <th>Curation id</th>
+      <th>Curator</th>
+      <th>PMID</th>
+      <th>TF</th>
+      <th>Species</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody data-provides="rowlink">
+  {% for curation in curations %}
+  {% if curation.curator.curator_type == "internal" %}
+  <tr class="{% if curation.validated_by %} success {% else %} danger {% endif %}">
+    <td><a href="{% url 'browse.view_curation.view_curation' curation.pk %}">{{ curation.pk }}</td>
+    <td>{% with curator=curation.curator.user %}{{ curator.first_name }} {{ curator.last_name }}{% endwith %}</td>
+    <td>{{ curation.publication.pmid }}</td>
+    <td>{{ curation.TF.name }}</td>
+    <td>{{ curation.site_instances.all.0.genome.taxonomy.name }}</td>
+    <td>{% if curation.validated_by %} validated by {{ curation.validated_by }} 
+      {% else %} <a href="{% url 'curate.validate_curation.validate_curation' curation.pk %}">validate</a>
+      {% endif %}
+    </td>
+  </tr>
+  {% endif %}
+  {% endfor %}
+  </tbody>
+</table>
+
+</div>
+
 
 {% endblock %}

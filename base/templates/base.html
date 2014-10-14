@@ -91,13 +91,9 @@
               <a href="#" clas="dropdown-toggle" data-toggle="dropdown">Admin<b class="caret"></b></a>
               <ul class="dropdown-menu">
                 <li><a href="{% url 'admin:index' %}">Admin page</a></li>
-                <li><a href="{% url 'browse.stats.update_stats' %}">Update statistics</a></li>
-                <li class="divider"></li>
-                <!--
-                <li><a href="{% url 'curate.validate_curation.view_edit_validate' %}">Edit/validate curations</a></li>
-                <li><a href="{% url 'curate.validate_curation.view_validated_curations' %}">View validated curations</a></li>
-                -->                
-                <li class="divider"></li>
+                <li><a href="{% url 'browse.stats.update_stats' %}">Update
+                statistics</a></li>
+                <li><a href="{% url 'curate.validate_curation.home' %}">Validate curations</a></li>
                 <li><a href="{% url 'ncbi.views.export_tbl_view' %}">Export NCBI submission</a></li>
 
               </ul>
