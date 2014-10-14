@@ -5,6 +5,6 @@ binding sites in the Bacteria domain.
 
 This repository contains the source code for the database and web interface.
 
-Read more [here](http://www.ncbi.nlm.nih.gov/pubmed/24234444)
+Read more [here](http://www.ncbi.nlm.nih.gov/pubmed/24234444).
 
 
