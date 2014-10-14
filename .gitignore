@@ -6,6 +6,7 @@ sitestatic/*
 collectf/migrations/*
 pickles/
 media/
+base/migrations
 
 access.log
 *.sql
