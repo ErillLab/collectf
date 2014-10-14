@@ -341,13 +341,6 @@ class TechniquesForm(forms.Form):
                                            label="Experimental process",
                                            help_text=help_dict['experimental_process'])
 
-
-    # External database links
-    has_external_db = forms.BooleanField(
-        required=False,
-        label="""The manuscript reports high-throughput data from an external
-        database. (You can report up to 5 external resources.)""")
-
     # Does TF interact with any other protein/ligand that influences binding?
     forms_complex = forms.BooleanField(required=False,
                                        label="""The manuscript reports that TF
@@ -357,6 +350,14 @@ class TechniquesForm(forms.Form):
     complex_notes = forms.CharField(widget=forms.Textarea, required=False,
                                     label="Notes",
                                     help_text=help_dict['complex_notes'])
+
+    # External database links
+    has_external_db = forms.BooleanField(
+        required=False,
+        label="""The manuscript reports high-throughput data from an external
+        database. (You can report up to 5 external resources.)""")
+
+
 
 class SiteEntryForm(forms.Form):
     """Form for reporting sites.
@@ -390,11 +391,6 @@ class SiteEntryForm(forms.Form):
     site_type = forms.ChoiceField(choices=(), widget=forms.RadioSelect,
                                   required=True,
                                   label="Site type")
-    
-    # site_type = forms.ChoiceField(choices=Curation_SiteInstance.SITE_TYPE,
-    #                               required=True,
-    #                               label="Site type",
-    #                               initial="motif_associated")
 
     sites = forms.CharField(required=True,
                             widget=forms.Textarea,
@@ -433,8 +429,8 @@ class SiteEntryForm(forms.Form):
     def verify_float(self, s):
         """Given string s, check if it is in float format."""
         try:
-            x = float(s)
-            return x
+            float(s)
+            return True
         except ValueError:
             return None
 
