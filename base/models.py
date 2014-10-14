@@ -360,8 +360,8 @@ class Curation_SiteInstance(models.Model):
     instance tables and provides some additional information"""
 
     SITE_TYPE = (('motif_associated', "motif associated"),
-                 ('non_motif_associated', "non-motif associated"),
-                 ('var_motif_associated', "variable motif associated"))
+                 ('var_motif_associated', "variable motif associated"),
+                 ('non_motif_associated', "non-motif associated"))
 
     TF_FUNCTION = (("ACT", "activator"),
                    ("REP", "repressor"),

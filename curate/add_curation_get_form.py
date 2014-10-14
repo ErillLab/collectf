@@ -133,10 +133,11 @@ def site_entry_get_form(wiz, form):
     # add non-motif-associated and variable-motif-associated
     site_type_choices.append((max(motif_ids)+1 if motif_ids else 0,
                               'new motif'))
-    site_type_choices.append(('non_motif_associated',
-                              'non-motif associated'))
     site_type_choices.append(('var_motif_associated',
                               'variable motif associated'))
+    site_type_choices.append(('non_motif_associated',
+                              'non-motif associated'))
+    
 
     form.fields['site_type'].choices = site_type_choices
 
