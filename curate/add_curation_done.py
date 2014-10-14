@@ -93,7 +93,7 @@ def curation_review_done(wiz, form_list):
     return dict(
         requires_revision = form.cleaned_data['revision_reasons'],
         confidence = form.cleaned_data['confidence'],
-        NCBI_submission_ready = form.cleaned_data['NCBI_submission_ready'],
+        #NCBI_submission_ready = form.cleaned_data['NCBI_submission_ready'],
         paper_complete = form.cleaned_data['paper_complete'],
         notes = form.cleaned_data['notes'],
     )
@@ -131,7 +131,18 @@ def master_done(wiz, form_list, **kwargs):
     return HttpResponseRedirect(reverse(browse.view_curation.view_curation,
                                         kwargs={'cid': curation.pk}))
 
+def is_ncbi_ready(wiz):
+    """Check if the curation is ready to submit to NCBI.  If at least 90% of
+    reported sites have exact matches in the reference genome, the curation is
+    marked as ready for NCBI submission."""
+    sites = wiz.request.session['sites']
+    exacts = [site for site in sites if site.is_matched() and site.get_match().is_exact()]
+    if len(exacts) < 0.9 * len(sites):
+        return False
+    return True
+    
 def create_curation(wiz, genome_dict, techniques_dict, curation_review_dict):
+
     """Create curation object and save it to the database."""
     # Find the curator
     curator = models.Curator.objects.get(user=wiz.request.user)
@@ -148,7 +159,7 @@ def create_curation(wiz, genome_dict, techniques_dict, curation_review_dict):
                                requires_revision=curation_review_dict['requires_revision'],
                                notes=curation_review_dict['notes'],
                                confidence=curation_review_dict['confidence'],
-                               NCBI_submission_ready=curation_review_dict['NCBI_submission_ready'],
+                               NCBI_submission_ready=is_ncbi_ready(wiz),
                                curator=curator)
     curation.save()
 

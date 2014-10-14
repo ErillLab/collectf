@@ -614,10 +614,6 @@ class CurationReviewForm(forms.Form):
                                     label="I am confident of the results reported in this manuscript.",
                                     help_text=help_dict['confidence'])
 
-    NCBI_submission_ready = forms.BooleanField(required=False,
-                                               label="Curation is ready to submit to NCBI.",
-                                               help_text=help_dict['NCBI_submission_ready'])
-
     paper_complete = forms.BooleanField(required=False,
                                         label="Curation for this paper is complete.",
                                         help_text=help_dict['paper_complete'])

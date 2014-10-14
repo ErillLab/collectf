@@ -51,6 +51,16 @@
 </tr>
 
 <tr>
+  <td>Requires revision</td>
+  <td>{{ curation.requires_revision }}</td>
+</tr>
+
+<tr>
+  <td>Ready to submit to NCBI</td>
+  <td>{{ curation.NCBI_submission_ready }}</td>
+</tr>
+
+<tr>
   <td>Experimental process</td>
   <td>{{ curation.experimental_process|default:"-" }}</td>
 </tr>
@@ -159,7 +169,7 @@
         <td>{{ cs.TF_function_verbose }}</td>
         <td>{{ cs.TF_type_verbose }}</td>
         <td>{{ cs.site_type }}</td>
-        <td>{{ cs.motif_id }}</td>
+        <td>[{{ cs.motif_id }}]</td>
       </tr>
       {% endif %}
       {% endfor %}
@@ -167,6 +177,8 @@
     </tbody>
   </table>
 </div>
+
+{% if all_motifs %}
 
 <h1>Motifs in CollecTF </h1>
 <table class="table">
@@ -177,12 +189,14 @@
 <tbody>
   {% for m in all_motifs %}
   <tr>
-    <td>{{ m.0 }}</td>
+    <td>[{{ m.0 }}]</td>
     <td> {{ m.1 }} </td>
   </tr>
   {% endfor %}
 </tbody>
 </table>
+
+{% endif %}
 
 <hr/>
 
