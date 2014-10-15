@@ -1,5 +1,9 @@
 {% load browsetags  %}
 
+{% block head-extras %}
+<title> CollecTF - {{ title }} </title>
+{% endblock %}
+
 <div id="description" class="boxed">
   <h4>{{ title }}</h4>
   <p> {{ description|HTMLify }}</p>

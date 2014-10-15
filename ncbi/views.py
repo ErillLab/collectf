@@ -33,7 +33,8 @@ def generate_tbl_string(curation_site_instances, test_export):
     # individually.  This saves us to check TF instance of each
     # curation-site-instance object in the create_meta_site method.
     # Get all TF-instances/species values for all curation-site-instances.
-    tf_instance_list = mas.values_list('curation__TF_instances').distinct()
+    tf_instance_list = list(set(mas.values_list('curation__TF_instances')))
+    print tf_instance_list
     # Find meta-sites for each group of curation-site-instances separately
     meta_sites = []
     for tf_insts in tf_instance_list:
@@ -96,7 +97,6 @@ def write_tf(meta_site):
     # Check if submitted and reference organisms are same
     same_org = (meta_site.delegate.site_instance.genome.organism in
                 [cur.site_species for cur in meta_site.curations])
-    print same_org
     return ('\t\t\tnote\tTranscription factor binding site for %s. %s\n' %
             (meta_site.delegate.curation.TF_instances.all()[0].name,
              "" if same_org else

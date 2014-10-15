@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block head-extras %}
+<title> CollecTF - {{ head_csi.curation.TF.name }} binding site in {{ head_csi.site_instance.genome.taxonomy.name }}</title>
+{% endblock %}
+
 {% block content %}
 
 <div class="container">

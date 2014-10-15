@@ -1,5 +1,11 @@
 {% extends "base.html" %}
 
+{% block head-extras %}
+<title> CollecTF - transcription factor binding sites for 
+{% for report in reports %}{{ report.TF_name }} in {{ report.species_name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+</title>
+{% endblock %}
+
 {% block content %}
 
 {% load dbxref %}

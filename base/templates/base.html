@@ -42,7 +42,10 @@
       ga('send', 'pageview');
     </script>
     
-    <title>CollecTF: a database of experimentally validated TF-binding motifs</title> 
+    {% block head-extras %}
+    {% endblock %}
+    
+    
     
     <meta name="description" content="CollecTF is a database of
     transcription factor binding sites (TFBS) in the Bacteria domain. It aims at
