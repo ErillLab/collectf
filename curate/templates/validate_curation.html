@@ -202,7 +202,7 @@
 
 <form action="{% url 'curate.validate_curation.validate_curation' curation.pk %}"
       method="post">{% csrf_token %}
-  <input class="btn btn-block btn-primary" type="submit" value="validate curation">
+  <input class="btn btn-block btn-primary btn-lg" type="submit" value="validate curation">
 </form>
 
 {% endblock %}

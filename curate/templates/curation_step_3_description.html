@@ -1,12 +1,14 @@
+{% load static from staticfiles %}
+
 <p>
   Please enter the binding sites reported in this work using the techniques
   specified in the previous step. Again, you will be able to define what
   techniques were used specifically for each binding site at a later step.
 </p>
 
-<dl>
-  <dt>Site types</dt>
-  <dd>
+<h4>Motif types</h4>
+
+<p>
     TF-binding sites can be defined at different levels. By
     definition, a TF-binding site is simply a (relatively short) stretch of DNA to
     which a transcription factor is shown to bind (e.g. a ChIP-Seq peak). Many TFs
@@ -15,18 +17,27 @@
     complex procedures in order to be defined. Other patterns are simpler and can be
     represented by a gapless alignment of sites (known as a motif), providing a much
     more concise definition of TF-binding site. In CollecTF we refer to these site
-    types as <code>motif-associated</code> [for gapless alignment], <code>variable
-      motif-associated</code> [for complex patterns] and <code>non-motif
-      associated</code> [for unknown or absent patterns; just evidence of binding]. If
-    you are confident that the sites you report conform to a known motif or you
-    demonstrate that they do through experimental work (e.g. site-directed
-    mutagenesis), you should check select either the <code>Motif associated</code>
-    or <code>Variable motif associated</code> options for your sites. Otherwise,
-    please report them as <code>Non-motif associated</code>.
-  </dd>
+    types as <code>motif-associated</code> (for gapless alignment), <code>variable
+      motif-associated</code> (for complex patterns) and <code>non-motif
+      associated</code> (for unknown or absent patterns; just evidence of
+    binding).
+</p>
 
-  <dt>Sequence, coordinates and quantitative data</dt>
-  <dd>
+<p>
+
+    If you are confident that the sites you report conform to a known motif or
+    you demonstrate that they do through experimental work (e.g. site-directed
+    mutagenesis), you should check select either the <code>Motif
+    associated</code> or <code>Variable motif associated</code> options for your
+    sites. Otherwise, please report them as <code>Non-motif associated</code>.
+</p>
+
+<hr/>
+
+
+
+<h4>Sequence, coordinates and quantitative data</h4>
+<p>
     Sites can be entered as sequences (e.g. <code>ATCAGACT</code>) or using
     genome coordinates if they have been mapped to the RefSeq reference strain in
     the reported work). Sites should be entered one per line (FASTA format is also
@@ -40,5 +51,4 @@
     entry. A brief description of its nature (method used and range of
     quantitative data) should be entered in the <code>Quantitative data format
     textbox</code>.
-  </dt>
-</dl>
+</p>

@@ -390,16 +390,18 @@ class SiteEntryForm(forms.Form):
     # To be populated dynamically
     site_type = forms.ChoiceField(choices=(), widget=forms.RadioSelect,
                                   required=True,
-                                  label="Site type")
+                                  label="Site type",
+                                  help_text=mark_safe(help_dict['site_type']))
 
     sites = forms.CharField(required=True,
                             widget=forms.Textarea,
                             label="Sites",
-                            help_text=help_dict['sites'])
+                            help_text=mark_safe(help_dict['sites']))
 
-    quantitative_data_format = forms.CharField(required=False,
-                                               label="Quantitative data format",
-                                               help_text=help_dict['quantitative_data_format'])
+    quantitative_data_format = forms.CharField(
+        required=False,
+        label="Quantitative data format",
+        help_text=help_dict['quantitative_data_format'])
 
     # Following fields will be visible only if the submission is high-throughput
     peaks = forms.CharField(widget=forms.Textarea,
@@ -443,7 +445,7 @@ class SiteEntryForm(forms.Form):
                 lines = [line.split() for line in sites_cd.split('\n')]
                 site_entry.parse_seq(sites_cd)
         except:
-            msg = "Ambiguous DNA sequence"
+            msg = """Ambiguous DNA sequence."""
             raise forms.ValidationError(msg)
         return sites_cd
 
