@@ -156,7 +156,7 @@
       {% for cs in curation_site_instances %}
       {% if not cs.is_high_throughput %}
       <tr>
-        <td><a href="{{ cs.site_instance.genome.genome_accession }}">{{ cs.site_instance.genome }}</a></td>
+        <td><a href="http://www.ncbi.nlm.nih.gov/nuccore/{{ cs.site_instance.genome.genome_accession }}">{{ cs.site_instance.genome }}</a></td>
         <td><span class="sequence">{{ cs.site_instance.seq }}</span></td>
         <td>
 	      {% for regulation in cs.regulation_set.all %}
