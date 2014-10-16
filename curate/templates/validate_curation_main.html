@@ -14,18 +14,20 @@
       <th>PMID</th>
       <th>TF</th>
       <th>Species</th>
+      <th>NCBI ready?</th>
       <th>Action</th>
     </tr>
   </thead>
   <tbody>
   {% for curation in curations %}
-  {% if curation.curator.curator_type == "external" %}
+  {% if curation.curator.curator_type == "external" and curation.validated_by == None %}
   <tr class="{% if curation.validated_by %} success {% else %} danger {% endif %}">
     <td><a href="{% url 'browse.view_curation.view_curation' curation.pk %}">{{ curation.pk }}</td>
     <td>{% with curator=curation.curator.user %}{{ curator.first_name }} {{ curator.last_name }}{% endwith %}</td>
     <td>{{ curation.publication.pmid }}</td>
     <td>{{ curation.TF.name }}</td>
     <td>{{ curation.site_instances.all.0.genome.taxonomy.name }}</td>
+    <td>{{ curation.NCBI_submission_ready }}</td>
     <td>{% if curation.validated_by %} validated by {{ curation.validated_by }} 
       {% else %} <a href="{% url 'curate.validate_curation.validate_curation' curation.pk %}">validate</a>
       {% endif %}
@@ -47,18 +49,20 @@
       <th>PMID</th>
       <th>TF</th>
       <th>Species</th>
+      <th>NCBI ready?</th>
       <th>Action</th>
     </tr>
   </thead>
   <tbody data-provides="rowlink">
   {% for curation in curations %}
-  {% if curation.curator.curator_type == "internal" %}
+  {% if curation.curator.curator_type == "internal" and curation.validated_by == None %}
   <tr class="{% if curation.validated_by %} success {% else %} danger {% endif %}">
     <td><a href="{% url 'browse.view_curation.view_curation' curation.pk %}">{{ curation.pk }}</td>
     <td>{% with curator=curation.curator.user %}{{ curator.first_name }} {{ curator.last_name }}{% endwith %}</td>
     <td>{{ curation.publication.pmid }}</td>
     <td>{{ curation.TF.name }}</td>
     <td>{{ curation.site_instances.all.0.genome.taxonomy.name }}</td>
+    <td>{{ curation.NCBI_submission_ready }}
     <td>{% if curation.validated_by %} validated by {{ curation.validated_by }} 
       {% else %} <a href="{% url 'curate.validate_curation.validate_curation' curation.pk %}">validate</a>
       {% endif %}
