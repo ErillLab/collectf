@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block head-extras %}
-<title> CollecTF - transcription factor binding sites for 
+<title> CollecTF - transcription factor binding motif for 
 {% for report in reports %}{{ report.TF_name }} in {{ report.species_name }}{% if not forloop.last %}, {% endif %}{% endfor %}
 </title>
 {% endblock %}
