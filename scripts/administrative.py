@@ -35,6 +35,15 @@ def add_pubs_from_csv(filename):
             print p
     return df
 
+def validate_curations():
+    sefa = models.Curator.objects.get(user__username='sefa1')
+    for curation in models.Curation.objects.all():
+        if curation.curator.user.username in ['dinara', 'ivanerill', 'ewhite5@umbc.edu']:
+            curation.validated_by = sefa
+            curation.save()
+            print "Curation", curation.pk, "validated."
+
 def run():
     #get_TFs()
-    add_pubs_from_csv("/home/sefa/Desktop/Book1.csv")
+    #add_pubs_from_csv("/home/sefa/Desktop/Book1.csv")
+    validate_curations()
