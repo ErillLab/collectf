@@ -43,6 +43,11 @@ def validate_curations():
             curation.save()
             print "Curation", curation.pk, "validated."
 
+        elif int(curation.pk) < 554:
+            curation.validated_by = sefa
+            curation.save()
+            print "Curation", curation.pk, "validated."
+
 def run():
     #get_TFs()
     #add_pubs_from_csv("/home/sefa/Desktop/Book1.csv")
