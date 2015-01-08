@@ -179,9 +179,9 @@ def export_tbl_view(request):
     genome_accession = form.cleaned_data['genome_accession']
     genome = models.Genome.objects.get(genome_accession=genome_accession)
     test_export = form.cleaned_data['is_test_export']
-    return generate_zip_response(genome, test_export)
+    return generate_zip_response(request, genome, test_export)
 
-def generate_zip_response(genome, test_export):
+def generate_zip_response(request, genome, test_export):
     """Given a genome and the boolean whether if the export is for test
     purposes, generate a zip file containing asn file."""
     # get all curation_site_instances

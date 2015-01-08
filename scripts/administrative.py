@@ -4,6 +4,7 @@ import base
 from curate import create_object
 from base import models
 import time
+import pandas as pd
 
 def get_TFs():
     """Get the list of TFs and their descriptions"""
@@ -48,7 +49,20 @@ def validate_curations():
             curation.save()
             print "Curation", curation.pk, "validated."
 
+def pub_analysis():
+    pubs = models.Publication.objects.all()
+    s = pd.Series([pub.publication_date.split()[0] for pub in pubs], name='date')
+    s.to_csv("pub_dates.csv", index=False, header=True)
+
+def site_analysis():
+    sites = models.Curation_SiteInstance.objects.filter(site_type='motif_associated')
+    s = pd.Series([site.curation.created or "2013-08-06 16:24:09+00:00"
+                   for site in sites], name='time')
+    s.to_csv("site_dates.csv", index=False, header=True)
+
 def run():
     #get_TFs()
     #add_pubs_from_csv("/home/sefa/Desktop/Book1.csv")
-    validate_curations()
+    #validate_curations()
+    #pub_analysis()
+    site_analysis()
