@@ -21,7 +21,8 @@
     <!-- Header -->
     <div id="header">
         <div id="branding">
-        {% block branding %}{% endblock %}
+        {% block branding %}
+        {% endblock %}
         </div>
         {% if user.is_active and user.is_staff %}
         <div id="user-tools">
