@@ -87,7 +87,9 @@ class MotifReport:
     @property
     def species_name(self):
         """Return the name of the species"""
-        return self.m_cur_site_insts[0].site_instance.genome.taxonomy.name
+        # changing .genome.taxonomy.name to .genome.organism would allow us to see full species name
+        # for example, Pseudomonas putida KT2440 instead of just Pseudomonas putida on the view_reports page
+        return self.m_cur_site_insts[0].site_instance.genome.organism
 
     @property
     def genome_accession(self):
