@@ -6,6 +6,7 @@ from base import bioutils
 from base.templatetags import dbxref
 from django.shortcuts import render
 from django.template import RequestContext
+from django.core.urlresolvers import reverse
 
 def view_site(request, dbxref_id):
     """Handler to view site instances."""
