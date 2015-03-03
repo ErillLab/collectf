@@ -97,7 +97,6 @@ def get_genes(genome_rec):
     # get gene ids
     gene_features = [f for f in genome_rec.features if f.type == 'gene']
     gids = [get_gene_id(f) for f in gene_features]
-
     recs = []
     chunk_size = 1000
     for start in xrange(0, len(gids), chunk_size):

@@ -34,7 +34,7 @@ def view_reports(request, tax_param_type, tax_param,
 
     cur_site_insts = models.Curation_SiteInstance.objects.filter(
         site_instance__genome__taxonomy__in=orgs,
-        site_instance__curation__TF__in=tfs,
+        curation__TF__in=tfs,
         experimental_techniques__in=techs,
     )
 
