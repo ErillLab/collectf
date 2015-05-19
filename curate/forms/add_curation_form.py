@@ -243,17 +243,19 @@ class GenomeForm(forms.Form):
             if 'TF_accession' not in cd:
                 return
             TF_accessions = [cd['TF_accession']]
-            for i in xrange(settings.NUMBER_OF_TF_ACCESSION_FIELDS):
-                field_name = 'TF_accession_%d' % i
-                if cd.get(field_name, None):
-                    self.clean_TF_accession_helper(cd[field_name].strip())
-                    TF_accessions.append(cd[field_name].strip())
-            # Check if all TF accession numbers come from the same organism
-            all_same = lambda items: all(x == items[0] for x in items)
-            if not all_same([bioutils.TF_accession_to_org_taxon(acc)
-                             for acc in TF_accessions]):
-                msg = "TF accession numbers are not from the same taxonomy ID."
-                self._errors['TF_accession'] = self.error_class([msg])
+            if len(TF_accessions) > 1:
+                for i in xrange(settings.NUMBER_OF_TF_ACCESSION_FIELDS):
+                    field_name = 'TF_accession_%d' % i
+                    if cd.get(field_name, None):
+                        self.clean_TF_accession_helper(cd[field_name].strip())
+                        TF_accessions.append(cd[field_name].strip())
+                # Check if all TF accession numbers come from the same organism
+                all_same = lambda items: all(x == items[0] for x in items)
+                if not all_same([bioutils.TF_accession_to_org_taxon(acc)
+                                 for acc in TF_accessions]):
+                    msg = "TF accession numbers are not from the same taxonomy ID."
+                    self._errors['TF_accession'] = self.error_class([msg])
+
         except:
             msg = """Failed to validate TF accession numbers (can not fetch
             records from NCBI)"""
