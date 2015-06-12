@@ -163,8 +163,9 @@ class GenomeForm(forms.Form):
         try:
             TF_accession = TF_accession.split('.')[0]
             if not (TF_accession.startswith('NP_') or
-                    TF_accession.startswith('YP_')):
-                msg = """TF accession number must start with 'NP_' or 'YP_'."""
+                    TF_accession.startswith('YP_') or
+                    TF_accession.startswith('WP_')):
+                msg = """TF accession number must start with 'NP_', 'YP_' or 'WP_'."""
                 raise forms.ValidationError(msg)
             TF_instance = TFInstance.objects.get(protein_accession=TF_accession)
         except TFInstance.DoesNotExist:

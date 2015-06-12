@@ -38,7 +38,6 @@ might help prioritize curation.""",
 # Curation help texts
 publication_form = dict(
     pub='',
-
     no_data= """Check this button if, after examining the paper, you find that
     the paper does not have data on binding sites. Checking this button will
     mark the paper as having no binding site data and set it to the 'curation
@@ -63,10 +62,10 @@ genome_form = dict(
     species closest to the reported species/strain.
     (e.g. <code>NC_000913.2</code>) You can add more than one chromosome. """,
 
-    TF_species_same="""
+    site_species_same="""
     Check if the reported strain and selected RefSeq strain are same.""",
 
-    site_species_same="""
+    TF_species_same="""
     Check if the reported strain and selected RefSeq strain are same for the TF.
     """,
 
