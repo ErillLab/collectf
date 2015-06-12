@@ -137,6 +137,9 @@
 		          <th class="techniques">Experimental techniques[<a href="#" onclick="hideCol('techniques');">x</a>]</th>
 		          <th class="diagram">Gene regulation [<a href="" id="regulation_diagram_switch"><small>Toggle diagrams</small></a>][<a href="#" onclick="hideCol('diagram');">x</a>]</th>
 		          <th>Curations</th>
+		          {% if user.is_superuser %}
+              			<th>Validation status</th>
+              		  {% endif %}
 		        </tr>
 	          </thead>
 	          <tbody>
@@ -193,6 +196,15 @@
 		            </span>
 		            {% endfor %}
 		          </td>
+		          
+		      <td> <!-- START validation status -->
+                	{% for curation in meta_site.curations %}
+                		{% if curation.validated_by %} validated by {{ curation.validated_by }} 
+	                	{% else %} <a href="{% url 'curate.validate_curation.validate_curation' curation.pk %}">validate</a>
+                		{% endif %}
+                	{% endfor %}
+	              </td> <!-- END validation status -->
+		          
 		        </tr>
 		        {% endfor %}
 
