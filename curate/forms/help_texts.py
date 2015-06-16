@@ -67,6 +67,9 @@ genome_form = dict(
 
     TF_species_same="""
     Check if the reported strain and selected RefSeq strain are same for the TF.
+    If it is checked and TF accession has <code>WP_</code> prefix,
+    organism of origin for reported
+    TF will be set to organism of entered genome.
     """,
 
     TF_accession="""Paste the NCBI TF protein accession number for the species

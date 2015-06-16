@@ -94,8 +94,8 @@ class GenomeForm(forms.Form):
     # Checked if TF species is the same with the reported genome
     TF_species_same = forms.BooleanField(
         required=False,
-        label="""This is the exact same strain as reported in the manuscript for
-        the TF.""",
+        label="""This is the exact same strain as
+        reported in the manuscript for the TF.""",
         help_text=help_dict['TF_species_same'])
 
     site_species = forms.CharField(

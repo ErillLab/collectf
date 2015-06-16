@@ -127,7 +127,7 @@
 	          regulated by TF are colored with green. </p>
 	        
             <ul id="hiddenCols"></ul>
-	        <table class="table table-bordered">
+	        <table class="table table-bordered table-striped">
 	          <thead>
 		        <tr>
 		          <th class="genome">Genome[<a href="#" class="" onclick="hideCol('genome');">x</a>]</th>
@@ -145,7 +145,7 @@
 	          <tbody>
 
 		        {% for meta_site in report.meta_sites %}
-		        <tr {% if meta_site.site_type == 'var_motif_associated' %} class="warning" {% else %}class="info"{% endif %}>
+		        <tr {% if meta_site.site_type == 'var_motif_associated' %} class="warning" {% else %}class=""{% endif %}>
                   {% with g=meta_site.genome %}
 		          <td class="genome"><a href="http://www.ncbi.nlm.nih.gov/nuccore/?term={{ g }}" target="_blank">
                       <span class="fixed-width">{{ g }}</span>

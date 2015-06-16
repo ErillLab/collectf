@@ -1,5 +1,4 @@
 body {
-  font-size: 14px;
 }
 
 table {
@@ -47,6 +46,14 @@ textarea {
 .alert {
     border-radius: 0px;
 }
+
+/*
+.alert, .alert-info {
+    background-color: #597ea2;
+}
+*/
+
+
 
 .nav > li > a {
     border-radius: 0px;

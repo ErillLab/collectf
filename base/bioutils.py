@@ -234,7 +234,7 @@ def weblogo_deprecated(sequences, format="PNG"):
 def weblogo_uri(sequences):
     """Generate the weblogo and make it ready for direct embed into response
     HTML."""
-    image_data = weblogo_deprecated(sequences)
+    image_data = weblogo(sequences)
     encoded = b64encode(image_data)
     mime = "image/png"
     return "data:" + mime + ';' + "base64," + encoded
