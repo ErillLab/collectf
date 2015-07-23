@@ -3,19 +3,20 @@ We occasionally need to make some changes in the database.
 In rare cases, we may need to add some new tables to the database. If that is
 the case, Django's own `syncdb` utility should be enough to do the job.
 
-    $ ./manage.py syncdb
+    ./manage.py syncdb
 
 Most of the time, however, schema changes are simpler, such as adding a new
 field to an existing field or modifying an existing field in a table. Since we
 are using Django 1.6, we rely on a third-party tool for migrations, called
-[south](http://south.readthedocs.org/en/latest/index.html#). (Django 1.7 comes
+[South](http://south.readthedocs.org/en/latest/index.html#). (Django 1.7 comes
 with a built-in migration tool).
 
 To use South,
-- make sure it is installed -- `sudo pip install south` should work.
+- make sure it is installed: `sudo pip install south` should work.
 - add south to `INSTALLED_APPS` list,
 
 The procedure to change a model is as follows:
+
 1. South complains if the migration history in the database and `migrations`
    directory (in the app directory) agrees. If you don't care about migration
    history,
