@@ -30,7 +30,7 @@ The procedure to change a model is as follows:
    `manage.py syncdb`
 
 3. Before adding the new field description in `models.py`, run `manage.py
-   schemamigration --initial`. Since there already tables existing in the
+   schemamigration --initial`. Since there are already tables in the
    database, the first migration should be a "fake" one: `manage.py migrate
    <app-name> --fake`.
 
