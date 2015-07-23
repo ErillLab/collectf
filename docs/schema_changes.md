@@ -18,7 +18,7 @@ To use South,
 The procedure to change a model is as follows:
 
 1. South complains if the migration history in the database and `migrations`
-   directory (in the app directory) agrees. If you don't care about migration
+   directory in the app directory disagree. If you don't care about migration
    history,
    - remove the `migrations` folder
    - drop the migration-history table
