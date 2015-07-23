@@ -26,7 +26,8 @@ The procedure to change a model is as follows:
      - drop the table: `drop table south_migrationhistory`
 
 2. If this is the first time you're using south or if you dropped the table in
-   the previous step, you need to create migration-history table using
+   the previous step, you need to create migration-history table by running
+
    `manage.py syncdb`.
 
 3. Before adding the new field description in `models.py`, run `manage.py
