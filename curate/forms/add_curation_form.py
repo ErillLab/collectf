@@ -329,14 +329,15 @@ class TechniquesForm(forms.Form):
     # generate techniques field by getting available techniques from db
     choices = []
     # Used Bootstrap tooltip for experimental technique description
-    description_markup = u'<span data-container="body" data-toggle="popover" title="%s" data-content="%s">%s</span>'
+    description_markup = u'<span data-container="body" data-toggle="popover" title="<a href =%s>%s</a>" data-content="%s " >%s</span>'
     for t in ExperimentalTechnique.objects.order_by('name'):
         choices.append((t.technique_id,
-                        mark_safe(description_markup % (t.name,
+                        mark_safe(description_markup % ( t.EO_term,
+                                                        t.name,
                                                         t.description,
                                                         t.name))))
-    techniques = forms.MultipleChoiceField(choices=choices,
-                                           label="Techniques",
+    techniques = forms.MultipleChoiceField(choices = choices,
+                                           label = "Techniques",
                                            help_text=help_dict['techniques'],
                                            widget=forms.CheckboxSelectMultiple())
 
