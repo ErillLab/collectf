@@ -30,12 +30,12 @@ The procedure to change a model is as follows:
    `manage.py syncdb`
 
 3. Before adding the new field description in `models.py`, run `manage.py
-   <app-name> schemamigration --initial`. Since there are already tables in the
+   schemamigration <app-name> --initial`. Since there are already tables in the
    database, the first migration should be a "fake" one: `manage.py migrate
    <app-name> --fake`.
 
 4. Finally, make the change in `models.py`, run `manage.py schemamigration
-   --auto` followed by `manage.py migrate <app-name>`.
+   <app-name> --auto` followed by `manage.py migrate <app-name>`.
 
 These steps should be sufficient to make a change in an existing table. For more
 information, see [South documentation](https://south.readthedocs.org/en/latest/).
