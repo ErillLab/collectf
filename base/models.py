@@ -500,7 +500,6 @@ class ExperimentalTechnique(models.Model):
                                        choices=FUNCTION_CATEGORIES, null=True)
     categories = models.ManyToManyField("ExperimentalTechniqueCategory")
 
-    # the foll. was added by Dinara
     EO_term = models.CharField(max_length=50, null=True, blank=True)
 
     def __unicode__(self):
