@@ -1,1 +1,8 @@
+MySQL-python
+biopython
+django-bootstrap-form
+django-extensions
 pylint
+regex
+reportlab
+south
