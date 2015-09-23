@@ -3,10 +3,9 @@
 \#*#
 .#*
 sitestatic/*
-collectf/migrations/*
 pickles/
 media/
-base/migrations
+base/migrations/*
 
 access.log
 *.sql
