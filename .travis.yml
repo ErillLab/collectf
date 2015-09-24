@@ -2,7 +2,7 @@ language: python
 python: "2.7"
 
 env:
-  - DJANGO_VERSION=1.6.1 DB=mysql
+  - DJANGO_VERSION=1.6.1 DB=mysql BUILD_ON_TRAVIS=true
 
 install:
   - pip install -q Django==$DJANGO_VERSION
@@ -11,6 +11,7 @@ install:
 
 before_script:
   - mysql -e 'create database test_collectfdb;'
+  - echo "USE mysql;\nUPDATE user SET password=PASSWORD('password') WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root
   - python manage.py syncdb --noinput
 
 script:
