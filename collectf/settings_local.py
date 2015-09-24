@@ -78,6 +78,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'STORAGE_ENGINE': 'MyISAM',
         'NAME': 'collectfdb_test',
+        'TEST_NAME': 'test_collectfdb',
         'USER': 'sefa',
         'PASSWORD': '46544654',
     }

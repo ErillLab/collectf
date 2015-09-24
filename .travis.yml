@@ -9,6 +9,9 @@ install:
   - pip install -r requirements.txt
   - pip install coveralls
 
+before_script:
+  - mysql -e 'create database test_collectfdb;'
+
 script:
   coverage run manage.py test
 
