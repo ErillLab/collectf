@@ -10,8 +10,7 @@ install:
   - pip install coveralls
 
 before_script:
-  - mysql -e 'create database test_collectfdb;'
-  - echo "USE mysql;\nUPDATE user SET password=PASSWORD('password') WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root
+  - mysql -e 'create database collectfdb_test;'
   - python manage.py syncdb --noinput
 
 script:
