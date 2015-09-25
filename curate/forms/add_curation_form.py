@@ -9,6 +9,8 @@ import re
 import help_texts
 from django.utils.safestring import mark_safe
 from collectf import settings
+from django.template.loader import get_template
+from django.template import Context
 
 
 class PublicationForm(forms.Form):
@@ -326,20 +328,20 @@ class TechniquesForm(forms.Form):
                                 help_text=help_dict['external_db_accession'])
 
     help_dict = help_texts.techniques_form
-    # generate techniques field by getting available techniques from db
-    choices = []
-    # Used Bootstrap tooltip for experimental technique description
-    description_markup = u'<span data-container="body" data-toggle="popover" title="<a href =%s>%s</a>" data-content="%s " >%s</span>'
-    for t in ExperimentalTechnique.objects.order_by('name'):
-        choices.append((t.technique_id,
-                        mark_safe(description_markup % ( t.EO_term,
-                                                        t.name,
-                                                        t.description,
-                                                        t.name))))
-    techniques = forms.MultipleChoiceField(choices = choices,
-                                           label = "Techniques",
-                                           help_text=help_dict['techniques'],
-                                           widget=forms.CheckboxSelectMultiple())
+
+    # Generate techniques field by getting available techniques from db
+    template = get_template('experimental_technique_field.html')
+    choices = [(t.technique_id,
+                template.render(Context({
+                    'experiment_id': t.technique_id,
+                    'experiment_name': t.name,
+                    'experiment_description': t.description,
+                })))
+               for t in ExperimentalTechnique.objects.order_by('name')]
+    techniques = forms.MultipleChoiceField(
+        choices = choices, label = "Techniques",
+        help_text=help_dict['techniques'],
+        widget=forms.CheckboxSelectMultiple())
 
     experimental_process = forms.CharField(widget=forms.Textarea,
                                            label="Experimental process",
