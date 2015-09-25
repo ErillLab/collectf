@@ -7,16 +7,16 @@ import time
 import pandas as pd
 
 def get_TFs():
-    """Get the list of TFs and their descriptions"""
-    TFs = models.TF.objects.all()
-    for TF in TFs:
-        print TF.name, "\t", TF.description
+    """Gets the list of TFs and their descriptions."""
+    tfs = models.TF.objects.all()
+    for tf in tfs:
+        print tf.name, "\t", tf.description
 
 def add_pubs_from_csv(filename):
     """Batch publication submission"""
     with open(filename) as f:
         df = [line.strip().split(',') for line in f.readlines()[1:]]
-        
+
     for row in df:
         print row[0], row[1], row[2]
         try:
@@ -60,7 +60,7 @@ def site_analysis():
                    for site in sites], name='time')
     s.to_csv("site_dates.csv", index=False, header=True)
 
-    
+
 
 def list_pubs():
     pubs = models.Publication.objects.all()
@@ -69,10 +69,23 @@ def list_pubs():
         for pub in pubs:
             f.write('%s\t%s\t%s\n' % (pub.pmid, pub.journal, pub.curation_complete))
 
+def tf_instance_consistency_check():
+    """Finds invalid TF instances and curations associated with it, if any."""
+    tf_instances = models.TFInstance.objects.all()
+    allowed_prefixes = ['NP', 'YP', 'WP']
+    for tf_instance in tf_instances:
+        if not any(tf_instance.protein_accession.startswith(prefix)
+                   for prefix in allowed_prefixes):
+            print tf_instance
+            # Find associated curations
+            curations = models.Curation.objects.filter(TF_instances=tf_instance)
+            print curations
+
 def run():
     #get_TFs()
     #add_pubs_from_csv("/home/sefa/Desktop/Book1.csv")
     #validate_curations()
     #pub_analysis()
     #site_analysis()
-    list_pubs()
+    #list_pubs()
+    tf_instance_consistency_check()
