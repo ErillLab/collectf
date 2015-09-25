@@ -6,14 +6,16 @@
 
 {% block content %}
 <dl class="">
-{% for t in techs %}
-<dt>
-{{ t.name }}
-</dt>
-<dd>{{ t.description }}
-</dd>
-<hr />
-{% endfor %}
+  {% for t in techs %}
+  <dt>
+    {{ t.name }}
+  </dt>
+  <dd>
+    {{ t.description }}
+    <a href="#">Evidence ontology (ECO) term for this technique.</a>
+  </dd>
+  <hr />
+  {% endfor %}
 </dl>
 
 {% endblock %}
