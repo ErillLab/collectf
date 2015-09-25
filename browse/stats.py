@@ -23,7 +23,7 @@ def experimental_techniques(request):
     """Get the experimental techniques."""
     exp_techniques = models.ExperimentalTechnique.objects.order_by('name').all()
     return render(request,
-                  "experimental_techniques.html",
+                  "all_experimental_techniques.html",
                   {'techs': exp_techniques},
                   context_instance=RequestContext(request))
 

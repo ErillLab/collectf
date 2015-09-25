@@ -333,9 +333,10 @@ class TechniquesForm(forms.Form):
     template = get_template('experimental_technique_field.html')
     choices = [(t.technique_id,
                 template.render(Context({
-                    'experiment_id': t.technique_id,
-                    'experiment_name': t.name,
-                    'experiment_description': t.description,
+                    'technique_id': t.technique_id,
+                    'technique_name': t.name,
+                    'technique_description': t.description,
+                    'technique_EO_term': t.EO_term,
                 })))
                for t in ExperimentalTechnique.objects.order_by('name')]
     techniques = forms.MultipleChoiceField(

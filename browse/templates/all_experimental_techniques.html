@@ -9,10 +9,12 @@
   {% for t in techs %}
   <dt>
     {{ t.name }}
+    {% if t.EO_term %}
+    - <a href="#">{{ t.EO_term }}</a>
+    {% endif %}
   </dt>
   <dd>
     {{ t.description }}
-    <a href="#">Evidence ontology (ECO) term for this technique.</a>
   </dd>
   <hr />
   {% endfor %}
