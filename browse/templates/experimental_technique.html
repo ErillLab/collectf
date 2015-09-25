@@ -1,21 +1,21 @@
-{# Used for populating fields on experimental techniques step of the curation #}
+{% comment %}
+Used for displaying a technique and more information about it when clicked on
+it.
+{% endcomment %}
 
-<span>
-  {{ technique_name }}
-  <a class="text-muted" data-toggle="modal" data-target="#modal{{ technique_id }}">
-    <small>more</small>
-  </a>
-</span>
+<a data-toggle="modal" data-target="#modal{{ experiment_id }}">
+  {{ technique.name }}
+</a>
 
-<div id="modal{{ technique_id }}" class="modal fade" role="dialog">
+<div id="modal{{ experiment_id }}" class="modal fade" role="dialog">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">{{ technique_name }}</h4>
+        <h4 class="modal-title">{{ technique.name }}</h4>
       </div>
       <div class="modal-body">
-        <p>{{ technique_description }}</p>
+        <p>{{ technique.description }}</p>
         <p><a href="#"> Evidence ontology term</a></p>
       </div>
       <div class="modal-footer">
@@ -26,4 +26,3 @@
     </div>
   </div>
 </div>
-
