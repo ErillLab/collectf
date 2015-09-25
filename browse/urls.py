@@ -30,7 +30,7 @@ urlpatterns += patterns(
 
 urlpatterns += patterns(
     'browse.view_reports',
-    (r'view_reports/(?P<tax_param_type>.+)/(?P<tax_param>-?\d+)/(?P<tf_param_type>.+)/(?P<tf_param>-?\d+)/(?P<tech_param_type>.+)/(?P<tech_param>-?\d+)/(?P<integrate_non_motif>\d)',
+    (r'view_reports/(?P<tax_param_type>.+)/(?P<tax_param>-?\d+)/(?P<tf_param_type>.+)/(?P<tf_param>.+)/(?P<tech_param_type>.+)/(?P<tech_param>-?\d+)/(?P<integrate_non_motif>\d)',
      'view_reports'),
     (r'view_reports_by_id_list', 'view_reports_by_id_list'),
 )
