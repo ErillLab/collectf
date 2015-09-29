@@ -5,6 +5,7 @@ UniProt identifiers.
 
 from collections import Counter
 import csv
+import pickle
 import random
 import re
 
@@ -15,10 +16,6 @@ import uniprot
 #from base import models
 
 Entrez.email = 'sefa1@umbc.edu'
-
-def refseq_to_uniprot(refseq_accession):
-    """Maps the given RefSeq accession to UniProt ID."""
-    return uniprot.map(refseq_accession, f='P_REFSEQ_AC', t='ACC')
 
 def fetch_ncbi_protein_record(accession):
     """Fetches the protein record from NCBI, for the given accession number."""
@@ -52,61 +49,72 @@ def get_uniprot_tax_id(uniprot_accession):
     record = uniprot.retrieve(uniprot_accession)
     return re.search(r'NCBI_TaxID=(\d+)', record).group(1)
 
-class Protein:
-    """Class for RefSeq->UniProt accession conversion."""
-    def __init__(self, refseq_accession):
-        self.refseq_accessions = [refseq_accession]
-        self.uniprot_accessions = []
-        self.uniprot_accessions_with_same_taxid = []
+def is_refseq_accession(accession):
+    """Returns true if the given accession number is from RefSeq."""
+    prefixes = ['NP', 'YP', 'WP']
+    return any(accession.startswith(prefix) for prefix in prefixes)
 
-    def find_uniprot_accessions(self):
-        """Finds all mapping UniProt accessions of the protein."""
-        refseq_acc = self.refseq_accessions[-1]
-        # Try to gets its UniProt mapping
-        mapping = refseq_to_uniprot(refseq_acc)
-        if refseq_acc in mapping:
-            self.uniprot_accessions.extend(mapping[refseq_acc])
-        else:
-            if refseq_acc.startswith('WP'):
-                return
-            # Convert NP/YP record to its WP counterpart and try accession
-            # number with WP for UniProt mapping.
-            wp_refseq_acc = refseq_to_wp(refseq_acc)
-            self.refseq_accessions.append(wp_refseq_acc)
-            self.find_uniprot_accessions()
+def is_uniprot_accession(accession):
+    """Returns true if the given accession is NOT RefSeq accession number."""
+    return not is_refseq_accession(accession)
 
-    def find_uniprot_accession_with_same_taxon(self):
-        """If there are more than one UniProt mappings, find the one that has
-        the same NCBI taxonomy ID with the protein of the RefSeq accession.
-        """
-        if len(self.uniprot_accessions) > 1:
-            refseq_rec = fetch_ncbi_protein_record(self.refseq_accessions[0])
+def filter_same_taxon_accessions(mappings):
+    """Filters mappings that have same NCBI taxonomy ID for both RefSeq and
+    UniProt accession numbers.
+    """
+    for refseq_acc in tqdm(mappings):
+        if mappings[refseq_acc] and len(mappings[refseq_acc]) > 1:
+            print refseq_acc, mappings[refseq_acc]
+            refseq_rec = fetch_ncbi_protein_record(refseq_acc)
             refseq_tax_id = extract_ncbi_taxonomy_id(refseq_rec)
-            #print self.refseq_accessions[0], refseq_tax_id
-            for uniprot_acc in self.uniprot_accessions:
-                uniprot_tax_id = get_uniprot_tax_id(uniprot_acc)
-                #print uniprot_acc, uniprot_tax_id
-                if refseq_tax_id == uniprot_tax_id:
-                    self.uniprot_accessions_with_same_taxid.append(uniprot_acc)
+            uniprot_accs = [uniprot_acc for uniprot_acc in mappings[refseq_acc]
+                            if get_uniprot_tax_id(uniprot_acc) == refseq_tax_id]
+            if uniprot_acc:
+                mappings[refseq_acc] = uniprot_accs
+    return mappings
+                
+def get_all_proteins(input_file=None, output_file=None):
+    """Returns the list of protein accessions in CollecTF.
 
-def get_all_proteins():
-    """Returns the list of protein accessions in CollecTF."""
-    return [Protein(protein.protein_accession)
-            for protein in models.TFInstance.objects.all()]
+    If input_file is provided, reads the list from file and returns it.
+    If output_file is provided, pickles list to output file.
+    """
+    if input_file:
+        proteins = pickle.load(open(input_file))
+    else:
+        proteins = [protein.protein_accession
+                    for protein in models.TFInstance.objects.all()]
+    if output_file:
+        pickle.dump(proteins, open(output_file, 'w'))
+    return proteins
 
+def refseq_to_uniprot(refseq_accessions):
+    """Maps the given RefSeq accession to UniProt ID."""
+    return uniprot.map(refseq_accessions, f='P_REFSEQ_AC', t='ACC')
+
+def refseq_to_uniprot_batch(refseq_accs):
+    """Given a list of RefSeq accessions, returns the mapping to UniProt. """
+    all_mappings = {}
+    mapping = refseq_to_uniprot(refseq_accs)
+    for refseq_acc in tqdm(refseq_accs):
+        all_mappings[refseq_acc] = mapping.get(refseq_acc, None)
+        if (not all_mappings[refseq_acc] and
+            (refseq_acc.startswith('NP') or refseq_acc.startswith('YP'))):
+            wp_acc = refseq_to_wp(refseq_acc)
+            all_mappings[refseq_acc] = {wp_acc}
+            mapping = refseq_to_uniprot(wp_acc)
+            all_mappings[wp_acc] = mapping.get(wp_acc, None)
+    return all_mappings
+
+def mock_get_all_proteins():
+    proteins =[u'NP_799324', u'NP_231738', u'YP_006516164',
+               u'YP_006516595', u'NP_417816']
+    return proteins
+
+def migrate_to_uniprot():
+    proteins = get_all_proteins()[:3]
+    all_mappings = refseq_to_uniprot_batch(proteins)
+    pickle.dump(all_mappings, open('all_mappings.pkl', 'w'))
+                
 def run():
-    uniprot_mapping_writer = csv.writer(open('refseq2uniprot.csv', 'w'))
-    uniprot_mapping_writer.writerow(['RefSeq',
-                                     'UniProt (all)',
-                                     'UniProt (w same taxid)'])
-    acc_sep = '/'               # accession number separator
-    proteins = get_all_proteins()
-    for protein in tqdm(proteins):
-        protein.find_uniprot_accessions()
-        protein.find_uniprot_accession_with_same_taxon()
-        uniprot_mapping_writer.writerow([
-            acc_sep.join(protein.refseq_accessions),
-            acc_sep.join(protein.uniprot_accessions),
-            acc_sep.join(protein.uniprot_accessions_with_same_taxid)])
-                                     
-
+    get_all_proteins(output_file='all_proteins.csv')
