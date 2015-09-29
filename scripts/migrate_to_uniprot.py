@@ -5,6 +5,7 @@ UniProt identifiers.
 
 from collections import Counter
 import csv
+import json
 import pickle
 import random
 import re
@@ -23,11 +24,11 @@ def fetch_ncbi_protein_record(accession):
     records = Entrez.read(handle)
     return records[0]
 
-def extract_wp_accession(rec):
+def parse_wp_accession(rec):
     """Extracts the non-redundant WP accession from a protein record."""
     return rec['GBSeq_contig']
 
-def extract_ncbi_taxonomy_id(rec):
+def parse_ncbi_taxonomy_id(rec):
     """Extracts the NCBI taxonomy id from the given protein record."""
     # Not safe, but OK for one-time script.
     source_features, = [features for features in rec['GBSeq_feature-table']
@@ -38,16 +39,25 @@ def extract_ncbi_taxonomy_id(rec):
     tax_id = tax_feature['GBQualifier_value'].replace('taxon:', '')
     return tax_id
 
-def refseq_to_wp(refseq_accession):
+def refseq_to_wp(rec):
     """Returns a WP accession for a given NP/YP accession."""
-    contig = extract_wp_accession(fetch_ncbi_protein_record(refseq_accession))
+    contig = parse_wp_accession(rec)
     wp_acc = re.match(r'join\((WP_\d+.\d):\d..\d+\)', contig).group(1)
     return wp_acc
 
-def get_uniprot_tax_id(uniprot_accession):
+def fetch_uniprot_records(uniprot_accessions):
+    records = uniprot.retrieve(uniprot_accessions)
+    return records.rstrip().split('//\n')
+    
+def parse_uniprot_tax_id(record):
     """Gets the NCBI taxonomy ID of the given protein."""
-    record = uniprot.retrieve(uniprot_accession)
     return re.search(r'NCBI_TaxID=(\d+)', record).group(1)
+
+def is_uniprot_record_reviewed(record):
+    """Returns true if the UniProt protein record is reviewed."""
+    status = re.search(r'ID.*(Reviewed|Unreviewed);', record).group(1)
+    assert status in ['Reviewed', 'Unreviewed']
+    return status == 'Reviewed'
 
 def is_refseq_accession(accession):
     """Returns true if the given accession number is from RefSeq."""
@@ -72,20 +82,12 @@ def filter_same_taxon_accessions(mappings):
             if uniprot_acc:
                 mappings[refseq_acc] = uniprot_accs
     return mappings
-                
-def get_all_proteins(input_file=None, output_file=None):
-    """Returns the list of protein accessions in CollecTF.
 
-    If input_file is provided, reads the list from file and returns it.
-    If output_file is provided, pickles list to output file.
-    """
-    if input_file:
-        proteins = pickle.load(open(input_file))
-    else:
-        proteins = [protein.protein_accession
-                    for protein in models.TFInstance.objects.all()]
-    if output_file:
-        pickle.dump(proteins, open(output_file, 'w'))
+def get_all_proteins():
+    """Returns the list of protein accessions in CollecTF."""
+    proteins = [protein.protein_accession
+                for protein in models.TFInstance.objects.all()]
+    json.dump(proteins, open('scripts/data/all_proteins.json', 'w'))
     return proteins
 
 def refseq_to_uniprot(refseq_accessions):
@@ -112,9 +114,9 @@ def mock_get_all_proteins():
     return proteins
 
 def migrate_to_uniprot():
-    proteins = get_all_proteins()[:3]
+    proteins = get_all_proteins()
     all_mappings = refseq_to_uniprot_batch(proteins)
     pickle.dump(all_mappings, open('all_mappings.pkl', 'w'))
-                
+
 def run():
-    get_all_proteins(output_file='all_proteins.csv')
+    get_all_proteins()
