@@ -115,13 +115,17 @@ def map_refseq_to_uniprot():
                                refseq_acc.startswith('YP'))]
         print ("Getting WP accs for %d NP/YP accs." % len(not_mapped_refseqs))
 
-        wp_accesssion_mapping = {refseq:parse_wp_accession(ncbi_records[refseq])
+        wp_accession_mapping = {refseq:parse_wp_accession(ncbi_records[refseq])
                                  for refseq in not_mapped_refseqs}
+        # Dump this for reference.
+        wp_accession_mapping_json = os.path.join(DATA_DIR, 'np_yp_to_wp.json')
+        json.dump(wp_accession_mapping, open(wp_accession_mapping_json, 'w'),
+                  indent=4)
 
-        uniprot_mapping = refseq_to_uniprot(wp_accesssion_mapping.values())
+        uniprot_mapping = refseq_to_uniprot(wp_accession_mapping.values())
         print "Found %d additional mappings" % len(uniprot_mapping)
         for not_mapped_refseq in not_mapped_refseqs:
-            wp = wp_accesssion_mapping[not_mapped_refseq]
+            wp = wp_accession_mapping[not_mapped_refseq]
             all_mappings[not_mapped_refseq] = list(uniprot_mapping.get(wp, {}))
 
         print "UniProt mapping size distribution:"
@@ -143,6 +147,18 @@ def filter_same_taxon_accessions(mappings):
     """
     ambiguous_mappings = {k:v for k, v in mappings.items() if len(v) > 1}
     print "Number of ambiguous mappings:", len(ambiguous_mappings)
+    same_taxon_mappings = {}
+    
+    for refseq_acc in tqdm(ambiguous_mappings):
+        if mappings[refseq_acc] and len(mappings[refseq_acc]) > 1:
+            print refseq_acc, mappings[refseq_acc]
+            refseq_rec = fetch_ncbi_protein_record(refseq_acc)
+            refseq_tax_id = extract_ncbi_taxonomy_id(refseq_rec)
+            uniprot_accs = [uniprot_acc for uniprot_acc in mappings[refseq_acc]
+                            if get_uniprot_tax_id(uniprot_acc) == refseq_tax_id]
+            if uniprot_acc:
+                mappings[refseq_acc] = uniprot_accs
+    return mappings
 
 def mock_get_all_proteins():
     proteins =[u'NP_799324', u'NP_231738', u'YP_006516164',
