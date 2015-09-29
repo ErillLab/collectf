@@ -68,21 +68,6 @@ def is_uniprot_accession(accession):
     """Returns true if the given accession is NOT RefSeq accession number."""
     return not is_refseq_accession(accession)
 
-def filter_same_taxon_accessions(mappings):
-    """Filters mappings that have same NCBI taxonomy ID for both RefSeq and
-    UniProt accession numbers.
-    """
-    for refseq_acc in tqdm(mappings):
-        if mappings[refseq_acc] and len(mappings[refseq_acc]) > 1:
-            print refseq_acc, mappings[refseq_acc]
-            refseq_rec = fetch_ncbi_protein_record(refseq_acc)
-            refseq_tax_id = extract_ncbi_taxonomy_id(refseq_rec)
-            uniprot_accs = [uniprot_acc for uniprot_acc in mappings[refseq_acc]
-                            if get_uniprot_tax_id(uniprot_acc) == refseq_tax_id]
-            if uniprot_acc:
-                mappings[refseq_acc] = uniprot_accs
-    return mappings
-
 def get_all_proteins():
     """Returns the list of protein accessions in CollecTF."""
     json_dump_file = os.path.join(DATA_DIR, 'proteins.json')
@@ -121,7 +106,7 @@ def map_refseq_to_uniprot():
         print "Found %d mappings." % len(uniprot_mapping)
         for refseq_acc in tqdm(refseq_accs):
             all_mappings[refseq_acc] = list(uniprot_mapping.get(refseq_acc, {}))
-            
+
         # For not mapped NP and YP accessions, get their WP accession and try
         # mapping again.
         not_mapped_refseqs = [refseq_acc for refseq_acc in refseq_accs
@@ -146,11 +131,18 @@ def map_refseq_to_uniprot():
         return all_mappings
 
     json_dump_file = os.path.join(DATA_DIR, "refseq_to_uniprot.json")
-    if not os.path.isfile(json_dump_file) or True:
+    if not os.path.isfile(json_dump_file):
         all_mappings = map_refseq_to_uniprot_helper()
         json.dump(all_mappings, open(json_dump_file, 'w'), indent=4)
 
     return json.load(open(json_dump_file))
+
+def filter_same_taxon_accessions(mappings):
+    """Filters mappings that have same NCBI taxonomy ID for both RefSeq and
+    UniProt accession numbers.
+    """
+    ambiguous_mappings = {k:v for k, v in mappings.items() if len(v) > 1}
+    print "Number of ambiguous mappings:", len(ambiguous_mappings)
 
 def mock_get_all_proteins():
     proteins =[u'NP_799324', u'NP_231738', u'YP_006516164',
