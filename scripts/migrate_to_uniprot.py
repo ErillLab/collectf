@@ -6,6 +6,7 @@ UniProt identifiers.
 from collections import Counter
 import csv
 import json
+import os
 import pickle
 import random
 import re
@@ -16,6 +17,7 @@ import uniprot
 
 #from base import models
 
+DATA_DIR = '/home/sefa/Dropbox/collectf/scripts/data'
 Entrez.email = 'sefa1@umbc.edu'
 
 def fetch_ncbi_protein_record(accession):
@@ -46,9 +48,10 @@ def refseq_to_wp(rec):
     return wp_acc
 
 def fetch_uniprot_records(uniprot_accessions):
+    """Returns the list of UniProt records for the given accession numbers."""
     records = uniprot.retrieve(uniprot_accessions)
     return records.rstrip().split('//\n')
-    
+
 def parse_uniprot_tax_id(record):
     """Gets the NCBI taxonomy ID of the given protein."""
     return re.search(r'NCBI_TaxID=(\d+)', record).group(1)
@@ -85,10 +88,25 @@ def filter_same_taxon_accessions(mappings):
 
 def get_all_proteins():
     """Returns the list of protein accessions in CollecTF."""
-    proteins = [protein.protein_accession
-                for protein in models.TFInstance.objects.all()]
-    json.dump(proteins, open('scripts/data/all_proteins.json', 'w'))
-    return proteins
+    json_dump_file = os.path.join(DATA_DIR, 'proteins.json')
+    if not os.path.isfile(json_dump_file):
+        proteins = [protein.protein_accession
+                    for protein in models.TFInstance.objects.all()]
+        json.dump(proteins, open(json_dump_file, 'w'))
+
+    return json.load(open(json_dump_file))
+
+def fetch_all_ncbi_protein_records():
+    """For all proteins, retrieves the NCBI records."""
+    json_dump_file = os.path.join(DATA_DIR, 'ncbi_records.json')
+    if not os.path.isfile(json_dump_file):
+        proteins = get_all_proteins()
+        all_records = {}
+        for refseq in tqdm(proteins):
+            all_records[refseq] = fetch_ncbi_protein_record(refseq)
+        json.dump(all_records, open(json_dump_file, 'w'))
+
+    return json.load(open(json_dump_file))
 
 def refseq_to_uniprot(refseq_accessions):
     """Maps the given RefSeq accession to UniProt ID."""
