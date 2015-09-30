@@ -14,11 +14,13 @@ from pprint import pprint
 
 from Bio import Entrez
 from tqdm import tqdm
+from tqdm import trange
 import uniprot
 
 #from base import models
 
-DATA_DIR = '/home/sefa/Dropbox/collectf/scripts/data'
+#DATA_DIR = '/home/sefa/Dropbox/collectf/scripts/data'
+DATA_DIR = '/Users/sefa/Dropbox/collectf/scripts/data'
 Entrez.email = 'sefa1@umbc.edu'
 
 def fetch_ncbi_protein_record(accession):
@@ -68,6 +70,10 @@ def is_uniprot_accession(accession):
     """Returns true if the given accession is NOT RefSeq accession number."""
     return not is_refseq_accession(accession)
 
+def is_uniparc_accession(accession):
+    """Returns true if the given accession is a UniParc accession number."""
+    return accession.startswith('UPI')
+
 def get_all_proteins():
     """Returns the list of protein accessions in CollecTF."""
     json_dump_file = os.path.join(DATA_DIR, 'proteins.json')
@@ -86,6 +92,29 @@ def fetch_all_ncbi_protein_records():
         all_records = {}
         for refseq in tqdm(refseq_accessions):
             all_records[refseq] = fetch_ncbi_protein_record(refseq)
+        json.dump(all_records, open(json_dump_file, 'w'), indent=4)
+
+    return json.load(open(json_dump_file))
+
+def fetch_all_uniprot_records():
+    """For all UniProt accession numbers, retrieves the UniProt records"""
+    json_dump_file = os.path.join(DATA_DIR, 'uniprot_records.json')
+    if not os.path.isfile(json_dump_file):
+        uniprot_mappings = map_refseq_to_uniprot()
+        uniprot_accs = [acc for accs in uniprot_mappings.values()
+                        for acc in accs if not is_uniparc_accession(acc)]
+                        
+        all_records = {}
+        print "Number of UniProt accession numbers:", len(uniprot_accs)
+        
+        # Split queries into smaller chunks
+        batch_size = 25
+        for i in trange(0, len(uniprot_accs), batch_size):
+            query_accs = uniprot_accs[i:i+batch_size]
+            records = fetch_uniprot_records(query_accs)
+            for acc, record in zip(query_accs, records):
+                all_records[acc] = record
+
         json.dump(all_records, open(json_dump_file, 'w'), indent=4)
 
     return json.load(open(json_dump_file))
@@ -141,23 +170,42 @@ def map_refseq_to_uniprot():
 
     return json.load(open(json_dump_file))
 
+def batch_ncbi_taxonomy_id():
+    """Writes NCBI taxonomy id for each RefSeq accession number to a file."""
+    ncbi_records = fetch_all_ncbi_protein_records()
+    tax_ids = {refseq:parse_ncbi_taxonomy_id(record)
+               for refseq, record in ncbi_records.items()}
+    json_dump_file = os.path.join(DATA_DIR, 'refseq_taxonomy_ids.json')
+    json.dump(tax_ids, open(json_dump_file, 'w'), indent=4)
+
+def batch_uniprot_taxonomy_id():
+    """Writes NCBI taxonomy id for each UniProt accession number to a file."""
+    mappings = map_refseq_to_uniprot()
+    uniprot_records = fetch_all_uniprot_records()
+    # Get all UniProt accessions and UniParc accessions.
+    uniprot_accessions = [acc for accs in mappings.values() for acc in accs
+                          if not acc.startswith('UPI')]
+    tax_ids = {acc:parse_uniprot_tax_id(uniprot_records[acc])
+               for acc in uniprot_accessions}
+    json_dump_file = os.path.join(DATA_DIR, 'uniprot_taxonomy_ids.json')
+    json.dump(tax_ids, open(json_dump_file, 'w'), indent=4)
+
 def filter_same_taxon_accessions(mappings):
     """Filters mappings that have same NCBI taxonomy ID for both RefSeq and
     UniProt accession numbers.
     """
+    ncbi_records = fetch_all_ncbi_protein_records()
     ambiguous_mappings = {k:v for k, v in mappings.items() if len(v) > 1}
     print "Number of ambiguous mappings:", len(ambiguous_mappings)
     same_taxon_mappings = {}
-    
+
     for refseq_acc in tqdm(ambiguous_mappings):
-        if mappings[refseq_acc] and len(mappings[refseq_acc]) > 1:
-            print refseq_acc, mappings[refseq_acc]
-            refseq_rec = fetch_ncbi_protein_record(refseq_acc)
-            refseq_tax_id = extract_ncbi_taxonomy_id(refseq_rec)
-            uniprot_accs = [uniprot_acc for uniprot_acc in mappings[refseq_acc]
-                            if get_uniprot_tax_id(uniprot_acc) == refseq_tax_id]
-            if uniprot_acc:
-                mappings[refseq_acc] = uniprot_accs
+        print refseq_acc, mappings[refseq_acc]
+        refseq_tax_id = extract_ncbi_taxonomy_id(refseq_rec)
+        uniprot_accs = [uniprot_acc for uniprot_acc in mappings[refseq_acc]
+                        if get_uniprot_tax_id(uniprot_acc) == refseq_tax_id]
+        if uniprot_acc:
+            mappings[refseq_acc] = uniprot_accs
     return mappings
 
 def mock_get_all_proteins():
