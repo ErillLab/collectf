@@ -222,6 +222,8 @@ def batch_uniprot_review_status():
     uniprot_records = fetch_all_uniprot_records()
     status = {acc: uniprot_record_review_status(rec)
               for acc, rec in uniprot_records.items()}
+    json_dump_file = os.path.join(DATA_DIR, 'uniprot_review_status.json')
+    json.dump(status, open(json_dump_file, 'w'), indent=4)
     return status
 
 def mock_get_all_proteins():
