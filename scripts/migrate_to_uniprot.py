@@ -4,23 +4,20 @@ UniProt identifiers.
 """
 
 from collections import Counter
-import csv
 import json
 import os
 import pickle
-import random
 import re
-from pprint import pprint
+import xmltodict
 
 from Bio import Entrez
 from tqdm import tqdm
-from tqdm import trange
 import uniprot
 
 #from base import models
 
-#DATA_DIR = '/home/sefa/Dropbox/collectf/scripts/data'
-DATA_DIR = '/Users/sefa/Dropbox/collectf/scripts/data'
+DATA_DIR = '/home/sefa/Dropbox/collectf/scripts/data'
+#DATA_DIR = '/Users/sefa/Dropbox/collectf/scripts/data'
 Entrez.email = 'sefa1@umbc.edu'
 
 def fetch_ncbi_protein_record(accession):
@@ -104,10 +101,10 @@ def fetch_all_uniprot_records():
         uniprot_mappings = map_refseq_to_uniprot()
         uniprot_accs = [acc for accs in uniprot_mappings.values()
                         for acc in accs if not is_uniparc_accession(acc)]
-                        
+
         all_records = {}
         print "Number of UniProt accession numbers:", len(uniprot_accs)
-        
+
         for acc in tqdm(uniprot_accs):
             record, = fetch_uniprot_records([acc])
             all_records[acc] = record
@@ -139,10 +136,10 @@ def map_refseq_to_uniprot():
                               if not all_mappings[refseq_acc] and
                               (refseq_acc.startswith('NP') or
                                refseq_acc.startswith('YP'))]
-        print ("Getting WP accs for %d NP/YP accs." % len(not_mapped_refseqs))
+        print "Getting WP accs for %d NP/YP accs." % len(not_mapped_refseqs)
 
         wp_accession_mapping = {refseq:parse_wp_accession(ncbi_records[refseq])
-                                 for refseq in not_mapped_refseqs}
+                                for refseq in not_mapped_refseqs}
         # Dump this for reference.
         wp_accession_mapping_json = os.path.join(DATA_DIR, 'np_yp_to_wp.json')
         json.dump(wp_accession_mapping, open(wp_accession_mapping_json, 'w'),
@@ -204,7 +201,7 @@ def same_taxon_accessions():
         ncbi_taxonomy_ids = batch_ncbi_taxonomy_id()
         uniprot_taxonomy_ids = batch_uniprot_taxonomy_id()
         same_taxon_mappings = {}
-        
+
         for refseq_acc in tqdm(mappings):
             refseq_tax_id = ncbi_taxonomy_ids[refseq_acc]
             uniprot_accs = [acc for acc in mappings[refseq_acc]
@@ -226,6 +223,26 @@ def batch_uniprot_review_status():
     json.dump(status, open(json_dump_file, 'w'), indent=4)
     return status
 
+def parse_proteome_file():
+    """Parses proteome file.
+
+    For each proteome, parses
+    - its taxonomy id (taxid)
+    - if it is representative for the proteome cluster
+    - if it belongs to reference species/strain.
+    """
+    proteome_file = os.path.join(DATA_DIR, 'proteomes_2015_09.xml')
+    with open(proteome_file) as f:
+        obj = xmltodict.parse(f.read())
+    proteomes = []
+    for proteome in obj['proteomes']['proteome']:
+        proteomes.append(
+            {'taxid': proteome['taxonomy'],
+             'is_reference': proteome['is_reference_proteome'],
+             'is_representative': proteome['is_representative_proteome']})
+    json_dump_file = os.path.join(DATA_DIR, 'proteomes.json')
+    json.dump(proteomes, open(json_dump_file, 'w'), indent=4)
+
 def mock_get_all_proteins():
     proteins =[u'NP_799324', u'NP_231738', u'YP_006516164',
                u'YP_006516595', u'NP_417816']
@@ -237,6 +254,7 @@ def migrate_to_uniprot():
     pickle.dump(all_mappings, open('all_mappings.pkl', 'w'))
 
 def get_ambiguous_mappings(mappings):
+
     """Returns mappings with more than one UniProt accessions."""
     return [accs for accs in mappings.values() if len(accs) > 1]
 
@@ -248,7 +266,7 @@ def mappings_stats(mappings):
     print "num missing mappings:", len(get_missing_mappings(mappings))
     print "num ambigous mappings:", len(get_ambiguous_mappings(mappings))
     print "//"
-    
+
 def resolve_mappings():
     """Gets initial mappings and resolves ambiguous mappings.
 
@@ -261,7 +279,7 @@ def resolve_mappings():
     # Find all mappings from RefSeq to UniProt.
     mappings = map_refseq_to_uniprot()
     mappings_stats(mappings)
-    
+
     # Resolve ambiguous mappings using taxonomy.
     same_taxon_mappings = same_taxon_accessions()
     for refseq, uniprots in mappings.items():
@@ -276,12 +294,9 @@ def resolve_mappings():
             reviewed_uniprots = [uniprot for uniprot in uniprots
                                  if uniprot_review_status[uniprot]]
             if len(reviewed_uniprots) > 0:
-                mappings[refseq] = reviewed_uniprots[0]
+                mappings[refseq] = [reviewed_uniprots[0]]
     mappings_stats(mappings)
 
-    
+
     json_dump_file = os.path.join(DATA_DIR, 'resolved_refseq_to_uniprot.json')
     json.dump(mappings, open(json_dump_file, 'w'), indent=4)
-
-    
-    
