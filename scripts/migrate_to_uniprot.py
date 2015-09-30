@@ -160,7 +160,7 @@ def map_refseq_to_uniprot():
 
         return all_mappings
 
-    json_dump_file = os.path.join(DATA_DIR, "refseq_to_uniprot.json")
+    json_dump_file = os.path.join(DATA_DIR, "simple_refseq_to_uniprot.json")
     if not os.path.isfile(json_dump_file):
         all_mappings = map_refseq_to_uniprot_helper()
         json.dump(all_mappings, open(json_dump_file, 'w'), indent=4)
@@ -236,5 +236,52 @@ def migrate_to_uniprot():
     all_mappings = refseq_to_uniprot_batch(proteins)
     pickle.dump(all_mappings, open('all_mappings.pkl', 'w'))
 
-def run():
-    get_all_proteins()
+def get_ambiguous_mappings(mappings):
+    """Returns mappings with more than one UniProt accessions."""
+    return [accs for accs in mappings.values() if len(accs) > 1]
+
+def get_missing_mappings(mappings):
+    """Retuns mappings with no UniProt accessions."""
+    return [accs for accs in mappings.values() if not accs]
+
+def mappings_stats(mappings):
+    print "num missing mappings:", len(get_missing_mappings(mappings))
+    print "num ambigous mappings:", len(get_ambiguous_mappings(mappings))
+    print "//"
+    
+def resolve_mappings():
+    """Gets initial mappings and resolves ambiguous mappings.
+
+    - Checks if any of the identified UniProt accessions have the same taxonomy
+      id as the RefSeq accession.
+    - Checks if any of the UniProt accessions have 'reviewed' status and uses it
+      if any.
+    """
+
+    # Find all mappings from RefSeq to UniProt.
+    mappings = map_refseq_to_uniprot()
+    mappings_stats(mappings)
+    
+    # Resolve ambiguous mappings using taxonomy.
+    same_taxon_mappings = same_taxon_accessions()
+    for refseq, uniprots in mappings.items():
+        if len(uniprots) > 1 and len(same_taxon_mappings.get(refseq, [])) == 1:
+            mappings[refseq] = same_taxon_mappings[refseq]
+    mappings_stats(mappings)
+
+    # Resolve ambiguous mappings with reviewed UniProt records.
+    uniprot_review_status = batch_uniprot_review_status()
+    for refseq, uniprots in mappings.items():
+        if len(uniprots) > 1:
+            reviewed_uniprots = [uniprot for uniprot in uniprots
+                                 if uniprot_review_status[uniprot]]
+            if len(reviewed_uniprots) > 0:
+                mappings[refseq] = reviewed_uniprots[0]
+    mappings_stats(mappings)
+
+    
+    json_dump_file = os.path.join(DATA_DIR, 'resolved_refseq_to_uniprot.json')
+    json.dump(mappings, open(json_dump_file, 'w'), indent=4)
+
+    
+    
