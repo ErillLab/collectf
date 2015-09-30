@@ -16,8 +16,8 @@ import uniprot
 
 #from base import models
 
-DATA_DIR = '/home/sefa/Dropbox/collectf/scripts/data'
-#DATA_DIR = '/Users/sefa/Dropbox/collectf/scripts/data'
+DATA_DIR = '/home/sefa/Dropbox/collectf/scripts/uniprot_migration/data'
+#DATA_DIR = '/Users/sefa/Dropbox/collectf/scripts/uniprot/migration/data'
 Entrez.email = 'sefa1@umbc.edu'
 
 def fetch_ncbi_protein_record(accession):
