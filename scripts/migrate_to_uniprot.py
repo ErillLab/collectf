@@ -238,8 +238,9 @@ def parse_proteome_file():
     for proteome in obj['proteomes']['proteome']:
         proteomes.append(
             {'taxid': proteome['taxonomy'],
-             'is_reference': proteome['is_reference_proteome'],
-             'is_representative': proteome['is_representative_proteome']})
+             'is_reference': proteome['is_reference_proteome'] == 'true',
+             'is_representative':
+                 proteome['is_representative_proteome'] == 'true'})
     json_dump_file = os.path.join(DATA_DIR, 'proteomes.json')
     json.dump(proteomes, open(json_dump_file, 'w'), indent=4)
 
