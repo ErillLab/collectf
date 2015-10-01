@@ -4,6 +4,7 @@ UniProt identifiers.
 """
 
 from collections import Counter
+import csv
 import json
 import os
 import pickle
@@ -232,7 +233,7 @@ def batch_uniprot_taxonomy_id():
 
     return json.load(open(json_dump_file))
 
-def map_to_acc_with_same_taxon(mapping):
+def map_to_acc_with_same_taxon(mapping, mapping_notes):
     """Filters mapping that have same NCBI taxonomy ID for both RefSeq and
     UniProt accession numbers.
     """
@@ -249,6 +250,7 @@ def map_to_acc_with_same_taxon(mapping):
                         if uniprot_taxonomy_ids[acc] == refseq_tax_id]
         if uniprot_accs:
             mapping[refseq_acc] = [uniprot_accs[0]]
+            mapping_notes[refseq_acc] = "taxonomy id match."
 
 def batch_uniprot_review_status():
     """Checks UniProt records for their review status."""
@@ -259,7 +261,7 @@ def batch_uniprot_review_status():
     json.dump(status, open(json_dump_file, 'w'), indent=4)
     return status
 
-def map_to_reviewed_accessions(mapping):
+def map_to_reviewed_accessions(mapping, mapping_notes):
     """Resolves ambiguous matchings with reviewed UniProt records."""
     uniprot_review_status = batch_uniprot_review_status()
     for refseq, uniprots in mapping.items():
@@ -269,6 +271,7 @@ def map_to_reviewed_accessions(mapping):
                              if uniprot_review_status[uniprot]]
         if reviewed_uniprots:
             mapping[refseq] = [reviewed_uniprots[0]]
+            mapping_notes[refseq] = "reviewed UniProt record"
 
 def parse_proteome_file():
     """Parses proteome file.
@@ -294,7 +297,7 @@ def parse_proteome_file():
 
     return json.load(open(json_dump_file))
 
-def map_to_accessions_with_proteome(mapping):
+def map_to_accessions_with_proteome(mapping, mapping_notes):
     """Resolves mapping using proteome data.
 
     For each candidate UniProt accession, pick
@@ -313,15 +316,20 @@ def map_to_accessions_with_proteome(mapping):
                    (proteome['is_reference'] or proteome['is_representative'])
                    for proteome in proteomes):
                 mapping[refseq] = [uniprot]
+                mapping_notes[refseq] = (
+                    "taxon match to reference/representative proteome")
                 break
     mapping_stats(mapping)
 
     # Check if the UniProt record has match for a proteome record.
     uniprot_records = fetch_all_uniprot_records()
     for refseq, uniprots in mapping.items():
+        if len(uniprots) <= 1:
+            continue
         for uniprot in uniprots:
             if does_uniprot_have_proteome(uniprot_records[uniprot]):
                 mapping[refseq] = [uniprot]
+                mapping_notes[refseq] = "UniProt record matches to a proteome"
                 break
 
 def mock_get_all_proteins():
@@ -354,20 +362,37 @@ def resolve_mapping():
     mapping = batch_refseq_to_uniprot()
     mapping_stats(mapping)
 
+    mapping_notes = {}
+    for refseq, matches in mapping.items():
+        if len(matches) == 1:
+            mapping_notes[refseq] = \
+                "single UniProt accession, no resolution required"
     # Resolve ambiguous matching using taxonomy. For each RefSeq accession, if
     # there are more than one matching UniProt accession, pick the one that has
     # the same taxonomy ID as RefSeq accession has.
-    map_to_acc_with_same_taxon(mapping)
+    map_to_acc_with_same_taxon(mapping, mapping_notes)
     mapping_stats(mapping)
 
     # For each RefSeq accession with more than one matching UniProt accessions,
     # pick the first reviewed UniProt accession.
-    map_to_reviewed_accessions(mapping)
+    map_to_reviewed_accessions(mapping, mapping_notes)
     mapping_stats(mapping)
 
     # Resolve using proteome data
-    map_to_accessions_with_proteome(mapping)
+    map_to_accessions_with_proteome(mapping, mapping_notes)
     mapping_stats(mapping)
 
     json_dump_file = os.path.join(DATA_DIR, 'resolved_refseq_to_uniprot.json')
     json.dump(mapping, open(json_dump_file, 'w'), indent=4)
+
+    csv_file = os.path.join(DATA_DIR, 'resolved_refseq_to_uniprot.csv')
+    with open(csv_file, 'w') as f:
+        writer = csv.writer(f)
+        writer.writerow(['RefSeq accession', 'UniProt accession', 'Notes'])
+        for refseq in mapping:
+            if mapping[refseq]:
+                assert len(mapping[refseq]) == 1
+                writer.writerow([refseq, mapping[refseq][0],
+                                 mapping_notes[refseq]])
+            else:
+                writer.writerow([refseq, "N/A", "no matching found"])
