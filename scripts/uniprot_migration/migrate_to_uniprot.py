@@ -250,7 +250,7 @@ def map_to_acc_with_same_taxon(mapping, mapping_notes):
                         if uniprot_taxonomy_ids[acc] == refseq_tax_id]
         if uniprot_accs:
             mapping[refseq_acc] = [uniprot_accs[0]]
-            mapping_notes[refseq_acc] = "taxonomy id match."
+            mapping_notes[refseq_acc] = "Taxonomy ID match"
 
 def batch_uniprot_review_status():
     """Checks UniProt records for their review status."""
@@ -271,7 +271,7 @@ def map_to_reviewed_accessions(mapping, mapping_notes):
                              if uniprot_review_status[uniprot]]
         if reviewed_uniprots:
             mapping[refseq] = [reviewed_uniprots[0]]
-            mapping_notes[refseq] = "reviewed UniProt record"
+            mapping_notes[refseq] = "Reviewed UniProt record"
 
 def parse_proteome_file():
     """Parses proteome file.
@@ -317,7 +317,7 @@ def map_to_accessions_with_proteome(mapping, mapping_notes):
                    for proteome in proteomes):
                 mapping[refseq] = [uniprot]
                 mapping_notes[refseq] = (
-                    "taxon match to reference/representative proteome")
+                    "Taxon match to reference/representative proteome")
                 break
     mapping_stats(mapping)
 
@@ -329,7 +329,7 @@ def map_to_accessions_with_proteome(mapping, mapping_notes):
         for uniprot in uniprots:
             if does_uniprot_have_proteome(uniprot_records[uniprot]):
                 mapping[refseq] = [uniprot]
-                mapping_notes[refseq] = "UniProt record matches to a proteome"
+                mapping_notes[refseq] = "UniProt record match to a proteome"
                 break
 
 def mock_get_all_proteins():
@@ -366,7 +366,7 @@ def resolve_mapping():
     for refseq, matches in mapping.items():
         if len(matches) == 1:
             mapping_notes[refseq] = \
-                "single UniProt accession, no resolution required"
+                "Single UniProt accession, no resolution required"
     # Resolve ambiguous matching using taxonomy. For each RefSeq accession, if
     # there are more than one matching UniProt accession, pick the one that has
     # the same taxonomy ID as RefSeq accession has.
@@ -395,4 +395,4 @@ def resolve_mapping():
                 writer.writerow([refseq, mapping[refseq][0],
                                  mapping_notes[refseq]])
             else:
-                writer.writerow([refseq, "N/A", "no matching found"])
+                writer.writerow([refseq, "N/A", "No matching found"])
