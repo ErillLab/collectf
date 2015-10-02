@@ -351,12 +351,16 @@ def mapping_stats(mapping):
     print "//"
 
 def resolve_mapping():
-    """Gets initial mapping and resolves  to multiple UniProt accessions
+    """Gets initial mapping and resolves multiple UniProt accessions cases.
 
-    - Checks if any of the identified UniProt accessions have the same taxonomy
-      id as the RefSeq accession.
-    - Checks if any of the UniProt accessions have 'reviewed' status and uses it
-      if any.
+    For a given RefSeq accession and a set of matches,
+
+    - checks if any of the UniProt accessions have the same taxonomy
+      id as the RefSeq accession,
+    - checks if any of the UniProt accessions have 'reviewed' status,
+    - checks if the taxonomy id of the candidate UniProt a match for
+      reference/representative proteome,
+    - checks if any of the UniProt accessions is a match to a complete proteome.
     """
     # Get all mappings
     mapping = batch_refseq_to_uniprot()
@@ -369,7 +373,7 @@ def resolve_mapping():
                 "Single UniProt accession, no resolution required"
     # Resolve ambiguous matching using taxonomy. For each RefSeq accession, if
     # there are more than one matching UniProt accession, pick the one that has
-    # the same taxonomy ID as RefSeq accession has.
+    # the same taxonomy ID as RefSeq accession.
     map_to_acc_with_same_taxon(mapping, mapping_notes)
     mapping_stats(mapping)
 
