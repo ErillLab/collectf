@@ -373,7 +373,7 @@ def resolve_mapping():
                 "Single UniProt accession, no resolution required"
     # Resolve ambiguous matching using taxonomy. For each RefSeq accession, if
     # there are more than one matching UniProt accession, pick the one that has
-    # the same taxonomy ID as RefSeq accession has.
+    # the same taxonomy ID as RefSeq accession.
     map_to_acc_with_same_taxon(mapping, mapping_notes)
     mapping_stats(mapping)
 
