@@ -1,10 +1,15 @@
 """Collection of code snippets for internal use"""
 
+from collections import defaultdict
+import csv
+import pandas as pd
+import time
+
+from tqdm import tqdm
+
 import base
 from curate import create_object
 from base import models
-import time
-import pandas as pd
 
 def get_TFs():
     """Gets the list of TFs and their descriptions."""
@@ -60,8 +65,6 @@ def site_analysis():
                    for site in sites], name='time')
     s.to_csv("site_dates.csv", index=False, header=True)
 
-
-
 def list_pubs():
     pubs = models.Publication.objects.all()
     with open("pub_list.csv", 'w') as f:
@@ -81,11 +84,20 @@ def tf_instance_consistency_check():
             curations = models.Curation.objects.filter(TF_instances=tf_instance)
             print curations
 
+def collectf_tf_instance_summary():
+    """Lists all TF instances and their TFs and the curation IDs into a file."""
+    with open('scripts/data/tf_instance_summary.csv', 'w') as f:
+        writer = csv.writer(f)
+        writer.writerow(['TF instance', 'TF', 'Curations using the TF instance'])
+        tf_instances = models.TFInstance.objects.all()
+        for tf_instance in tqdm(tf_instances):
+            # Get curations using this TF instance.
+            curations = models.Curation.objects.filter(TF_instances=tf_instance)
+            tfs = set(curation.TF for curation in curations)
+            writer.writerow([tf_instance.protein_accession,
+                             ', '.join([tf.name for tf in tfs]),
+                             ', '.join([str(curation.curation_id)
+                                        for curation in curations])])
+
 def run():
-    #get_TFs()
-    #add_pubs_from_csv("/home/sefa/Desktop/Book1.csv")
-    #validate_curations()
-    #pub_analysis()
-    #site_analysis()
-    #list_pubs()
-    tf_instance_consistency_check()
+    collectf_tf_instance_summary()
