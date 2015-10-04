@@ -86,3 +86,6 @@ table {
     width:auto;
 }
 
+.modal-body {
+    font-weight: normal;
+}

@@ -1,0 +1,33 @@
+{# Used for populating fields on experimental techniques step of the curation #}
+
+<span>
+  {{ technique_name }}
+  <a class="text-muted" data-toggle="modal" data-target="#modal{{ technique_id }}">
+    <small>more</small>
+  </a>
+</span>
+
+<div id="modal{{ technique_id }}" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">
+          {{ technique_name }}
+          {% if technique_EO_term %}
+          - <a href="#">{{ technique_EO_term }}</a>
+          {% endif %}
+        </h4>
+      </div>
+      <div class="modal-body">
+        <p>{{ technique_description }}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+

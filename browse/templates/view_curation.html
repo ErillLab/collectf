@@ -135,7 +135,11 @@
 	      {% endfor %}
         </td>
         <td><div>{{ cs.regulation_set.all|regulation_diagram:cs.site_instance }}</div></td>
-        <td>{% for t in cs.experimental_techniques.all %}{{ t.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        <td>
+          {% for technique in cs.experimental_techniques.all %}
+          {% include "experimental_technique.html" %}
+          {% if not forloop.last %} - {% endif %}{% endfor %}
+        </td>
         <td>{{ cs.TF_function_verbose }}</td>
         <td>{{ cs.TF_type_verbose }}</td>
       </tr>

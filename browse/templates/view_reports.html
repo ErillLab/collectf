@@ -171,8 +171,9 @@
                   </a></td>
 		          
 		          <td class="techniques">
-		            {% for tech in meta_site.techniques %}
-		            {{ tech.name }}{% if not forloop.last %},{% endif %}
+		            {% for technique in meta_site.techniques %}
+                    {% include "experimental_technique.html" %}                    
+                    {% if not forloop.last %} - {% endif %}
 		            {% endfor %}
 		          </td>
 		          
