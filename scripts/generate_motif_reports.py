@@ -31,7 +31,29 @@ def motif_reports_by_taxonomy():
             site_instance__genome__taxonomy__in=taxon.get_all_species())
         reports = motif_report.make_reports(curation_site_instances)
 
+def motif_reports_by_experimental_technique_category():
+    """Generate motif reports for experimental technique categories."""
+    for category in tqdm(models.ExperimentalTechniqueCategory.objects.all()):
+        techniques = models.ExperimentalTechnique.objects.filter(
+            categories=category)
+        curation_site_instances = models.Curation_SiteInstance.objects.filter(
+            experimental_techniques__in=techniques)
+        reports = motif_report.make_reports(curation_site_instances)
+    
+def motif_reports_by_experimental_technique():
+    """Generates motif reports for each experimental technique."""
+    for technique in tqdm(models.ExperimentalTechnique.objects.all()):
+        curation_site_instances = models.Curation_SiteInstance.objects.filter(
+            experimental_techniques=technique)
+        reports = motif_report.make_reports(curation_site_instances)
+
 def run():
+    print "Generating motif reports for all experimental techniques."
+    motif_reports_by_experimental_technique()
+    
+    print "Generating motif reports for all experimental technique categories."
+    motif_reports_by_experimental_technique_category()
+
     print "Generating motif reports for all taxonomy levels."""
     motif_reports_by_taxonomy()
     
