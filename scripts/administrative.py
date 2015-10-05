@@ -72,18 +72,6 @@ def list_pubs():
         for pub in pubs:
             f.write('%s\t%s\t%s\n' % (pub.pmid, pub.journal, pub.curation_complete))
 
-def tf_instance_consistency_check():
-    """Finds invalid TF instances and curations associated with it, if any."""
-    tf_instances = models.TFInstance.objects.all()
-    allowed_prefixes = ['NP', 'YP', 'WP']
-    for tf_instance in tf_instances:
-        if not any(tf_instance.protein_accession.startswith(prefix)
-                   for prefix in allowed_prefixes):
-            print tf_instance
-            # Find associated curations
-            curations = models.Curation.objects.filter(TF_instances=tf_instance)
-            print curations
-
 def collectf_tf_instance_summary():
     """Lists all TF instances and their TFs and the curation IDs into a file."""
     with open('scripts/data/tf_instance_summary.csv', 'w') as f:
