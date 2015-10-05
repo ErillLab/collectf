@@ -28,6 +28,8 @@ def get_TFs(tf_type, tf_id):
 def get_tf_instance(accession):
     return get_object_or_404(models.TFInstance, protein_accession=accession)
 
+# TODO(sefa): Split this function for TF and TF-family to make the URL
+# resolution simpler.
 def get_results_TF(request, type_, id_):
     """GIven the type (TF or TF family) and the id of the object, return query
     results and list TF/species that have binding site data for the selected TF
