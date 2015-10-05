@@ -24,7 +24,17 @@ def motif_reports_by_tf():
             curation__TF_instances__TF=TF)
         reports = motif_report.make_reports(curation_site_instances)
 
+def motif_reports_by_taxonomy():
+    """Generates motif reports for each taxon."""
+    for taxon in tqdm(models.Taxonomy.objects.all()):
+        curation_site_instances = models.Curation_SiteInstance.objects.filter(
+            site_instance__genome__taxonomy__in=taxon.get_all_species())
+        reports = motif_report.make_reports(curation_site_instances)
+
 def run():
+    print "Generating motif reports for all taxonomy levels."""
+    motif_reports_by_taxonomy()
+    
     print "Generating motif reports for TF families."
     motif_reports_by_tf_family()
 
