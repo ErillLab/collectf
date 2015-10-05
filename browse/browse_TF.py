@@ -47,7 +47,7 @@ def get_results_TF(request, type_, id_):
     # get all curation-site-instance objects for browsed TFs
     assert TFs
     cur_site_insts = models.Curation_SiteInstance.objects.\
-                     filter(curation__TF__in=TFs)
+                     filter(curation__TF_instances__TF__in=TFs)
 
     # generate all reports
     reports = motif_report.make_reports(cur_site_insts)
