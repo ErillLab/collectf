@@ -81,7 +81,7 @@ class MotifReport:
     def TF_name(self):
         """Return the name of the TF"""
         #self.TF_accession_check()
-        return self.m_cur_site_insts[0].curation.TF.name
+        return self.m_cur_site_insts[0].curation.TF
 
     @property
     def TF(self):

@@ -43,7 +43,8 @@ def view_reports(request, tax_param_type, tax_param,
             curation__TF_instances=tf_instance)
     else:
         tfs = browse_TF.get_TFs(tf_param_type, tf_param)
-        cur_site_insts = cur_site_insts.filter(curation__TF__in=tfs)
+        cur_site_insts = cur_site_insts.filter(
+            curation__TF_instances__TF__in=tfs)
 
 
     # Exclude non-motif-associated sites here, it can be integrated if user
