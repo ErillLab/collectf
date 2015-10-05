@@ -100,9 +100,10 @@ def make_all_genes(genome_record, genome_obj):
     #genome = Genome.objects.get(genome_accession=genome_record.id)
     return [Gene(genome=genome_obj, **g) for g in genes]
 
-def make_TF_instance(TF_rec):
+def make_TF_instance(TF_rec, TF):
     """Given the TF record, create the TF object in the database."""
-    tf = TFInstance(protein_accession=TF_rec.name,
+    TF_instance = TFInstance(protein_accession=TF_rec.name,
                     name=TF_rec.name,
-                    description=TF_rec.description)
-    tf.save()
+                    description=TF_rec.description,
+                    TF=TF)
+    TF_instance.save()
