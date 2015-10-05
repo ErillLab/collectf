@@ -13,7 +13,7 @@ def each_curation_has_only_one_tf():
                    (curation.curation_id, len(tfs)))
 
 def tf_instances_have_valid_accession_number():
-    """Finds invalid TF instances and curations associated with it, if any."""
+    """Checks if all TF-instances have valid accession numbers."""
     tf_instances = models.TFInstance.objects.all()
     allowed_prefixes = ['NP', 'YP', 'WP']
     for tf_instance in tf_instances:
