@@ -17,7 +17,18 @@ def motif_reports_by_tf_family():
             curation__TF_instances__TF__in=TFs)
         reports = motif_report.make_reports(curation_site_instances)
 
+def motif_reports_by_tf():
+    """Generates motif reports for each TF."""
+    for TF in tqdm(models.TF.objects.all()):
+        curation_site_instances = models.Curation_SiteInstance.objects.filter(
+            curation__TF_instances__TF=TF)
+        reports = motif_report.make_reports(curation_site_instances)
+
 def run():
+    print "Generating motif reports for TF families."
     motif_reports_by_tf_family()
+
+    print "Generating motif reports for TFs."
+    motif_reports_by_tf()
 
 
