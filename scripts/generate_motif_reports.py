@@ -3,10 +3,26 @@
 # pages in CollecTF without accessing database and computing motif reports for
 # the query TFs, species or experimental techniques.
 
+import os
+
 from tqdm import tqdm
+import pickle
 
 from base import models
 from browse import motif_report
+from collectf import settings
+
+def pickle_report(reports, by, object_id):
+    """Pickles the given report.
+
+    The pickling type can be taxonomy, TF, TF_family, experimental technique and
+    experimental technique category.
+    """
+    assert by in ['taxonomy', 'TF', 'TF_family', 'experimental_technique',
+                  'experimental_technique_category']
+    pickle_file = os.path.join(settings.PICKLE_ROOT, 'motif_reports',
+                               by + '_' + str(object_id) + '.pkl')
+    pickle.dump(reports, open(pickle_file, 'w'))
 
 def motif_reports_by_tf_family():
     """Generates motif reports for each TF-family."""
@@ -16,6 +32,7 @@ def motif_reports_by_tf_family():
         curation_site_instances = models.Curation_SiteInstance.objects.filter(
             curation__TF_instances__TF__in=TFs)
         reports = motif_report.make_reports(curation_site_instances)
+        pickle_report(reports, 'TF_family', TF_family.TF_family_id)
 
 def motif_reports_by_tf():
     """Generates motif reports for each TF."""
@@ -23,6 +40,7 @@ def motif_reports_by_tf():
         curation_site_instances = models.Curation_SiteInstance.objects.filter(
             curation__TF_instances__TF=TF)
         reports = motif_report.make_reports(curation_site_instances)
+        pickle_report(reports, 'TF', TF.TF_id)
 
 def motif_reports_by_taxonomy():
     """Generates motif reports for each taxon."""
@@ -30,6 +48,7 @@ def motif_reports_by_taxonomy():
         curation_site_instances = models.Curation_SiteInstance.objects.filter(
             site_instance__genome__taxonomy__in=taxon.get_all_species())
         reports = motif_report.make_reports(curation_site_instances)
+        pickle_report(reports, 'taxonomy', taxon.taxonomy_id)
 
 def motif_reports_by_experimental_technique_category():
     """Generate motif reports for experimental technique categories."""
@@ -39,6 +58,8 @@ def motif_reports_by_experimental_technique_category():
         curation_site_instances = models.Curation_SiteInstance.objects.filter(
             experimental_techniques__in=techniques)
         reports = motif_report.make_reports(curation_site_instances)
+        pickle_report(reports, 'experimental_technique_category',
+                      category.category_id)
     
 def motif_reports_by_experimental_technique():
     """Generates motif reports for each experimental technique."""
@@ -46,6 +67,7 @@ def motif_reports_by_experimental_technique():
         curation_site_instances = models.Curation_SiteInstance.objects.filter(
             experimental_techniques=technique)
         reports = motif_report.make_reports(curation_site_instances)
+        pickle_report(reports, 'experimental_technique', technique.technique_id)
 
 def run():
     print "Generating motif reports for all experimental techniques."
