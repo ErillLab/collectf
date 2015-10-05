@@ -266,6 +266,7 @@ class Taxonomy(models.Model):
 
     class Meta:
         verbose_name_plural = 'taxonomies'
+        ordering = ['name']
 
 class TF(models.Model):
     """TF table containing information about TF and link to its family"""
@@ -279,6 +280,7 @@ class TF(models.Model):
 
     class Meta:
         verbose_name_plural = "TFs"
+        ordering = ['name']
 
 class TFFamily(models.Model):
     """TF family contains name and description for the family"""
@@ -292,6 +294,7 @@ class TFFamily(models.Model):
     class Meta:
         verbose_name = "TF family"
         verbose_name_plural = "TF families"
+        ordering = ['name']
 
 class TFInstance(models.Model):
     """Protein table. Contains accession number, which TF it is and the
@@ -509,6 +512,9 @@ class ExperimentalTechnique(models.Model):
 
     def __unicode__(self):
         return u'%s' % self.name
+
+    class Meta:
+        ordering = ['name']
 
 class ExperimentalTechniqueCategory(models.Model):
     """Each experimental technique can belong to a set of categories. Categories
