@@ -37,7 +37,7 @@ YP_185556,Q5HI51,UniProt record redundancy resolved through taxonomy ID match be
 YP_007451729,P74426,"Single UniProt accession, no resolution required"
 NP_805932,Q7CQY3, UniProt record redundancy resolved by selecting UniProt record that maps to reference/representative proteome.
 NP_743929,P0A128,"Single UniProt accession, no resolution required"
-YP_004189297,E8VMW5.1 (obsolete),"Manual, through UniParc"
+YP_004189297,Q7MMB6,"Manual, from E8VMW5.1 (obsolete) through reference proteome UP000002675."
 YP_008242746,A0A0C6FYN7,UniProt record redundancy resolved by selecting UniProt record that maps to complete proteome
 NP_420709,Q9A724,"Single UniProt accession, no resolution required"
 NP_415753,P0ACF8,"Single UniProt accession, no resolution required"
@@ -45,7 +45,7 @@ YP_008489272,F7YRV4,"Manual, through UniParc. Complete proteome."
 NP_952668,P61609,"Single UniProt accession, no resolution required"
 NP_206965,O24973,"Single UniProt accession, no resolution required"
 NP_251116,G3XCV1,UniProt record redundancy resolved through taxonomy ID match between RefSeq and UniProt records
-YP_004565686,F7YNE5.1 (obsolete) & T1XXI5.1 (obsolete),"Manual, through UniParc."
+YP_004565686,P37736,"Manual, from T1XXI5.1 (obsolete) through reference proteome UP000006800."
 YP_001720620,B1JJ73,UniProt record redundancy resolved through taxonomy ID match between RefSeq and UniProt records
 YP_002562227,B9DUC0,"Single UniProt accession, no resolution required"
 YP_006516595,I6XGD8,UniProt record redundancy resolved through taxonomy ID match between RefSeq and UniProt records
@@ -132,7 +132,7 @@ NP_384784,Q92RZ4,"Single UniProt accession, no resolution required"
 YP_002876145,A0A0H3Q9Z3,"Manual, through UniParc. Complete proteome."
 NP_745849,Q88GK5,"Single UniProt accession, no resolution required"
 NP_358301,P0A4H8,"Single UniProt accession, no resolution required"
-YP_004936796,A0A016XCN6.1 (obsolete),"Manual, through UniParc."
+YP_004936796,A0A0H3PXJ2,"Manual, from A0A016XCN6.1 (obsolete) through reference proteome UP000004007."
 YP_008113561,T2H788,"Single UniProt accession, no resolution required"
 NP_460201,P0DM78,"Single UniProt accession, no resolution required"
 NP_298057,Q9PFB1,UniProt record redundancy resolved through taxonomy ID match between RefSeq and UniProt records
@@ -183,7 +183,7 @@ NP_358700,Q8DPL7,"Single UniProt accession, no resolution required"
 YP_003027057,R4NTK7,UniProt record redundancy resolved by selecting UniProt record that maps to complete proteome
 NP_484646,Q9L3R4,"Single UniProt accession, no resolution required"
 NP_600584,Q8NQQ9,"Single UniProt accession, no resolution required"
-YP_005555344,G4PC64.1 (obsolete),"Manual, through UniParc."
+YP_005555344,P55910,"Manual, from G4PC64.1 (obsolete) through reference proteome UP000001570."
 YP_006513920,P9WMG5,UniProt record redundancy resolved through taxonomy ID match between RefSeq and UniProt records
 YP_002286360,B5XI03,UniProt record redundancy resolved through taxonomy ID match between RefSeq and UniProt records
 YP_001216650,Q9KSX6,"Single UniProt accession, no resolution required"
