@@ -69,6 +69,20 @@ def motif_reports_by_experimental_technique():
         reports = motif_report.make_reports(curation_site_instances)
         pickle_report(reports, 'experimental_technique', technique.technique_id)
 
+def motif_reports_by_species_and_TF():
+    """Generates motif reports for each pair of species and TF."""
+    TF_and_species = models.Curation_SiteInstance.objects.values_list(
+        'curation__TF_instances__TF',
+        'site_instance__genome__taxonomy')
+    for TF, species in tqdm(TF_and_species.distinct()):
+        curation_site_instances = models.Curation_SiteInstance.objects.filter(
+            curation__TF_instances__TF=TF,
+            site_instance__genome__taxonomy=species)
+        reports = motif_report.make_reports(curation_site_instances)
+        pickle_file = os.path.join(settings.PICKLE_ROOT, 'motif_reports',
+                                   'tf_%d_species_%d.pkl' % (TF, species))
+        pickle.dump(reports, open(pickle_file, 'w'))
+
 def run():
     print "Generating motif reports for all experimental techniques."
     motif_reports_by_experimental_technique()
@@ -84,5 +98,8 @@ def run():
 
     print "Generating motif reports for TFs."
     motif_reports_by_tf()
+
+    print "Generating motif reports for all pairs of TFs and species."
+    motif_reports_by_species_and_TF()
 
 
