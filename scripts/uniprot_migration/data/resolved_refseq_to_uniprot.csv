@@ -213,7 +213,7 @@ YP_489307,P52106,UniProt record redundancy resolved by selecting UniProt record 
 NP_488432,P0A4U6,UniProt record redundancy resolved through taxonomy ID match between RefSeq and UniProt records
 NP_389499,P39779,"Single UniProt accession, no resolution required"
 NP_462230,P26979,"Single UniProt accession, no resolution required"
-NP_992452,(UniProt absent),"Manual, through UniParc."
+NP_992452,P33086,"Manual, retrieved through BLASTP (UniProt absent)."
 YP_001450866,A0A0F3HTU8,UniProt record redundancy resolved by selecting UniProt record that maps to complete proteome
 NP_267427,Q9CG39,"Single UniProt accession, no resolution required"
 NP_991864,Q0WJZ2, UniProt record redundancy resolved by selecting UniProt record that maps to reference/representative proteome.
@@ -441,7 +441,7 @@ YP_241587,Q4UZF6,UniProt record redundancy resolved through taxonomy ID match be
 YP_007999290,Q4KFB4,"Single UniProt accession, no resolution required"
 YP_001443333,A7MXA8,UniProt record redundancy resolved through taxonomy ID match between RefSeq and UniProt records
 NP_418098,P0C093,"Single UniProt accession, no resolution required"
-WP_018003289,(absent in UniProt),"Manual, through UniParc."
+WP_018003289,(absent in UniProt),"Manual. Unused record? Targeted for deletion."
 NP_601169,Q8NP59,"Single UniProt accession, no resolution required"
 YP_004189248,A0A0H0Y234,"Single UniProt accession, no resolution required"
 NP_954404,Q747A3,"Single UniProt accession, no resolution required"
