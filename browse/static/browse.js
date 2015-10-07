@@ -1,5 +1,6 @@
 /*global $,document,window*/
 "use strict";
+
 if (!window.console) {
     window.console = {};
 }
@@ -16,7 +17,7 @@ function get_wiki(name) {
             //titles: name,
             page: name,
             format: 'json',
-            prop: 'text',
+            prop: 'text'
         },
         dataType: 'jsonp',
         success: function (data) {
@@ -41,13 +42,14 @@ function get_wiki(name) {
     });
 }
 
-function getReportLinksSpecies(id) {
+// Retrieves list of motif report links by the given taxonomy ID.
+function getReportLinksByTaxonomy(objectId) {
     // retrieve list of reports
     $(document).ajaxStop($.unblockUI); // unblock when ajax activity stops
     $.blockUI();
     $.ajax({
         type: "GET",
-        url: '/browse/get_results_tax/' + id,
+        url: '/browse/get_results_tax/' + objectId,
         success: function (data) {
             $("#browse").html(data);
             get_wiki($("#browse #description h4").text());
@@ -55,8 +57,38 @@ function getReportLinksSpecies(id) {
     });
 }
 
-function getReportLinksTechniques(type, id) {
-    // retrieve list of reports
+// Retrieves the list of motif report links by the given category.
+function getReportLinksByTechniqueCategory(technique_function, objectId) {
+    $(document).ajaxStop($.unblockUI); // unblock when ajax activity stops
+    $.blockUI();
+    $.ajax({
+        type: "GET",
+        url: ('/browse/get_results_technique_category/' +
+              technique_function + '/' + objectId),
+        success: function (data) {
+            $("#browse").html(data);
+            get_wiki($("#browse #description h4").text());
+        }
+    });
+}
+
+// Retrieves the list of motif report links by binding/expression.
+function getReportLinksByTechniqueFunction(technique_function) {
+    $(document).ajaxStop($.unblockUI); // unblock when ajax activity stops
+    $.blockUI();
+    $.ajax({
+        type: "GET",
+        url: '/browse/get_results_technique_all/' + technique_function,
+        success: function (data) {
+            $("#browse").html(data);
+            get_wiki($("#browse #description h4").text());
+        }
+    });
+}
+
+
+// Retrieves the list of motif report links by the given technique.
+function getReportLinksByTechnique(objectId) {
     $(document).ajaxStop($.unblockUI); // unblock when ajax activity stops
     $.blockUI();
     $.ajax({
@@ -68,7 +100,20 @@ function getReportLinksTechniques(type, id) {
     });
 }
 
-function getReportLinksTF(type, id) {
+// Performs AJAX call to retrieve list of motif reports by given TF family.
+function getReportLinksByTFFamily(objectID) {
+    $(document).ajaxStop($.unblockUI); // unblock when AJAX activity stops.
+    $.blockUI();
+    $.ajax({
+        type: "GET",
+        url: "/browse/get_results_TF_family/" + objectID,
+        success: function(data) {
+            $("#browse").html(data);
+        }
+    });
+}
+
+function getReportLinksByTF(type, id) {
     // Given string type (TF_family|TF) and id of the object, perform ajax to
     // retrieve list of reports
     $(document).ajaxStop($.unblockUI); // unblock when ajax activity stops

@@ -532,6 +532,7 @@ class ExperimentalTechniqueCategory(models.Model):
         return u'[%d] %s' % (self.category_id, self.name)
 
     class Meta:
+        ordering = ['name']
         verbose_name_plural = "experimental technique categories"
 
 class ChipInfo(models.Model):

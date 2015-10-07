@@ -9,7 +9,6 @@ same organism).
 import base
 from base import metasite
 import base.models as models
-import sys
 
 class MotifReport:
     def __init__(self, m_cur_site_insts,
