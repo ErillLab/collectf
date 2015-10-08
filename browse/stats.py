@@ -19,11 +19,27 @@ def curator_roster(request):
                   "curator_roster.html",
                   context_instance=RequestContext(request))
 
-def experimental_techniques(request):
-    """Get the experimental techniques."""
-    exp_techniques = models.ExperimentalTechnique.objects.order_by('name').all()
+def list_tfs(request):
+    """Returns all TF families."""
+    tf_families = models.TFFamily.objects.all()
     return render(request,
-                  "experimental_techniques.html",
+                  'all_tfs.html',
+                  {'tf_families': tf_families},
+                  context_instance=RequestContext(request))
+
+def list_species(request):
+    """Returns all phyla objects, therefore all species."""
+    phyla = models.Taxonomy.objects.filter(rank='phylum')
+    return render(request,
+                  'all_species.html',
+                  {'phyla': phyla},
+                  context_instance=RequestContext(request))
+
+def list_experimental_techniques(request):
+    """Get the experimental techniques."""
+    exp_techniques = models.ExperimentalTechnique.objects.all()
+    return render(request,
+                  "all_experimental_techniques.html",
                   {'techs': exp_techniques},
                   context_instance=RequestContext(request))
 

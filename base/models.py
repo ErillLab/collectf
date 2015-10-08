@@ -51,7 +51,6 @@ class Curation(models.Model):
     # relations
     curator = models.ForeignKey("Curator")
     publication = models.ForeignKey("Publication")
-    TF = models.ForeignKey("TF", null=True)
 
     # <Wed Jan 29 2014> 1:N relationship between TF-instance and curation will
     # be changed into a N:N relationship. This will allow to define TFs composed
@@ -89,6 +88,11 @@ class Curation(models.Model):
         d = dict(list)
         if key in d: return d[key]
         return None
+
+    @property
+    def TF(self):
+        """Returns the TF associated with the curation."""
+        return self.TF_instances.all()[0].TF
 
     def TF_function_verbose(self):
         return self._get_display(self.TF_function, self.TF_FUNCTION)
@@ -262,6 +266,7 @@ class Taxonomy(models.Model):
 
     class Meta:
         verbose_name_plural = 'taxonomies'
+        ordering = ['name']
 
 class TF(models.Model):
     """TF table containing information about TF and link to its family"""
@@ -275,6 +280,7 @@ class TF(models.Model):
 
     class Meta:
         verbose_name_plural = "TFs"
+        ordering = ['name']
 
 class TFFamily(models.Model):
     """TF family contains name and description for the family"""
@@ -288,6 +294,7 @@ class TFFamily(models.Model):
     class Meta:
         verbose_name = "TF family"
         verbose_name_plural = "TF families"
+        ordering = ['name']
 
 class TFInstance(models.Model):
     """Protein table. Contains accession number, which TF it is and the
@@ -295,6 +302,7 @@ class TFInstance(models.Model):
     protein_accession = models.CharField(max_length=20, primary_key=True)
     name = models.CharField(max_length=50)
     description = models.TextField()
+    TF = models.ForeignKey("TF", null=False)
 
     def __unicode__(self):
         return u'%s -- %s' % (self.protein_accession, self.description)
@@ -504,6 +512,9 @@ class ExperimentalTechnique(models.Model):
 
     def __unicode__(self):
         return u'%s' % self.name
+
+    class Meta:
+        ordering = ['name']
 
 class ExperimentalTechniqueCategory(models.Model):
     """Each experimental technique can belong to a set of categories. Categories

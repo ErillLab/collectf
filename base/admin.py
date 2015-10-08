@@ -113,14 +113,14 @@ class TFAdmin(admin.ModelAdmin):
     ordering = ('name',)
 
 class TFInstance(admin.ModelAdmin):
-    list_display = ('protein_accession', 'name')
+    list_display = ('protein_accession', 'name', 'TF')
     list_filter = ('')
     ordering = ('name')
 
 class NCBISubmissionAdmin(admin.ModelAdmin):
     list_display = ('pk', 'genome_submitted_to', 'submission_time')
-    
 
+    
 def register_rest():
     """Register all models that have not been registered explicitly."""
     app = get_app("base")

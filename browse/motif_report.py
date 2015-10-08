@@ -81,7 +81,7 @@ class MotifReport:
     def TF_name(self):
         """Return the name of the TF"""
         #self.TF_accession_check()
-        return self.m_cur_site_insts[0].curation.TF.name
+        return self.m_cur_site_insts[0].curation.TF
 
     @property
     def TF(self):
@@ -228,22 +228,22 @@ def make_reports(cur_site_insts):
 
     """
     # find all tuples of (TF,species)
-    tf_species = cur_site_insts.values_list("curation__TF", "site_instance__genome__taxonomy")\
+    tf_species = cur_site_insts.values_list("curation__TF_instances__TF", "site_instance__genome__taxonomy")\
       .distinct()\
-      .order_by("curation__TF__name", "site_instance__genome__taxonomy__name")
+      .order_by("curation__TF_instances__TF__name", "site_instance__genome__taxonomy__name")
 
     # Group all curation-site-instances by TF and species
     reports = []
     for (TF, species) in tf_species:
         # Filter motif-assoc cur-site-insts and non-motif-assoc ones by TF and
         # species
-        m_csis = cur_site_insts.filter(curation__TF=TF,
+        m_csis = cur_site_insts.filter(curation__TF_instances__TF=TF,
                                        site_instance__genome__taxonomy=species,
                                        site_type="motif_associated")
-        nm_csis = cur_site_insts.filter(curation__TF=TF,
+        nm_csis = cur_site_insts.filter(curation__TF_instances__TF=TF,
                                         site_instance__genome__taxonomy=species,
                                         site_type="non_motif_associated")
-        var_csis = cur_site_insts.filter(curation__TF=TF,
+        var_csis = cur_site_insts.filter(curation__TF_instances__TF=TF,
                                          site_instance__genome__taxonomy=species,
                                          site_type='var_motif_associated')
 

@@ -1,14 +1,13 @@
 {% extends "base.html" %}
 
 {% load staticfiles %}
+
 {% block head-extras %}
-
-<!-- jQuery -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-
 <!-- BioPortal -->
 <link href="{% static "jquery.ncbo.tree.css" %}" rel="stylesheet" type="text/css"></link>
 <script type="text/javascript" src="{% static "jquery.ncbo.tree-2.0.0.js" %}"></script>
+<script type="text/javascript" src="{% static "form_complete.js" %}"></script>
+
 
 {% endblock %}
 

@@ -9,6 +9,8 @@ import re
 import help_texts
 from django.utils.safestring import mark_safe
 from collectf import settings
+from django.template.loader import get_template
+from django.template import Context
 
 
 class PublicationForm(forms.Form):
@@ -159,15 +161,23 @@ class GenomeForm(forms.Form):
         return self.clean_genome_accession_helper(genome_accession)
 
     def clean_TF_accession_helper(self, TF_accession):
-        """Check if the entered TF accession number is valid"""
+        """Checks if the entered TF accession number is valid."""
+        TF = self.cleaned_data['TF']
         try:
             TF_accession = TF_accession.split('.')[0]
             if not (TF_accession.startswith('NP_') or
                     TF_accession.startswith('YP_') or
                     TF_accession.startswith('WP_')):
-                msg = """TF accession number must start with 'NP_', 'YP_' or 'WP_'."""
+                msg = "TF accession number must start with 'NP_', 'YP_' or 'WP_'."
                 raise forms.ValidationError(msg)
             TF_instance = TFInstance.objects.get(protein_accession=TF_accession)
+            # Check if selected TF matches with the TF_instance's TF.
+            
+            print TF_accession
+            if TF != TF_instance.TF:
+                raise forms.ValidationError(
+                    "It seems that %s is a %s but you selected %s" %
+                    (TF_accession, TF_instance.TF.name, TF.name))
         except TFInstance.DoesNotExist:
             TF_record = bioutils.get_TF(TF_accession)
             if not TF_record:
@@ -175,7 +185,7 @@ class GenomeForm(forms.Form):
                 number."""
                 raise forms.ValidationError(msg)
             # Create TF instance object
-            create_object.make_TF_instance(TF_record)
+            create_object.make_TF_instance(TF_record, TF)
         return TF_accession
 
     def clean_TF_accession(self):
@@ -239,27 +249,20 @@ class GenomeForm(forms.Form):
 
     def check_TF_accession_origin(self):
         """Check if all TF accession fields belong to the same taxonomy ID"""
-        try:
-            cd = self.cleaned_data
-            if 'TF_accession' not in cd:
-                return
-            TF_accessions = [cd['TF_accession']]
-            if len(TF_accessions) > 1:
-                for i in xrange(settings.NUMBER_OF_TF_ACCESSION_FIELDS):
-                    field_name = 'TF_accession_%d' % i
-                    if cd.get(field_name, None):
-                        self.clean_TF_accession_helper(cd[field_name].strip())
-                        TF_accessions.append(cd[field_name].strip())
-                # Check if all TF accession numbers come from the same organism
-                all_same = lambda items: all(x == items[0] for x in items)
-                if not all_same([bioutils.TF_accession_to_org_taxon(acc)
-                                 for acc in TF_accessions]):
-                    msg = "TF accession numbers are not from the same taxonomy ID."
-                    self._errors['TF_accession'] = self.error_class([msg])
-
-        except:
-            msg = """Failed to validate TF accession numbers (can not fetch
-            records from NCBI)"""
+        cd = self.cleaned_data
+        if 'TF_accession' not in cd:
+            return
+        TF_accessions = [cd['TF_accession']]
+        for i in xrange(settings.NUMBER_OF_TF_ACCESSION_FIELDS):
+            field_name = 'TF_accession_%d' % i
+            if cd.get(field_name, None):
+                self.clean_TF_accession_helper(cd[field_name].strip())
+                TF_accessions.append(cd[field_name].strip())
+        # Check if all TF accession numbers come from the same organism
+        all_same = lambda items: all(x == items[0] for x in items)
+        if not all_same([bioutils.TF_accession_to_org_taxon(acc)
+                         for acc in TF_accessions]):
+            msg = "TF accession numbers are not from the same taxonomy ID."
             self._errors['TF_accession'] = self.error_class([msg])
 
     def clean(self):
@@ -326,20 +329,21 @@ class TechniquesForm(forms.Form):
                                 help_text=help_dict['external_db_accession'])
 
     help_dict = help_texts.techniques_form
-    # generate techniques field by getting available techniques from db
-    choices = []
-    # Used Bootstrap tooltip for experimental technique description
-    description_markup = u'<span data-container="body" data-toggle="popover" title="<a href =%s>%s</a>" data-content="%s " >%s</span>'
-    for t in ExperimentalTechnique.objects.order_by('name'):
-        choices.append((t.technique_id,
-                        mark_safe(description_markup % ( t.EO_term,
-                                                        t.name,
-                                                        t.description,
-                                                        t.name))))
-    techniques = forms.MultipleChoiceField(choices = choices,
-                                           label = "Techniques",
-                                           help_text=help_dict['techniques'],
-                                           widget=forms.CheckboxSelectMultiple())
+
+    # Generate techniques field by getting available techniques from db
+    template = get_template('experimental_technique_field.html')
+    choices = [(t.technique_id,
+                template.render(Context({
+                    'technique_id': t.technique_id,
+                    'technique_name': t.name,
+                    'technique_description': t.description,
+                    'technique_EO_term': t.EO_term,
+                })))
+               for t in ExperimentalTechnique.objects.order_by('name')]
+    techniques = forms.MultipleChoiceField(
+        choices = choices, label = "Techniques",
+        help_text=help_dict['techniques'],
+        widget=forms.CheckboxSelectMultiple())
 
     experimental_process = forms.CharField(widget=forms.Textarea,
                                            label="Experimental process",

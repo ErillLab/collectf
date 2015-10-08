@@ -83,6 +83,11 @@ DATABASES = {
     }
 }
 
+# Change database username/password if build on Travis CI.
+if os.getenv('BUILD_ON_TRAVIS', None):
+    DATABASES['default']['USER'] = 'travis'
+    DATABASES['default']['PASSWORD'] = ''
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
 

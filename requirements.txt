@@ -6,3 +6,5 @@ pylint
 regex
 reportlab
 south
+tqdm
+uniprot_tools

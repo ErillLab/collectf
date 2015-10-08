@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{# List of all species in CollecTF #}
+
+{% block head-extras %}
+<title>CollecTF - List of Species</title>
+{% endblock %}
+
+{% block content %}
+
+<ul>
+  {% for phylum in phyla %}
+  <li>
+    {{ phylum.name }}
+    <ul>
+      {% for class in phylum.taxonomy_set.all %}
+      <li>
+        {{ class.name }}
+        <ul>
+          {% for order in class.taxonomy_set.all %}
+          <li>
+            {{ order.name }}
+            <ul>
+              {% for family in order.taxonomy_set.all %}
+              <li>
+                {{ family.name }}
+                <ul>
+                  {% for genus in family_set.all %}
+                  <li>
+                    {{ genus.name }}
+                    <ul>
+                      {% for species in genus_set.all %}
+                      <li>
+                        {{ species.name }}
+                      </li>
+                      {% endfor %}
+                    </ul>
+                  </li>
+                  {% endfor %}
+                </ul>
+              </li>
+              {% endfor %}
+            </ul>
+          </li>
+          {% endfor %}
+        </ul>
+      </li>
+      {% endfor %}
+    </ul>
+  </li>
+  {% endfor %}
+</ul>
+
+{% endblock %}

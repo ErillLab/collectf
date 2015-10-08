@@ -1,6 +1,6 @@
 # CollecTF
 
-[![Build Status](https://travis-ci.org/ErillLab/collectf.svg)](https://travis-ci.org/ErillLab/collectf) [![Coverage Status](https://coveralls.io/repos/sefakilic/collectf/badge.svg?branch=master&service=github)](https://coveralls.io/github/sefakilic/collectf?branch=master)
+[![Build Status](https://travis-ci.org/ErillLab/collectf.svg)](https://travis-ci.org/ErillLab/collectf) [![Coverage Status](https://coveralls.io/repos/ErillLab/collectf/badge.svg?branch=develop&service=github)](https://coveralls.io/github/ErillLab/collectf?branch=develop)
 
 CollecTF (http://collectf.umbc.edu) is a database of transcription factor
 binding sites in the Bacteria domain.

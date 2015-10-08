@@ -22,21 +22,30 @@ def view_reports(request, tax_param_type, tax_param,
 
     tax_param_type:  all/group/species
     tax_param:       id of the taxonomy object
-    tf_param_type:   all/family/tf
-    tf_param:        id of the TF/TF_family object
+    tf_param_type:   all/family/tf/tf_instance
+    tf_param:        id of the TF/TF_family object or the accession number
     tech_param_type: all/binding/expression/binding_category/expression_category
     integrate_non_motif: 1 to integrate non-motif-associated data, 0 otherwise
     """
 
     orgs = browse_tax.get_species(tax_param_type, tax_param)
-    tfs = browse_TF.get_TFs(tf_param_type, tf_param)
     _, _, techs = browse_tech.get_techniques(tech_param_type, tech_param)
 
     cur_site_insts = models.Curation_SiteInstance.objects.filter(
         site_instance__genome__taxonomy__in=orgs,
-        curation__TF__in=tfs,
         experimental_techniques__in=techs,
     )
+
+    # Filter by TFs or TF-instance
+    if tf_param_type == "tf_instance":
+        tf_instance = browse_TF.get_tf_instance(tf_param)
+        cur_site_insts = cur_site_insts.filter(
+            curation__TF_instances=tf_instance)
+    else:
+        tfs = browse_TF.get_TFs(tf_param_type, tf_param)
+        cur_site_insts = cur_site_insts.filter(
+            curation__TF_instances__TF__in=tfs)
+
 
     # Exclude non-motif-associated sites here, it can be integrated if user
     # wants to do so

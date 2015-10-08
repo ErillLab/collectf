@@ -30,7 +30,7 @@ urlpatterns += patterns(
 
 urlpatterns += patterns(
     'browse.view_reports',
-    (r'view_reports/(?P<tax_param_type>.+)/(?P<tax_param>-?\d+)/(?P<tf_param_type>.+)/(?P<tf_param>-?\d+)/(?P<tech_param_type>.+)/(?P<tech_param>-?\d+)/(?P<integrate_non_motif>\d)',
+    (r'view_reports/(?P<tax_param_type>.+)/(?P<tax_param>-?\d+)/(?P<tf_param_type>.+)/(?P<tf_param>.+)/(?P<tech_param_type>.+)/(?P<tech_param>-?\d+)/(?P<integrate_non_motif>\d)',
      'view_reports'),
     (r'view_reports_by_id_list', 'view_reports_by_id_list'),
 )
@@ -45,7 +45,9 @@ urlpatterns += patterns(
     'browse.stats',
     url(r'^curation_stats/$', 'curation_stats'),
     url(r'^curator_roster/$', 'curator_roster'),
-    url(r'^exp_tech_list/$', 'experimental_techniques'),
+    url(r'^tf_list/$', 'list_tfs'),
+    url(r'^species_list/$', 'list_species'),
+    url(r'^exp_tech_list/$', 'list_experimental_techniques'),
     url(r'^release_history/$', 'release_history'),
     url(r'^view_all_curations/$', 'view_all_curations'),
     url(r'^view_all_publications/$', 'view_all_publications'),

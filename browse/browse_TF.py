@@ -25,6 +25,9 @@ def get_TFs(tf_type, tf_id):
         tfs = get_list_or_404(models.TF, TF_id=tf_id)
     return tfs
 
+def get_tf_instance(accession):
+    return get_object_or_404(models.TFInstance, protein_accession=accession)
+
 def get_results_TF(request, type_, id_):
     """GIven the type (TF or TF family) and the id of the object, return query
     results and list TF/species that have binding site data for the selected TF
@@ -44,7 +47,7 @@ def get_results_TF(request, type_, id_):
     # get all curation-site-instance objects for browsed TFs
     assert TFs
     cur_site_insts = models.Curation_SiteInstance.objects.\
-                     filter(curation__TF__in=TFs)
+                     filter(curation__TF_instances__TF__in=TFs)
 
     # generate all reports
     reports = motif_report.make_reports(cur_site_insts)
