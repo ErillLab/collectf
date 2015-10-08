@@ -1,4 +1,6 @@
-# Scripts for CollecTF database schema changes. Intented to run once.
+"""
+Scripts for CollecTF database schema changes. Intented to run once.
+"""
 
 from tqdm import tqdm
 
@@ -12,5 +14,5 @@ def move_TF_from_curation_to_TF_instance_table():
             TF_instance.save()
     
 def run():
+    """Entry point for the script."""
     move_TF_from_curation_to_TF_instance_table()
-    

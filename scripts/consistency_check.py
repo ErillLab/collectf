@@ -30,6 +30,7 @@ def tf_instances_have_associated_tf():
                    tf_instance.protein_accession)
 
 def run():
+    """Entry point for the script."""
     each_curation_has_only_one_tf()
     tf_instances_have_valid_accession_number()
     tf_instances_have_associated_tf()
