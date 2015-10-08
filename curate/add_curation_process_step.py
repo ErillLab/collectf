@@ -36,10 +36,10 @@ def publication_process(wiz, form):
     # Check if the publication is previously curated
     cs = models.Curation.objects.filter(publication=p)
     if cs.count() >= 1:
-        session_utils.put(wiz.request.session, "previously_curated_paper",
+        session_utils.put(wiz.request.session, "previous_curation",
                           cs[0])
     else:
-        session_utils.put(wiz.request.session, "previously_curated_paper", None)
+        session_utils.put(wiz.request.session, "previous_curation", None)
 
 def genome_process(wiz, form):
     """Post-process genome and TF selection step."""
