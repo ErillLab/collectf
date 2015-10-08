@@ -1,13 +1,15 @@
+"""Custom template tags for curation form."""
+
 from django import template
 from django.template import Context
 from django.template.loader import get_template
-from django.utils.safestring import mark_safe
 
 register = template.Library()
 
 @register.filter
 def print_pub(pub):
-    template = get_template("pub_template.html")
+    """Renders publication template."""
+    templ = get_template("pub_template.html")
     c = Context({'pub': pub})
-    return template.render(c)
+    return templ.render(c)
 

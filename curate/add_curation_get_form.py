@@ -1,4 +1,4 @@
-"""This file contains get_form functions for curation-wizard steps. At each step
+"""This module contains get_form functions for curation-wizard steps. At each step
 of the curation, get_form function is called to construct the form for the
 particular step.
 
@@ -8,75 +8,72 @@ https://docs.djangoproject.com/en/1.6/ref/contrib/formtools/form-wizard/#django.
 
 """
 
-import curate.models as models
-import curate.templatetags.print_pub as print_pub
-import curate.session_utils as session_utils
 from django import forms
 from django.utils.safestring import mark_safe
 from django.contrib import messages
-from collectf import settings
+
 from base import bioutils
+import curate.models as models
+import curate.session_utils as session_utils
+import curate.templatetags.print_pub as print_pub
 
 def publication_get_form(wiz, form):
-    """Construct the form for publication selection step."""
+    """Constructs the form for publication selection step."""
     user = wiz.request.user
     curator, _ = models.Curator.objects.get_or_create(user=user)
-    # select papers assigned to user and not complete
     assigned_pubs = models.Publication.objects.filter(assigned_to=curator,
                                                       curation_complete=False)
-    # put them in form choices, populate form field
-    choices = [(p.publication_id, mark_safe("%s" % (print_pub.print_pub(p))))
-               for p in assigned_pubs]
-    form.fields["pub"].choices = choices
-    # External submitters shouldn't see "This paper contains no data" checkbox
+    form.fields['pub'].choices = [
+        (p.publication_id, mark_safe(print_pub.print_pub(p)))
+        for p in assigned_pubs]
+
+    # External curators shouldn't see "This paper contains no data" checkbox
     # on their paper list, assuming that they are submitting on a paper they
     # uploaded and which contains data.
-    if curator.curator_type == "external":
+    if curator.curator_type == 'external':
         form.fields['no_data'].initial = False
         form.fields['no_data'].widget = forms.HiddenInput()
+
     return form
 
-
 def genome_get_form(wiz, form):
-    """Construct the form for genome and TF selection step."""
-    c = session_utils.get(wiz.request.session, "previously_curated_paper")
+    """Constructs the form for genome and TF selection step."""
+    prev_curation = session_utils.get(wiz.request.session, 'previous_curation')
+
     # If selected publication is the one most recently curated, the related
-    # curation should be in object c. Otherwise, c = None.  If so, populate
-    # "Genome and TF information" form fields from the previously submitted
-    # curation to make things easier for curator.
-    if c:
-        form.initial["TF"] = c.TF
-        if c.site_instances.all():
-            genomes = list(set(site.genome.genome_accession
-                               for site in c.site_instances.all()))
-            form.initial["genome_accession"] = c.site_instances.all()[0].\
-                                               genome.genome_accession
-            for i, g in zip(xrange(1, settings.NUMBER_OF_GENOME_ACCESSION_FIELDS), genomes[1:]):
-                form.initial['genome_accession_%d' % i] = g
+    # curation should be in object prev_curation. Otherwise, it is None.  If so,
+    # populate 'Genome' and 'TF information' form fields from the previously
+    # submitted curation to make things easier for curator.
+    if prev_curation:
+        form.initial['TF'] = prev_curation.TF
+        sites = prev_curation.site_instances.all()
+        if sites:
+            genomes = list(set(site.genome.genome_accession for site in sites))
+            form.initial['genome_accession'] = sites[0].genome.genome_accession
+            for i, genome in enumerate(genomes[1:], start=1):
+                form.initial['genome_accession_%d' % i] = genome
 
-        # Enter TF accession numbers
-        form.initial["TF_accession"] = c.TF_instances.all()[0].protein_accession
-        for i, TF_instance in zip(xrange(1, settings.NUMBER_OF_TF_ACCESSION_FIELDS),
-                                  c.TF_instances.all()[1:]):
-            form.initial["TF_accession_%d" % i] = TF_instance.protein_accession
+        TF_instances = prev_curation.TF_instances.all()
+        form.initial['TF_accession'] = TF_instances[0].protein_accession
+        for i, TF_instance in enumerate(TF_instances):
+            form.initial['TF_accession_%d' % i] = TF_instance.protein_accession
 
-        form.initial["TF_species"] = c.TF_species
-        form.initial["site_species"] = c.site_species
+        form.initial["TF_species"] = prev_curation.TF_species
+        form.initial["site_species"] = prev_curation.site_species
 
-        msg = """
-        <h4>Warning!</h4> It seems that the paper you selected is previously
-        curated. For convenience, fields in this form are automatically filled
-        based on the previous curation of the paper. They may differ in this
-        curation, so it is best to check that they are correct before proceeding
-        to the next step."""
-        messages.warning(wiz.request, mark_safe(msg))
+        messages.warning(wiz.request, mark_safe("""
+        <h4>Warning!</h4> It seems that the paper you selected is
+        previously curated. For convenience, fields in this form are
+        automatically filled based on the previous curation of the paper. They
+        may differ in this curation, so it is best to check that they are
+        correct before proceeding to the next step."""))
 
     # In addition populate two fields on whether the manuscript contains
     # experimental data and promoter information
-    pid = session_utils.get(wiz.request.session, 'publication')
-    pub = models.Publication.objects.get(publication_id=pid)
-    form.fields["contains_promoter_data"].initial = pub.contains_promoter_data
-    form.fields["contains_expression_data"].initial = pub.contains_expression_data
+    pub_id = session_utils.get(wiz.request.session, 'publication')
+    p = models.Publication.objects.get(publication_id=pub_id)
+    form.fields['contains_promoter_data'].initial = p.contains_promoter_data
+    form.fields['contains_expression_data'].initial = p.contains_expression_data
 
     return form
 
