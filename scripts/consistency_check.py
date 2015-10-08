@@ -21,8 +21,14 @@ def tf_instances_have_valid_accession_number():
                    for prefix in allowed_prefixes):
             print ("TF instance %s has an invalid accession number." %
                    tf_instance.protein_accession)
-            
+
+def tf_instances_have_associated_tf():
+    """Checks if all TF-instances have an associated TF."""
+    for tf_instance in models.TFInstance.objects.all():
+        if not tf_instance.TF:
+            print ("TF instance %s doesn't have a TF." %
+                   tf_instance.protein_accession)
+
 def run():
     each_curation_has_only_one_tf()
     tf_instances_have_valid_accession_number()
-            
