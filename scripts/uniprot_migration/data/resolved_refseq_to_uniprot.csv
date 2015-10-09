@@ -489,3 +489,17 @@ NP_253948,P26275,"Single UniProt accession, no resolution required"
 YP_002406666,A0A0H3MEC8,UniProt record redundancy resolved through taxonomy ID match between RefSeq and UniProt records
 NP_759503,Q7MNN2, UniProt record redundancy resolved by selecting UniProt record that maps to reference/representative proteome.
 YP_001031533,A2RHP2,UniProt record redundancy resolved through taxonomy ID match between RefSeq and UniProt records
+NP_840700,Q820Q2,"Single UniProt accession, no resolution required"
+NP_454727,Q8Z9H8,"Single UniProt accession, no resolution required"
+YP_488382,P10151,UniProt record redundancy resolved by selecting UniProt record with 'Reviewed' status
+NP_414618,P10151,"Single UniProt accession, no resolution required"
+NP_389835,O34844,UniProt record redundancy resolved by selecting UniProt record with 'Reviewed' status
+NP_391248,O32238,UniProt record redundancy resolved by selecting UniProt record with 'Reviewed' status
+YP_005235771,P46924,UniProt record redundancy resolved by selecting UniProt record with 'Reviewed' status
+NP_233336,Q9KKZ8,UniProt record redundancy resolved through taxonomy ID match between RefSeq and UniProt records
+WP_001026760,A0A0F6AXY2,UniProt record redundancy resolved through taxonomy ID match between RefSeq and UniProt records
+WP_013023516,D3UIX2,"Single UniProt accession, no resolution required"
+NP_266988,Q9CHA6,"Single UniProt accession, no resolution required"
+NP_215482,P9WP49,UniProt record redundancy resolved by selecting UniProt record with 'Reviewed' status
+WP_002223593,Q6VQX1,Manual; used the only match at the species level.
+WP_003527557,Q7APB9,UniProt record redundancy resolved through taxonomy ID match between RefSeq and UniProt records
