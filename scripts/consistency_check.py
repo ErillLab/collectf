@@ -1,4 +1,6 @@
-# This script checks for inconsistency in CollecTF database.
+"""
+This script checks for inconsistency in CollecTF database.
+"""
 # TODO(sefa): Set up a cron job for this script.
 
 from base import models
@@ -21,8 +23,22 @@ def tf_instances_have_valid_accession_number():
                    for prefix in allowed_prefixes):
             print ("TF instance %s has an invalid accession number." %
                    tf_instance.protein_accession)
+
+def curations_with_no_sites():
+    """Checks if there are curations with no sites."""
+    for curation in models.Curation.objects.all():
+        if not curation.site_instances.all():
+            print "Curation %d has no site instances." % curation.curation_id
+
+def curation_site_instances_link_to_curation():
+    """Checks if all Curation_SiteInstance objects link to Curation objects."""
+    for curation_site_instance in models.Curation_SiteInstance.objects.all():
+        if not curation_site_instance.curation:
+            print ("Curation_SiteInstance %d doesn't have link to a curation." %
+                   curation_site_instance.pk)
             
 def run():
     each_curation_has_only_one_tf()
     tf_instances_have_valid_accession_number()
-            
+    curations_with_no_sites()
+    curation_site_instances_link_to_curation()

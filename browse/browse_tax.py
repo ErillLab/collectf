@@ -2,6 +2,9 @@
 The view function for browsing by taxonomy.
 """
 
+import os
+import pickle
+
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render_to_response
@@ -10,6 +13,7 @@ from django.template import RequestContext
 import browse.models as models
 import browse.motif_report as motif_report
 from browse.view_reports import view_reports_by_taxonomy
+from collectf import settings
 
 def browse_taxonomy(request):
     """View function for browse by taxonomy. Returns the taxonomy"""
@@ -29,10 +33,10 @@ def get_species(tax_type, taxid):
 
 def get_results_taxonomy(request, object_id):
     """Returns motif reports for a given taxonomy ID."""
-    tax = get_object_or_404(models.Taxonomy, pk=object_id)
-    curation_site_instances = models.Curation_SiteInstance.objects.filter(
-        site_instance__genome__taxonomy__in=tax.get_all_species())
-    reports = motif_report.make_reports(curation_site_instances)
+    tax = get_object_or_404(models.Taxonomy, taxonomy_id=object_id)
+    reports = pickle.load(open(os.path.join(settings.PICKLE_ROOT,
+                                            'motif_reports',
+                                            'taxonomy_%s.pkl' % object_id)))
     return render_to_response(
         'browse_results.html',
         {'title': tax.name,

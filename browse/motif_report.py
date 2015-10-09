@@ -38,7 +38,6 @@ class MotifReport:
                    for csi in self.nm_cur_site_insts)
         assert all(head.curation.TF == csi.curation.TF
                    for csi in self.var_cur_site_insts)
-        
 
     def species_check(self):
         """Check if all curation_site_instance objects have the same species"""
@@ -84,7 +83,7 @@ class MotifReport:
 
     @property
     def TF(self):
-        """Return the TF"""
+        """Returns the TF."""
         return self.m_cur_site_insts[0].curation.TF
 
     @property
