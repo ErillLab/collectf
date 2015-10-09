@@ -175,12 +175,12 @@ class GenomeForm(forms.Form):
                 Can not fetch protein record from NCBI. Check accession
                 number.""")
             create_object.make_TF_instance(TF_record, TF)
-
-        # Check if selected TF matches with the TF_instance's TF.
-        if TF != TF_instance.TF:
-            raise forms.ValidationError(
-                "It seems that %s is a %s but you selected %s." %
-                (TF_accession, TF_instance.TF.name, TF.name))
+        else:
+            # Check if selected TF matches with the TF_instance's TF.
+            if TF != TF_instance.TF:
+                raise forms.ValidationError(
+                    "It seems that %s is a %s but you selected %s." %
+                    (TF_accession, TF_instance.TF.name, TF.name))
 
         return TF_accession
 
