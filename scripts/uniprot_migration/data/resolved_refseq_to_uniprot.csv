@@ -503,3 +503,4 @@ NP_266988,Q9CHA6,"Single UniProt accession, no resolution required"
 NP_215482,P9WP49,UniProt record redundancy resolved by selecting UniProt record with 'Reviewed' status
 WP_002223593,Q6VQX1,Manual; used the only match at the species level.
 WP_003527557,Q7APB9,UniProt record redundancy resolved through taxonomy ID match between RefSeq and UniProt records
+NP_465480,Q8Y5U9,"Single UniProt accession, no resolution required"
