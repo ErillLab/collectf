@@ -50,8 +50,22 @@ def motif_reports_by_taxonomy():
         reports = motif_report.make_reports(curation_site_instances)
         pickle_report(reports, 'taxonomy', taxon.taxonomy_id)
 
+def motif_reports_by_technique_function():
+    """Generates motif reports for all binding/expression techniques."""
+    for function in ['binding', 'expression']:
+        techniques = models.ExperimentalTechnique.objects.filter(
+            preset_function=function)
+        curation_site_instances = models.Curation_SiteInstance.objects.filter(
+            experimental_techniques__in=techniques)
+        reports = motif_report.make_reports(curation_site_instances)
+        pickle_file = os.path.join(
+            settings.PICKLE_ROOT, 'motif_reports',
+            'experimental_technique_all_%s.pkl' % function)
+        pickle.dump(reports, open(pickle_file, 'w'))
+
 def motif_reports_by_experimental_technique_category():
     """Generate motif reports for experimental technique categories."""
+    # TODO(sefa): Group motifs by binding/expression function as well.
     for category in tqdm(models.ExperimentalTechniqueCategory.objects.all()):
         techniques = models.ExperimentalTechnique.objects.filter(
             categories=category)
@@ -92,6 +106,9 @@ def run():
     
     print "Generating motif reports for all experimental technique categories."
     motif_reports_by_experimental_technique_category()
+
+    print "Generating motif reports for all binding/expression techniques."
+    motif_reports_by_technique_function()
 
     print "Generating motif reports for all taxonomy levels."""
     motif_reports_by_taxonomy()

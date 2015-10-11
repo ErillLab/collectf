@@ -1,6 +1,10 @@
 """
 The view functions for browsing by experimental techniques.
 """
+
+import os
+import pickle
+
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import get_list_or_404
@@ -12,6 +16,7 @@ import browse.motif_report as motif_report
 from browse.view_reports import view_reports_by_all_techniques
 from browse.view_reports import view_reports_by_technique_category
 from browse.view_reports import view_reports_by_technique
+from collectf import settings
 
 def browse_tech(request):
     """Returns all techniques, grouped by categories."""
@@ -39,11 +44,9 @@ def browse_tech(request):
 def get_results_all(request, function):
     """Returns motif reports of sites validated by binding or expression."""
     assert function in ['binding', 'expression']
-    techniques = get_list_or_404(models.ExperimentalTechnique,
-                                 preset_function=function)
-    curation_site_instances = models.Curation_SiteInstance.objects.filter(
-        experimental_techniques__in=techniques)
-    reports = motif_report.make_reports(curation_site_instances)
+    reports = pickle.load(
+        open(os.path.join(settings.PICKLE_ROOT, 'motif_reports',
+                          'experimental_technique_all_%s.pkl' % function)))
     title_lookup = {'binding': 'Detection of binding',
                     'expression': 'Assessment of expression'}
     return render_to_response(
@@ -61,11 +64,9 @@ def get_results_category(request, category_function, object_id):
     assert category_function in ['binding', 'expression']
     category = get_object_or_404(models.ExperimentalTechniqueCategory,
                                  category_id=object_id)
-    techniques = models.ExperimentalTechnique.objects.filter(
-        categories=category, preset_function=category_function)
-    curation_site_instances = models.Curation_SiteInstance.objects.filter(
-        experimental_techniques__in=techniques)
-    reports = motif_report.make_reports(curation_site_instances)
+    reports = pickle.load(open(os.path.join(
+        settings.PICKLE_ROOT, 'motif_reports',
+        'experimental_technique_category_%s.pkl' % object_id)))
     
     return render_to_response(
         'browse_results.html',
@@ -81,9 +82,9 @@ def get_results_technique(request, object_id):
     """Returns motif reports by experimental technique ID."""
     technique = get_object_or_404(models.ExperimentalTechnique,
                                   technique_id=object_id)
-    curation_site_instances = models.Curation_SiteInstance.objects.filter(
-        experimental_techniques=technique)
-    reports = motif_report.make_reports(curation_site_instances)
+    reports = pickle.load(open(os.path.join(
+        settings.PICKLE_ROOT, 'motif_reports',
+        'experimental_technique_%s.pkl' % object_id)))
     return render_to_response(
         'browse_results.html',
         {'title': technique.name,

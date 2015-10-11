@@ -67,7 +67,6 @@ function getReportLinksByTechniqueCategory(technique_function, objectId) {
               technique_function + '/' + objectId),
         success: function (data) {
             $("#browse").html(data);
-            get_wiki($("#browse #description h4").text());
         }
     });
 }
@@ -81,7 +80,6 @@ function getReportLinksByTechniqueFunction(technique_function) {
         url: '/browse/get_results_technique_all/' + technique_function,
         success: function (data) {
             $("#browse").html(data);
-            get_wiki($("#browse #description h4").text());
         }
     });
 }
@@ -93,7 +91,7 @@ function getReportLinksByTechnique(objectId) {
     $.blockUI();
     $.ajax({
         type: "GET",
-        url: '/browse/get_results_tech/' + type + '/' + id,
+        url: '/browse/get_results_technique/' + objectId,
         success: function (data) {
             $("#browse").html(data);
         }
