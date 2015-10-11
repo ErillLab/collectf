@@ -42,7 +42,7 @@ def refseq_to_wp(acc):
         return wp
     return acc
 
-def add_refseq_accession():
+def add_refseq_accessions():
     """Populates WP accession numbers on 'refseq_accession' field."""
     for TF_instance in models.TFInstance.objects.all():
         print TF_instance.protein_accession
@@ -57,13 +57,14 @@ def merge_same_wps():
     wp_accessions = models.TFInstance.objects.values_list(
         'refseq_accession', flat=True).distinct()
     for wp_acc in wp_accessions:
-        tf_instances = models.TFInstance.objects.filter(refseq_accession=wp_acc)
-        if tf_instances.count() == 1:
+        tf_instances = list(
+            models.TFInstance.objects.filter(refseq_accession=wp_acc))
+        if len(tf_instances) == 1:
             continue
         # Get the first one and merge the rest
-        primary_tf_instance = tf_instances[0]
+        primary_tf_instance = tf_instances[-1]
         print primary_tf_instance.protein_accession, '--',
-        for obsolete_tf_instance in tf_instances[1:]:
+        for obsolete_tf_instance in tf_instances[:-1]:
             print obsolete_tf_instance.protein_accession,
             for curation in models.Curation.objects.filter(
                     TF_instances=obsolete_tf_instance):
@@ -154,13 +155,10 @@ def udpate_TF_instance_description():
 
 def run():
     """Entry point for the script."""
-    #move_TF_from_curation_to_TF_instance_table()
-    #refseq_to_uniprot_accession()
-    #move_to_wp()
     #add_refseq_accessions()
     #merge_same_wps()
-    #add_uniprot_accessions()
+    #oadd_uniprot_accessions()
     #dump_curation_TF_instance()
     #dump_TF_instance()
-    #load_TF_instance()
+    load_TF_instance()
     load_curation_TF_instance()
