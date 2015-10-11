@@ -94,7 +94,7 @@ class MotifReport:
         This function should be called only if all curation-site-instance
         objects have the same TF accession numbers."""
         get_TF = lambda csi: csi.curation.TF_instances.all()
-        return [str(TF_inst.protein_accession)
+        return [str(TF_inst.uniprot_accession)
                 for TF_inst in get_TF(self.m_cur_site_insts[0])]
 
     @property
@@ -258,7 +258,8 @@ def make_distinct_reports(cur_site_insts):
     rather than grouping curation_site_instances by TF and species names, it
     groups them by accession numbers."""
     tf_species = cur_site_insts.values_list(
-        'curation__TF_instances__protein_accession').distinct()
+        'curation__TF_instances__TF_instance_id').distinct()
+    
 
     reports = []
     for tf_insts in tf_species:

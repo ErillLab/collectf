@@ -29,7 +29,7 @@ def tf_instances_have_associated_tf():
     for tf_instance in models.TFInstance.objects.all():
         if not tf_instance.TF:
             print ("TF instance %s doesn't have a TF." %
-                   tf_instance.protein_accession)
+                   tf_instance.uniprot_accession)
 
 def run():
     """Entry point for the script."""

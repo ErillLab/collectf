@@ -434,8 +434,8 @@ class Curation_SiteInstance(models.Model):
     @property
     def TF_instances(self):
         """Return the list of TF instance accession numbers bound to it."""
-        return self.curation.TF_instances.values_list('protein_accession',
-                                                      flat=True)
+        return self.curation.TF_instances.values_list(
+            'uniprot_accession', flat=True)
 
     @property
     def genome(self):

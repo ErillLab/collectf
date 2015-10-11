@@ -23,7 +23,7 @@
     <dt>TF</dt>
     <dd>{{ curation.TF.name }} 
 
-      {% for TF_instance in curation.TF_instances.all %}<a href="http://www.ncbi.nlm.nih.gov/protein/?term={{ TF_instance.protein_accession }}" target="_blank">
+      {% for TF_instance in curation.TF_instances.all %}<a href="http://www.ncbi.nlm.nih.gov/protein/?term={{ TF_instance.refseq_accession }}" target="_blank">
         [{{ TF_instance.protein_accession }}]</a>{% if not forloop.last %}, {% endif %}{% endfor %}</dd>
 
     <dt>Reported TF sp.</dt>
