@@ -113,14 +113,13 @@ function getReportLinksByTFFamily(objectID) {
     });
 }
 
-function getReportLinksByTF(type, id) {
-    // Given string type (TF_family|TF) and id of the object, perform ajax to
-    // retrieve list of reports
+function getReportLinksByTF(objectID) {
+    // Given TF id, performs ajax toretrieve list of reports.
     $(document).ajaxStop($.unblockUI); // unblock when ajax activity stops
     $.blockUI();
     $.ajax({
         type: "GET",
-        url: '/browse/get_results_tf/' + type + '/' + id,
+        url: '/browse/get_results_TF/' + objectID,
         success: function (data) {
             $("#browse").html(data);
         }

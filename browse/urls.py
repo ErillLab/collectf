@@ -9,7 +9,7 @@ urlpatterns = patterns(
 urlpatterns += patterns(
     'browse.browse_TF',
     (r'browse_tf/$', 'browse_TF'),
-    (r'get_results_tf/(?P<type_>\w+)/(?P<id_>\d+)/$', 'get_results_TF'),
+    (r'get_results_TF/(?P<object_id>\d+)/$', 'get_results_TF'),
     (r'get_results_TF_family/(?P<object_id>\d+)/$', 'get_results_TF_family'),
 )
 

@@ -84,6 +84,9 @@ def motif_reports_by_species_and_TF():
         pickle.dump(reports, open(pickle_file, 'w'))
 
 def run():
+    print "Generating motif reports for all pairs of TFs and species."
+    motif_reports_by_species_and_TF()
+    
     print "Generating motif reports for all experimental techniques."
     motif_reports_by_experimental_technique()
     
@@ -99,7 +102,6 @@ def run():
     print "Generating motif reports for TFs."
     motif_reports_by_tf()
 
-    print "Generating motif reports for all pairs of TFs and species."
-    motif_reports_by_species_and_TF()
+
 
 
