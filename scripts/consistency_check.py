@@ -36,9 +36,20 @@ def curation_site_instances_link_to_curation():
         if not curation_site_instance.curation:
             print ("Curation_SiteInstance %d doesn't have link to a curation." %
                    curation_site_instance.pk)
-            
+            print ("Associated curations are:",
+                   models.Curation.objects.filter(TF_instances=tf_instance))
+
+def tf_instances_have_associated_tf():
+    """Checks if all TF-instances have an associated TF."""
+    for tf_instance in models.TFInstance.objects.all():
+        if not tf_instance.TF:
+            print ("TF instance %s doesn't have a TF." %
+                   tf_instance.uniprot_accession)
+
 def run():
+    """Entry point for the script."""
     each_curation_has_only_one_tf()
     tf_instances_have_valid_accession_number()
     curations_with_no_sites()
     curation_site_instances_link_to_curation()
+    tf_instances_have_associated_tf()

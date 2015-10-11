@@ -31,9 +31,9 @@
         <td>{{ random_rec.TF_name }}</td>
       </tr>
       <tr>
-        <td>Protein record @NCBI</td>
+        <td>Protein record @UniProt</td>
         <td>
-          <a href="http://www.ncbi.nlm.nih.gov/protein/?term={{ random_rec.TF_accession }}" target="_blank">
+          <a href="http://www.uniprot.org/uniprot/{{ random_rec.TF_accession }}" target="_blank">
             {{ random_rec.TF_accession }}
           </a>
         </td>

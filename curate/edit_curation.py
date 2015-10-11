@@ -123,7 +123,7 @@ def edit_curation(request, cid):
     # are same for all curations that belong to one publication). We shouldn't use
     # this feature, for edit_curation feature as the fields are populated with
     # curation data being edited.
-    sesion_utils.put(request.session, "previously_curated_paper", None)
+    sesion_utils.put(request.session, "previous_curation", None)
 
     wiz = CurationWizard.as_view([PublicationForm,
                                   GenomeForm,

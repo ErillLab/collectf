@@ -299,15 +299,23 @@ class TFFamily(models.Model):
 class TFInstance(models.Model):
     """Protein table. Contains accession number, which TF it is and the
     description"""
-    protein_accession = models.CharField(max_length=20, primary_key=True)
-    name = models.CharField(max_length=50)
+    #protein_accession = models.CharField(max_length=20, primary_key=True)
+    TF_instance_id = models.AutoField(primary_key=True)
+    refseq_accession = models.CharField(max_length=20)
+    uniprot_accession = models.CharField(max_length=20, unique=True)
+    #name = models.CharField(max_length=50)
     description = models.TextField()
     TF = models.ForeignKey("TF", null=False)
+    notes = models.TextField()
 
     def __unicode__(self):
-        return u'%s -- %s' % (self.protein_accession, self.description)
+        return u'%s (%s): %s' % (self.uniprot_accession,
+                                 self.refseq_accession,
+                                 self.description)
+        #return u'%s -- %s' % (self.protein_accession, self.description)
 
     class Meta:
+        ordering = ['uniprot_accession']
         verbose_name = "TF instance"
 
 class SiteInstance(models.Model):
@@ -427,8 +435,8 @@ class Curation_SiteInstance(models.Model):
     @property
     def TF_instances(self):
         """Return the list of TF instance accession numbers bound to it."""
-        return self.curation.TF_instances.values_list('protein_accession',
-                                                      flat=True)
+        return self.curation.TF_instances.values_list(
+            'uniprot_accession', flat=True)
 
     @property
     def genome(self):
