@@ -175,7 +175,6 @@ class GenomeForm(forms.Form):
 
     def clean_TF_accession_helper(self, TF_accession_field):
         """Checks if the entered TF accession number is valid."""
-        TF = self.clean_TF()
         print self.cleaned_data
         TF_accession = self.cleaned_data[TF_accession_field].strip()
         try:
@@ -210,6 +209,7 @@ class GenomeForm(forms.Form):
                 TF_accession, TF_refseq_accession, TF)
         else:
             # Check if selected TF matches with the TF_instance's TF.
+            TF = self.cleaned_data['TF']
             if TF != TF_instance.TF:
                 raise forms.ValidationError(
                     "It seems that %s is a %s but you selected %s." %
@@ -306,7 +306,8 @@ class GenomeForm(forms.Form):
         """Cleans the rest of the form."""
         cleaned_data = self.cleaned_data
 
-        if 'TF_accession' in cleaned_data:
+        if (cleaned_data.get('TF', None) and
+            cleaned_data.get('TF_accession', None)):
             self.clean_TF_accession_helper('TF_accession')
         
         # Check if either TF_species or TF_species_same is filled
@@ -321,7 +322,7 @@ class GenomeForm(forms.Form):
         # Check if all genome accession numbers come from the same taxon
         self.check_genome_accession_origin()
         # Check if all TF accession numbers come from the same taxon
-        self.check_TF_accession_origin()
+        #self.check_TF_accession_origin()
         return cleaned_data
 
 class TechniquesForm(forms.Form):
