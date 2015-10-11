@@ -11,5 +11,5 @@ def get_genomes(request):
 def get_TF_instances(request):
     """Get the list of all TF instances"""
     TF_instances = list(models.TFInstance.objects.values(
-            'uniprot_accession', 'name', 'description').distinct())
+            'uniprot_accession', 'refseq_accession', 'description').distinct())
     return HttpResponse(json.dumps(TF_instances), mimetype="application/json")

@@ -315,6 +315,7 @@ class TFInstance(models.Model):
         #return u'%s -- %s' % (self.protein_accession, self.description)
 
     class Meta:
+        ordering = ['uniprot_accession']
         verbose_name = "TF instance"
 
 class SiteInstance(models.Model):

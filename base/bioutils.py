@@ -1,16 +1,19 @@
 """This module contains generic functions that are used in collectf apps, for
 processing sequence information. Most of them are built on top of Biopython."""
 
-from Bio import Entrez
-from Bio import SeqIO
-from Bio.Seq import Seq
-from Bio import Motif
-from Bio.Alphabet import IUPAC
-from Bio.SeqUtils import GC
 from base64 import b64encode
-import models
-import lasagna
 from subprocess import Popen, PIPE, STDOUT
+
+from Bio import Entrez
+from Bio import Motif
+from Bio import SeqIO
+from Bio.Alphabet import IUPAC
+from Bio.Seq import Seq
+from Bio.SeqUtils import GC
+import uniprot
+
+import lasagna
+import models
 
 Entrez.email = "sefa1@umbc.edu"
 
@@ -49,6 +52,13 @@ def get_TF(accession):
     except RuntimeError as e:
         print e
         return None
+
+def get_uniprot_TF(accession):
+    """Retrieves UniProt record for the given accession number."""
+    return uniprot.retrieve(accession)
+
+def uniprot_to_refseq(TF_record):
+    return None
 
 def get_gene_id(feature):
     """Given a Biopython SeqFeature object, extract the gene id."""

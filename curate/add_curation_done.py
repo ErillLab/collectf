@@ -32,11 +32,13 @@ def genome_done(wiz, form_list):
 
     # Get TF instances
     TF_accession = form.cleaned_data['TF_accession']
-    TF_instances = [models.TFInstance.objects.get(protein_accession=TF_accession)]
+    TF_instances = [models.TFInstance.objects.get(uniprot_accession=TF_accession)]
     # Extra genome accession numbers (if any)
     for i in xrange(1, settings.NUMBER_OF_TF_ACCESSION_FIELDS):
         tf = form.cleaned_data.get('TF_accession_%d' % i, None)
-        if tf: TF_instances.append(models.TFInstance.objects.get(protein_accession=tf))
+        if tf:
+            TF_instances.append(models.TFInstance.objects.get(
+                uniprot_accession=tf))
 
     assert TF_instances
     return dict(TF=form.cleaned_data['TF'],

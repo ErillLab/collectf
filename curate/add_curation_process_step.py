@@ -65,7 +65,7 @@ def genome_process(wiz, form):
         if t:
             protein_accessions.append(t)
     TF_instances = models.TFInstance.objects.filter(
-        protein_accession__in=protein_accessions)
+        uniprot_accession__in=protein_accessions)
     session_utils.put(wiz.request.session, 'TF_instances', TF_instances)
 
     # store site species in session data

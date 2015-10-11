@@ -1,5 +1,6 @@
 """Form definitions for curation."""
 
+import itertools
 import re
 
 from django import forms
@@ -39,8 +40,11 @@ class GenomeForm(forms.Form):
         """Overrides initialization."""
         super(GenomeForm, self).__init__(*args, **kwargs)
 
+
         num_genome_fields = settings.NUMBER_OF_GENOME_ACCESSION_FIELDS
-        num_TF_fields = settings.NUMBER_OF_TF_ACCESSION_FIELDS
+        #num_TF_fields = settings.NUMBER_OF_TF_ACCESSION_FIELDS
+        # TODO(sefa): Check TF-species origin using UniProt accessions
+        num_TF_fields = 0
         # Extra genome accession fields
         for i in range(1, num_genome_fields):
             self.fields['genome_accession_%d' % i] = forms.CharField(
@@ -51,14 +55,21 @@ class GenomeForm(forms.Form):
             self.fields['TF_accession_%d' % i] = forms.CharField(
                 label="TF accession number [%d]" % i,
                 required=False)
+            self.fields['TF_refseq_accession_%d' % i] = forms.CharField(
+                label="TF RefSeq accession number [%d]" % i,
+                required=False)
+
+            
         # Change the order of fields.
         current_order = self.fields.keyOrder
         self.fields.keyOrder = (
             ['TF', 'genome_accession'] +
             ['genome_accession_%d' % i for i in range(1, num_genome_fields)] +
             ['site_species_same'] +
-            ['TF_accession'] +
-            [('TF_accession_%d' % i) for i in range(1, num_TF_fields)] +
+            ['TF_accession', 'TF_refseq_accession'] +
+            list(itertools.chain.from_iterable(
+                ((('TF_accession_%d' % i) for i in range(1, num_TF_fields)),
+                 (('TF_refseq_accession_%d' % i) for i in range(1, num_TF_fields))))) +
             ['TF_species_same', 'site_species', 'TF_species'] +
             ['contains_promoter_data', 'contains_expression_data'])
 
@@ -84,8 +95,11 @@ class GenomeForm(forms.Form):
         help_text=help_dict['site_species_same'])
 
     # TF accession number
-    TF_accession = forms.CharField(label="TF accession number",
+    TF_accession = forms.CharField(label="TF UniProt accession number",
                                    help_text=help_dict['TF_accession'])
+    TF_refseq_accession = forms.CharField(label="TF RefSeq accession number",
+                                          help_text='',
+                                          widget=forms.HiddenInput)
 
     # 'TF_species_same' field is checked if TF species is the same with the
     # reported genome.
@@ -114,6 +128,9 @@ class GenomeForm(forms.Form):
         required=False,
         label="The manuscript contains expression data",
         help_text=help_dict['contains_expression_data'])
+
+    def clean_TF(self):
+        return self.cleaned_data.get('TF', None)
 
     def clean_genome_accession_helper(self, genome_accession):
         """Checks if the entered genome accession number is valid."""
@@ -156,25 +173,41 @@ class GenomeForm(forms.Form):
         genome_accession = self.cleaned_data['genome_accession'].strip()
         return self.clean_genome_accession_helper(genome_accession)
 
-    def clean_TF_accession_helper(self, TF_accession):
+    def clean_TF_accession_helper(self, TF_accession_field):
         """Checks if the entered TF accession number is valid."""
-        # TODO(sefa): Check if the TF is not present.
-        TF = self.cleaned_data['TF']
-        TF_accession = TF_accession.split('.')[0]
-        if not any(TF_accession.startswith(prefix)
-                   for prefix in ['NP_', 'YP_', 'WP_']):
-            raise forms.ValidationError(
-                "TF accession number must start with 'NP_', 'YP_' or 'WP_'.")
+        TF = self.clean_TF()
+        print self.cleaned_data
+        TF_accession = self.cleaned_data[TF_accession_field].strip()
         try:
-            TF_instance = TFInstance.objects.get(protein_accession=TF_accession)
+            TF_instance = TFInstance.objects.get(uniprot_accession=TF_accession)
         except TFInstance.DoesNotExist:
             # Create new TFInstance object in the database.
-            TF_record = bioutils.get_TF(TF_accession)
+            TF_record = bioutils.get_uniprot_TF(TF_accession)
             if not TF_record:
                 raise forms.ValidationError("""
-                Can not fetch protein record from NCBI. Check accession
-                number.""")
-            create_object.make_TF_instance(TF_record, TF)
+                Can not fetch protein record from UniProt. Check accession
+                numbers.""")
+
+            TF_refseq_accession = self.cleaned_data.get('TF_refseq_accession',
+                                                        None)
+            if not TF_refseq_accession:
+                TF_refseq_accession = bioutils.uniprot_to_refseq(TF_record)
+                if not TF_refseq_accession:
+                    self.fields['TF_refseq_accession'].widget = forms.TextInput()
+                    raise forms.ValidationError("""
+                    Can't get RefSeq accession for the entered UniProt
+                    protein accession. Please enter RefSeq accession
+                    manually.""")
+
+            # Check if entered/retrieved WP accession is valid
+            TF_refseq_accession = TF_refseq_accession.strip().split('.')[0]
+            if not (TF_refseq_accession.startswith('WP_') and
+                    bioutils.get_TF(TF_refseq_accession)):
+                self.fields['TF_refseq_accession'].widget = forms.TextInput()
+                raise forms.ValidationError("Invalid protein RefSeq accession.")
+
+            create_object.make_TF_instance(
+                TF_accession, TF_refseq_accession, TF)
         else:
             # Check if selected TF matches with the TF_instance's TF.
             if TF != TF_instance.TF:
@@ -192,8 +225,7 @@ class GenomeForm(forms.Form):
         CollecTF. Does the validity check for all TF accession fields, if there
         are more than one.
         """
-        TF_accession = self.cleaned_data['TF_accession'].strip()
-        return self.clean_TF_accession_helper(TF_accession)
+        return self.cleaned_data['TF_accession']
 
     def clean_species(self, field):
         """Helper function for clean_TF_species and clean_site_species.
@@ -261,7 +293,7 @@ class GenomeForm(forms.Form):
         for i in xrange(settings.NUMBER_OF_TF_ACCESSION_FIELDS):
             field_name = 'TF_accession_%d' % i
             if cleaned_data.get(field_name, None):
-                self.clean_TF_accession_helper(cleaned_data[field_name].strip())
+                self.clean_TF_accession_helper(field_name)
                 TF_accessions.append(cleaned_data[field_name].strip())
         # Check if all TF accession numbers come from the same organism
         all_same = lambda items: all(x == items[0] for x in items)
@@ -273,6 +305,10 @@ class GenomeForm(forms.Form):
     def clean(self):
         """Cleans the rest of the form."""
         cleaned_data = self.cleaned_data
+
+        if 'TF_accession' in cleaned_data:
+            self.clean_TF_accession_helper('TF_accession')
+        
         # Check if either TF_species or TF_species_same is filled
         if not (cleaned_data['TF_species'] or cleaned_data['TF_species_same']):
             self._errors['TF_species'] = self.error_class(

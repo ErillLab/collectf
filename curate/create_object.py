@@ -93,9 +93,12 @@ def make_all_genes(genome_record, genome_obj):
     genes = bioutils.get_genes(genome_record)
     return [Gene(genome=genome_obj, **g) for g in genes]
 
-def make_TF_instance(TF_rec, TF):
+def make_TF_instance(uniprot_accession, refseq_accession, TF):
     """Creates the TF object in the database, given the TF record."""
+    refseq_record = bioutils.get_TF(refseq_accession)
     TF_instance = TFInstance(
-        protein_accession=TF_rec.name, name=TF_rec.name,
-        description=TF_rec.description, TF=TF)
+        uniprot_accession=uniprot_accession,
+        refseq_accession=refseq_accession,
+        description=refseq_record.description,
+        TF=TF)
     TF_instance.save()

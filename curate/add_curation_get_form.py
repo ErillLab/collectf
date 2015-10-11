@@ -54,9 +54,9 @@ def genome_get_form(wiz, form):
                 form.initial['genome_accession_%d' % i] = genome
 
         TF_instances = prev_curation.TF_instances.all()
-        form.initial['TF_accession'] = TF_instances[0].protein_accession
-        for i, TF_instance in enumerate(TF_instances):
-            form.initial['TF_accession_%d' % i] = TF_instance.protein_accession
+        #form.initial['TF_accession'] = TF_instances[0].protein_accession
+        #for i, TF_instance in enumerate(TF_instances):
+        #    form.initial['TF_accession_%d' % i] = TF_instance.protein_accession
 
         form.initial["TF_species"] = prev_curation.TF_species
         form.initial["site_species"] = prev_curation.site_species

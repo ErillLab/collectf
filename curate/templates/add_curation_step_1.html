@@ -51,7 +51,8 @@ function TFAccesssionTypeAhead() {
     TFFields.attr('autocomplete', 'off');
     $.getJSON("{% url 'browse.json_views.get_TF_instances' %}", function (data) {
         var TFs = $.map(data, function (n, i) {
-            return n['protein_accession'] + ' - ' + n['description'];
+            return (n['uniprot_accession'] + ' (' + n['refseq_accession'] +
+                    ') ' + n['description']);
         });
         TFFields.typeahead({
             source: TFs,
