@@ -176,6 +176,7 @@ class GenomeForm(forms.Form):
     def clean_TF_accession_helper(self, TF_accession_field):
         """Checks if the entered TF accession number is valid."""
         print self.cleaned_data
+        TF = self.cleaned_data['TF']
         TF_accession = self.cleaned_data[TF_accession_field].strip()
         try:
             TF_instance = TFInstance.objects.get(uniprot_accession=TF_accession)
@@ -209,7 +210,6 @@ class GenomeForm(forms.Form):
                 TF_accession, TF_refseq_accession, TF)
         else:
             # Check if selected TF matches with the TF_instance's TF.
-            TF = self.cleaned_data['TF']
             if TF != TF_instance.TF:
                 raise forms.ValidationError(
                     "It seems that %s is a %s but you selected %s." %

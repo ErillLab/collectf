@@ -49,7 +49,7 @@ def get_TF(accession):
         seq_record = SeqIO.read(h, 'gb')
         h.close()
         return seq_record
-    except RuntimeError as e:
+    except Exception, e:
         print e
         return None
 
