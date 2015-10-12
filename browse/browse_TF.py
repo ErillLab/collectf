@@ -43,6 +43,8 @@ def get_results_TF(request, object_id):
         'browse_results.html',
         {'title': TF.name,
          'description': TF.description,
-         'reports': [r.generate_browse_result_dict() for r in reports]},
+         'reports': [r.generate_browse_result_dict() for r in reports],
+         'combined_report_url': reverse(view_reports_by_TF,
+                                        args=(TF.TF_id))},
         context_instance=RequestContext(request))
 
