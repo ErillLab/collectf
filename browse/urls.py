@@ -20,7 +20,6 @@ urlpatterns += patterns(
     (r'get_results_technique_all/(binding|expression)$', 'get_results_all'),
     (r'get_results_technique_category/(binding|expression)/(\d+)$',
      'get_results_category'),
-    
 )
 
 urlpatterns += patterns(
