@@ -12,17 +12,18 @@ from base import models
 from browse import motif_report
 from collectf import settings
 
-def pickle_report(reports, by, object_id):
-    """Pickles the given report.
-
-    The pickling type can be taxonomy, TF, TF_family, experimental technique and
-    experimental technique category.
+def pickle_report(curation_site_instances, filename_suffix):
+    """Generates a report and pickles it, given Curation_SiteInstances objects.
     """
-    assert by in ['taxonomy', 'TF', 'TF_family', 'experimental_technique',
-                  'experimental_technique_category']
-    pickle_file = os.path.join(settings.PICKLE_ROOT, 'motif_reports',
-                               by + '_' + str(object_id) + '.pkl')
-    pickle.dump(reports, open(pickle_file, 'w'))
+    reports = motif_report.make_reports(curation_site_instances)
+    reports_file = os.path.join(
+        settings.PICKLE_ROOT, 'reports', filename_suffix + '.pkl')
+    pickle.dump(reports, open(reports_file, 'w'))
+    
+    ensemble_report = motif_report.make_ensemble_report(curation_site_instances)
+    ensemble_report_file = os.path.join(
+        settings.PICKLE_ROOT, 'ensemble_reports', filename_suffix + '.pkl')
+    pickle.dump(ensemble_report, open(ensemble_report_file, 'w'))
 
 def motif_reports_by_tf_family():
     """Generates motif reports for each TF-family."""
@@ -31,24 +32,23 @@ def motif_reports_by_tf_family():
         TFs = models.TF.objects.filter(family=TF_family)
         curation_site_instances = models.Curation_SiteInstance.objects.filter(
             curation__TF_instances__TF__in=TFs)
-        reports = motif_report.make_reports(curation_site_instances)
-        pickle_report(reports, 'TF_family', TF_family.TF_family_id)
+        pickle_report(curation_site_instances,
+                      'TF_family_%s' % TF_family.TF_family_id)
 
 def motif_reports_by_tf():
     """Generates motif reports for each TF."""
     for TF in tqdm(models.TF.objects.all()):
         curation_site_instances = models.Curation_SiteInstance.objects.filter(
             curation__TF_instances__TF=TF)
-        reports = motif_report.make_reports(curation_site_instances)
-        pickle_report(reports, 'TF', TF.TF_id)
+        pickle_report(curation_site_instances, 'TF_%s' % TF.TF_id)
 
 def motif_reports_by_taxonomy():
     """Generates motif reports for each taxon."""
     for taxon in tqdm(models.Taxonomy.objects.all()):
         curation_site_instances = models.Curation_SiteInstance.objects.filter(
             site_instance__genome__taxonomy__in=taxon.get_all_species())
-        reports = motif_report.make_reports(curation_site_instances)
-        pickle_report(reports, 'taxonomy', taxon.taxonomy_id)
+        pickle_report(curation_site_instances,
+                      'taxonomy_%s' % taxon.taxonomy_id)
 
 def motif_reports_by_technique_function():
     """Generates motif reports for all binding/expression techniques."""
@@ -57,11 +57,8 @@ def motif_reports_by_technique_function():
             preset_function=function)
         curation_site_instances = models.Curation_SiteInstance.objects.filter(
             experimental_techniques__in=techniques)
-        reports = motif_report.make_reports(curation_site_instances)
-        pickle_file = os.path.join(
-            settings.PICKLE_ROOT, 'motif_reports',
-            'experimental_technique_all_%s.pkl' % function)
-        pickle.dump(reports, open(pickle_file, 'w'))
+        pickle_report(curation_site_instances,
+                      'experimental_technique_all_' + function)
 
 def motif_reports_by_experimental_technique_category():
     """Generate motif reports for experimental technique categories."""
@@ -71,17 +68,17 @@ def motif_reports_by_experimental_technique_category():
             categories=category)
         curation_site_instances = models.Curation_SiteInstance.objects.filter(
             experimental_techniques__in=techniques)
-        reports = motif_report.make_reports(curation_site_instances)
-        pickle_report(reports, 'experimental_technique_category',
-                      category.category_id)
+        pickle_report(
+            curation_site_instances,
+            'experimental_technique_category_%s' % category.category_id)
     
 def motif_reports_by_experimental_technique():
     """Generates motif reports for each experimental technique."""
     for technique in tqdm(models.ExperimentalTechnique.objects.all()):
         curation_site_instances = models.Curation_SiteInstance.objects.filter(
             experimental_techniques=technique)
-        reports = motif_report.make_reports(curation_site_instances)
-        pickle_report(reports, 'experimental_technique', technique.technique_id)
+        pickle_report(curation_site_instances,
+                      'experimental_technique_%s' % technique.technique_id)
 
 def motif_reports_by_species_and_TF():
     """Generates motif reports for each pair of species and TF."""
@@ -92,10 +89,8 @@ def motif_reports_by_species_and_TF():
         curation_site_instances = models.Curation_SiteInstance.objects.filter(
             curation__TF_instances__TF=TF,
             site_instance__genome__taxonomy=species)
-        reports = motif_report.make_reports(curation_site_instances)
-        pickle_file = os.path.join(settings.PICKLE_ROOT, 'motif_reports',
-                                   'tf_%d_species_%d.pkl' % (TF, species))
-        pickle.dump(reports, open(pickle_file, 'w'))
+        pickle_report(curation_site_instances,
+                      'tf_%d_species_%d' % (TF, species))
 
 def run():
     print "Generating motif reports for all pairs of TFs and species."

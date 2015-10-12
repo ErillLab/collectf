@@ -1,7 +1,11 @@
-"""This file contains function definitions that are used to display generated
+"""This module contains function that are used to display generated
 reports. Given a collection of motif-associated and non-motif-associated
-curation-site-instance objects, they are grouped by TF and species and rendered
-properly."""
+Curation_SiteInstance objects, they are grouped by TF and species and rendered
+properly.
+"""
+
+import os
+import pickle
 
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render_to_response
@@ -9,21 +13,23 @@ from django.template import RequestContext
 
 import browse.models as models
 import browse.motif_report as motif_report
+from collectf import settings
+
+def get_static_reports(filename):
+    """Gets the reports and ensemble report."""
+    print 'getting reports'
+    reports = pickle.load(open(os.path.join(
+        settings.PICKLE_ROOT, 'reports', filename + '.pkl')))
+    ensemble_report = pickle.load(open(os.path.join(
+        settings.PICKLE_ROOT, 'ensemble_reports', filename + '.pkl')))
+    return reports, ensemble_report
 
 def view_reports_by_TF_and_species(request, TF_id, species_id):
     """Finds sites and generates motif reports given an organism and TF ID."""
     org = get_object_or_404(models.Taxonomy, pk=species_id)
     TF = get_object_or_404(models.TF, TF_id=TF_id)
-    
-    curation_site_instances = models.Curation_SiteInstance.objects.filter(
-        site_instance__genome__taxonomy=org,
-        curation__TF_instances__TF=TF)
-    if not request.GET.get('integrate_non_motif', None):
-        curation_site_instances = curation_site_instances.exclude(
-            site_type='non_motif_associated')
-
-    reports = motif_report.make_distinct_reports(curation_site_instances)
-    ensemble_report = motif_report.make_ensemble_report(curation_site_instances)
+    reports, ensemble_report = get_static_reports(
+        'tf_%s_species_%s' % (TF_id, species_id))
     return render_to_response(
         'view_reports.html',
         {'reports': [r.generate_view_reports_dict() for r in reports],
@@ -34,11 +40,6 @@ def view_reports_by_id_list(request):
     """Returns motif reports from given Curation_SiteInstance object IDs."""
     curation_site_instances = models.Curation_SiteInstance.objects.filter(
         pk__in=request.POST['csi_list'].strip().split(','))
-
-    if request.POST.get('integrate_non_motif', None):
-        curation_site_instances = curation_site_instances.exclude(
-            site_type='non_motif_associated')
-
     reports = motif_report.make_distinct_reports(curation_site_instances)
     ensemble_report = motif_report.make_ensemble_report(cur_site_insts)
 
@@ -48,7 +49,6 @@ def view_reports_by_id_list(request):
          'ensemble_report': ensemble_report.generate_view_reports_dict(),
          'curation_site_instances': ','.join(
              map(lambda csi: '%d'%csi.pk, curation_site_instances)),
-         'integrate_non_motif': integrate_non_motif,
          'by_id': True},
         context_instance=RequestContext(request))
 
