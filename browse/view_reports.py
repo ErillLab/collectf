@@ -14,6 +14,7 @@ def view_reports_by_TF_and_species(request, TF_id, species_id):
     """Finds sites and generates motif reports given an organism and TF ID."""
     org = get_object_or_404(models.Taxonomy, pk=species_id)
     TF = get_object_or_404(models.TF, TF_id=TF_id)
+    
     curation_site_instances = models.Curation_SiteInstance.objects.filter(
         site_instance__genome__taxonomy=org,
         curation__TF_instances__TF=TF)
