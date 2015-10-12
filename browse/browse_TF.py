@@ -2,9 +2,6 @@
 The view functions for browsing by TF and TF family.
 """
 
-import os
-import pickle
-
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, get_list_or_404
 from django.shortcuts import render_to_response
@@ -12,8 +9,8 @@ from django.template import RequestContext
 
 from browse import models
 from browse.motif_report import make_reports
+from browse.static_reports import get_static_reports
 from browse.view_reports import view_reports_by_TF_family
-from collectf import settings
 
 def browse_TF(request):
     """Returns the TF tree-view."""
@@ -28,9 +25,7 @@ def get_tf_instance(accession):
 def get_results_TF_family(request, object_id):
     """Returns TF-species pairs that have binding sites for the given family."""
     TF_family = get_object_or_404(models.TFFamily, TF_family_id=object_id)
-    reports = pickle.load(open(os.path.join(settings.PICKLE_ROOT,
-                                            'motif_reports',
-                                            'TF_family_%s.pkl' % object_id)))
+    reports, _ = get_static_reports('TF_family_%s' % object_id)
     return render_to_response(
         'browse_results.html',
         {'title': TF_family.name,
@@ -43,9 +38,7 @@ def get_results_TF_family(request, object_id):
 def get_results_TF(request, object_id):
     """Returns TF-species pairs that have binding sites for the given TF."""
     TF = get_object_or_404(models.TF, TF_id=object_id)
-    reports = pickle.load(open(os.path.join(settings.PICKLE_ROOT,
-                                            'motif_reports',
-                                            'TF_%s.pkl' % object_id)))
+    reports, _ = get_static_reports('TF_%s' % object_id)
     return render_to_response(
         'browse_results.html',
         {'title': TF.name,
