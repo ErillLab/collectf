@@ -11,6 +11,7 @@ from browse import models
 from browse.motif_report import make_reports
 from browse.static_reports import get_static_reports
 from browse.view_reports import view_reports_by_TF_family
+from browse.view_reports import view_reports_by_TF
 
 def browse_TF(request):
     """Returns the TF tree-view."""
@@ -45,6 +46,6 @@ def get_results_TF(request, object_id):
          'description': TF.description,
          'reports': [r.generate_browse_result_dict() for r in reports],
          'combined_report_url': reverse(view_reports_by_TF,
-                                        args=(TF.TF_id))},
+                                        args=(TF.TF_id,))},
         context_instance=RequestContext(request))
 
