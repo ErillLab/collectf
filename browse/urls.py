@@ -34,9 +34,10 @@ urlpatterns += patterns(
 
 urlpatterns += patterns(
     'browse.view_reports',
+    (r'view_reports_by_id_list', 'view_reports_by_id_list'),
+    (r'view_reports_by_TF_instance/(\d+)/$', 'view_reports_by_TF_instance'),
     (r'view_reports_by_TF_and_species/(\d+)/(\d+)/$',
      'view_reports_by_TF_and_species'),
-    (r'view_reports_by_id_list', 'view_reports_by_id_list'),
     (r'view_reports_by_TF_family/(\d+)$', 'view_reports_by_TF_family'),
     (r'view_reports_by_TF/(\d+)$', 'view_reports_by_TF'),
     (r'view_reports_by_taxonomy/(\d+)$', 'view_reports_by_taxonomy'),

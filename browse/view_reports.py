@@ -36,6 +36,14 @@ def render_report_to_response(request, reports, ensemble_report):
          'ensemble_report': ensemble_report.generate_view_reports_dict()},
         context_instance=RequestContext(request))
 
+def view_reports_by_TF_instance(request, TF_instance_id):
+    """Finds sites and generates motif reports given a TF instance."""
+    TF_instance = get_object_or_404(models.TFInstance,
+                                    TF_instance_id=TF_instance_id)
+    reports, ensemble_report = get_static_reports(
+        'tf_instance_%d' % TF_instance_id)
+    return render_report_to_response(request, reports, ensemble_report)
+    
 def view_reports_by_TF_and_species(request, TF_id, species_id):
     """Finds sites and generates motif reports given an organism and TF ID."""
     org = get_object_or_404(models.Taxonomy, pk=species_id)

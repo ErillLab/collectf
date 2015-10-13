@@ -42,6 +42,14 @@ def motif_reports_by_tf():
             curation__TF_instances__TF=TF)
         pickle_report(curation_site_instances, 'TF_%s' % TF.TF_id)
 
+def motif_reports_by_tf_instance():
+    """Generates motif reports for each TF-instance."""
+    for TF_instance in tqdm(models.TFInstance.objects.all()):
+        curation_site_instances = models.Curation_SiteInstance.objects.filter(
+            curation__TF_instances=TF_instance)
+        pickle_report(curation_site_instances,
+                      'TF_instance_%s' % TF_instance.TF_instance_id)
+
 def motif_reports_by_taxonomy():
     """Generates motif reports for each taxon."""
     for taxon in tqdm(models.Taxonomy.objects.all()):
@@ -113,6 +121,9 @@ def run():
 
     print "Generating motif reports for TFs."
     motif_reports_by_tf()
+
+    print "Generating motif reports for TF instances."
+    motif_reports_by_tf_instance()
 
 
 
