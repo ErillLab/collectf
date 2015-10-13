@@ -1,5 +1,7 @@
 """Template tags for id > dbxref and dbxref > id conversions"""
 
+# TODO(sefa): Move these functions to the same module with UniProt dbxref stuff.
+
 from django.template import Library
 
 register = Library()
