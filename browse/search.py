@@ -10,19 +10,19 @@ import browse.models as models
 import browse.motif_report as motif_report
 
 def search(request):
-    """Handler for search view.  If it is GET request, the page with the list of
-    TFs, species and experimental techniques is rendered.  If it is POST
-    request, selected TFs, species and techniques are identified and
-    curation-site-instances that fits to search criteria are retrieved, search
-    results are displayed."""
-    if not request.POST: return search_get(request)
-    else: return search_post(request)
+    """Handler for search view.
+
+    If it is GET request, renders the page with the list of TFs, species and
+    experimental techniques. If it is POST request, identifies selected TFs,
+    species and techniques and retrives Curation_SiteInstance that fits to
+    search criteria.
+    """
+    return search_get(request) if not request.POST else search_post(request)
 
 def search_get(request):
-    """Render the page that allows the user to select TFs, species and
-    techniques to filter TFBSs"""
+    """Renders the page to select TFs, species and techniques."""
     binding, expression, insilico = get_all_techniques()
-    return render_to_response("search_.html",
+    return render_to_response('search_.html',
                               {'TF_families': get_TF_families(),
                                'phyla': get_all_phyla(),
                                'binding_techniques': binding,
@@ -31,16 +31,18 @@ def search_get(request):
                               context_instance=RequestContext(request))
 
 def get_TF_families():
-    """Return all TF families in the database."""
+    """Returns all TF families in the database."""
     return models.TFFamily.objects.all().order_by('name')
 
 def get_all_phyla():
-    """Return all phyla in the database."""
+    """Returns all phyla in the database."""
     return models.Taxonomy.objects.filter(rank='phylum').order_by('name')
 
 def get_all_techniques():
-    """Get all techniques in the database and group them by type
-    (binding/expression/in-silico)"""
+    """Gets all techniques in the database and group them by type.
+    
+    type is one of {binding, expression, in-silico}
+    """
     binding_techniques = {}
     expression_techniques = {}
     insilico_techniques = {}
@@ -48,13 +50,13 @@ def get_all_techniques():
     for category in all_categories:
         techs = models.ExperimentalTechnique.objects.filter(
             categories=category).order_by('name')
-        binding_techniques[category.name] =\
-                techs.filter(preset_function='binding')
-        expression_techniques[category.name] =\
-                techs.filter(preset_function='expression')
-        insilico_techniques[category.name] =\
-                techs.filter(preset_function='insilico')
-    # remove empty keys
+        binding_techniques[category.name] = techs.filter(
+            preset_function='binding')
+        expression_techniques[category.name] = techs.filter(
+            preset_function='expression')
+        insilico_techniques[category.name] = techs.filter(
+            preset_function='insilico')
+    # Remove empty keys
     remove_empty_keys = lambda d: dict((x, y) for x, y in d.items() if y)
     binding_techniques = remove_empty_keys(binding_techniques)
     expression_techniques = remove_empty_keys(expression_techniques)
@@ -62,8 +64,11 @@ def get_all_techniques():
     return binding_techniques, expression_techniques, insilico_techniques
 
 def search_post_helper(request):
-    """Handler for search_post requests. Given request, get motif- and
-    non-motif-associated sites from database and render the results."""
+    """Handler for search_post requests.
+
+    Given request, get motif- and non-motif-associated sites from database and
+    render the results.
+    """
     def get_TF_input():
         TF_input = [x for x in request.POST.getlist('tf_input') if x != 'on']
         if not TF_input:
@@ -96,16 +101,18 @@ def search_post_helper(request):
         return (techniques1, techniques2, techniques3)
 
     def techniques_to_Q(techniques):
-        """Given a collection of techniques, create a query filter that only
-        filters objects associated with any of the techniques."""
+        """Creates a query filter for the given techniques.
+
+        Returns a query filter for objects that are associated with any of the
+        given techniques.
+        """
         q = Q(curation__curation_id=-9999)
         for t in techniques:
             q = q | Q(experimental_techniques=t)
         return q
 
     def filter_by_technique(cur_site_insts):
-        """Given a queryset of curation-site-instance objects, filter them by
-        experimental techniques."""
+        """Filters Curation_SiteInstance objects."""
         boolean1 = request.POST['boolean1']
         boolean2 = request.POST['boolean2']
         # Create filter queries
@@ -128,7 +135,7 @@ def search_post_helper(request):
     species = get_species_input()
     # Get curation-site-instance objects, filtered by TF and species
     cur_site_insts = models.Curation_SiteInstance.objects.filter(
-        curation__TF__in=TFs,
+        curation__TF_instances__TF__in=TFs,
         site_instance__genome__taxonomy__in=species)
     # Filter Curation-site-instance objects by experimental techniques
     cur_site_insts = filter_by_technique(cur_site_insts)
@@ -137,7 +144,7 @@ def search_post_helper(request):
 def search_post(request):
     """Handler for database search request."""
     def raise_validation_error(msg):
-        """Check if all three steps have been submitted."""
+        """Checks if all three steps have been submitted."""
         messages.add_message(request, messages.ERROR, message)
         return HttpResponseRedirect(reverse(search))
 
@@ -152,19 +159,22 @@ def search_post(request):
             message = "No search results that match your search criteria."
             return raise_validation_error(message)
 
-        return render_to_response("search_results.html",
-                                  {'title': "",
-                                   'description': """Search results can be seen
-                                   as individual reports (one report per
-                                   TF/species) or as ensemble reports (multiple
-                                   TF/species). """,
-                                   'all_cur_site_insts': [pk for report in reports
-                                                          for pk in report.get_all_cur_site_insts_ids()],
-                                   'reports': [report.generate_browse_result_dict() for report in reports],
-                                  },
-                                  context_instance=RequestContext(request))
+        return render_to_response(
+            'search_results.html',
+            {'title': "",
+             'description': """
+             Search results can be seen as individual reports (one report per
+             TF/species) or as ensemble reports (multiple TF/species). """,
+             'all_cur_site_insts': [
+                 pk for report in reports
+                 for pk in report.get_all_cur_site_insts_ids()],
+             'reports': [report.generate_browse_result_dict()
+                         for report in reports],
+            },
+            context_instance=RequestContext(request))
     except RuntimeError as e:
-        message = """Please select at least one TF, species and experimental
-        technique to search database."""
+        message = """
+        Please select at least one TF, species and experimentaltechnique to
+        search database."""
         return raise_validation_error(message)
 

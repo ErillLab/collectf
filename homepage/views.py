@@ -35,7 +35,7 @@ def feedback(request):
                               context_instance=RequestContext(request))
 
 def feedback_send_email(request):
-    """Send an email to myself containing a feedback form"""
+    """Sends an email to myself containing a feedback form."""
     email_address = request.POST['email']
     type = request.POST['type']
     comment = request.POST['comment']
@@ -47,8 +47,11 @@ def feedback_send_email(request):
                   fail_silently=False)
         messages.add_message(request, messages.INFO, "Thanks for the feedback!")
     except:
-        messages.add_message(request, messages.ERROR,
-                             "Something went wrong. Please try again or send your feedback to collectfdb@umbc.edu")
+        messages.add_message(
+            request, messages.ERROR,
+            """
+            Something went wrong. Please try again or send your feedback to
+            collectfdb@umbc.edu""")
 
     return HttpResponseRedirect(reverse(base.views.home))
 
@@ -69,8 +72,9 @@ def acknowledgements(request):
                               context_instance=RequestContext(request))
 
 def greet(request):
-    """Handler for the main page!
-    It grabs a random motif from the database to display on the main page."""
+    """Handler for the main page.
+    
+    Grabs a random motif from the database to display on the main page."""
     random_record = get_random_motif()
     template_dict = dict(TF_name=random_record.TF_name,
                          TF_accession=random_record.TF_accessions[0],
@@ -84,41 +88,33 @@ def greet(request):
                               context_instance=RequestContext(request))
 
 def get_random_motif(motif_len_th=30, motif_sz_th=10):
-    """Get random motif from the database, to display on the main page. Randomly
-    selected motif must be no longer than <motif_len_th> and motif size must be
-    at least <motif_sz_th>."""
-    # Get all possible TF-instance & species combinations
+    """Gets random motif from the database to display on the main page.
+
+    Randomly selected motif must be no longer than <motif_len_th> and motif size
+    must be at least <motif_sz_th>.
+    """
+    # Get all possible TF-instance and species combinations
     TF_genome_list = models.Curation_SiteInstance.objects.values_list(
-        'curation__TF_instances',
-        'site_instance__genome').distinct()
-    # select one of the combinations that satisfies the criteria (motif_len and
-    # motif_sz)
+        'curation__TF_instances', 'site_instance__genome').distinct()
+    # Select one of the combinations that satisfies the criteria: motif_len and
+    # motif_sz.
     while True:
         try:
             TF_instances, genome = random.choice(TF_genome_list)
-            # get all curation-site-instance objects for the TF-instance and
-            # genome
+            # Get all curation-site-instance objects for the TF-instance and
+            # genome.
             cur_site_insts = models.Curation_SiteInstance.objects.filter(
                 curation__TF_instances=TF_instances,
                 site_instance__genome=genome,
-                site_type="motif_associated")
-            # generate a motif report out of curation-site-instance objects
+                site_type='motif_associated')
+            # Generate a motif report out of curation-site-instance objects
             if cur_site_insts.count() > motif_sz_th:
                 # First criterion is satisfied.
                 report = motif_report.MotifReport(cur_site_insts)
-                # Align binding sites
+                # Align binding sites.
                 aligned_sites = report.align_sites()
                 if len(aligned_sites[0]) < motif_len_th:
-                    # Second criterion is satisfied too, incorporate
-                    # non-motif-associated data into the motif-report.
-                    non_motif_cur_site_insts = models.Curation_SiteInstance.objects.filter(
-                        curation__TF_instances=TF_instances,
-                        site_instance__genome=genome,
-                        site_type="non_motif_associated")
-                    report.set_non_motif_curation_site_instances(non_motif_cur_site_insts)
-
-                    # An appropriate motif is randomly selected at this
-                    # point. Return it.
+                    # Second criterion is satisfied too.
                     return report
         except:
             pass

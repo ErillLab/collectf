@@ -3,19 +3,23 @@ from django.conf.urls import patterns, url
 urlpatterns = patterns(
     'browse.browse_tax',
     (r'browse_tax/$', 'browse_taxonomy'),
-    (r'get_results_tax/(?P<taxid>\d+)$', 'get_results_taxonomy'),
+    (r'get_results_tax/(?P<object_id>\d+)$', 'get_results_taxonomy'),
 )
 
 urlpatterns += patterns(
     'browse.browse_TF',
     (r'browse_tf/$', 'browse_TF'),
-    (r'get_results_tf/(?P<type_>\w+)/(?P<id_>\d+)/$', 'get_results_TF'),
+    (r'get_results_TF/(?P<object_id>\d+)/$', 'get_results_TF'),
+    (r'get_results_TF_family/(?P<object_id>\d+)/$', 'get_results_TF_family'),
 )
 
 urlpatterns += patterns(
     'browse.browse_tech',
     (r'browse_tech/$', 'browse_tech'),
-    url(r'^get_results_tech/(?P<type_>\w+)/(?P<id_>\d+)/$', 'get_results_tech'),
+    (r'get_results_technique/(\d+)$', 'get_results_technique'),
+    (r'get_results_technique_all/(binding|expression)$', 'get_results_all'),
+    (r'get_results_technique_category/(binding|expression)/(\d+)$',
+     'get_results_category'),
 )
 
 urlpatterns += patterns(
@@ -30,9 +34,17 @@ urlpatterns += patterns(
 
 urlpatterns += patterns(
     'browse.view_reports',
-    (r'view_reports/(?P<tax_param_type>.+)/(?P<tax_param>-?\d+)/(?P<tf_param_type>.+)/(?P<tf_param>.+)/(?P<tech_param_type>.+)/(?P<tech_param>-?\d+)/(?P<integrate_non_motif>\d)',
-     'view_reports'),
+    (r'view_reports_by_TF_and_species/(\d+)/(\d+)/$',
+     'view_reports_by_TF_and_species'),
     (r'view_reports_by_id_list', 'view_reports_by_id_list'),
+    (r'view_reports_by_TF_family/(\d+)$', 'view_reports_by_TF_family'),
+    (r'view_reports_by_TF/(\d+)$', 'view_reports_by_TF'),
+    (r'view_reports_by_taxonomy/(\d+)$', 'view_reports_by_taxonomy'),
+    (r'view_reports_by_all_techniques/(binding|expression)$',
+     'view_reports_by_all_techniques'),
+    (r'view_reports_by_technique_category/(binding|expression)/(\d+)$',
+     'view_reports_by_technique_category'),
+    (r'view_reports_by_technique/(\d+)$', 'view_reports_by_technique'),
 )
 
 urlpatterns += patterns(

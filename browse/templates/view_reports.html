@@ -20,23 +20,6 @@
     <ul class="nav nav-pills">
       <li class="active"><a href="#split_view" data-toggle="tab">Split view</a></li>
       <li><a href="#ensemble_view" data-toggle="tab">Ensemble view</a></li>
-      {% if integrate_non_motif %}
-      <li>
-	    <a class="block_before_load" href="#" onclick="$('#integrate_non_motif').submit();">Motif-associated sites only</a>
-	    <form action="{% url 'browse.view_reports.view_reports_by_id_list' %}" method="post" style="display:inline;" id="integrate_non_motif">{% csrf_token %}
-          <input type="hidden" name="csi_list" value="{{ cur_site_insts }}" />
-	    </form>
-      </li>
-      {% else %}
-      <li>
-	    <a class="block_before_load" href="#"
-	       onclick="$('#integrate_non_motif_2').submit();">Integrate evidence from non-motif-associated sites</a>
-	    <form action="{% url 'browse.view_reports.view_reports_by_id_list' %}" method="post" style="display:inline;" id="integrate_non_motif_2">{% csrf_token %}
-          <input type="hidden" name="csi_list" value="{{ cur_site_insts }}" />
-	      <input type="hidden" name="integrate_non_motif" value="integrate_non_motif"/>
-	    </form>
-      </li>
-      {% endif %}
       <li><a href="#export" data-toggle="tab">Export data</a></li>
     </ul>
   </div>
@@ -46,32 +29,19 @@
     <ul class="nav nav-pills">
       <li class="active"><a href="#split_view" data-toggle="tab">Split view</a></li>
       <li><a href="#ensemble_view" data-toggle="tab">Ensemble view</a></li>
-      {% if integrate_non_motif == 0 %}
-      <li>
-	    <a class="block_before_load" 
-           href="{% url 'browse.view_reports.view_reports' tax_param_type tax_param tf_param_type tf_param tech_param_type tech_param 0 %}">
-          Motif-associated sites only
-        </a>
-      </li>
-      {% else %}
-      <li>
-	    <a class="block_before_load"
-           href="{% url 'browse.view_reports.view_reports' tax_param_type tax_param tf_param_type tf_param tech_param_type tech_param 1 %}">
-          Integrate evidence from non-motif-associated sites
-        </a>
-      </li>
-      {% endif %}
-
       <li><a href="#export" data-toggle="tab">Export data</a></li>
     </ul>
   </div>
-
   {% endif %}
   <div class="tab-content">
     <div class="tab-pane active" id="split_view">
       {% for report in reports %}
       <div class="boxed">
-	    <h3>{{ report.TF_name }} ({% for acc in report.TF_accessions %}<a href="http://www.ncbi.nlm.nih.gov/protein/?term={{acc}}" target="_blank"><span class="fixed-width">{{acc}}</span></a>{% if not forloop.last %}, {% endif %}{% endfor %})
+	    <h3>{{ report.TF_name }} ({% for acc in report.TF_accessions %}
+          <a href="http://www.ncbi.nlm.nih.gov/protein/?term={{acc}}"
+             target="_blank">
+            <span class="fixed-width">{{acc}}</span>
+          </a>{% if not forloop.last %}, {% endif %}{% endfor %})
           binding site collection of 
           <i>{{ report.species_name }}</i> 
         </h3>
@@ -82,7 +52,6 @@
 	      <li class="active"><a href="#{{report.id}}_weblogo" data-toggle="tab">Sequence logo</a></li>
 	      <li><a href="#{{report.id}}_detail" data-toggle="tab">Detailed view</a></li>
 	    </ul>
-
 
 	    <div class="tab-content">
 	      <div class="tab-pane" id="{{report.id}}_unaligned">
@@ -260,14 +229,6 @@
       </div>
     </div>
     
-    <div class="tab-pane" id="integrate_non_motif">
-      <p class="boxed">Integrate non motif: not yet.</p>
-    </div>
-
-    <div class="tab-pane" id="report_non_motif">
-      <p class="boxed">Report non-motif: not yet</p>
-    </div>
-
     <div class="tab-pane" id="export">
       <div class="boxed">
 	    <form action="{% url 'browse.export.export_sites' %}" method="POST">{% csrf_token %}
@@ -326,53 +287,53 @@
 
 <script type="text/javascript">
 
-  function hideCol(colClass) {
-  $('table .'+colClass).each(function() {
-  $(this).toggle();
-  });
-  $('ul#hiddenCols').append('<li id="'+colClass
-			                         +'"><a href="javascript:;" onclick="showCol(\''
-			                                                             +colClass+'\');">Show '+colClass+ ' column</a></li>');
-  }
+function hideCol(colClass) {
+    $('table .'+colClass).each(function() {
+        $(this).toggle();
+    });
+    $('ul#hiddenCols').append('<li id="'+colClass
+			                  +'"><a href="javascript:;" onclick="showCol(\''
+			                  +colClass+'\');">Show '+colClass+ ' column</a></li>');
+}
 
-  function showCol(columnClass){
-  $('table .'+columnClass).each(function(index) {
-  $(this).show();
-  });
-  $('li#'+columnClass).remove();
-  }
+function showCol(columnClass){
+    $('table .'+columnClass).each(function(index) {
+        $(this).show();
+    });
+    $('li#'+columnClass).remove();
+}
 
-  $(document).ready(function() {
-  // regulation diagram hide/show
-  $("#regulation_diagram_switch").on('click', function() {
-  $(".regulation_diagram").toggle();
-  return false;
-  })
+$(document).ready(function() {
+    // regulation diagram hide/show
+    $("#regulation_diagram_switch").on('click', function() {
+        $(".regulation_diagram").toggle();
+        return false;
+    })
 
-  $('.weblogo_img').each(function() {
-  var img = $(this);
-  img.parent().block({message: '<i class="icon-spinner icon-spin"></i>'});
-  var site_data = $(this).attr('site_data');
-  $.ajax({
-  type: "POST",
-  url: "{% url 'base.views.get_weblogo' %}",
-  data: {
-  sites: site_data,
-  csrfmiddlewaretoken:'{{csrf_token}}', 
-  },
-  success: function(data) {
-  img.attr('src', data);
-  img.parent().unblock();
-  },
-  });
-  });
+    $('.weblogo_img').each(function() {
+        var img = $(this);
+        img.parent().block({message: '<i class="icon-spinner icon-spin"></i>'});
+        var site_data = $(this).attr('site_data');
+        $.ajax({
+            type: "POST",
+            url: "{% url 'base.views.get_weblogo' %}",
+            data: {
+                sites: site_data,
+                csrfmiddlewaretoken:'{{csrf_token}}', 
+            },
+            success: function(data) {
+                img.attr('src', data);
+                img.parent().unblock();
+            },
+        });
+    });
 
-  // hide 'genome' and 'TF' columns in the table
-  hideCol('genome');
-  hideCol('TF');
-  hideCol('motif_id');
+    // hide 'genome' and 'TF' columns in the table
+    hideCol('genome');
+    hideCol('TF');
+    hideCol('motif_id');
 
-  });
+});
 </script>
 
 {% endblock %}

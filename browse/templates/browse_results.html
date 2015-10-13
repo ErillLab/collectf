@@ -11,11 +11,8 @@
 
 <div id="report_table" class="boxed">
   {% if reports %}
-  {# put view_all link #}
   <p>
-    <a class="block_before_load"
-       href="{% url 'browse.view_reports.view_reports' tax_param_type tax_param tf_param_type tf_param tech_param_type tech_param 0 %}"
-       target="_blank">
+    <a class="block_before_load" href="{{ combined_report_url }}" target="_blank">
       Combined report
     </a>
   </p>
@@ -33,7 +30,9 @@
         <td>{{ report.species.name }}</td>
         <td>
           <a target="_blank"
-             href="{% url 'browse.view_reports.view_reports' 'species' report.species.pk 'tf' report.TF.pk tech_param_type tech_param 0 %}">view</a>
+             href="{% url 'browse.view_reports.view_reports_by_TF_and_species' report.TF.pk report.species.pk %}">
+            view
+          </a>
         </td>
       </tr>
       {% endfor %}

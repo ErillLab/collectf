@@ -5,9 +5,9 @@ from django.shortcuts import get_object_or_404
 from django.template import RequestContext
 
 def view_curation(request, cid):
-    """Handler function for curation view"""
+    """Handler function for curation view."""
     curation = get_object_or_404(models.Curation, curation_id=cid)
-    return render_to_response("view_curation.html",
+    return render_to_response('view_curation.html',
                               {'curation': curation},
                               context_instance=RequestContext(request))
 

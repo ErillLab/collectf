@@ -1,104 +1,85 @@
-"""This file contains function definitions that are used to display generated
+"""This module contains function that are used to display generated
 reports. Given a collection of motif-associated and non-motif-associated
-curation-site-instance objects, they are grouped by TF and species and rendered
-properly."""
+Curation_SiteInstance objects, they are grouped by TF and species and rendered
+properly.
+"""
 
+from django.shortcuts import get_object_or_404
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.http import Http404
+
 import browse.models as models
 import browse.motif_report as motif_report
-import browse.browse_tax as browse_tax
-import browse.browse_TF as browse_TF
-import browse.browse_tech as browse_tech
-
-def view_reports(request, tax_param_type, tax_param,
-                 tf_param_type, tf_param,
-                 tech_param_type, tech_param,
-                 integrate_non_motif):
-
-    """Given an organism and a TF, find all sites and make reports out of
-    them.
-
-    tax_param_type:  all/group/species
-    tax_param:       id of the taxonomy object
-    tf_param_type:   all/family/tf/tf_instance
-    tf_param:        id of the TF/TF_family object or the accession number
-    tech_param_type: all/binding/expression/binding_category/expression_category
-    integrate_non_motif: 1 to integrate non-motif-associated data, 0 otherwise
-    """
-
-    orgs = browse_tax.get_species(tax_param_type, tax_param)
-    _, _, techs = browse_tech.get_techniques(tech_param_type, tech_param)
-
-    cur_site_insts = models.Curation_SiteInstance.objects.filter(
-        site_instance__genome__taxonomy__in=orgs,
-        experimental_techniques__in=techs,
-    )
-
-    # Filter by TFs or TF-instance
-    if tf_param_type == "tf_instance":
-        tf_instance = browse_TF.get_tf_instance(tf_param)
-        cur_site_insts = cur_site_insts.filter(
-            curation__TF_instances=tf_instance)
-    else:
-        tfs = browse_TF.get_TFs(tf_param_type, tf_param)
-        cur_site_insts = cur_site_insts.filter(
-            curation__TF_instances__TF__in=tfs)
-
-
-    # Exclude non-motif-associated sites here, it can be integrated if user
-    # wants to do so
-    if integrate_non_motif != 1:
-        cur_site_insts = \
-            cur_site_insts.exclude(site_type='non_motif_associated')
-
-    reports = motif_report.make_distinct_reports(cur_site_insts)
-    # Combine reports
-    ensemble_report = motif_report.make_ensemble_report(cur_site_insts)
-
-    if integrate_non_motif not in ['0', '1']:
-        raise Http404
-    switched_integrate = 1 if integrate_non_motif == '0' else 0
-
-    return render_to_response('view_reports.html',
-                              dict(reports=[report.generate_view_reports_dict()
-                                            for report in reports],
-                                   ensemble_report=
-                                   ensemble_report.generate_view_reports_dict(),
-                                   tax_param_type=tax_param_type,
-                                   tax_param=tax_param,
-                                   tf_param_type=tf_param_type,
-                                   tf_param=tf_param,
-                                   tech_param_type=tech_param_type,
-                                   tech_param=tech_param,
-                                   integrate_non_motif=switched_integrate),
-                              context_instance=RequestContext(request))
-
+from browse.static_reports import get_static_reports
+    
 def view_reports_by_id_list(request):
-    """Given a collection of curation-site-instance ids with a post request,
-    group them by TF/species and return the reports"""
-    cur_site_insts = models.Curation_SiteInstance.objects.filter(
-        pk__in=request.POST['csi_list'].strip().split(',')
-    )
-
-    integrate_non_motif = bool('integrate_non_motif' in request.POST)
-
-    if not integrate_non_motif:
-        cur_site_insts =\
-            cur_site_insts.exclude(site_type='non_motif_associated')
-
-    reports = motif_report.make_distinct_reports(cur_site_insts)
+    """Returns motif reports from given Curation_SiteInstance object IDs."""
+    curation_site_instances = models.Curation_SiteInstance.objects.filter(
+        pk__in=request.POST['csi_list'].strip().split(','))
+    reports = motif_report.make_distinct_reports(curation_site_instances)
     ensemble_report = motif_report.make_ensemble_report(cur_site_insts)
 
-    return render_to_response('view_reports.html',
-                              dict(reports=[report.generate_view_reports_dict()
-                                            for report in reports],
-                                   ensemble_report=
-                                   ensemble_report.generate_view_reports_dict(),
-                                   cur_site_insts=','.join(
-                                       map(lambda csi: '%d'%csi.pk,
-                                           cur_site_insts)),
-                                   integrate_non_motif=integrate_non_motif,
-                                   by_id=True),
-                              context_instance=RequestContext(request))
+    return render_to_response(
+        'view_reports.html',
+        {'reports': [report.generate_view_reports_dict() for report in reports],
+         'ensemble_report': ensemble_report.generate_view_reports_dict(),
+         'curation_site_instances': ','.join(
+             map(lambda csi: '%d'%csi.pk, curation_site_instances)),
+         'by_id': True},
+        context_instance=RequestContext(request))
+
+def render_report_to_response(request, reports, ensemble_report):
+    """Helps rendering MotifReport object to the response."""
+    return render_to_response(
+        'view_reports.html',
+        {'reports': [r.generate_view_reports_dict() for r in reports],
+         'ensemble_report': ensemble_report.generate_view_reports_dict()},
+        context_instance=RequestContext(request))
+
+def view_reports_by_TF_and_species(request, TF_id, species_id):
+    """Finds sites and generates motif reports given an organism and TF ID."""
+    org = get_object_or_404(models.Taxonomy, pk=species_id)
+    TF = get_object_or_404(models.TF, TF_id=TF_id)
+    reports, ensemble_report = get_static_reports(
+        'tf_%s_species_%s' % (TF_id, species_id))
+    return render_report_to_response(request, reports, ensemble_report)
+
+def view_reports_by_TF_family(request, object_id): 
+    """Returns the motif reports for the given TF family."""
+    TF_family = get_object_or_404(models.TFFamily, TF_family_id=object_id)
+    reports, ensemble_report = get_static_reports('TF_family_%s' % object_id)
+    return render_report_to_response(request, reports, ensemble_report)
+
+def view_reports_by_TF(request, object_id):
+    """Returns the motif reports for the given TF."""
+    TF = get_object_or_404(models.TF, TF_id=object_id)
+    reports, ensemble_report = get_static_reports('TF_%s' % object_id)
+    return render_report_to_response(request, reports, ensemble_report)
+
+def view_reports_by_all_techniques(request, function):
+    """Returns the motif reports for the given technique function."""
+    reports, ensemble_report = get_static_reports(
+        'experimental_technique_all_' + function)
+    return render_report_to_response(request, reports, ensemble_report)
+    
+def view_reports_by_technique_category(request, category_function, object_id):
+    """Returns the motif reports for a given experimental technique category."""
+    category = get_object_or_404(models.ExperimentalTechniqueCategory,
+                                 category_id=object_id)
+    reports, ensemble_report = get_static_reports(
+        'experimental_technique_category_%s' % object_id)
+    return render_report_to_response(request, reports, ensemble_report)
+
+def view_reports_by_technique(request, object_id):
+    """Returns the motif reports for a given experimental technique."""
+    technique = get_object_or_404(models.ExperimentalTechnique,
+                                  technique_id=object_id)
+    reports, ensemble_report = get_static_reports(
+        'experimental_technique_%s' % object_id)
+    return render_report_to_response(request, reports, ensemble_report)
+
+def view_reports_by_taxonomy(request, object_id):
+    """Returns the motif reports for a given taxon."""
+    taxonomy = get_object_or_404(models.Taxonomy, taxononmy_id=object_id)
+    reports, ensemble_report = get_static_reports('taxonomy_%s' % object_id)
+    return render_report_to_response(request, reports, ensemble_report)

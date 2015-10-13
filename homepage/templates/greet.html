@@ -18,7 +18,7 @@
 
 <p class="lead">
   A record from CollecTF
-  <a href="{% url 'browse.view_reports.view_reports' 'species' random_rec.species.pk 'tf' random_rec.TF.pk 'all' -1 0 %}">
+  <a href="{% url 'browse.view_reports.view_reports_by_TF_and_species' random_rec.TF.pk random_rec.species.pk %}">
     <small>View full record</small>
   </a>
 </p>

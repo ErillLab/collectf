@@ -1,100 +1,86 @@
-"""This file contains view functions for browsing by experimental techniques"""
+"""
+The view functions for browsing by experimental techniques.
+"""
 
+from django.core.urlresolvers import reverse
+from django.shortcuts import get_object_or_404
+from django.shortcuts import get_list_or_404
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+
 import browse.models as models
 import browse.motif_report as motif_report
-from django.shortcuts import get_object_or_404, get_list_or_404
+from browse.static_reports import get_static_reports
+from browse.view_reports import view_reports_by_all_techniques
+from browse.view_reports import view_reports_by_technique_category
+from browse.view_reports import view_reports_by_technique
 
 def browse_tech(request):
-    """View function for browse by techniques. Returns all techniques, grouped
-    by categories."""
-    all_categories = models.ExperimentalTechniqueCategory.objects.all().\
-                     order_by('name')
-    binding_techniques = {}
-    expression_techniques = {}
-    for category in all_categories:
-        # Find all techniques that belong to that category.
-        # Category and techniques have n:n relationship.
+    """Returns all techniques, grouped by categories."""
+    # Group all binding and expression techniques by their category.
+    categories = models.ExperimentalTechniqueCategory.objects.all()
+    binding_techs = {}
+    expression_techs = {}
+    for category in categories:
         techs = models.ExperimentalTechnique.objects.filter(categories=category)
-        binding_techniques[category.category_id] = \
-                    techs.filter(preset_function='binding').order_by('name')
-        expression_techniques[category.category_id] = \
-                    techs.filter(preset_function='expression').order_by('name')
+        binding_techs[category.category_id] = techs.filter(
+            preset_function='binding')
+        expression_techs[category.category_id] = techs.filter(
+            preset_function='expression')
 
     # remove empty keys from dict
-    binding_techniques = dict((x, y)
-                              for (x, y) in binding_techniques.items() if y)
-    expression_techniques = dict((x, y)
-                                 for (x, y) in expression_techniques.items()
-                                 if y)
-    all_categories = dict((x.category_id, x) for x in all_categories)
+    binding_techs = {x: y for x, y in binding_techs.items() if y}
+    expression_techs = {x: y for x, y in expression_techs.items() if y}
+    categories = {x.category_id: x for x in categories}
     return render_to_response('browse_tech.html',
-                              {'binding_techniques': binding_techniques,
-                               'expression_techniques': expression_techniques,
-                               'categories': all_categories},
+                              {'binding_techniques': binding_techs,
+                               'expression_techniques': expression_techs,
+                               'categories': categories},
                               context_instance=RequestContext(request))
 
-def get_techniques(tech_type, tech_id):
-    """Given a technique or category, return all techniques that fits under that
-    category"""
+def get_results_all(request, function):
+    """Returns motif reports of sites validated by binding or expression."""
+    assert function in ['binding', 'expression']
+    reports, _ = get_static_reports('experimental_technique_all_%s' % function)
+    title_lookup = {'binding': 'Detection of binding',
+                    'expression': 'Assessment of expression'}
+    return render_to_response(
+        'browse_results.html',
+        {'title': title_lookup[function],
+         'description': '',
+         'reports': [r.generate_browse_result_dict() for r in reports],
+         'combined_report_url': reverse(view_reports_by_all_techniques,
+                                        args=(function,))},
+        context_instance=RequestContext(request))
 
-    tech_objs = models.ExperimentalTechnique.objects
 
-    title, desc, techniques = (None, None, None)
-    if tech_type == 'all':
-        techniques = tech_objs.all()
-    elif tech_type in ['binding', 'expression']:
-        techniques = tech_objs.filter(preset_function=tech_type)
-        if tech_type == 'binding':
-            title = 'Detection of binding'
-        else:
-            title = 'Assessment of expression'
-        desc = ''
-    elif tech_type == 'binding_category':
-        category = get_object_or_404(models.ExperimentalTechniqueCategory,
-                                     category_id=tech_id)
-        techniques = tech_objs.filter(categories=category,
-                                      preset_function='binding')
-        title = category.name
-        desc = category.description
-    elif tech_type == 'expression_category':
-        category = get_object_or_404(models.ExperimentalTechniqueCategory,
-                                     category_id=tech_id)
-        techniques = tech_objs.filter(categories=category,
-                                      preset_function='expression')
-        title = category.name
-        desc = category.description
-    elif tech_type == 'technique':
-        techniques = get_list_or_404(models.ExperimentalTechnique,
-                                     technique_id=tech_id)
-        title = techniques[0].name
-        desc = techniques[0].description
+def get_results_category(request, category_function, object_id):
+    """Returns motif reports by binding/expression category."""
+    assert category_function in ['binding', 'expression']
+    category = get_object_or_404(models.ExperimentalTechniqueCategory,
+                                 category_id=object_id)
+    reports, _ = get_static_reports(
+        'experimental_technique_category_%s' % object_id)
+    return render_to_response(
+        'browse_results.html',
+        {'title': category.name,
+         'description': category.description,
+         'reports': [r.generate_browse_result_dict() for r in reports],
+         'combined_report_url': reverse(
+             view_reports_by_technique_category,
+             args=(category_function, object_id,))},
+        context_instance=RequestContext(request))
 
-    return title, desc, techniques
-
-def get_results_tech(request, type_, id_):
-    """Given a technique category and an id describing that category object,
-    retrieve all curation-site-instance objects that have a technique with the
-    specified category."""
-
-    title, desc, techniques = get_techniques(type_, id_)
-
-    cur_site_insts = models.Curation_SiteInstance.objects.filter(
-        experimental_techniques__in=techniques
-    )
-    # generate all reports
-    reports = motif_report.make_reports(cur_site_insts)
-
-    return render_to_response("browse_results.html",
-                              dict(title=title,
-                                   description=desc,
-                                   reports=[report.generate_browse_result_dict()
-                                            for report in reports],
-                                   tax_param_type='all',
-                                   tax_param=-1,
-                                   tf_param_type='all',
-                                   tf_param=-1,
-                                   tech_param_type=type_,
-                                   tech_param=id_),
-                              context_instance=RequestContext(request))
+def get_results_technique(request, object_id):
+    """Returns motif reports by experimental technique ID."""
+    technique = get_object_or_404(models.ExperimentalTechnique,
+                                  technique_id=object_id)
+    reports, _ = get_static_reports('experimental_technique_%s' % object_id)
+    return render_to_response(
+        'browse_results.html',
+        {'title': technique.name,
+         'description': technique.description,
+         'reports': [r.generate_browse_result_dict() for r in reports],
+         'combined_report_url': reverse(view_reports_by_technique,
+                                        args=(technique.technique_id,))},
+        context_instance=RequestContext(request))

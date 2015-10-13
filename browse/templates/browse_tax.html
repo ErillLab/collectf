@@ -14,42 +14,42 @@
       <li>
 	    <div class="node expandable">
 	      <i class=""></i>
-	      <a href="#" onclick="getReportLinksSpecies({{ phylum.pk }}, '{{ phylum.name }}'); return false;">{{ phylum.name }}</a>
+	      <a href="#" onclick="getReportLinksByTaxonomy({{ phylum.taxonomy_id }}); return false;">{{ phylum.name }}</a>
 	    </div>
 	    <ul class="list-unstyled">
 	      {% for class in phylum.taxonomy_set.all %}
 	      <li>
 	        <div class="node expandable">
 	          <i class=""></i>
-	          <a href="#" onclick="getReportLinksSpecies({{ class.pk }}, '{{ class.name }}'); return false;">{{ class.name }}</a>
+	          <a href="#" onclick="getReportLinksByTaxonomy({{ class.taxonomy_id }}); return false;">{{ class.name }}</a>
 	        </div>
 	        <ul class="list-unstyled">
 	          {% for order in class.taxonomy_set.all %}
 	          <li>
 		        <div class="node expandable">
 		          <i class=""></i>
-		          <a href="#" onclick="getReportLinksSpecies({{ order.pk }}, '{{ order.name }}'); return false;">{{ order.name }}</a>
+		          <a href="#" onclick="getReportLinksByTaxonomy({{ order.taxonomy_id }}); return false;">{{ order.name }}</a>
 		        </div>
 		        <ul class="list-unstyled">
 		          {% for family in order.taxonomy_set.all %}
 		          <li>
 		            <div class="node expandable">
 		              <i class=""></i>
-		              <a href="#" onclick="getReportLinksSpecies({{ family.pk }}, '{{ family.name }}'); return false;">{{ family.name }}</a>
+		              <a href="#" onclick="getReportLinksByTaxonomy({{ family.taxonomy_id }}); return false;">{{ family.name }}</a>
 		            </div>
 		            <ul class="list-unstyled">
 		              {% for genus in family.taxonomy_set.all %}
 		              <li>
 			            <div class="node expandable">
 			              <i></i>
-			              <a href="#" onclick="getReportLinksSpecies({{ genus.pk }}, '{{ genus.name }}'); return false;">{{ genus.name }}</a>
+			              <a href="#" onclick="getReportLinksByTaxonomy({{ genus.taxonomy_id }}); return false;">{{ genus.name }}</a>
 			            </div>
 			            <ul class="list-unstyled">
 			              {% for species in genus.taxonomy_set.all %}
 			              <li>
 			                <div class="node">
 			                  <i></i>
-			                  <a href="#" onclick="getReportLinksSpecies({{ species.pk }}, '{{ species.name }}'); return false;">{{ species.name }}</a>
+			                  <a href="#" onclick="getReportLinksByTaxonomy({{ species.taxonomy_id }}); return false;">{{ species.name }}</a>
 			                </div>
 			              </li>
 			              {% endfor %}
