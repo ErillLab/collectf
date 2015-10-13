@@ -135,11 +135,17 @@ class MotifReport:
             'motif_id', flat=True).distinct()
         motifs = {}
         for motif_id in motif_ids:
-            meta_sites = [meta_site for meta_site in self.meta_sites
+            meta_sites = [meta_site for meta_site in self.get_meta_sites()
                           if meta_site.motif_id == motif_id]
             motifs[motif_id] = base.bioutils.run_lasagna(
                 [x.delegate_site_instance for x in meta_sites])
         return motifs
+
+    def get_single_motif(self):
+        """Return the motif (list of sites) with most number of sites."""
+        motifs = self.get_motifs().values()
+        motifs.sort(key=lambda motif: len(motif), reverse=True)
+        return motifs[0]
 
     def get_meta_sites(self):
         """Creates meta-sites from curation-site-instances."""

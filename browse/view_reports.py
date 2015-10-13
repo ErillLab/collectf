@@ -5,12 +5,14 @@ properly.
 """
 
 from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 
 import browse.models as models
 import browse.motif_report as motif_report
 from browse.static_reports import get_static_reports
+from browse.dbxref import from_uniprot_dbxref
     
 def view_reports_by_id_list(request):
     """Returns motif reports from given Curation_SiteInstance object IDs."""
@@ -35,6 +37,11 @@ def render_report_to_response(request, reports, ensemble_report):
         {'reports': [r.generate_view_reports_dict() for r in reports],
          'ensemble_report': ensemble_report.generate_view_reports_dict()},
         context_instance=RequestContext(request))
+
+def view_reports_by_uniprot_id(request, uniprot_dbxref):
+    """Builds motif report for the given UniProt dbxref identifier."""
+    TF_instance_id = from_uniprot_dbxref(uniprot_dbxref)
+    return redirect(view_reports_by_TF_instance, TF_instance_id)
 
 def view_reports_by_TF_instance(request, TF_instance_id):
     """Finds sites and generates motif reports given a TF instance."""

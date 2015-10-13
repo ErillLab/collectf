@@ -6,11 +6,9 @@ admin.autodiscover()
 
 import base.views
 import browse.view_site
+import browse.view_reports
 
 urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'collectf.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'', include('base.urls')),
     url(r'^home/', include('homepage.urls')),
@@ -23,8 +21,13 @@ urlpatterns = patterns('',
     url(r'^accounts/logout/$', base.views.logout),
     url(r'^accounts/', include('registration.backends.default.urls')),
 
-    # This should be in browseapp urls.py, but since NCBI links cannot be
-    # changed, it will serve here.
+    # This should ideally be in browseapp urls.py, but since NCBI links cannot
+    # be changed, it will serve here.
     url(r'^expsite_(?P<dbxref_id>\w+)$', browse.view_site.view_site),
     url(r'^EXPSITE_(?P<dbxref_id>\w+)$', browse.view_site.view_site),
+    # UniProt link-outs
+    url(r'^expreg_(?P<uniprot_dbxref>\w+)$',
+        browse.view_reports.view_reports_by_uniprot_id),
+    url(r'^EXPREG_(?P<uniprot_dbxref>\w+)$',
+        browse.view_reports.view_reports_by_uniprot_id)
 )
