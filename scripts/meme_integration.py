@@ -17,7 +17,7 @@ def generate_motif_file():
                 'TF_instance_%s' % TF_instance.TF_instance_id)
             if reports:
                 motif_sites = reports[0].get_single_motif()
-                if len(motif_sites) < 8:
+                if len(motif_sites) < 5:
                     continue
                 motif = build_motif(motif_sites)
                 f.write('>%s\n' % TF_instance.uniprot_accession)
