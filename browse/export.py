@@ -64,11 +64,10 @@ def export_base(meta_sites):
     """
     rows = []
     for meta_site in meta_sites:
-        values = meta_site.values('curation__TF__name',
-                                  'curation__TF_instances__protein_accession',
+        values = meta_site.values('curation__TF_instances__TF__name',
+                                  'curation__TF_instances__uniprot_accession',
                                   'site_instance__genome__genome_accession',
                                   'site_instance__genome__organism').distinct()
-        #assert len(values)==1, values
         if len(values) > 1:
             print values
             continue
