@@ -1,12 +1,12 @@
 """Export functions to export binding site data in various formats."""
-import models
-from base import bioutils
+
 from django.http import HttpResponse
 
-def export_sites(request):
-    """Given a list of sites, report fasta/csv/arff etc. file containing sites
-    for particular TF and species"""
+from base import bioutils
+from browse import models
 
+def export_sites(request):
+    """Exports report in different formats for the given list of sites."""
     export_options = ['fasta', 'tsv', 'tsv-raw', 'arff',
                       'PSFM-jaspar', 'PSFM-transfac', 'PSFM-raw-fasta']
     ext = {
@@ -45,20 +45,25 @@ def export_sites(request):
 
     # Given the list of curation-site-instance objects,
     curation_site_id_groups = request.POST.getlist('site_id')
-    meta_sites = [models.Curation_SiteInstance.objects.filter(pk__in=id_group.split('|'))
-                  for id_group in curation_site_id_groups]
+    meta_sites = [
+        models.Curation_SiteInstance.objects.filter(pk__in=id_group.split('|'))
+        for id_group in curation_site_id_groups]
 
     response = HttpResponse(content_type='application/download')
     # call corresponding export function
     response["Content-Disposition"] = \
-            "attachment;filename=collectf-export-%s.%s" % (export_format, ext[export_format])
+            "attachment;filename=collectf-export-%s.%s" % (export_format,
+                                                           ext[export_format])
     response.write(func[export_format](meta_sites, **kwargs[export_format]))
     return response
 
 def export_base(meta_sites):
-    """Base function for export. Called by format-specific export functions."""
+    """Helper function to be called by export functions.
+
+    Called by format-specific export functions.
+    """
     rows = []
-    for i, meta_site in enumerate(meta_sites):
+    for meta_site in meta_sites:
         values = meta_site.values('curation__TF__name',
                                   'curation__TF_instances__protein_accession',
                                   'site_instance__genome__genome_accession',
@@ -81,9 +86,9 @@ def export_base(meta_sites):
     return rows
 
 def export_fasta(meta_sites, **kwargs):
-    """Export TFBS in FASTA format."""
+    """Exports binding sites in FASTA format."""
     fasta_str = ""
-    # dont load genome sequence when retrieving from DB
+    # Don't load genome sequence when retrieving from DB
     rows = export_base(meta_sites)
     for row in rows:
         fasta_str += (">TF_%(TF)s_%(TF_accession)s|genome_%(genome)s_%(organism)s|start=%(start_pos)d|end=%(end_pos)d|strand=%(strand)d\n" %
