@@ -63,7 +63,6 @@ class Curation(models.Model):
     #TF_function = models.CharField(max_length=50)
     #TF_type = models.CharField(max_length=50)
 
-
     # <Wed Jan 29 2014> Experimental techniques are now going to be associated
     # directly (N:N) with curation_site_instances, allowing a curation to
     # contain curation_site_instances that have different associated techniques.

@@ -157,7 +157,7 @@ def run():
     """Entry point for the script."""
     #add_refseq_accessions()
     #merge_same_wps()
-    #oadd_uniprot_accessions()
+    #add_uniprot_accessions()
     #dump_curation_TF_instance()
     #dump_TF_instance()
     load_TF_instance()
