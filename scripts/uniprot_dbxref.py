@@ -25,7 +25,7 @@ def generate_uniprot_dbxref():
     with open(export_file, 'w') as f:
         for TF_instance in tqdm(models.TFInstance.objects.all()):
             reports, _ = get_static_reports(
-                'tf_instance_%s' % TF_instance.TF_instance_id)
+                'TF_instance_%s' % TF_instance.TF_instance_id)
             if reports:
                 motif_sites = reports[0].get_single_motif()
                 f.write('\t'.join(
