@@ -48,7 +48,7 @@ def view_reports_by_TF_instance(request, TF_instance_id):
     TF_instance = get_object_or_404(models.TFInstance,
                                     TF_instance_id=TF_instance_id)
     reports, ensemble_report = get_static_reports(
-        'tf_instance_%s' % TF_instance_id)
+        'TF_instance_%s' % TF_instance_id)
     return render_report_to_response(request, reports, ensemble_report)
     
 def view_reports_by_TF_and_species(request, TF_id, species_id):
