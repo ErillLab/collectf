@@ -27,7 +27,9 @@ urlpatterns = patterns('',
     url(r'^EXPSITE_(?P<dbxref_id>\w+)$', browse.view_site.view_site),
     # UniProt link-outs
     url(r'^expreg_(?P<uniprot_dbxref>\w+)$',
-        browse.view_reports.view_reports_by_uniprot_id),
+        browse.view_reports.view_reports_by_uniprot_dbxref),
     url(r'^EXPREG_(?P<uniprot_dbxref>\w+)$',
-        browse.view_reports.view_reports_by_uniprot_id)
+        browse.view_reports.view_reports_by_uniprot_dbxref),
+    url(r'^uniprot_(?P<uniprot_accession>\w+)$',
+        browse.view_reports.view_reports_by_uniprot_accession),
 )

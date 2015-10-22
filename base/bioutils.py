@@ -209,8 +209,6 @@ def run_lasagna(site_instances, trim=True):
                  zip(site_instances, aligned, strands)]
     return recovered
 
-
-
 def extend_site(site_instance, genome_seq, n=250):
     """Extend the site instance sequence by n bases both sides."""
     seq = genome_seq[site_instance.start-n: site_instance.end+n+1]
@@ -265,7 +263,6 @@ def score_sequence(motif, sequence):
     """Given Biopython motif object and a sequence match, return PWM score of
     the match"""
     return motif.score_hit(sequence, position=0)
-
 
 def degenerate_consensus(motif):
     """Grabbed and modified from Biopython modules library.  Following the rules
