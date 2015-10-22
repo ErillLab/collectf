@@ -2,7 +2,6 @@ from django.test import TestCase
 from base import bioutils
 
 class SequenceTest(TestCase):
-
     def test_performs_reverse_complement(self):
         seq = 'ACGTAAA'
         self.assertEqual(bioutils.reverse_complement(seq), 'TTTACGT')
@@ -10,6 +9,10 @@ class SequenceTest(TestCase):
     def test_reverse_complements_empty_sequence(self):
         self.assertEqual(bioutils.reverse_complement(''), '')
 
+    def test_converts_to_FASTA_format(self):
+        seqs = ['ACGT', 'ACCCA']
+        self.assertEqual(bioutils.to_fasta(seqs),
+                         '>instance0\nACGT\n>instance1\nACCCA\n')
 
 class EntrezTest(TestCase):
     def setUp(self):
@@ -61,5 +64,26 @@ class EntrezTest(TestCase):
 
     def test_gets_genes(self):
         genes = bioutils.get_genes(self.genome_record)
-        print len(genes)
-        print genes[0]
+        self.assertEqual(len(genes), 4498)
+        expected = {'locus_tag': 'b0001',
+                    'name': 'thrL',
+                    'gene_accession': '944742',
+                    'description': 'thr operon leader peptide',
+                    'start': 189,
+                    'end': 255,
+                    'strand': 1}
+        self.assertEqual(genes[0], expected)
+
+    def test_gets_org_name(self):
+        self.assertEqual(bioutils.get_org_name(self.genome_record),
+                         'Escherichia coli str. K-12 substr. MG1655')
+
+    def test_gets_org_taxon(self):
+        self.assertEqual(bioutils.get_organism_taxon(self.genome_record),
+                         '511145')
+
+    def test_gets_org_taxon_from_TF_accession(self):
+        acc = 'WP_010970539.1'
+        self.assertEqual(bioutils.TF_accession_to_org_taxon(acc), '382')
+
+    
