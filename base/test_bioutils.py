@@ -30,3 +30,25 @@ class EntrezTest(TestCase):
     def test_returns_nothing_on_invalid_genome_accession(self):
         record = bioutils.get_genome('NC_invalid')
         self.assertIsNone(record)
+
+    def test_fetches_TF_record(self):
+        accession = 'NP_233336.1'
+        record = bioutils.get_TF(accession)
+        self.assertEqual(record.id, accession)
+        self.assertEqual(record.seq[:5], 'MKDEN')
+
+    def test_returns_none_on_invalid_TF_accession(self):
+        record = bioutils.get_TF('invalid_TF_accession')
+        self.assertIsNone(record)
+
+    def test_fetches_TF_uniprot_record(self):
+        record = bioutils.get_uniprot_TF('Q9KKZ8')
+        self.assertIsInstance(record, unicode)
+        self.assertIn(record, 'LuxR family')
+
+    def test_returns_empty_on_invalid_uniprot_accession(self):
+        record = bioutils.get_uniprot_TF('invalid_uniprot_acc')
+        self.assertIsInstance(record, unicode)
+        self.assertEqual(record, '')
+
+
