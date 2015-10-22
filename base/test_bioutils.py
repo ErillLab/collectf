@@ -12,6 +12,9 @@ class SequenceTest(TestCase):
 
 
 class EntrezTest(TestCase):
+    def setUp(self):
+        self.genome_record = bioutils.get_genome('NC_000913.3')
+        
     def test_fetches_pubmed_record(self):
         record = bioutils.get_pubmed(1)
         self.assertEqual(
@@ -23,9 +26,8 @@ class EntrezTest(TestCase):
         self.assertIsNone(record)
     
     def test_fetches_genome_record(self):
-        record = bioutils.get_genome('NC_000913.2')
-        self.assertEqual(record.id, 'NC_000913.2')
-        self.assertEqual(str(record.seq[:5]), 'AGCTT')
+        self.assertEqual(self.genome_record.id, 'NC_000913.3')
+        self.assertEqual(str(self.genome_record.seq[:5]), 'AGCTT')
 
     def test_returns_nothing_on_invalid_genome_accession(self):
         record = bioutils.get_genome('NC_invalid')
@@ -44,11 +46,20 @@ class EntrezTest(TestCase):
     def test_fetches_TF_uniprot_record(self):
         record = bioutils.get_uniprot_TF('Q9KKZ8')
         self.assertIsInstance(record, unicode)
-        self.assertIn(record, 'LuxR family')
+        self.assertIn('LuxR family', record)
 
     def test_returns_empty_on_invalid_uniprot_accession(self):
         record = bioutils.get_uniprot_TF('invalid_uniprot_acc')
         self.assertIsInstance(record, unicode)
         self.assertEqual(record, '')
 
+    def test_gets_gene_id_from_feature(self):
+        gene_features = [feature for feature in self.genome_record.features
+                         if feature.type == 'gene']
+        gene_id = bioutils.get_gene_id(gene_features[0])
+        self.assertEqual(gene_id, '944742')
 
+    def test_gets_genes(self):
+        genes = bioutils.get_genes(self.genome_record)
+        print len(genes)
+        print genes[0]
