@@ -1,10 +1,11 @@
 """Model definitions"""
+import Queue
 
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.cache import cache
-import base.bioutils as bioutils
-import Queue
+
+import bioutils
 
 # Create your models here.
 class Curation(models.Model):
