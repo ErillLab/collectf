@@ -1,8 +1,9 @@
 
 from django.conf.urls import patterns, include, url
-
+from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.contrib import admin
 admin.autodiscover()
+from django.views.generic import RedirectView
 
 import base.views
 import browse.view_site
@@ -32,4 +33,6 @@ urlpatterns = patterns('',
         browse.view_reports.view_reports_by_uniprot_dbxref),
     url(r'^uniprot/(?P<uniprot_accession>\w+)$',
         browse.view_reports.view_reports_by_uniprot_accession),
+    url(r'^uniprotkbmap$',
+        RedirectView.as_view(url=static('uniprot_dbxref.txt'))),
 )
