@@ -19,15 +19,6 @@ def browse_taxonomy(request):
     return render_to_response('browse_tax.html', {'taxonomy': taxonomy},
                               context_instance=RequestContext(request))
 
-def get_species(tax_type, taxid):
-    """Given a taxonomy id with its type (all, group or species), return the
-    list of species"""
-    if tax_type == 'all':
-        return models.Taxonomy.objects.all()
-    elif tax_type == 'group' or tax_type == 'species':
-        tax = get_object_or_404(models.Taxonomy, pk=taxid)
-        return tax.get_all_species()
-
 def get_results_taxonomy(request, object_id):
     """Returns motif reports for a given taxonomy ID."""
     tax = get_object_or_404(models.Taxonomy, taxonomy_id=object_id)
