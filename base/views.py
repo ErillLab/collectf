@@ -48,10 +48,9 @@ login = django.contrib.auth.views.login
 logout =  django.contrib.auth.views.logout
 
 def get_weblogo(request):
-    """Given a POST request having a list of binding sites, return the generated
-    weblogo."""
+    """Generates the sequence logo, given a list of binding sites."""
     sites = request.POST['sites'].strip().split(',')
-    sites = map(str, sites) # make them string
-    # make sure they all have the same length
+    sites = map(str, sites) 
+    # Make sure they all have the same length
     assert all(len(sites[0]) == len(site) for site in sites)
     return HttpResponse(bioutils.weblogo_uri(sites), "text/plain")

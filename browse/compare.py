@@ -115,7 +115,7 @@ def motif_comparison_post(request, step):
         request.session['permute_motif_a'] = None
         request.session['permute_motif_b'] = None
         request.session.modified = True
-        
+
         return render_to_response(
             'motif_compare_results.html',
             {'form_title': FORM_TITLES[2],
