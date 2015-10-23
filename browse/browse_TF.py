@@ -20,9 +20,6 @@ def browse_TF(request):
                               {'TF_families': TF_families},
                               context_instance=RequestContext(request))
 
-def get_tf_instance(accession):
-    return get_object_or_404(models.TFInstance, protein_accession=accession)
-
 def get_results_TF_family(request, object_id):
     """Returns TF-species pairs that have binding sites for the given family."""
     TF_family = get_object_or_404(models.TFFamily, TF_family_id=object_id)
