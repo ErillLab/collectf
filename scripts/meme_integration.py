@@ -6,6 +6,7 @@ from tqdm import tqdm
 from base import models
 from base.bioutils import build_motif
 from browse.static_reports import get_static_reports
+from browse.dbxref import to_uniprot_dbxref
 from collectf import settings
 
 def generate_motif_file():
@@ -20,7 +21,7 @@ def generate_motif_file():
                 if len(motif_sites) < 5:
                     continue
                 motif = build_motif(motif_sites)
-                f.write('>%s\n' % TF_instance.uniprot_accession)
+                f.write('>%s\n' % to_uniprot_dbxref(TF_instance.TF_instance_id))
                 f.write('A| %s\n' % ' '.join(map(str, motif.counts['A'])))
                 f.write('C| %s\n' % ' '.join(map(str, motif.counts['C'])))
                 f.write('G| %s\n' % ' '.join(map(str, motif.counts['G'])))
