@@ -157,9 +157,12 @@
 		          </td>
 		          
 		      <td> <!-- START validation status -->
-                	{% for curation in meta_site.curations %}
-                		{% if curation.validated_by %} validated by {{ curation.validated_by }} 
-	                	{% else %} <a href="{% url 'curate.validate_curation.validate_curation' curation.pk %}">validate</a>
+                {% for curation in meta_site.curations %}
+                {% if user.is_superuser %}
+                {% if curation.validated_by %} validated by {{ curation.validated_by }}
+                {% endif %}
+	            {% else %}
+                <a href="{% url 'curate.validate_curation.validate_curation' curation.pk %}">validate</a>
                 		{% endif %}
                 	{% endfor %}
 	              </td> <!-- END validation status -->
