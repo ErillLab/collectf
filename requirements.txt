@@ -2,6 +2,7 @@ MySQL-python
 biopython
 django-bootstrap-form
 django-extensions
+matplotlib
 pylint
 regex
 reportlab
