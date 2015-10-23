@@ -2,23 +2,23 @@ from django.conf.urls import patterns, url
 
 urlpatterns = patterns(
     'browse.browse_tax',
-    (r'browse_tax/$', 'browse_taxonomy'),
-    (r'get_results_tax/(?P<object_id>\d+)$', 'get_results_taxonomy'),
+    (r'browse_taxonomy/$', 'browse_taxonomy'),
+    (r'get_results_taxonomy/(?P<object_id>\d+)/$', 'get_results_taxonomy'),
 )
 
 urlpatterns += patterns(
     'browse.browse_TF',
-    (r'browse_tf/$', 'browse_TF'),
+    (r'browse_TF/$', 'browse_TF'),
     (r'get_results_TF/(?P<object_id>\d+)/$', 'get_results_TF'),
     (r'get_results_TF_family/(?P<object_id>\d+)/$', 'get_results_TF_family'),
 )
 
 urlpatterns += patterns(
     'browse.browse_tech',
-    (r'browse_tech/$', 'browse_tech'),
-    (r'get_results_technique/(\d+)$', 'get_results_technique'),
-    (r'get_results_technique_all/(binding|expression)$', 'get_results_all'),
-    (r'get_results_technique_category/(binding|expression)/(\d+)$',
+    (r'browse_technique/$', 'browse_tech'),
+    (r'get_results_technique/(\d+)/$', 'get_results_technique'),
+    (r'get_results_technique_all/(binding|expression)/$', 'get_results_all'),
+    (r'get_results_technique_category/(binding|expression)/(\d+)/$',
      'get_results_category'),
 )
 
