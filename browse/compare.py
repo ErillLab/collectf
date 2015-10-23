@@ -1,23 +1,27 @@
-"""Compare motifs"""
-import motif_report
-import search
-import math
-import random
-import StringIO
-import matplotlib
-matplotlib.use('Agg') # generate images without having a window appear
-import matplotlib.pyplot as plt
-from base import bioutils
+"""Compare motifs."""
+
+from base64 import b64encode
 from matplotlib import rc
-from django.shortcuts import render_to_response
-from django.template import RequestContext
+import StringIO
+import math
+import matplotlib
+import matplotlib.pyplot as plt
+import random
+
+from base import bioutils
+from browse import motif_report
+from browse import search
+
 from django.contrib import messages
-from django.shortcuts import render
+from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
-from django.core.urlresolvers import reverse
-from base64 import b64encode
+from django.shortcuts import render
+from django.shortcuts import render_to_response
+from django.template import RequestContext
 
+# Generate images without having a window appear.
+matplotlib.use('Agg') 
 
 FORM_TITLES = ["Step 1/3: Search for the first motif.",
                "Step 2/3: Search for the second motif.",
@@ -25,24 +29,24 @@ FORM_TITLES = ["Step 1/3: Search for the first motif.",
 
 
 FORM_DESCRIPTIONS = [
-"""Search in CollecTF is fully customizable. Just select a taxonomic unit (e.g. the
-Vibrio genus), a transcription factor family or instance (e.g. LexA) and the set of
-experimental techniques that reported sites should be backed by and proceed.""",
+"""Search in CollecTF is fully customizable. Just select a taxonomic unit
+(e.g. the Vibrio genus), a transcription factor family or instance (e.g. LexA)
+and the set of experimental techniques that reported sites should be backed by
+and proceed.""",
 
-"""Search for the second motif to be compared. Just select a taxonomic unit (e.g. the
-Vibrio genus), a transcription factor family or instance (e.g. LexA) and the set of
-experimental techniques that reported sites should be backed by and proceed.""",
+"""Search for the second motif to be compared. Just select a taxonomic unit
+(e.g. the Vibrio genus), a transcription factor family or instance (e.g. LexA)
+and the set of experimental techniques that reported sites should be backed by
+and proceed.""",
 
-"",
-]
+""]
 
 def motif_comparison_get(request, step):
-    """Get form for motif comparison page."""
-    # Get all techniques
+    """Gets form for motif comparison page."""
     TF_families = search.get_TF_families()
     phyla = search.get_all_phyla()
     binding,expression,insilico = search.get_all_techniques()
-    return render_to_response("motif_compare_search.html",
+    return render_to_response('motif_compare_search.html',
                               {'TF_families': TF_families,
                                'phyla': phyla,
                                'binding_techniques': binding,
@@ -53,76 +57,82 @@ def motif_comparison_get(request, step):
                                'compare': True},
                                context_instance=RequestContext(request))
 
-def motif_comparison_post(request, step):
-    """Process motif comparison forms."""
-    try:
-        cur_site_insts = search.search_post_helper(request)
-    except:
-        message = "Please select at least one TF, species and experimental technique to search database."
-        messages.add_message(request, messages.ERROR, message)
-        return HttpResponseRedirect(reverse(eval('motif_comparison_step%d' % step)))
-
-    if not cur_site_insts.filter(site_type='motif_associated'):
-        # If there is no motif-associated site, raise error
-        message = "No results found for selected TF and species"
-        messages.add_message(request, messages.ERROR, message)
-        return HttpResponseRedirect(reverse(eval('motif_comparison_step%d' % step)))
-
-    # store search results
-    request.session['compare_step_%s' % step] = cur_site_insts
-    request.session.modified = True
-    
-    if step == 1:
-        return HttpResponseRedirect(reverse(motif_comparison_step2))
-    else: # step2
-        # Render results
-        # Get motif_associated and non-motif_associated curation site instances
-        cur_site_insts_a = request.session['compare_step_1']
-        cur_site_insts_b = request.session['compare_step_2']
-        
-        motif_a_reports = [report.generate_view_reports_dict()
-                           for report in motif_report.make_reports(cur_site_insts_a)]
-        motif_a_ensemble_report = \
-          motif_report.make_ensemble_report(cur_site_insts_a).generate_view_reports_dict()
-
-        motif_b_reports = [report.generate_view_reports_dict()
-                           for report in motif_report.make_reports(cur_site_insts_b)]
-        motif_b_ensemble_report = \
-          motif_report.make_ensemble_report(cur_site_insts_b).generate_view_reports_dict()
-        
-        # clean session data from possible previous requests
-        # ???
-        request.session['permute_motif_a'] = None
-        request.session['permute_motif_b'] = None
-        request.session.modified = True
-        
-        return render_to_response("motif_compare_results.html",
-                                  {'form_title': FORM_TITLES[2],
-                                   'form_description': FORM_DESCRIPTIONS[2],
-                                   'motif_a_reports': motif_a_reports,
-                                   'motif_b_reports': motif_b_reports,
-                                   'motif_a_ensemble_report': motif_a_ensemble_report,
-                                   'motif_b_ensemble_report': motif_b_ensemble_report,},
-                                  context_instance=RequestContext(request))
-
 def motif_comparison_step1(request):
-    """Motif comparison step 1. (selecting first motif)"""
+    """View for step 1 of the motif comparison."""
     if request.POST:
         return motif_comparison_post(request, 1)
     return motif_comparison_get(request, 1)
 
 def motif_comparison_step2(request):
-    """Motif comparison step 2. (selecting second motif)"""
+    """View for step 2 of the motif comparison."""
     if request.POST:
         return motif_comparison_post(request, 2)
     if 'compare_step_1' not in request.session:
         return motif_comparison_get(request, 1)
     return motif_comparison_get(request, 2)
 
+def motif_comparison_post(request, step):
+    """Processes motif comparison forms and compares motifs."""
+    try:
+        cur_site_insts = search.search_post_helper(request)
+    except:
+        message = """
+        Please select at least one TF, species and experimental technique to
+        search database."""
+        messages.add_message(request, messages.ERROR, message)
+        return HttpResponseRedirect(
+            reverse(eval('motif_comparison_step%d' % step)))
+
+    if not cur_site_insts.filter(site_type='motif_associated'):
+        message = "No results found for selected TF and species."
+        messages.add_message(request, messages.ERROR, message)
+        return HttpResponseRedirect(
+            reverse(eval('motif_comparison_step%d' % step)))
+
+    # Store search results
+    request.session['compare_step_%s' % step] = cur_site_insts
+    request.session.modified = True
+    
+    if step == 1:
+        return HttpResponseRedirect(reverse(motif_comparison_step2))
+    else: # Step 2
+        # Render results
+        cur_site_insts_a = request.session['compare_step_1']
+        cur_site_insts_b = request.session['compare_step_2']
+        
+        motif_a_reports = [
+            report.generate_view_reports_dict()
+            for report in motif_report.make_reports(cur_site_insts_a)]
+        motif_a_ensemble_report = motif_report.make_ensemble_report(
+            cur_site_insts_a).generate_view_reports_dict()
+        motif_b_reports = [
+            report.generate_view_reports_dict()
+            for report in motif_report.make_reports(cur_site_insts_b)]
+        motif_b_ensemble_report = motif_report.make_ensemble_report(
+            cur_site_insts_b).generate_view_reports_dict()
+        
+        # Clean session data from possible previous requests.
+        request.session['permute_motif_a'] = None
+        request.session['permute_motif_b'] = None
+        request.session.modified = True
+        
+        return render_to_response(
+            'motif_compare_results.html',
+            {'form_title': FORM_TITLES[2],
+             'form_description': FORM_DESCRIPTIONS[2],
+             'motif_a_reports': motif_a_reports,
+             'motif_b_reports': motif_b_reports,
+             'motif_a_ensemble_report': motif_a_ensemble_report,
+             'motif_b_ensemble_report': motif_b_ensemble_report,},
+            context_instance=RequestContext(request))
+
 def motif_sim_measure(request):
-    """AJAX handler for motif similarity measurements.  Request has the
-    similarity function and two motifs (comma seperated strings). Reponse
-    returns HTML which is embedded into the main comparison page."""
+    """AJAX handler for motif similarity measurements.
+
+    Request has the similarity function and two motifs (comma seperated
+    strings). Reponse returns HTML which is embedded into the main comparison
+    page.
+    """
     unaligned_sites_a = request.POST['unaligned_sites_a'].strip().split(',')
     unaligned_sites_b = request.POST['unaligned_sites_b'].strip().split(',')
     sites_a = request.POST['sites_a'].strip().split(',')
@@ -149,7 +159,7 @@ def motif_sim_measure(request):
                         'ALLR': average_log_likelihood_ratio,
                         }[fun_str]
             
-            sites_a, sites_b = motif_alignment(sites_a, sites_b) # align motif_a and motif_b
+            sites_a, sites_b = motif_alignment(sites_a, sites_b)
             fig, p_val = motif_sim_test(request, sites_a, sites_b, fun2call)
         except Exception as e:
             print e
@@ -170,7 +180,8 @@ def levenshtein_measure(motif_a, motif_b):
     b_vs_b = levenshtein_motifs(motif_b, motif_b)
 
     bp = plt.boxplot([a_vs_a, a_vs_b, b_vs_b])
-    plt.xticks(range(1,4), [r'$M_a$ vs $M_a$', r'$M_a$ vs $M_b$', r'$M_b$ vs $M_b$'])
+    plt.xticks(range(1,4),
+               [r'$M_a$ vs $M_a$', r'$M_a$ vs $M_b$', r'$M_b$ vs $M_b$'])
     plt.setp(bp['boxes'], color='#0088CC')
     plt.setp(bp['whiskers'], color='#0088CC')
     plt.setp(bp['fliers'], color='#0088CC', marker='+')
@@ -178,7 +189,6 @@ def levenshtein_measure(motif_a, motif_b):
     boxplot = fig2img(plt.gcf())
     plt.hist([a_vs_a, a_vs_b, b_vs_b], bins=15,
              label=[r'$M_a$ vs $M_a$', r'$M_a$ vs $M_b$', r'$M_b$ vs $M_b$'],
-             #color=["#FFCC33", "#006699", "#FF6633"]
              )
     plt.ylabel('frequency of site-pairs')
     plt.xlabel('Levenshtein distance')
@@ -187,30 +197,35 @@ def levenshtein_measure(motif_a, motif_b):
     return boxplot, hist
 
 def motif_sim_test(request, ma, mb, fnc):
-    """Given two motifs and a similarity function, perform the permutation tests and
-    return the histogram"""
+    """Performs the permutation test for the given motifs."""
     permuted_dists = permutation_test(request, ma, mb, fnc)
     true_dist = fnc(ma, mb)
-    plt.hist(permuted_dists, bins=30, normed=False, color='#0088CC', label="permuted pairs")
-    plt.axvline(true_dist, linestyle='dashed', linewidth=2, color='#FF3300', label="motif pair")
-    plt.xlabel({euclidean_distance: "Eucledian distance",
-                pearson_correlation_coefficient: "Pearson Correlation Coefficient",
-                kullback_leibler_divergence: "Kullback-Leibler Divergence",
-                average_log_likelihood_ratio: "average log likelihood ratio"}[fnc])
+    plt.hist(permuted_dists, bins=30, normed=False, color='#0088CC',
+             label='permuted pairs')
+    plt.axvline(true_dist, linestyle='dashed', linewidth=2, color='#FF3300',
+                label='motif pair')
+    plt.xlabel({
+        euclidean_distance: 'Eucledian distance',
+        pearson_correlation_coefficient: 'Pearson Correlation Coefficient',
+        kullback_leibler_divergence: 'Kullback-Leibler Divergence',
+        average_log_likelihood_ratio: 'average log likelihood ratio'}[fnc])
     plt.ylabel('frequency')
     plt.legend()
     # calc p-value
     if fnc in [euclidean_distance, kullback_leibler_divergence]:
-        p_value = (sum(1 if pd<true_dist else 0 for pd in permuted_dists) + 1.0) / (len(permuted_dists)+1)
+        p_value = (
+            (sum(1 if pd<true_dist else 0 for pd in permuted_dists) + 1.0) /
+            (len(permuted_dists) + 1))
     else:
-        p_value = (sum(1 if pd>true_dist else 0 for pd in permuted_dists) + 1.0) / (len(permuted_dists)+1)
+        p_value = (
+            (sum(1 if pd>true_dist else 0 for pd in permuted_dists) + 1.0) /
+            (len(permuted_dists)+1))
     return fig2img(plt.gcf()), p_value
 
 def motif_alignment(sites_a, sites_b):
-    """
-    Given two sets of sites and a similiarity/distance function, align two motifs
-    that gives the maximum similarity (minimum distance). Returns two sets of sites
-    that are aligned and of same length.
+    """Aligns two motifs that gives the maximum similarity.
+    
+    Returns two sets of sites that are aligned and of same length.
     """
     return motif_SW(sites_a, sites_b)
     
@@ -229,8 +244,9 @@ def motif_SW(sites_a, sites_b):
             # score from diag
             # ungapped
             M[i][j] = max(0, (M[i-1][j-1] +
-                              pearson_correlation_coefficient([site[i-1] for site in sites_a],\
-                                                              [site[j-1] for site in sites_b])))
+                              pearson_correlation_coefficient(
+                                  [site[i-1] for site in sites_a],
+                                  [site[j-1] for site in sites_b])))
 
     # find max/min
     opt_score = M[0][0]
