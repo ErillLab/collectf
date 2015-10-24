@@ -103,7 +103,7 @@
 
 		        {% for meta_site in report.meta_sites %}
 		        <tr {% if meta_site.site_type == 'var_motif_associated' %} class="warning" {% else %}class=""{% endif %}>
-                  {% with g=meta_site.genome %}
+                  {% with g=meta_site.genome_accession %}
 		          <td class="genome"><a href="http://www.ncbi.nlm.nih.gov/nuccore/?term={{ g }}" target="_blank">
                       <span class="fixed-width">{{ g }}</span>
                   </a></td>
@@ -111,20 +111,17 @@
 		          {% with TF_instances=meta_site.TF_instances%}
 		          <td class="TF">
                     {% for TF_instance in TF_instances %}
-                    {% with acc=TF_instance %}
                     <a href="http://uniprot.org/uniprot/{{ acc }}" target="_blank">
-                      <span class="fixed-width">{{ acc }}</span>
+                      <span class="fixed-width">{{ TF_instance }}</span>
                     </a>
                     {% if not forloop.last %}, {% endif %}
-                    {% endwith %}
                     {% endfor %}
                   </td>
 		          {% endwith %}
 
                   <td class="motif_id">[{{ meta_site.motif_id }}]</td>
 
-		          <td><a href="{% url 'browse.view_site.view_site' meta_site.delegate.pk|id2dbxref_hex_only %}" target="_blank">
-                      <span class="sequence">{{ meta_site.delegate_sequence }}</span>
+		          <td><span class="sequence">{{ meta_site.delegate_sequence }}</span>
                   </a></td>
 		          
 		          <td class="techniques">
@@ -225,9 +222,7 @@
       <div class="boxed">
 	    <form action="{% url 'browse.export.export_sites' %}" method="POST">{% csrf_token %}
 	      {% for report in reports %}
-	      {% for meta_site in report.meta_sites %}
-	      <input type="hidden" name="site_id" value="{% for csi in meta_site.cur_site_insts %}{{ csi.pk }}{% if not forloop.last %}|{% endif %}{% endfor %}">
-	      {% endfor %}
+	      <input type="hidden" name="site_id" value="{% for csi_id in report.cur_site_insts %}{{ csi_id }}{% if not forloop.last %}|{% endif %}{% endfor %}">
 	      {% endfor %}
 
           <table class="table table-bordered table-striped">

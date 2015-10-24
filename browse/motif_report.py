@@ -6,6 +6,9 @@ curation-site-instance objects have to have exactly the same TF-instances
 objects, but in other cases, having the same TF (there can be paralog TFs in the
 same organism).
 """
+
+from tqdm import tqdm
+
 import base
 from base import bioutils
 from base import metasite
@@ -197,14 +200,24 @@ class MotifReport:
 
     def generate_view_reports_dict(self):
         """Generates a dictionary of values to render view result template."""
-        print self.weblogo_uri
+        meta_site_info = [
+            {'delegate_sequence': ms.delegate_sequence,
+             'delegate_site_instance': ms.delegate_site_instance,
+             'genome_accession': ms.genome_accession,
+             'site_type': ms.site_type,
+             'TF_instances': ms.TF_instances,
+             'motif_id': ms.motif_id,
+             'techniques': ms.techniques,
+             'regulations': ms.regulations,
+             'curations': ms.curations}
+            for ms in self.get_meta_sites()]
         return {
             'TF_name': self.TF_name,
             'species_name': self.species_name,
             'TF_accessions': self.TF_accessions,
             'genome_accession': self.genome_accession,
             'id': id(self),
-            'meta_sites': self.get_meta_sites(),
+            'meta_sites': meta_site_info,
             'aligned_sites': self.get_aligned_meta_sites(),
             'weblogo': self.weblogo_uri,
             'cur_site_insts': self.get_all_cur_site_insts_ids(),
