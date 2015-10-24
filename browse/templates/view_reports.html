@@ -37,9 +37,8 @@
     <div class="tab-pane active" id="split_view">
       {% for report in reports %}
       <div class="boxed">
-	    <h3>{{ report.TF_name }} ({% for acc in report.TF_accessions %}
-          <a href="http://www.ncbi.nlm.nih.gov/protein/?term={{acc}}"
-             target="_blank">
+	    <h3>{{ report.TF_name }}({% for acc in report.TF_accessions %}
+          <a href="http://www.uniprot.org/uniprot/{{acc}}" target="_blank">
             <span class="fixed-width">{{acc}}</span>
           </a>{% if not forloop.last %}, {% endif %}{% endfor %})
           binding site collection of 
@@ -113,7 +112,7 @@
 		          <td class="TF">
                     {% for TF_instance in TF_instances %}
                     {% with acc=TF_instance %}
-                    <a href="http://www.ncbi.nlm.nih.gov/protein/?term={{ acc }}" target="_blank">
+                    <a href="http://uniprot.org/uniprot/{{ acc }}" target="_blank">
                       <span class="fixed-width">{{ acc }}</span>
                     </a>
                     {% if not forloop.last %}, {% endif %}
