@@ -82,7 +82,7 @@ def greet(request):
                          species=random_record.species,
                          organism=random_record.species_name,
                          genome_accession=random_record.genome_accession,
-                         weblogo=random_record.weblogo_uri)
+                         aligned_sites=random_record.align_sites())
 
     return render_to_response("greet.html", {'random_rec': template_dict},
                               context_instance=RequestContext(request))
@@ -112,7 +112,7 @@ def get_random_motif(motif_len_th=30, motif_sz_th=10):
                 # First criterion is satisfied.
                 report = motif_report.MotifReport(cur_site_insts)
                 # Align binding sites.
-                aligned_sites = report.get_aligned_meta_sites()
+                aligned_sites = report.align_sites()
                 if len(aligned_sites[0]) < motif_len_th:
                     # Second criterion is satisfied too.
                     return report

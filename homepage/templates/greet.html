@@ -54,8 +54,34 @@
   </table>
 
   <div>
-    <img src="{{ random_rec.weblogo }}"/>
+    <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+	 class="weblogo_img" alt=""
+         id="ex_weblogo" data-site="{% for site in random_rec.aligned_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}">
   </div>
 </div>
+
+<script>
+
+$(document).ready(function() {
+    $('.weblogo_img').each(function() {
+	var img = $(this);
+    img.parent().block();
+	var site_data = $(this).data('site');
+	$.ajax({
+	    type: "POST",
+	    url: "{% url 'base.views.get_weblogo' %}",
+	    data: {
+		sites: site_data,
+		csrfmiddlewaretoken:'{{csrf_token}}', 
+	    },
+	    success: function(data) {
+		img.attr('src', data);
+        img.parent().unblock();
+	    },
+	});
+    });
+
+});
+</script>
 
 {% endblock %}

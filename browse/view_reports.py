@@ -30,12 +30,12 @@ def view_reports_by_id_list(request):
          'by_id': True},
         context_instance=RequestContext(request))
 
-def render_report_to_response(request, report_data):
-    """Helps rendering motif report to the response."""
+def render_report_to_response(request, reports, ensemble_report):
+    """Helps rendering MotifReport object to the response."""
     return render_to_response(
         'view_reports.html',
-        {'reports': report_data['view_reports'],
-         'ensemble_report': report_data['view_ensemble_report']},
+        {'reports': [r.generate_view_reports_dict() for r in reports],
+         'ensemble_report': ensemble_report.generate_view_reports_dict()},
         context_instance=RequestContext(request))
 
 def view_reports_by_uniprot_dbxref(request, uniprot_dbxref):
@@ -61,8 +61,9 @@ def view_reports_by_TF_and_species(request, TF_id, species_id):
     """Finds sites and generates motif reports given an organism and TF ID."""
     org = get_object_or_404(models.Taxonomy, pk=species_id)
     TF = get_object_or_404(models.TF, TF_id=TF_id)
-    report_data = get_static_reports('tf_%s_species_%s' % (TF_id, species_id))
-    return render_report_to_response(request, report_data)
+    reports, ensemble_report = get_static_reports(
+        'tf_%s_species_%s' % (TF_id, species_id))
+    return render_report_to_response(request, reports, ensemble_report)
 
 def view_reports_by_TF_family(request, object_id): 
     """Returns the motif reports for the given TF family."""

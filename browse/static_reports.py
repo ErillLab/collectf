@@ -7,6 +7,8 @@ from collectf import settings
 
 def get_static_reports(filename):
     """Gets the reports and ensemble report."""
-    report_data = pickle.load(open(os.path.join(
+    reports = pickle.load(open(os.path.join(
         settings.PICKLE_ROOT, 'reports', filename + '.pkl')))
-    return report_data
+    ensemble_report = pickle.load(open(os.path.join(
+        settings.PICKLE_ROOT, 'ensemble_reports', filename + '.pkl')))
+    return reports, ensemble_report

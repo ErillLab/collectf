@@ -37,8 +37,9 @@
     <div class="tab-pane active" id="split_view">
       {% for report in reports %}
       <div class="boxed">
-	    <h3>{{ report.TF_name }}({% for acc in report.TF_accessions %}
-          <a href="http://www.uniprot.org/uniprot/{{acc}}" target="_blank">
+	    <h3>{{ report.TF_name }} ({% for acc in report.TF_accessions %}
+          <a href="http://www.ncbi.nlm.nih.gov/protein/?term={{acc}}"
+             target="_blank">
             <span class="fixed-width">{{acc}}</span>
           </a>{% if not forloop.last %}, {% endif %}{% endfor %})
           binding site collection of 
@@ -57,7 +58,7 @@
 	        <p>Sites are listed as curated.</p>
 	        <pre>
 	          {% for meta_site in report.meta_sites %}
-              {{ meta_site.delegate_sequence }}{% endfor %}
+              {{ meta_site.cur_site_insts.0.site_instance.seq }}{% endfor %}
 	        </pre>
 	      </div>
 	      <div class="tab-pane" id="{{report.id}}_aligned">
@@ -73,7 +74,20 @@
 	      </div>
 	      <div class="tab-pane active" id="{{report.id}}_weblogo">
 	        <p>To generate the weblogo, aligned binding sites are used.</p>
-            <img src="{{ report.weblogo }}"/>
+            <div class="">
+              <table class="table table-bordered">
+                {% for id,sites in report.motifs.items %}
+                <tr>
+                  <td>[{{ id }}]</td>
+                  <td>
+                    <img src="" class="weblogo_img"
+                         site_data={% for site in sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}>
+                  </td>
+                </tr>
+                {% endfor %}
+              </table>
+            </div>
+
 	      </div>
 	      <div class="tab-pane" id="{{report.id}}_detail">
 	        <p>For the selected transcription
@@ -90,20 +104,18 @@
                   <th class="motif_id">Motif id[<a href="#" class="" onclick="hideCol('motif_id');">x</a>]</th>
 		          <th>Site sequence</th>
 		          <th class="techniques">Experimental techniques[<a href="#" onclick="hideCol('techniques');">x</a>]</th>
-		          <th class="diagram">Gene regulation
-                    [<a href="" id="regulation_diagram_switch"><small>Toggle diagrams</small></a>]
-                    [<a href="#" onclick="hideCol('diagram');">x</a>]</th>
+		          <th class="diagram">Gene regulation [<a href="" id="regulation_diagram_switch"><small>Toggle diagrams</small></a>][<a href="#" onclick="hideCol('diagram');">x</a>]</th>
 		          <th>Curations</th>
 		          {% if user.is_superuser %}
-              	  <th>Validation status</th>
-              	  {% endif %}
+              			<th>Validation status</th>
+              		  {% endif %}
 		        </tr>
 	          </thead>
 	          <tbody>
 
 		        {% for meta_site in report.meta_sites %}
 		        <tr {% if meta_site.site_type == 'var_motif_associated' %} class="warning" {% else %}class=""{% endif %}>
-                  {% with g=meta_site.genome_accession %}
+                  {% with g=meta_site.genome %}
 		          <td class="genome"><a href="http://www.ncbi.nlm.nih.gov/nuccore/?term={{ g }}" target="_blank">
                       <span class="fixed-width">{{ g }}</span>
                   </a></td>
@@ -111,17 +123,20 @@
 		          {% with TF_instances=meta_site.TF_instances%}
 		          <td class="TF">
                     {% for TF_instance in TF_instances %}
-                    <a href="http://uniprot.org/uniprot/{{ acc }}" target="_blank">
-                      <span class="fixed-width">{{ TF_instance }}</span>
+                    {% with acc=TF_instance %}
+                    <a href="http://www.ncbi.nlm.nih.gov/protein/?term={{ acc }}" target="_blank">
+                      <span class="fixed-width">{{ acc }}</span>
                     </a>
                     {% if not forloop.last %}, {% endif %}
+                    {% endwith %}
                     {% endfor %}
                   </td>
 		          {% endwith %}
 
                   <td class="motif_id">[{{ meta_site.motif_id }}]</td>
 
-		          <td><span class="sequence">{{ meta_site.delegate_sequence }}</span>
+		          <td><a href="{% url 'browse.view_site.view_site' meta_site.delegate.pk|id2dbxref_hex_only %}" target="_blank">
+                      <span class="sequence">{{ meta_site.delegate_sequence }}</span>
                   </a></td>
 		          
 		          <td class="techniques">
@@ -151,18 +166,14 @@
 		            </span>
 		            {% endfor %}
 		          </td>
-
-                  {% if user.is_superuser %}
-		          <td> <!-- START validation status -->
-                    {% for curation in meta_site.curations %}
-                    {% if curation.validated_by %} validated by {{ curation.validated_by }}
-	                {% else %}
-                    <a href="{% url 'curate.validate_curation.validate_curation' curation.pk %}">
-                      validate</a>
-                    {% endif %}
+		          
+		      <td> <!-- START validation status -->
+                	{% for curation in meta_site.curations %}
+                		{% if curation.validated_by %} validated by {{ curation.validated_by }} 
+	                	{% else %} <a href="{% url 'curate.validate_curation.validate_curation' curation.pk %}">validate</a>
+                		{% endif %}
                 	{% endfor %}
 	              </td> <!-- END validation status -->
-                  {% endif %}
 		          
 		        </tr>
 		        {% endfor %}
@@ -194,7 +205,7 @@
 	        <p>Sites are listed as curated.</p>
 	        <pre>
 	          {% for meta_site in ensemble_report.meta_sites %}
-              {{ meta_site.delegate_sequence }}{% endfor %}
+              {{ meta_site.cur_site_insts.0.site_instance.seq }}{% endfor %}
 	        </pre>
 	      </div>
 	      <div class="tab-pane" id="ensemble_view_aligned">
@@ -211,7 +222,7 @@
 	      <div class="tab-pane active" id="ensemble_view_weblogo">
 	        <p>To generate the weblogo, aligned binding sites are used.</p>
 	        <div class="">
-	          <img src="{{ ensemble_report.weblogo }}"/>
+	          <img src="" class="weblogo_img" id="{{report.id}}_weblogo" site_data={% for site in ensemble_report.aligned_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}>
 	        </div>
 	      </div>
 	    </div>
@@ -222,7 +233,9 @@
       <div class="boxed">
 	    <form action="{% url 'browse.export.export_sites' %}" method="POST">{% csrf_token %}
 	      {% for report in reports %}
-	      <input type="hidden" name="site_id" value="{% for csi_id in report.cur_site_insts %}{{ csi_id }}{% if not forloop.last %}|{% endif %}{% endfor %}">
+	      {% for meta_site in report.meta_sites %}
+	      <input type="hidden" name="site_id" value="{% for csi in meta_site.cur_site_insts %}{{ csi.pk }}{% if not forloop.last %}|{% endif %}{% endfor %}">
+	      {% endfor %}
 	      {% endfor %}
 
           <table class="table table-bordered table-striped">
@@ -296,6 +309,24 @@ $(document).ready(function() {
         $(".regulation_diagram").toggle();
         return false;
     })
+
+    $('.weblogo_img').each(function() {
+        var img = $(this);
+        img.parent().block({message: '<i class="icon-spinner icon-spin"></i>'});
+        var site_data = $(this).attr('site_data');
+        $.ajax({
+            type: "POST",
+            url: "{% url 'base.views.get_weblogo' %}",
+            data: {
+                sites: site_data,
+                csrfmiddlewaretoken:'{{csrf_token}}', 
+            },
+            success: function(data) {
+                img.attr('src', data);
+                img.parent().unblock();
+            },
+        });
+    });
 
     // hide 'genome' and 'TF' columns in the table
     hideCol('genome');
