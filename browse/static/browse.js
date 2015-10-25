@@ -49,7 +49,7 @@ function getReportLinksByTaxonomy(objectId) {
     $.blockUI();
     $.ajax({
         type: "GET",
-        url: '/browse/get_results_taxonomy/' + objectId,
+        url: '/browse/get_results_tax/' + objectId,
         success: function (data) {
             $("#browse").html(data);
             get_wiki($("#browse #description h4").text());

@@ -6,14 +6,19 @@ curation-site-instance objects have to have exactly the same TF-instances
 objects, but in other cases, having the same TF (there can be paralog TFs in the
 same organism).
 """
+
+from tqdm import tqdm
+
 import base
+from base import bioutils
 from base import metasite
 import base.models as models
 
 class MotifReport:
-    def __init__(self, m_cur_site_insts,
-                 nm_cur_site_insts=models.Curation_SiteInstance.objects.none(),
-                 var_cur_site_insts= models.Curation_SiteInstance.objects.none()):
+    def __init__(
+            self, m_cur_site_insts,
+            nm_cur_site_insts=models.Curation_SiteInstance.objects.none(),
+            var_cur_site_insts= models.Curation_SiteInstance.objects.none()):
         """Creates a MotifReport objcet.
         
         Given a collection of motif-associated and non-motif-associated
@@ -24,6 +29,11 @@ class MotifReport:
         self.m_cur_site_insts = m_cur_site_insts
         self.nm_cur_site_insts = nm_cur_site_insts
         self.var_cur_site_insts = var_cur_site_insts
+
+        # Compute and store additional data
+        self.compute_meta_sites()
+        self.align_meta_sites()
+        self.build_sequence_logo()
 
     def TF_check(self):
         """Checks if all Curation_SiteInstance objects have the same TF."""
@@ -120,53 +130,27 @@ class MotifReport:
         get_genome = lambda csi: csi.site_instance.genome
         return str(get_genome(self.m_cur_site_insts[0]).genome_accession)
 
-    def align_sites(self):
-        """Aligns all binding sites using Lasagna."""
-        # Make sure meta-sites are computed beforehand.
-        self.get_meta_sites()
-        r = base.bioutils.run_lasagna(
-            [x.delegate_site_instance for x in self.meta_sites
-             if x.site_type == 'motif_associated'])
-        return r
-
-    def get_motifs(self):
-        """Returns the sites grouped by motif."""
-        motif_ids = self.get_all_motif_cur_site_insts(). values_list(
-            'motif_id', flat=True).distinct()
-        motifs = {}
-        for motif_id in motif_ids:
-            meta_sites = [meta_site for meta_site in self.get_meta_sites()
-                          if meta_site.motif_id == motif_id]
-            motifs[motif_id] = base.bioutils.run_lasagna(
-                [x.delegate_site_instance for x in meta_sites])
-        return motifs
-
-    def get_single_motif(self):
-        """Return the motif (list of sites) with most number of sites."""
-        motifs = self.get_motifs().values()
-        motifs.sort(key=lambda motif: len(motif), reverse=True)
-        return motifs[0]
-
-    def get_meta_sites(self):
+    def compute_meta_sites(self):
         """Creates meta-sites from curation-site-instances."""
-        if not hasattr(self, 'meta_sites'):
-            # Compute them here.
-            self.meta_sites = metasite.create_meta_sites(
-                self.m_cur_site_insts,
-                self.nm_cur_site_insts,
-                self.var_cur_site_insts)
+        self.meta_sites = metasite.create_meta_sites(self.m_cur_site_insts,
+                                                     self.nm_cur_site_insts,
+                                                     self.var_cur_site_insts)
+    def get_meta_sites(self):
         return self.meta_sites
 
-    def set_meta_sites(self, meta_sites):
-        """Sets meta-sites rather than computing them from given sites.
+    def align_meta_sites(self):
+        """Aligns all binding sites using Lasagna."""
+        meta_sites = self.get_meta_sites()
+        self.aligned_meta_sites = bioutils.run_lasagna(
+            [x.delegate_site_instance for x in meta_sites
+             if x.site_type == 'motif_associated'])
 
-        Should be called only if the MotifReport object is an ensemble of
-        reports, from multiple species/TFs. In this case, since meta-sites
-        should be specific for TF-species combination, computing meta-sites
-        would give exactly the same collection: union of meta-sites from
-        individual reports.
-        """
-        self.meta_sites = meta_sites
+    def get_aligned_meta_sites(self):
+        return self.aligned_meta_sites
+
+    def build_sequence_logo(self):
+        seqs = self.get_aligned_meta_sites()
+        self.weblogo_uri = bioutils.weblogo_uri(seqs)
 
     @property
     def num_motif_cur_site_insts(self):
@@ -212,20 +196,30 @@ class MotifReport:
         return {
             'TF': self.TF,
             'species': self.species,
-            'cur_site_insts': self.get_all_cur_site_insts_ids(),
         }
 
     def generate_view_reports_dict(self):
         """Generates a dictionary of values to render view result template."""
+        meta_site_info = [
+            {'delegate_sequence': ms.delegate_sequence,
+             'delegate_site_instance': ms.delegate_site_instance,
+             'genome_accession': ms.genome_accession,
+             'site_type': ms.site_type,
+             'TF_instances': ms.TF_instances,
+             'motif_id': ms.motif_id,
+             'techniques': ms.techniques,
+             'regulations': ms.regulations,
+             'curations': ms.curations}
+            for ms in self.get_meta_sites()]
         return {
             'TF_name': self.TF_name,
             'species_name': self.species_name,
             'TF_accessions': self.TF_accessions,
             'genome_accession': self.genome_accession,
             'id': id(self),
-            'meta_sites': self.get_meta_sites(),
-            'aligned_sites': self.align_sites(),
-            'motifs': self.get_motifs(),
+            'meta_sites': meta_site_info,
+            'aligned_sites': self.get_aligned_meta_sites(),
+            'weblogo': self.weblogo_uri,
             'cur_site_insts': self.get_all_cur_site_insts_ids(),
         }
 
@@ -285,13 +279,13 @@ def make_distinct_reports(cur_site_insts):
                                         site_type='non_motif_associated')
         var_csis = cur_site_insts.filter(curation__TF_instances=tf_insts,
                                          site_type='var_motif_associated')
+            
 
         # Generate only if there is at least one motif-associated site.
         if m_csis:
             reports.append(MotifReport(m_csis, nm_csis, var_csis))
 
     return reports
-
 
 def make_ensemble_report(cur_site_insts):
     """Aligns all Curation_SiteInstance objects and generates a report."""
@@ -303,25 +297,3 @@ def make_ensemble_report(cur_site_insts):
     if motif_associated:
         return MotifReport(motif_associated, non_motif_associated,
                            var_motif_associated)
-
-def merge_reports(reports):
-    """Merges a collection of reports, without recomputing meta-sites.
-
-    Depreceates <make_ensemble_report> function.
-    """
-    # Get all motif associated and non-motif-associated Curation_SiteInstances
-    # from all reports. Each report has a collection of binding sites for a
-    # specific TF/species.
-    assert reports
-    # Merge all Curation_SiteInstance objects.
-    all_csi = reduce(lambda x,y: x|y,
-                     [r.get_all_cur_site_insts() for r in reports[1:]],
-                     reports[0].get_all_cur_site_insts())
-
-    all_motif_csi = all_csi.filter(site_type='motif_associated')
-    all_non_motif_csi = all_csi.filter(site_type='non_motif_associated')
-    ensemble = MotifReport(all_motif_csi, all_non_motif_csi)
-    # Instead of computing meta-sites again, set them using existing meta-site
-    # collection from individual reports.
-    ensemble.set_meta_sites([ms for r in reports for ms in r.get_meta_sites()])
-    return ensemble

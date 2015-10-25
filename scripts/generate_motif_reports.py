@@ -6,7 +6,7 @@
 import os
 
 from tqdm import tqdm
-import pickle
+import cPickle as pickle
 
 from base import models
 from browse import motif_report
@@ -16,15 +16,17 @@ def pickle_report(curation_site_instances, filename_suffix):
     """Generates a report and pickles it, given Curation_SiteInstances objects.
     """
     reports = motif_report.make_reports(curation_site_instances)
-    reports_file = os.path.join(
-        settings.PICKLE_ROOT, 'reports', filename_suffix + '.pkl')
-    pickle.dump(reports, open(reports_file, 'w'))
-    
     ensemble_report = motif_report.make_ensemble_report(curation_site_instances)
-    ensemble_report_file = os.path.join(
-        settings.PICKLE_ROOT, 'ensemble_reports', filename_suffix + '.pkl')
-    pickle.dump(ensemble_report, open(ensemble_report_file, 'w'))
 
+    pickle_dict = {
+        'browse_reports': [r.generate_browse_result_dict() for r in reports],
+        'view_reports': [r.generate_view_reports_dict() for r in reports],
+        'browse_ensemble_report': ensemble_report.generate_browse_result_dict(),
+        'view_ensemble_report': ensemble_report.generate_view_reports_dict()}
+    pickle_file = os.path.join(
+        settings.PICKLE_ROOT, 'reports', filename_suffix + '.pkl')
+    pickle.dump(pickle_dict, open(pickle_file, 'w'))
+    
 def motif_reports_by_tf_family():
     """Generates motif reports for each TF-family."""
     TF_families = models.TFFamily.objects.all()
@@ -109,7 +111,7 @@ def run():
     
     print "Generating motif reports for all experimental technique categories."
     motif_reports_by_experimental_technique_category()
-
+    
     print "Generating motif reports for all binding/expression techniques."
     motif_reports_by_technique_function()
 
