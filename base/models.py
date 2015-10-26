@@ -558,14 +558,15 @@ class MetaSite(models.Model):
     delegate = models.ForeignKey('Curation_SiteInstance', null=False)
 
     @property
-    def genome(self):
-        """Returns the genome of the Curation_SiteInstances of the meta-site."""
-        return self.delegate.site_instance.genome
+    def genome_accession(self):
+        """Returns the genome accession of the meta-site."""
+        return self.delegate.site_instance.genome.genome_accession
 
     @property
-    def TF_instances(self):
-        """Returns the TF_instances of he Curation_SiteInstances."""
-        return self.delegate.TF_instances
+    def TF_instance_accessions(self):
+        """Returns the accession numbers of TF_instances of the meta-site."""
+        return self.delegate.curation.TF_instances.values_list(
+            'uniprot_accession', flat=True)
 
     @property
     def motif_id(self):
@@ -583,6 +584,12 @@ class MetaSite(models.Model):
         The site type is the site type of the delegate site.
         """
         return self.delegate.site_type
+
+    @property
+    def techniques(self):
+        """Returns the experimental techniques for all Curation_SiteInstances"""
+        return models.ExperimentalTechnique.objects.filter(
+            curation_site_instance=self.curation_site_instance_set.all())
 
     def membership_test(self, curation_site_instance):
         """Checks if curation_site_instance can be member of the meta-site.
@@ -608,12 +615,14 @@ class MetaSite(models.Model):
 
     def TF_instances_test(self, curation_site_instance):
         """Checks if a curation_site_instance have the same TF instances."""
-        return (set(self.TF_instances) ==
-                set(curation_site_instance.TF_instances))
+        return (set(self.TF_instance_accessions) ==
+                set(curation_site_instance.curation.TF_instances.values_list(
+                    'uniprot_accession', flat=True)))
 
     def genome_test(self, curation_site_instance):
         """Checks if the curation_site_instance the same genome."""
-        return self.genome == curation_site_instance.genome
+        return (self.genome_accession ==
+                curation_site_instance.site_instance.genome.genome_accession)
 
     def motif_id_test(self, curation_site_instance):
         """Checks if the curation_site_instance is from the same motif."""
