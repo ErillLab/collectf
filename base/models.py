@@ -54,7 +54,7 @@ class Curation(models.Model):
 
     # The curator that validated the curation.
     validated_by = models.ForeignKey('Curator', null=True, blank=True,
-                                     related_name="validated_by")
+                                     related_name='validated_by')
 
     # The time that the curation is created.
     created = models.DateTimeField(auto_now_add=True)
@@ -63,20 +63,20 @@ class Curation(models.Model):
     last_modified = models.DateTimeField(auto_now=True)
 
     # The curator that submitted the curation.
-    curator = models.ForeignKey("Curator")
+    curator = models.ForeignKey('Curator')
 
     # The publication that the curation belongs to.
-    publication = models.ForeignKey("Publication")
+    publication = models.ForeignKey('Publication')
 
     # The transcription factor instances that the curation has.
-    TF_instances = models.ManyToManyField("TFInstance")
+    TF_instances = models.ManyToManyField('TFInstance')
 
     # The binding sites
-    site_instances = models.ManyToManyField("SiteInstance",
-                                            through="Curation_SiteInstance")
+    site_instances = models.ManyToManyField('SiteInstance',
+                                            through='Curation_SiteInstance')
 
     # ChIP experiment data if the curation belongs to a ChIP paper.
-    chip_info = models.ForeignKey("ChipInfo", null=True, blank=True)
+    chip_info = models.ForeignKey('ChipInfo', null=True, blank=True)
 
     # The format of the quantitative data the curation has.
     quantitative_data_format = models.TextField(null=True, blank=True)
@@ -114,7 +114,7 @@ class Curator(models.Model):
     # The type of the curator
     CURATOR_TYPE = (('internal', 'internal'), ('external', 'external'))
     curator_type = models.CharField(max_length=20, choices=CURATOR_TYPE,
-                                    default="external")
+                                    default='external')
 
     def __unicode__(self):
         """Returns the unicode representation of the curator."""
@@ -157,7 +157,7 @@ class Publication(models.Model):
     url = models.CharField(max_length=1000, null=True, blank=True)
 
     # TODO(sefa): remove unused pdf field.
-    pdf = models.FileField(upload_to="papers/", null=True, blank=True)
+    pdf = models.FileField(upload_to='papers/', null=True, blank=True)
 
     # If true, the paper contains promoter data.
     contains_promoter_data = models.BooleanField()
@@ -172,7 +172,7 @@ class Publication(models.Model):
     curation_complete = models.BooleanField(default=False)
 
     # The curator that the paper is assigned to.
-    assigned_to = models.ForeignKey("Curator", null=True, blank=True)
+    assigned_to = models.ForeignKey('Curator', null=True, blank=True)
 
     # The transcription factor that is reported in the paper.
     reported_TF = models.CharField(max_length=100, null=True, blank=True)
@@ -199,7 +199,7 @@ class Gene(models.Model):
     gene_accession = models.CharField(max_length=30, null=True, blank=True)
 
     # The genome of the gene.
-    genome = models.ForeignKey("Genome")
+    genome = models.ForeignKey('Genome')
 
     # The name of the gene.
     name = models.CharField(max_length=50)
@@ -345,7 +345,7 @@ class TF(models.Model):
     name = models.CharField(max_length=50)
 
     # The TF family.
-    family = models.ForeignKey("TFFamily")
+    family = models.ForeignKey('TFFamily')
 
     # The description of the TF.
     description = models.TextField()
@@ -467,6 +467,9 @@ class Curation_SiteInstance(models.Model):
     # The SiteInstance object.
     site_instance = models.ForeignKey("SiteInstance", null=False)
 
+    # The MetaSite object.
+    meta_site = models.ForeignKey('MetaSite', null=True)
+
     # The type of the binding site.
     SITE_TYPE = (('motif_associated', "motif associated"),
                  ('var_motif_associated', "variable motif associated"),
@@ -538,9 +541,124 @@ class Curation_SiteInstance(models.Model):
         """Returns the genome accession of the site instance."""
         return self.site_instance.genome.genome_accession
 
+class MetaSite(models.Model):
+    """MetaSite table.
+
+    A site could be reported in multiple papers. To avoid redundancy
+    (i.e. presenting the same site sequence multiple times, one per paper), the
+    Curation_SiteInstance objects are collapsed into one entity called a
+    "meta-site". To be collapsed into the same meta-site, two sites are required
+    to overlap more than a defined threshold.
+    """
+
+    # Meta-site identifier
+    meta_site_id = models.AutoField(primary_key=True)
+
+    # Delegate Curation_SiteInstance object.
+    delegate = models.ForeignKey('Curation_SiteInstance', null=False)
+
+    @property
+    def genome(self):
+        """Returns the genome of the Curation_SiteInstances of the meta-site."""
+        return self.delegate.site_instance.genome
+
+    @property
+    def TF_instances(self):
+        """Returns the TF_instances of he Curation_SiteInstances."""
+        return self.delegate.TF_instances
+
+    @property
+    def motif_id(self):
+        """Returns the motif ID of its Curation_SiteInstances.
+
+        A TF may have multiple motifs for the same species and this field is
+        used to identify the specific motif that the binding site belongs to.
+        """
+        return self.delegate.motif_id
+
+    @property
+    def site_type(self):
+        """Returns the site type of the meta-site.
+
+        The site type is the site type of the delegate site.
+        """
+        return self.delegate.site_type
+
+    def membership_test(self, curation_site_instance):
+        """Checks if curation_site_instance can be member of the meta-site.
+
+        Based on the type of Curation_SiteInstance object, performs
+        motif_associated_overlap_test or non_motif_associated_overlap_test.
+        """
+        if curation_site_instance.site_type in ['motif_associated',
+                                                'var_motif_associated']:
+            return (
+                self.motif_associated_overlap_test(curation_site_instance) and
+                self.genome_test(curation_site_instance) and
+                self.TF_instances_test(curation_site_instance) and
+                self.motif_id_test(curation_site_instance))
+        elif cur_site_inst.site_type == 'non_motif_associated':
+            return (
+                self.non_motif_associated_overlap_test(
+                    curation_site_instance) and
+                self.genome_test(curation_site_instance) and
+                self.TF_instances_test(curation_site_instance))
+
+        return False
+
+    def TF_instances_test(self, curation_site_instance):
+        """Checks if a curation_site_instance have the same TF instances."""
+        return (set(self.TF_instances) ==
+                set(curation_site_instance.TF_instances))
+
+    def genome_test(self, curation_site_instance):
+        """Checks if the curation_site_instance the same genome."""
+        return self.genome == curation_site_instance.genome
+
+    def motif_id_test(self, curation_site_instance):
+        """Checks if the curation_site_instance is from the same motif."""
+        return self.motif_id == curation_site_instance.motif_id
+
+    def motif_associated_overlap_test(self, curation_site_instance):
+        """Checks if the meta-site and the Curation_SiteInstance overlaps.
+
+        Includes the new Curation_SiteInstance into this meta-site if the
+        overlap between new site and the delegate site is more than 75%.
+        """
+        def get_overlap(loca, locb):
+            """Given two locations, returns the overlap ratio."""
+            overlap_len = max(0, min(loca[1], locb[1]) - max(loca[0], locb[0]))
+            return float(overlap_len) / (loca[1]-loca[0]+1)
+
+        loca = (self.delegate.site_instance.start,
+                self.delegate.site_instance.end)
+        locb = (curation_site_instance.site_instance.start,
+                curation_site_instance.site_instance.end)
+        overlap_a = get_overlap(loca, locb)
+        overlap_b = get_overlap(locb, loca)
+        return (overlap_a + overlap_b) / 2.0 >= 0.75
+
+    def non_motif_associated_overlap_test(self, curation_site_instance):
+        """Checks if the meta-site and the Curation_SiteInstance overlaps.
+
+        In case of enough overlap, integrates the evidence from
+        non-motif-associated site into the meta-site. The criteria is full
+        overlap between the delegate-site (motif-associated one) and the target
+        site-instance (non-motif_associated one)
+        """
+        loca = (curation_site_instance.site_instance.start,
+                curation_site_instance.site_instance.end)
+        locb = (self.delegate.site_instance.start,
+                self.delegate.site_instance.end)
+        return (min(loca[0], loca[1]) <= min(locb[0], locb[1]) and
+                max(loca[0], loca[1]) >= max(locb[0], locb[1]))
+
+        
+
 class Regulation(models.Model):
+
     """Gene regulation table.
-    
+
     Stores the TF regulation of genes. Links two tables, Curation_SiteInstance
     and Gene, to capture the information of which TF regulates which gene by
     binding which site on the genome.
@@ -571,7 +689,7 @@ class Regulation(models.Model):
 
 class NotAnnotatedSiteInstance(models.Model):
     """The table for not annotated site instances.
-    
+
     For some curations, the binding site that is reported in the paper could not
     be matched to any sequence in the reference genome for some reason (e.g. the
     reported genome is not available in RefSeq). Therefore, it is stored as
@@ -697,7 +815,7 @@ class ChipInfo(models.Model):
 
 class ExternalDatabase(models.Model):
     """The external database table.
-    
+
     Sometimes, authors prefers uploading additional data (e.g. DNA-array data,
     gene expression data) to a database. To capture that information, during the
     submission process, the curator is asked to provide the external database
