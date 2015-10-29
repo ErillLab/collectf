@@ -21,10 +21,12 @@
     </dd>
 
     <dt>TF</dt>
-    <dd>{{ curation.TF.name }} 
-
-      {% for TF_instance in curation.TF_instances.all %}<a href="http://www.ncbi.nlm.nih.gov/protein/?term={{ TF_instance.uniprot_accession }}" target="_blank">
-        [{{ TF_instance.uniprot_accession }}]</a>{% if not forloop.last %}, {% endif %}{% endfor %}</dd>
+    <dd>
+      {{ curation.TF.name }} 
+      {% for TF_instance in curation.TF_instances.all %}
+      <a href="http://uniprot.org/uniprot/{{ TF_instance.uniprot_accession }}" target="_blank">
+        [{{ TF_instance.uniprot_accession }}]</a>{% if not forloop.last %}, {% endif %}{% endfor %}
+    </dd>
 
     <dt>Reported TF sp.</dt>
     <dd>{{ curation.TF_species|default:"-" }}</dd>
@@ -43,11 +45,18 @@
 <div class="boxed">
   <h3>Experimental Process</h3>
 
-  <p>{{ curation.experimental_process|default:"-" }}</p>
+  <p>
+    {{ curation.experimental_process|default:"-" }}
+  </p>
 
   {% if curation.forms_complex %}
-  <p>The paper reports that TF forms complex with other proteins for binding with reported sites.</p>
-  <p>{{ curation.complex_notes }}</p>
+  <p>
+    The paper reports that TF forms complex with other proteins for binding with
+    reported sites.
+  </p>
+  <p>
+    {{ curation.complex_notes }}
+  </p>
   {% endif %}
 
   {% if curation.chip_info %}
@@ -58,33 +67,57 @@
     <dd>{{ curation.chip_info.method_notes }}</dd>
   </dl>
 {% endif %}
+  
 </div>
 
 
 <div class="boxed">
   <h3>Transcription Factor Binding Sites</h3>
   <ul class="nav nav-tabs" id="sites_tab">
-    <li><a href="#reported" data-toggle="tab">Sites reported in the paper</a></li>
-    <li class="active"><a href="#curated">Sites matched in the genome</a></li>
+    <li>
+      <a href="#reported" data-toggle="tab">
+        Sites reported in the paper
+    </a>
+    </li>
+
+    <li class="active">
+      <a href="#curated">
+        Sites matched in the genome
+      </a>
+    </li>
+    
     {% if curation.quantitative_data_format %}
-    <li><a href="#quantitative_data">Site-specific quantitative values</a></li>
+    <li>
+      <a href="#quantitative_data">
+        Site-specific quantitative values
+      </a>
+    </li>
     {% endif %}
-    {% if curation.chip_info %} {# if curation has high_throughput data #}
-    <li><a href="#high-throughput">High-throughput data</a></li>
+    
+    {% if curation.chip_info %}
+    {# if curation has high_throughput data #}
+    <li>
+      <a href="#high-throughput">
+        High-throughput data
+      </a>
+    </li>
     {% endif %}
   </ul>
 
   <div class="tab-content">
+    
     <div class="tab-pane" id="reported">
       <pre>{# display non-high-throuhput data only #}
 {% for csi in curation.curation_siteinstance_set.all %}{% if not csi.is_high_throughput %}
 {{ csi.annotated_seq }}{% endif %}{% endfor %}</pre>
     </div>
+    
     <div class="tab-pane active" id="curated">
       <pre>{# display non-high-throuhput data only #}
 {% for csi in curation.curation_siteinstance_set.all %}{% if not csi.is_high_throughput %}
 {{ csi.site_instance.seq }}{% endif %}{% endfor %}</pre>
     </div>
+    
     {% if curation.quantitative_data_format %}
     <div class="tab-pane" id="quantitative_data">
       <p><b>Quantitative data format:</b> {{ curation.quantitative_data_format }}</p>
@@ -94,10 +127,12 @@
       </pre>
     </div>
     {% endif %}
-    {% if curation.chip_info %} {# if curation has high-throughput data #}
+    
+    {% if curation.chip_info %}
+    {# if curation has high-throughput data #}
     <div class="tab-pane" id="high-throughput">
       <pre>
-      {% for csi in curation.curation_siteinstance_set.all %}{% if csi.is_high_throughput %}
+{% for csi in curation.curation_siteinstance_set.all %}{% if csi.is_high_throughput %}
 {{ csi.site_instance.seq }} {% if csi.quantitative_value %}{{ csi.quantitative_value }}{% endif %}{% endif %}{% endfor %}
       </pre>
     </div>
@@ -107,9 +142,11 @@
 
 <div class="boxed">
   <h3>Gene Regulation</h3>
-  <p>Regulated genes for each binding site are displayed below. Genes that are reported
-    for TF-site mediated regulation are displayed in <span style="color:green">green</span>.
-    For each indvidual site, experimental techniques used to determine the site are also given.
+  <p>
+    Regulated genes for each binding site are displayed below. Genes that are
+    reported for TF-site mediated regulation are displayed
+    in <span style="color:green">green</span>.  For each indvidual site,
+    experimental techniques used to determine the site are also given.
   </p>
   
   {% load diagram %}
@@ -134,7 +171,7 @@
 	      <a href="http://www.ncbi.nlm.nih.gov/gene/{{ regulation.gene.gene_accession }}" target="_blank">{{ regulation.gene.name }}</a>{% if not forloop.last %},{% endif %}{% endif %}
 	      {% endfor %}
         </td>
-        <td><div>{{ cs.regulation_set.all|regulation_diagram:cs.site_instance }}</div></td>
+        <td><div>{{ cs.regulation_set.all|regulation_diagram }}</div></td>
         <td>
           {% for technique in cs.experimental_techniques.all %}
           {% include "experimental_technique.html" %}
