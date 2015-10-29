@@ -69,7 +69,7 @@ for TF-site mediated regulation are displayed in green.
 {% load diagram %}
 <div class="regulation-diagram">
   {% with site=head_csi.site_instance %}
-  {{ regulations|regulation_diagram:site }}  
+  {{ regulations|regulation_diagram }}  
   {% endwith %}
 </div>
 
