@@ -28,8 +28,8 @@
       <div class="boxed">
 	    <h3>{{ report.TF_name }}
           {% for acc in report.TF_accessions %}
-          <a href="http://www.ncbi.nlm.nih.gov/protein/?term={{acc}}" target="_blank">
-            <span class="fixed-width">{{ acc }}</span>
+          - <a href="http://uniprot.org/uniprot/{{acc}}" target="_blank">
+            <span class="fixed-width">UniProtKB: {{ acc }}</span>
           </a>
           {% if not forloop.last %}, {% endif %}
           {% endfor %}
