@@ -25,7 +25,7 @@ def generate_motif_file():
                 f.write('>%s %s_%s\n' % (
                     dbxref.to_uniprot_dbxref(TF_instance.TF_instance_id),
                     reports[0].TF_name,
-                    reports[0].species_name.replace(' ', '_')))
+                    reports[0].short_species_name))
                 f.write('%s\n' % '\t'.join(map(str, motif.counts['A'])))
                 f.write('%s\n' % '\t'.join(map(str, motif.counts['C'])))
                 f.write('%s\n' % '\t'.join(map(str, motif.counts['G'])))

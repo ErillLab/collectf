@@ -28,7 +28,7 @@ class MotifReport:
     @property
     def TF_name(self):
         """Returns the name of the TF."""
-        return self.TF.name
+        return self.TF.name.strip()
 
     @property
     def TF_accessions(self):
@@ -39,6 +39,17 @@ class MotifReport:
     def species_name(self):
         """Returns the name of the species."""
         return self.meta_sites[0].delegate.site_instance.genome.organism
+
+    @property
+    def short_species_name(self):
+        """Returns the species name in short format.
+
+        For example, returns
+        Y.pestis
+        for the species Yersinia pestis KIM10+.
+        """
+        genus, species = self.species_name.split()[:2]
+        return genus[0] + '.' + species
 
     @property
     def species(self):
