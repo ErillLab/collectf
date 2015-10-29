@@ -20,7 +20,7 @@ def browse_taxonomy(request):
 
 def get_results_taxonomy(request, object_id):
     """Returns motif reports for a given taxonomy ID."""
-    tax = get_object_or_404(models.Taxonomy, taxonomy_id=object_id)
+    tax = get_object_or_404(models.Taxonomy, pk=object_id)
     curation_site_instances = models.Curation_SiteInstance.objects.filter(
         site_instance__genome__taxonomy__in=tax.get_all_species())
     reports = make_reports(curation_site_instances)
@@ -30,6 +30,6 @@ def get_results_taxonomy(request, object_id):
          'description': '',
          'reports': reports,
          'combined_report_url': reverse(view_reports_by_taxonomy,
-                                        args=(tax.taxonomy_id,))},
+                                        args=(tax.pk,))},
         context_instance=RequestContext(request))
 

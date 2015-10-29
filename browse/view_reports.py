@@ -119,9 +119,9 @@ def view_reports_by_technique(request, object_id):
 
 def view_reports_by_taxonomy(request, object_id):
     """Returns the motif reports for a given taxon."""
-    taxonomy = get_object_or_404(models.Taxonomy, taxononmy_id=object_id)
+    taxonomy = get_object_or_404(models.Taxonomy, pk=object_id)
     curation_site_instances = models.Curation_SiteInstance.objects.filter(
-        site_instance__genome__taxonomy=taxonomy)
+        site_instance__genome__taxonomy__in=taxonomy.get_all_species())
     reports = make_reports(curation_site_instances)
     ensemble_report = make_ensemble_report(curation_site_instances)
     return render_report_to_response(request, reports, ensemble_report)
