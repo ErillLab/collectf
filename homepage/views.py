@@ -99,22 +99,19 @@ def get_random_motif(motif_len_th=30, motif_sz_th=10):
     # Select one of the combinations that satisfies the criteria: motif_len and
     # motif_sz.
     while True:
-        try:
-            TF_instances, genome = random.choice(TF_genome_list)
-            # Get all curation-site-instance objects for the TF-instance and
-            # genome.
-            cur_site_insts = models.Curation_SiteInstance.objects.filter(
-                curation__TF_instances=TF_instances,
-                site_instance__genome=genome,
-                site_type='motif_associated')
-            # Generate a motif report out of curation-site-instance objects
-            if cur_site_insts.count() > motif_sz_th:
-                # First criterion is satisfied.
-                report = motif_report.make_reports(cur_site_insts)
-                # Align binding sites.
-                aligned_sites = report.align_sites()
-                if len(aligned_sites[0]) < motif_len_th:
-                    # Second criterion is satisfied too.
-                    return report
-        except:
-            pass
+        TF_instances, genome = random.choice(TF_genome_list)
+        # Get all curation-site-instance objects for the TF-instance and
+        # genome.
+        cur_site_insts = models.Curation_SiteInstance.objects.filter(
+            curation__TF_instances=TF_instances,
+            site_instance__genome=genome,
+            site_type='motif_associated')
+        # Generate a motif report out of curation-site-instance objects
+        if cur_site_insts.count() > motif_sz_th:
+            # First criterion is satisfied.
+            reports = motif_report.make_reports(cur_site_insts)
+            # Align binding sites.
+            aligned_sites = reports[0].align_sites()
+            if len(aligned_sites[0]) < motif_len_th:
+                # Second criterion is satisfied too.
+                return reports[0]
