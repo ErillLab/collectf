@@ -36,17 +36,17 @@ def view_site(request, dbxref_id):
     for csi in all_curation_site_instances:
         if csi==curation_site_instance: continue
         if meta_site.membership_test(csi):
-            meta_site.add_cur_site_inst(csi)
+            meta_site.add(csi)
 
     alignment = None
-    if len(meta_site.cur_site_insts) > 1:
-        alignment = bioutils.run_lasagna(map(lambda csi: csi.site_instance, meta_site.cur_site_insts), trim=False)
+    if len(meta_site.curation_site_instances) > 1:
+        alignment = bioutils.run_lasagna(map(lambda csi: csi.site_instance, meta_site.curation_site_instances), trim=False)
     
     return render(request,
                   "view_site.html",
                   {
                       'head_csi': curation_site_instance,
-                      'csis': meta_site.cur_site_insts,
+                      'csis': meta_site.curation_site_instances,
                       'regulations': meta_site.regulations,
                       'dbxref': dbxref.id2dbxref(curation_site_instance.pk),
                       'alignment': alignment,
