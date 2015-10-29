@@ -36,4 +36,6 @@ urlpatterns = patterns(
         browse.view_reports.view_reports_by_uniprot_accession),
     url(r'^uniprotkbmap$',
         RedirectView.as_view(url=static('uniprot_dbxref.txt'))),
+    url(r'^go_annotations$',
+        RedirectView.as_view(url=static('collectf.gdap'))),
 )
