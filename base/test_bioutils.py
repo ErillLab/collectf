@@ -1,5 +1,6 @@
 from django.test import TestCase
-from base import bioutils
+
+from . import bioutils
 
 class SequenceTest(TestCase):
     def test_performs_reverse_complement(self):

@@ -26,11 +26,11 @@
     <tbody>
       {% for report in reports %}
       <tr>
-        <td>{{ report.TF.name }}</td>
-        <td>{{ report.species.name }}</td>
+        <td>{{ report.TF_name }}</td>
+        <td>{{ report.species_name }}</td>
         <td>
           <a target="_blank"
-             href="{% url 'browse.view_reports.view_reports_by_TF_and_species' report.TF.pk report.species.pk %}">
+             href="{% url 'browse.view_reports.view_reports_by_TF_and_species' report.TF.TF_id report.species.pk %}">
             view
           </a>
         </td>

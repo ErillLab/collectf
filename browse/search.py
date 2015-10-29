@@ -165,11 +165,7 @@ def search_post(request):
              'description': """
              Search results can be seen as individual reports (one report per
              TF/species) or as ensemble reports (multiple TF/species). """,
-             'all_cur_site_insts': [
-                 pk for report in reports
-                 for pk in report.get_all_cur_site_insts_ids()],
-             'reports': [report.generate_browse_result_dict()
-                         for report in reports],
+             'reports': reports,
             },
             context_instance=RequestContext(request))
     except RuntimeError as e:

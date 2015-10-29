@@ -15,7 +15,6 @@
 
 <div id="report_table" class="boxed">
   {% if reports %}
-  {% if all_cur_site_insts %} 
   {# put view_all link #}
   <p>
     <a class="block_before_load" href="#"  onclick="$('#view_all').submit(); return false;">
@@ -31,9 +30,8 @@
     {% endcomment %}
     {% csrf_token %}
     <input type="hidden" name="csi_list"
-           value="{% for csi in all_cur_site_insts %}{{ csi }}{% if not forloop.last %},{% endif %}{% endfor %}">
+           value="{% for report in reports %}{% for csi in report.curation_site_instance_ids %}{{ csi }}{% if not forloop.last %},{% endif %}{% endfor %}{% endfor %}">
   </form>
-  {% endif %}
 
   <table class="table table-condensed table-striped">
     <thead>
@@ -56,7 +54,7 @@
                 id="{{ form_id }}" target="_blank">
             {% csrf_token %}
 	        <input type="hidden" name="csi_list"
-                   value="{% for csi_pk in report.cur_site_insts %}{{ csi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}">
+                   value="{% for csi_pk in report.curation_site_instance_ids %}{{ csi_pk }}{% if not forloop.last %},{% endif %}{% endfor %}">
 	      </form>
         </td>
         {% endwith %}

@@ -90,16 +90,17 @@ def export_fasta(meta_sites, **kwargs):
     # Don't load genome sequence when retrieving from DB
     rows = export_base(meta_sites)
     for row in rows:
-        fasta_str += (">TF_%(TF)s_%(TF_accession)s|genome_%(genome)s_%(organism)s|start=%(start_pos)d|end=%(end_pos)d|strand=%(strand)d\n" %
-                      {'TF': row['curation__TF__name'],
-                       'TF_accession': row['curation__TF_instances__protein_accession'],
-                       'genome': row['site_instance__genome__genome_accession'],
-                       'organism': row['site_instance__genome__organism'],
-                       'start_pos': row['start_pos'],
-                       'end_pos': row['end_pos'],
-                       'strand': row['strand'],
-                       })
-        fasta_str += ("%s\n" % row['seq'])
+        fasta_str += (
+            '>TF_%(TF)s_%(TF_accession)s|genome_%(genome)s %(organism)s|'
+            'start=%(start_pos)d|end=%(end_pos)d|strand=%(strand)d\n' %
+            {'TF': row['curation__TF_instances__TF__name'],
+             'TF_accession': row['curation__TF_instances__uniprot_accession'],
+             'genome': row['site_instance__genome__genome_accession'],
+             'organism': row['site_instance__genome__organism'],
+             'start_pos': row['start_pos'],
+             'end_pos': row['end_pos'],
+             'strand': row['strand']})
+        fasta_str += ('%s\n' % row['seq'])
     return fasta_str
 
 tsv_sep = '\t'
@@ -124,23 +125,24 @@ def export_tsv(meta_sites, **kwargs):
     rows = export_base(meta_sites)
     for i,row in enumerate(rows):
         csis = meta_sites[i]
-        experimental_evidence = [csi.experimental_techniques.all() for csi in csis.all()]
+        experimental_evidence = [csi.experimental_techniques.all()
+                                 for csi in csis.all()]
         pmids = [csi.curation.publication.pmid for csi in csis.all()]
-        regulated_genes = models.Regulation.objects.filter(evidence_type="exp_verified")\
-                          .filter(curation_site_instance__in=csis)
-        line = tsv_sep.join(map(str, [row['curation__TF__name'],
-                                      row['curation__TF_instances__protein_accession'],
-                                      row['site_instance__genome__genome_accession'],
-                                      row['site_instance__genome__organism'],
-                                      row['start_pos'],
-                                      row['end_pos'],
-                                      row['strand'],
-                                      row['seq'],
-                                      row['mode'],
-                                      ' | '.join((','.join(t.name for t in evidence) + ' [PMID:%s]' % pmid)
-                                                 for evidence,pmid in zip(experimental_evidence, pmids)),
-                                      ', '.join(reg.gene.locus_tag for reg in regulated_genes),
-                                      ]))
+        regulated_genes = models.Regulation.objects.filter(
+            evidence_type='exp_verified').filter(curation_site_instance__in=csis)
+        line = tsv_sep.join(map(str, [
+            row['curation__TF_instances__TF__name'],
+            row['curation__TF_instances__uniprot_accession'],
+            row['site_instance__genome__genome_accession'],
+            row['site_instance__genome__organism'],
+            row['start_pos'],
+            row['end_pos'],
+            row['strand'],
+            row['seq'],
+            row['mode'],
+            ' | '.join((','.join(t.name for t in evidence) + ' [PMID:%s]' % pmid)
+                       for evidence, pmid in zip(experimental_evidence, pmids)),
+            ', '.join(reg.gene.locus_tag for reg in regulated_genes)]))
         tsv_lines.append(line)
     return '\n'.join(tsv_lines)
 
@@ -152,20 +154,21 @@ def export_tsv_raw(meta_sites, **kwargs):
         csis = meta_sites[i]
         # report each csi individually
         for csi in csis.all():
-            line = tsv_sep.join(map(str, [csi.curation.TF.name,
-                                          csi.curation.TF_instances.all()[0].protein_accession,
-                                          csi.site_instance.genome.genome_accession,
-                                          csi.site_instance.genome.organism,
-                                          csi.site_instance.start+1,
-                                          csi.site_instance.end+1,
-                                          csi.site_instance.strand,
-                                          csi.site_instance.seq,
-                                          csi.TF_function,
-                                          ', '.join(t.name for t in csi.experimental_techniques.all()) + \
-                                                                       ' [PMID:%s]' % csi.curation.publication.pmid,
-                                          ','.join(r.gene.locus_tag for r in models.Regulation.objects.filter(evidence_type="exp_verified")\
-                                                                                                      .filter(curation_site_instance=csi)),
-                                          ]))
+            line = tsv_sep.join(map(str, [
+                csi.curation.TF.name,
+                csi.curation.TF_instances.all()[0].protein_accession,
+                csi.site_instance.genome.genome_accession,
+                csi.site_instance.genome.organism,
+                csi.site_instance.start+1,
+                csi.site_instance.end+1,
+                csi.site_instance.strand,
+                csi.site_instance.seq,
+                csi.TF_function,
+                ', '.join(t.name for t in csi.experimental_techniques.all()) + \
+                ' [PMID:%s]' % csi.curation.publication.pmid,
+                ','.join(r.gene.locus_tag for r in models.Regulation.objects.filter(evidence_type="exp_verified")\
+                         .filter(curation_site_instance=csi)),
+            ]))
             tsv_lines.append(line)
     return '\n'.join(tsv_lines)
 

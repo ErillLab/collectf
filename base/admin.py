@@ -1,19 +1,17 @@
-from django.contrib import admin
-from django.db.models import get_models
-from django.db.models import get_app
-from base.models import *
 from django import forms
-from django.shortcuts import render_to_response
-from django.http import HttpResponseRedirect
-from django.template import RequestContext
+from django.contrib import admin
 from django.contrib import messages
+from django.db.models import get_app
+from django.db.models import get_models
+from django.http import HttpResponseRedirect
+from django.shortcuts import render_to_response
+from django.template import RequestContext
 
-# Register your models here.
+from base.models import *
 
 class GenomeAdmin(admin.ModelAdmin):
     list_display = ('genome_accession', 'organism')
 
-# Curation admin view
 class CurationSiteInstanceInline(admin.StackedInline):
     model = Curation_SiteInstance
     filter_horizontal = ('experimental_techniques',)
@@ -40,7 +38,6 @@ class CuratorAdmin(admin.ModelAdmin):
 
 class SiteInstanceAdmin(admin.ModelAdmin):
     list_display = ('site_id',)
-    #list_filter = ('genome__genome_accession',)
     ordering = ('-site_id', )
 
 class Curation_SiteInstanceAdmin(admin.ModelAdmin):

@@ -2,20 +2,20 @@
 processing sequence information. Most of them are built on top of Biopython."""
 
 from base64 import b64encode
-from subprocess import Popen, PIPE, STDOUT
+from subprocess import Popen
+from subprocess import PIPE
 
 from Bio import Entrez
 from Bio import Motif
 from Bio import SeqIO
 from Bio.Alphabet import IUPAC
 from Bio.Seq import Seq
-from Bio.SeqUtils import GC
 import uniprot
 
 import lasagna
 import models
 
-Entrez.email = "sefa1@umbc.edu"
+Entrez.email = 'sefa1@umbc.edu'
 
 def reverse_complement(seq):
     """Returns the reverse complement of a sequence"""

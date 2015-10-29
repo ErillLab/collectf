@@ -50,10 +50,8 @@ INSTALLED_APPS = (
     'curate',
     # dependencies
     'django_extensions',
-    'south',
     'bootstrapform',
     'registration',
-#    'debug_toolbar',
 )
 
 MIDDLEWARE_CLASSES = (

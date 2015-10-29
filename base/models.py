@@ -6,7 +6,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.cache import cache
 
-from base import bioutils
+import bioutils
 
 class Curation(models.Model):
     """Curation model.
@@ -395,7 +395,7 @@ class TFInstance(models.Model):
     description = models.TextField()
 
     # Transcription factor that the protein is.
-    TF = models.ForeignKey("TF", null=False)
+    TF = models.ForeignKey('TF', null=False)
 
     # The notes -- mostly about RefSeq to UniProt migration.
     notes = models.TextField()
@@ -557,6 +557,10 @@ class MetaSite(models.Model):
     # Delegate Curation_SiteInstance object.
     delegate = models.ForeignKey('Curation_SiteInstance', null=False)
 
+    def __unicode__(self):
+        """Returns the unicode representation of the MetaSite."""
+        return u'[%s] delegate: %s' % (self.meta_site_id, self.delegate)
+
     @property
     def genome_accession(self):
         """Returns the genome accession of the meta-site."""
@@ -588,8 +592,28 @@ class MetaSite(models.Model):
     @property
     def techniques(self):
         """Returns the experimental techniques for all Curation_SiteInstances"""
-        return models.ExperimentalTechnique.objects.filter(
-            curation_site_instance=self.curation_site_instance_set.all())
+        technique_ids = self.curation_siteinstance_set.values_list(
+            'experimental_techniques', flat=True)
+        return ExperimentalTechnique.objects.filter(
+            technique_id__in=technique_ids)
+
+    @property
+    def regulations(self):
+        regulation_ids = self.regulation_set.values_list(
+            'pk', flat=True)
+        return Regulation.objects.filter(pk__in=regulation_ids)
+
+    @property
+    def curation_ids(self):
+        """Returns the curation IDs of the meta-site."""
+        return self.curation_siteinstance_set.values_list(
+            'curation_id', flat=True)
+
+    @property
+    def curation_site_instance_ids(self):
+        """Returns the Curation_SiteInstance IDs of the meta-site."""
+        return self.curation_siteinstance_set.values_list('pk', flat=True)
+        
 
     def membership_test(self, curation_site_instance):
         """Checks if curation_site_instance can be member of the meta-site.
@@ -600,16 +624,16 @@ class MetaSite(models.Model):
         if curation_site_instance.site_type in ['motif_associated',
                                                 'var_motif_associated']:
             return (
-                self.motif_associated_overlap_test(curation_site_instance) and
                 self.genome_test(curation_site_instance) and
                 self.TF_instances_test(curation_site_instance) and
-                self.motif_id_test(curation_site_instance))
+                self.motif_id_test(curation_site_instance) and
+                self.motif_associated_overlap_test(curation_site_instance))
         elif cur_site_inst.site_type == 'non_motif_associated':
             return (
-                self.non_motif_associated_overlap_test(
-                    curation_site_instance) and
                 self.genome_test(curation_site_instance) and
-                self.TF_instances_test(curation_site_instance))
+                self.TF_instances_test(curation_site_instance) and
+                self.non_motif_associated_overlap_test(
+                    curation_site_instance))
 
         return False
 
@@ -662,10 +686,7 @@ class MetaSite(models.Model):
         return (min(loca[0], loca[1]) <= min(locb[0], locb[1]) and
                 max(loca[0], loca[1]) >= max(locb[0], locb[1]))
 
-        
-
 class Regulation(models.Model):
-
     """Gene regulation table.
 
     Stores the TF regulation of genes. Links two tables, Curation_SiteInstance
@@ -678,7 +699,10 @@ class Regulation(models.Model):
     the site is upstream, are labeled as 'inferred'.
     """
     # The Curation_SiteInstance object.
-    curation_site_instance = models.ForeignKey("Curation_SiteInstance")
+    curation_site_instance = models.ForeignKey('Curation_SiteInstance')
+
+    # The MetaSite object.
+    meta_site = models.ForeignKey('MetaSite', null=True)
 
     # The regulated gene.
     gene = models.ForeignKey("Gene")
@@ -884,3 +908,4 @@ class NCBISubmission(models.Model):
 
     class Meta:
         verbose_name = 'NCBI Submission'
+

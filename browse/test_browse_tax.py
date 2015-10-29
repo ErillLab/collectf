@@ -12,7 +12,11 @@ class BrowseTaxTest(TestCase):
         response = self.client.get('/browse/browse_taxonomy/')
         self.assertEqual(response.status_code, 200)
 
-    def test_get_results_taxonomy_URL_resolve_success(self):
-        url = reverse('browse.browse_tax.get_results_taxonomy', args=[123])
-        self.assertEqual(url, '/browse/get_results_taxonomy/123/')
+    def test_browse_taxonomy_no_taxonomy(self):
+        assert False
 
+    def test_browse_taxonomy_empty_curation_site_instances(self):
+        assert False
+
+    def test_browse_taxonomy_success(self):
+        assert False
