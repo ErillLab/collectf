@@ -11,7 +11,7 @@ install:
   - pip install flake8  
 
 before_script:
-  - flake8 collectf
+  - flake8 .
   - mysql -e 'create database collectfdb_test;'
   - python manage.py syncdb --noinput
 
