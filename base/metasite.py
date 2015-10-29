@@ -53,9 +53,12 @@ class MetaSite:
     @property
     def techniques(self):
         """Returns the experimental techniques for all Curation_SiteInstances"""
-        self.curation_site_instances.values_list(
-            'experimental_techniques', flat=True)
-        return ExperimentalTechnique.objects.filter(
+        technique_ids = set(
+            technique.technique_id
+            for curation_site_instance in self.curation_site_instances
+            for technique in curation_site_instance.experimental_techniques.all())
+        print technique_ids
+        return models.ExperimentalTechnique.objects.filter(
             technique_id__in=technique_ids)
 
     @property
