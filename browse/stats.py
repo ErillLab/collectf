@@ -67,7 +67,7 @@ def num_curations_and_sites():
             cur_site_insts = models.Curation_SiteInstance.objects.filter(
                 site_type__in=['motif_associated', 'var_motif_associated'],
                 site_instance__genome__taxonomy=species,
-                curation__TF=TF)
+                curation__TF_instances__TF=TF)
             num_cur = cur_site_insts.values('curation').distinct().count()
             num_sit = cur_site_insts.values('site_instance').distinct().count()
             num_curations[TF.name][species.name] = num_cur
