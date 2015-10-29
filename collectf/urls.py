@@ -9,7 +9,8 @@ import base.views
 import browse.view_site
 import browse.view_reports
 
-urlpatterns = patterns('',
+urlpatterns = patterns(
+    '',
     url(r'^admin/', include(admin.site.urls)),
     url(r'', include('base.urls')),
     url(r'^home/', include('homepage.urls')),

@@ -25,11 +25,11 @@ DEBUG = True
 TEMPLATE_DEBUG = True
 
 TEMPLATE_DIRS = (
-    os.path.join(os.path.dirname(os.path.dirname(__file__)), 'base', 'templates'),
-    os.path.join(os.path.dirname(os.path.dirname(__file__)), 'homepage', 'templates'),
-    os.path.join(os.path.dirname(os.path.dirname(__file__)), 'browse', 'templates'),
-    os.path.join(os.path.dirname(os.path.dirname(__file__)), 'curate', 'templates'),
-    os.path.join(os.path.dirname(os.path.dirname(__file__)), 'ncbi', 'templates'),
+    os.path.join(BASE_DIR, 'base', 'templates'),
+    os.path.join(BASE_DIR, 'templates'),
+    os.path.join(BASE_DIR, 'templates'),
+    os.path.join(BASE_DIR, 'templates'),
+    os.path.join(BASE_DIR, 'ncbi', 'templates'),
 )
 
 ALLOWED_HOSTS = []
@@ -106,11 +106,11 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
-    os.path.join(os.path.dirname(os.path.dirname(__file__)), 'base', 'static'),
-    os.path.join(os.path.dirname(os.path.dirname(__file__)), 'browse', 'static'),
+    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'browse', 'static'),
 )
 
-STATIC_ROOT = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'sitestatic')
+STATIC_ROOT = os.path.join(BASE_DIR, 'sitestatic')
 
 # Redirect to here when logged in
 LOGIN_REDIRECT_URL = '/'
@@ -120,7 +120,7 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
 # Absolute path to the directory of pickle files that are used.
 # Don't put anything in this directory yourself.
-PICKLE_ROOT = os.path.join(os.path.dirname(os.path.dirname(__file__)), "pickles")
+PICKLE_ROOT = os.path.join(BASE_DIR, 'pickles')
 
 
 # Curation submission settings
@@ -133,18 +133,17 @@ ACCOUNT_ACTIVATION_DAYS = 7
 
 # Profiling settings
 DEBUG_TOOLBAR_PANELS = [
-    #'debug_toolbar.panels.versions.VersionsPanel',
+    # 'debug_toolbar.panels.versions.VersionsPanel',
     'debug_toolbar.panels.timer.TimerPanel',
-    #'debug_toolbar.panels.settings.SettingsPanel',
-    #'debug_toolbar.panels.headers.HeadersPanel',
-    #'debug_toolbar.panels.request.RequestPanel',
+    # 'debug_toolbar.panels.settings.SettingsPanel',
+    # 'debug_toolbar.panels.headers.HeadersPanel',
+    # 'debug_toolbar.panels.request.RequestPanel',
     'debug_toolbar.panels.sql.SQLPanel',
-   # 'debug_toolbar.panels.staticfiles.StaticFilesPanel',
-   # 'debug_toolbar.panels.templates.TemplatesPanel',
-   # 'debug_toolbar.panels.cache.CachePanel',
-   # 'debug_toolbar.panels.signals.SignalsPanel',
-   # 'debug_toolbar.panels.logging.LoggingPanel',
-   # 'debug_toolbar.panels.redirects.RedirectsPanel',
+    # 'debug_toolbar.panels.staticfiles.StaticFilesPanel',
+    # 'debug_toolbar.panels.templates.TemplatesPanel',
+    # 'debug_toolbar.panels.cache.CachePanel',
+    # 'debug_toolbar.panels.signals.SignalsPanel',
+    # 'debug_toolbar.panels.logging.LoggingPanel',
+    # 'debug_toolbar.panels.redirects.RedirectsPanel',
     'debug_toolbar.panels.profiling.ProfilingPanel',
 ]
-
