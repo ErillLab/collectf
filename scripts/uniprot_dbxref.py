@@ -16,24 +16,22 @@ from base import models
 from base.bioutils import build_motif
 from base.bioutils import degenerate_consensus
 from browse import dbxref
-from browse.static_reports import get_static_reports
+from browse import motif_report
 from collectf import settings
 
 def generate_uniprot_dbxref():
     export_file = os.path.join(
-        settings.STATICFILES_DIRS[0], 'uniprot_dbxref.txt')
+        settings.STATIC_ROOT, 'uniprot_dbxref.txt')
     with open(export_file, 'w') as f:
-        for TF_instance in tqdm(models.TFInstance.objects.all()):
-            reports, _ = get_static_reports(
-                'TF_instance_%s' % TF_instance.TF_instance_id)
+        for TF_instance in models.TFInstance.objects.all():
+            print TF_instance
+            curation_site_instances = models.Curation_SiteInstance.objects.filter(
+                curation__TF_instances=TF_instance)
+            reports = motif_report.make_reports(curation_site_instances)
             if reports:
-                motif_sites = reports[0].get_single_motif()
                 f.write('\t'.join(
                     [TF_instance.uniprot_accession,
-                     dbxref.to_uniprot_dbxref(TF_instance.TF_instance_id),
-                     "Collection of %d %s binding sites" %
-                     (len(motif_sites), TF_instance.TF.name),
-                     degenerate_consensus(build_motif(motif_sites))]))
+                     dbxref.to_uniprot_dbxref(TF_instance.TF_instance_id)]))
                 f.write('\n')
 def run():
     generate_uniprot_dbxref()
