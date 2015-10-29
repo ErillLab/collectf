@@ -110,7 +110,7 @@ def get_random_motif(motif_len_th=30, motif_sz_th=10):
             # Generate a motif report out of curation-site-instance objects
             if cur_site_insts.count() > motif_sz_th:
                 # First criterion is satisfied.
-                report = motif_report.MotifReport(cur_site_insts)
+                report = motif_report.make_reports(cur_site_insts)
                 # Align binding sites.
                 aligned_sites = report.align_sites()
                 if len(aligned_sites[0]) < motif_len_th:

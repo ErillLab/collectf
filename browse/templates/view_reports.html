@@ -74,8 +74,7 @@
 	        <p>To generate the weblogo, aligned binding sites are used.</p>
             <div class="">
               <img src="" class="weblogo_img"
-                   site_data={% for site in report.align_sites %}{{ site }}
-                   {% if not forloop.last %},{% endif %}{% endfor %}>
+                   site_data={% for site in report.align_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}>
             </div>
 
 	      </div>
@@ -232,8 +231,7 @@
 	        <p>To generate the weblogo, aligned binding sites are used.</p>
 	        <div class="">
 	          <img src="" class="weblogo_img" id="{{report.id}}_weblogo"
-                   site_data={% for site in ensemble_report.align_sites %}{{ site }}
-                   {% if not forloop.last %},{% endif %}{% endfor %}>
+                   site_data={% for site in ensemble_report.align_sites %}{{ site }}{% if not forloop.last %},{% endif %}{% endfor %}>
 	        </div>
 	      </div>
 	    </div>

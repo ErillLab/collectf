@@ -14,9 +14,7 @@ class MotifReport:
         Given a collection of Curation_SiteInstance objects, creates the report
         object.
         """
-        self.meta_sites = list(set(
-            curation_site_instance.meta_site
-            for curation_site_instance in curation_site_instances))
+        self.meta_sites = metasite.create_meta_sites(curation_site_instances)
 
     @property
     def id(self):

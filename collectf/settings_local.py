@@ -52,6 +52,7 @@ INSTALLED_APPS = (
     'django_extensions',
     'bootstrapform',
     'registration',
+    # 'debug_toolbar',
 )
 
 MIDDLEWARE_CLASSES = (

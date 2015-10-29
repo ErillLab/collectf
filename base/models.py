@@ -467,9 +467,6 @@ class Curation_SiteInstance(models.Model):
     # The SiteInstance object.
     site_instance = models.ForeignKey("SiteInstance", null=False)
 
-    # The MetaSite object.
-    meta_site = models.ForeignKey('MetaSite', null=True)
-
     # The type of the binding site.
     SITE_TYPE = (('motif_associated', "motif associated"),
                  ('var_motif_associated', "variable motif associated"),
@@ -541,150 +538,7 @@ class Curation_SiteInstance(models.Model):
         """Returns the genome accession of the site instance."""
         return self.site_instance.genome.genome_accession
 
-class MetaSite(models.Model):
-    """MetaSite table.
 
-    A site could be reported in multiple papers. To avoid redundancy
-    (i.e. presenting the same site sequence multiple times, one per paper), the
-    Curation_SiteInstance objects are collapsed into one entity called a
-    "meta-site". To be collapsed into the same meta-site, two sites are required
-    to overlap more than a defined threshold.
-    """
-
-    # Meta-site identifier
-    meta_site_id = models.AutoField(primary_key=True)
-
-    # Delegate Curation_SiteInstance object.
-    delegate = models.ForeignKey('Curation_SiteInstance', null=False)
-
-    def __unicode__(self):
-        """Returns the unicode representation of the MetaSite."""
-        return u'[%s] delegate: %s' % (self.meta_site_id, self.delegate)
-
-    @property
-    def genome_accession(self):
-        """Returns the genome accession of the meta-site."""
-        return self.delegate.site_instance.genome.genome_accession
-
-    @property
-    def TF_instance_accessions(self):
-        """Returns the accession numbers of TF_instances of the meta-site."""
-        return self.delegate.curation.TF_instances.values_list(
-            'uniprot_accession', flat=True)
-
-    @property
-    def motif_id(self):
-        """Returns the motif ID of its Curation_SiteInstances.
-
-        A TF may have multiple motifs for the same species and this field is
-        used to identify the specific motif that the binding site belongs to.
-        """
-        return self.delegate.motif_id
-
-    @property
-    def site_type(self):
-        """Returns the site type of the meta-site.
-
-        The site type is the site type of the delegate site.
-        """
-        return self.delegate.site_type
-
-    @property
-    def techniques(self):
-        """Returns the experimental techniques for all Curation_SiteInstances"""
-        technique_ids = self.curation_siteinstance_set.values_list(
-            'experimental_techniques', flat=True)
-        return ExperimentalTechnique.objects.filter(
-            technique_id__in=technique_ids)
-
-    @property
-    def regulations(self):
-        regulation_ids = self.regulation_set.values_list(
-            'pk', flat=True)
-        return Regulation.objects.filter(pk__in=regulation_ids)
-
-    @property
-    def curation_ids(self):
-        """Returns the curation IDs of the meta-site."""
-        return self.curation_siteinstance_set.values_list(
-            'curation_id', flat=True)
-
-    @property
-    def curation_site_instance_ids(self):
-        """Returns the Curation_SiteInstance IDs of the meta-site."""
-        return self.curation_siteinstance_set.values_list('pk', flat=True)
-        
-
-    def membership_test(self, curation_site_instance):
-        """Checks if curation_site_instance can be member of the meta-site.
-
-        Based on the type of Curation_SiteInstance object, performs
-        motif_associated_overlap_test or non_motif_associated_overlap_test.
-        """
-        if curation_site_instance.site_type in ['motif_associated',
-                                                'var_motif_associated']:
-            return (
-                self.genome_test(curation_site_instance) and
-                self.TF_instances_test(curation_site_instance) and
-                self.motif_id_test(curation_site_instance) and
-                self.motif_associated_overlap_test(curation_site_instance))
-        elif cur_site_inst.site_type == 'non_motif_associated':
-            return (
-                self.genome_test(curation_site_instance) and
-                self.TF_instances_test(curation_site_instance) and
-                self.non_motif_associated_overlap_test(
-                    curation_site_instance))
-
-        return False
-
-    def TF_instances_test(self, curation_site_instance):
-        """Checks if a curation_site_instance have the same TF instances."""
-        return (set(self.TF_instance_accessions) ==
-                set(curation_site_instance.curation.TF_instances.values_list(
-                    'uniprot_accession', flat=True)))
-
-    def genome_test(self, curation_site_instance):
-        """Checks if the curation_site_instance the same genome."""
-        return (self.genome_accession ==
-                curation_site_instance.site_instance.genome.genome_accession)
-
-    def motif_id_test(self, curation_site_instance):
-        """Checks if the curation_site_instance is from the same motif."""
-        return self.motif_id == curation_site_instance.motif_id
-
-    def motif_associated_overlap_test(self, curation_site_instance):
-        """Checks if the meta-site and the Curation_SiteInstance overlaps.
-
-        Includes the new Curation_SiteInstance into this meta-site if the
-        overlap between new site and the delegate site is more than 75%.
-        """
-        def get_overlap(loca, locb):
-            """Given two locations, returns the overlap ratio."""
-            overlap_len = max(0, min(loca[1], locb[1]) - max(loca[0], locb[0]))
-            return float(overlap_len) / (loca[1]-loca[0]+1)
-
-        loca = (self.delegate.site_instance.start,
-                self.delegate.site_instance.end)
-        locb = (curation_site_instance.site_instance.start,
-                curation_site_instance.site_instance.end)
-        overlap_a = get_overlap(loca, locb)
-        overlap_b = get_overlap(locb, loca)
-        return (overlap_a + overlap_b) / 2.0 >= 0.75
-
-    def non_motif_associated_overlap_test(self, curation_site_instance):
-        """Checks if the meta-site and the Curation_SiteInstance overlaps.
-
-        In case of enough overlap, integrates the evidence from
-        non-motif-associated site into the meta-site. The criteria is full
-        overlap between the delegate-site (motif-associated one) and the target
-        site-instance (non-motif_associated one)
-        """
-        loca = (curation_site_instance.site_instance.start,
-                curation_site_instance.site_instance.end)
-        locb = (self.delegate.site_instance.start,
-                self.delegate.site_instance.end)
-        return (min(loca[0], loca[1]) <= min(locb[0], locb[1]) and
-                max(loca[0], loca[1]) >= max(locb[0], locb[1]))
 
 class Regulation(models.Model):
     """Gene regulation table.
@@ -700,9 +554,6 @@ class Regulation(models.Model):
     """
     # The Curation_SiteInstance object.
     curation_site_instance = models.ForeignKey('Curation_SiteInstance')
-
-    # The MetaSite object.
-    meta_site = models.ForeignKey('MetaSite', null=True)
 
     # The regulated gene.
     gene = models.ForeignKey("Gene")
