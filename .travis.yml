@@ -16,7 +16,7 @@ before_script:
   - python src/manage.py migrate
 
 script:
-  coverage run src/manage.py test
+  coverage run --source='src/' src/manage.py test
 
 after_success:
   coveralls
