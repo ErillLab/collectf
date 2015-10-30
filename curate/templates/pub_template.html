@@ -1,8 +1,0 @@
-{% load print_pub %}
-
-<div>
-  {{ pub.title }} <a href="https://www.ncbi.nlm.nih.gov/pubmed/?term={{pub.pmid}}" target="_blank">
-    [{{ pub.pmid }}]</a><br/>
-{{ pub.authors }}<br/>
-<i>{{ pub.journal }}</i> {{pub.publication_date}}; {{pub.volume}}({{pub.issue}}):{{pub.pages}}
-</div>
