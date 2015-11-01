@@ -10,7 +10,6 @@ from django.template import RequestContext
 
 import models
 from .motif_report import make_reports
-from .static_reports import get_static_reports
 from .view_reports import view_reports_by_all_techniques
 from .view_reports import view_reports_by_technique_category
 from .view_reports import view_reports_by_technique

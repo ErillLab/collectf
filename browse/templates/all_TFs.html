@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{# List of all TFs in CollecTF #}
+{# Transcription factors in CollecTF #}
 
 {% block head-extras %}
 <title>CollecTF - List of Transcription Factors</title>
@@ -8,17 +8,47 @@
 
 {% block content %}
 
-<ul>
-  {% for tf_family in  tf_families %}
-  <li>
-    {{ tf_family.name }}
-    <ul>
-      {% for tf in tf_family.tf_set.all %}
-      <li>{{ tf.name }}</li>
-      {% endfor %}
-    </ul>
-  </li>
-  {% endfor %}
-</ul>
+<h1>List of transcription factors in CollecTF</h1>
+<div>
+  <ul id="tree" class="list-unstyled">
+    {% for TF_family in context_data %}
+    <li>  
+	  <div class="node {% if TF_family.TFs %}expandable{% endif %}">
+	    <i class=""></i>
+	    <a href="#" onclick="return false;">
+          {{ TF_family.name }}
+        </a>
+	  </div>
+	  
+	  <ul class="list-unstyled">
+	    {% for TF in TF_family.TFs %}
+	    <li>
+	      <div class="node expandable">
+	        <i class=""></i>
+            <a href="#" onclick="return false;">
+              {{ TF.name }}
+            </a>
+          </div>
+          <ul class="list-unstyled">
+            <div class="node">
+              <a href="{% url 'browse.view_reports.view_reports_by_TF' TF.id %}"
+                 target="_blank">
+                <img src="{{ TF.sequence_logo }}">
+              </a>
+            </div>
+            </ul>
+	    </li>
+	    {% endfor %}
+	  </ul>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+ 
+
+{% load static from staticfiles %}
+<script type="text/javascript" src="{% static "tree_view.js" %}"></script>
+<script type="text/javascript" src="{% static "browse.js" %}"></script>
 
 {% endblock %}
+

@@ -4,11 +4,16 @@ from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.template.loader import render_to_string
 from django.http import HttpResponseRedirect
+from django.http import HttpResponse
 from collectf import settings
 import models
 import pickle
 from browse.motif_report import make_reports
+from browse.motif_report import make_ensemble_report
+from base import bioutils
+
 
 DBSTATS_PICKLE_FILE = os.path.join(settings.PICKLE_ROOT,
                                    "collectf_dbstats.pickle")
@@ -19,14 +24,32 @@ def curator_roster(request):
                   "curator_roster.html",
                   context_instance=RequestContext(request))
 
-def list_tfs(request):
-    """Returns all TF families."""
-    tf_families = models.TFFamily.objects.all()
-    return render(request,
-                  'all_tfs.html',
-                  {'tf_families': tf_families},
-                  context_instance=RequestContext(request))
+def list_TFs(request):
+    """Returns the TF tree."""
+    TF_tree_data_file = os.path.join(settings.PICKLE_ROOT, 'TF_tree.pkl')
+    if not os.path.isfile(TF_tree_data_file):
+        context_data = []
+        for TF_family in models.TFFamily.objects.all():
+            TFs = models.TF.objects.filter(family=TF_family)
+            TF_data = []
+            for TF in TFs:
+                print TF
+                curation_site_instances = models.Curation_SiteInstance.objects.filter(
+                    curation__TF_instances__TF=TF,
+                    site_type='motif_associated')
+                if curation_site_instances:
+                    ensemble_report = make_ensemble_report(curation_site_instances)
+                    sequence_logo = bioutils.weblogo_uri(ensemble_report.align_sites())
+                    TF_data.append({'id': TF.TF_id,
+                                    'name': TF.name,
+                                    'sequence_logo': sequence_logo})
+            context_data.append({'name': TF_family.name, 'TFs': TF_data})
+        pickle.dump(context_data, open(TF_tree_data_file, 'w'))
 
+    context_data = pickle.load(open(TF_tree_data_file))
+    return render(request, 'all_TFs.html', {'context_data': context_data},
+                  context_instance=RequestContext(request))
+                
 def list_species(request):
     """Returns all phyla objects, therefore all species."""
     phyla = models.Taxonomy.objects.filter(rank='phylum')

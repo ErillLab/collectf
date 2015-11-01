@@ -58,7 +58,7 @@ urlpatterns += patterns(
     'browse.stats',
     url(r'^curation_stats/$', 'curation_stats'),
     url(r'^curator_roster/$', 'curator_roster'),
-    url(r'^tf_list/$', 'list_tfs'),
+    url(r'^TF_list/$', 'list_TFs'),
     url(r'^species_list/$', 'list_species'),
     url(r'^exp_tech_list/$', 'list_experimental_techniques'),
     url(r'^release_history/$', 'release_history'),
