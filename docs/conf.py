@@ -14,6 +14,7 @@
 
 import sys
 import os
+import django
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -22,6 +23,7 @@ sys.path.insert(0, os.path.abspath('../src/'))
 
 # Required for autodoc
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "collectf.settings")
+django.setup()
 
 # -- General configuration ------------------------------------------------
 
