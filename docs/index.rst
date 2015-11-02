@@ -19,6 +19,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   development/index
+
 
 
 Indices and tables

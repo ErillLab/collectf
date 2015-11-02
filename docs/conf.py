@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # CollecTF documentation build configuration file, created by
-# sphinx-quickstart on Mon Nov  2 12:25:42 2015.
+# sphinx-quickstart on Mon Nov  2 13:37:21 2015.
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -18,7 +18,10 @@ import os
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('../src/'))
+
+# Required for autodoc
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "collectf.settings")
 
 # -- General configuration ------------------------------------------------
 
@@ -29,6 +32,8 @@ import os
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.doctest',
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
@@ -115,8 +120,6 @@ html_theme = 'default'
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
-
-html_style = '/default.css'
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
