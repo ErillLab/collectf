@@ -1,7 +1,7 @@
 To setup CollecTF project for development, you need Python 2.7 and the Python
 packages in ``requirements.txt``.
 
-It is recommended to install `virtualenv`, a virtual Python environment
+It is recommended to install `virtualenv`_, a virtual Python environment
 builder. `The Python guide`_ has more information why you should consider using
 virtual environments.
 
