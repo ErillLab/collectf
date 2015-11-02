@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'core',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -78,8 +79,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'collectfdb_devel',
-        'USER': '',
-        'PASSWORD': '',
+        'USER': 'sefa',
+        'PASSWORD': '46544654',
         'HOST': 'localhost',
         'PORT': ''
     }
