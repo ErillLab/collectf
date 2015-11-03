@@ -2,7 +2,10 @@ language: python
 python: "2.7"
 
 env:
-  - DJANGO_VERSION=1.9b1 DB=mysql
+  global:
+    - DJANGO_VERSION=1.9b1
+    - DB=mysql
+    - DJANGO_SETTINGS=collectf.settings.travis_ci
 
 install:
   - pip install -q Django==$DJANGO_VERSION
@@ -13,10 +16,10 @@ install:
 before_script:
   - flake8 .
   - mysql -e 'create database collectfdb_devel;'
-  - python src/manage.py migrate
+  - python src/manage.py migrate settings=$DJANGO_SETTINGS
 
 script:
-  coverage run --source='src/' src/manage.py test --settings=collectf.settings.travis_ci
+  coverage run --source='src/' src/manage.py test --settings=$DJANGO_SETTINGS
 
 after_success:
   coveralls
