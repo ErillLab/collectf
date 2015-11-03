@@ -15,6 +15,7 @@ install:
 
 before_script:
   - flake8 .
+  - mysql -e 'create database collectfdb_devel;'
   - python src/manage.py migrate --settings=$DJANGO_SETTINGS
 
 script:
