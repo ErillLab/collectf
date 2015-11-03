@@ -1,4 +1,4 @@
-CollecTF models
+Models
 ===============
 
 We store all the collected data in relational database using Django database API

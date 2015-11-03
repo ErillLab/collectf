@@ -1,6 +1,6 @@
-===========
-Development
-===========
+====================
+CollecTF development
+====================
 
 .. toctree::
    :maxdepth: 1
