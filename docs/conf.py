@@ -127,7 +127,7 @@ html_theme_options = {}
 # "<project> v<release> documentation".
 html_title = "CollecTF documentation"
 
-html_style = '/default.css'
+html_style = '/sphinxdoc.css'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #html_short_title = None
