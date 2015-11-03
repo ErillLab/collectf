@@ -99,6 +99,10 @@ class Curation(models.Model):
     def TF_type_verbose(self):
         return dict(self.TF_TYPE)[self.TF_type]
 
+    def PMID(self):
+        """Returns the Pubmed ID of the paper for the curation."""
+        return self.publication.pmid
+
 
 class Curator(models.Model):
     """Curator table.
@@ -119,6 +123,21 @@ class Curator(models.Model):
     def __unicode__(self):
         """Returns the unicode representation of the curator."""
         return u'%s' % self.user
+
+    @property
+    def username(self):
+        """Returns the user name of the curator."""
+        return self.user.username
+
+    @property
+    def email(self):
+        """Returns the email of the curator."""
+        return self.user.email
+
+    @property
+    def name(self):
+        """Returns the curator's first name and last name."""
+        return self.user.first_name + ' ' + self.user.last_name
 
 
 class Publication(models.Model):
@@ -617,9 +636,7 @@ class ExperimentalTechnique(models.Model):
     technique_id = models.AutoField(primary_key=True)
 
     # The name of the technique.
-    name = models.CharField(max_length=100)
-
-    # The description of the technique.
+    name = models.CharField(max_length=100)  # The description of the technique
     description = models.TextField()
 
     # The default function of the experimental technique.
@@ -715,6 +732,7 @@ class ExternalDatabase(models.Model):
     ext_database_name = models.CharField(max_length=50, null=False,
                                          unique=True)
 
+    # TODO(sefa): Fix typo.
     # The external database description.
     ext_database_descripton = models.CharField(max_length=500)
 
