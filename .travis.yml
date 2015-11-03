@@ -2,7 +2,7 @@ language: python
 python: "2.7"
 
 env:
-  - DJANGO_VERSION=1.9b1 DB=mysql BUILD_ON_TRAVIS=true
+  - DJANGO_VERSION=1.9b1 DB=mysql
 
 install:
   - pip install -q Django==$DJANGO_VERSION
@@ -16,7 +16,7 @@ before_script:
   - python src/manage.py migrate
 
 script:
-  coverage run --source='src/' src/manage.py test
+  coverage run --source='src/' src/manage.py test --settings=collectf.settings.travis_ci
 
 after_success:
   coveralls
