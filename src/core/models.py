@@ -6,13 +6,14 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.cache import cache
 
+
 class Curation(models.Model):
     """Curation model.
 
     Contains all the details about the curation, such as reported TF and
     species, followed experimental process, link to curator, publication,
-    etc. Also keeps some meta-information about the curation, such as whether it
-    requires revision, ready for NCBI submission, validation status, etc.
+    etc. Also keeps some meta-information about the curation, such as whether
+    it requires revision, ready for NCBI submission, validation status, etc.
     """
     # Curation identifier
     curation_id = models.AutoField(primary_key=True)
@@ -98,6 +99,7 @@ class Curation(models.Model):
     def TF_type_verbose(self):
         return dict(self.TF_TYPE)[self.TF_type]
 
+
 class Curator(models.Model):
     """Curator table.
 
@@ -118,6 +120,7 @@ class Curator(models.Model):
         """Returns the unicode representation of the curator."""
         return u'%s' % self.user
 
+
 class Publication(models.Model):
     """Publication table."""
 
@@ -129,7 +132,8 @@ class Publication(models.Model):
     publication_id = models.AutoField(primary_key=True)
 
     # The type of the publication.
-    publication_type = models.CharField(max_length=20, choices=PUBLICATION_TYPE)
+    publication_type = models.CharField(max_length=20,
+                                        choices=PUBLICATION_TYPE)
 
     # The PubMed identifier of the publication.
     pmid = models.CharField(max_length=30, null=True, blank=True)
@@ -184,6 +188,7 @@ class Publication(models.Model):
                 (self.publication_id, self.pmid, self.reported_TF,
                  self.reported_species, self.assigned_to))
 
+
 class Gene(models.Model):
     """Gene table.
 
@@ -223,6 +228,7 @@ class Gene(models.Model):
         return '%s (%s-%s)' % (self.gene_id, self.name,
                                self.genome.genome_accession)
 
+
 class Genome(models.Model):
     """Genome table."""
     # The genome identifier.
@@ -257,9 +263,9 @@ class Genome(models.Model):
     def get_sequence(self):
         """Gets genome sequence from the cache."""
         key = 'genome_sequence_%s' % self.genome_accession
-        if not cache.has_key(key):
+        if key not in cache:
             value = self.genome_sequence.sequence
-            value = str(value) # No need for unicode, less memory usage.
+            value = str(value)  # No need for unicode, less memory usage.
             cache.set(key, value)
         ret = cache.get(key)
         return ret
@@ -267,11 +273,12 @@ class Genome(models.Model):
     def get_genes(self):
         """Gets the list of genes from the cache."""
         key = 'genome_genes_%s' % self.genome_accession
-        if not cache.has_key(key):
+        if key not in cache:
             value = Gene.objects.filter(genome=self).order_by('start')
             cache.set(key, value)
         ret = cache.get(key)
         return ret
+
 
 class GenomeSequence(models.Model):
     """Genome sequence table.
@@ -287,6 +294,7 @@ class GenomeSequence(models.Model):
     def __unicode__(self):
         """Unicode representation of the genome sequence."""
         return '%s' % self.genome
+
 
 class Taxonomy(models.Model):
     """The phylogeny in the database."""
@@ -333,6 +341,7 @@ class Taxonomy(models.Model):
         verbose_name_plural = 'taxonomies'
         ordering = ['name']
 
+
 class TF(models.Model):
     """Transcription factor and link to its family."""
 
@@ -356,6 +365,7 @@ class TF(models.Model):
         verbose_name_plural = "TFs"
         ordering = ['name']
 
+
 class TFFamily(models.Model):
     """TF family table."""
 
@@ -376,6 +386,7 @@ class TFFamily(models.Model):
         verbose_name = "TF family"
         verbose_name_plural = "TF families"
         ordering = ['name']
+
 
 class TFInstance(models.Model):
     """TF instance (protein) table."""
@@ -407,6 +418,7 @@ class TFInstance(models.Model):
         ordering = ['uniprot_accession']
         verbose_name = "TF instance"
 
+
 class SiteInstance(models.Model):
     """The binding site table."""
 
@@ -436,20 +448,6 @@ class SiteInstance(models.Model):
         """Returns the genome sequence that binding site belongs to."""
         return self.genome.get_sequence()
 
-    @property
-    def seq(self):
-        """Returns the sequence of the binding site."""
-        genome = self.get_genome_sequence()
-        sequence = genome[self.start:self.end+1]
-        if self.strand == -1:
-            sequence = bioutils.reverse_complement(sequence)
-        assert sequence == self._seq
-        return sequence
-
-    @property
-    def seq_lower(self):
-        """Returns the binding site in lower-case letters."""
-        return str(self.seq).lower()
 
 class Curation_SiteInstance(models.Model):
     """'Through' model between Curation and SiteInstance models.
@@ -537,7 +535,6 @@ class Curation_SiteInstance(models.Model):
         return self.site_instance.genome.genome_accession
 
 
-
 class Regulation(models.Model):
     """Gene regulation table.
 
@@ -547,8 +544,8 @@ class Regulation(models.Model):
 
     Also stores the evidence type. If there is experimental evidence of
     regulation in the paper, saying that TF x up/down-regulates gene y, the
-    evidence type is 'exp-verified'. Otherwise, all genes in the operon of which
-    the site is upstream, are labeled as 'inferred'.
+    evidence type is 'exp-verified'. Otherwise, all genes in the operon of
+    which the site is upstream, are labeled as 'inferred'.
     """
     # The Curation_SiteInstance object.
     curation_site_instance = models.ForeignKey('Curation_SiteInstance')
@@ -569,14 +566,15 @@ class Regulation(models.Model):
             self.curation_site_instance.site_instance.site_id,
             self.evidence_type)
 
+
 class NotAnnotatedSiteInstance(models.Model):
     """The table for not annotated site instances.
 
-    For some curations, the binding site that is reported in the paper could not
-    be matched to any sequence in the reference genome for some reason (e.g. the
-    reported genome is not available in RefSeq). Therefore, it is stored as
-    NotAnnotatedSiteInstance which basically holds the reported sequence and a
-    link to the curation table.
+    For some curations, the binding site that is reported in the paper could
+    not be matched to any sequence in the reference genome for some reason
+    (e.g. the reported genome is not available in RefSeq). Therefore, it is
+    stored as NotAnnotatedSiteInstance which basically holds the reported
+    sequence and a link to the curation table.
     """
     # The binding site sequence
     sequence = models.TextField(max_length=100000)
@@ -605,8 +603,9 @@ class NotAnnotatedSiteInstance(models.Model):
     is_high_throughput = models.BooleanField(default=False)
 
     def __unicode__(self):
-        """Returns the unicode representation of the NotAnnotatedSiteInstance"""
+        """Returns the unicode representation of the object."""
         return u'%s [%s]' % (self.id, self.sequence)
+
 
 class ExperimentalTechnique(models.Model):
     """The table of experimental techniques.
@@ -643,6 +642,7 @@ class ExperimentalTechnique(models.Model):
     class Meta:
         ordering = ['name']
 
+
 class ExperimentalTechniqueCategory(models.Model):
     """Experimental technique category table.
 
@@ -673,13 +673,15 @@ class ExperimentalTechniqueCategory(models.Model):
         ordering = ['name']
         verbose_name_plural = "experimental technique categories"
 
+
 class ChipInfo(models.Model):
     """Chromatin immunoprecipitation (ChIP) experiment information.
 
-    Some papers report binding sites using ChIP techniques. For these curations,
-    this table contains information on ChIP experiment details. The curation
-    table has a link (chip_info) to this table and it is NULL if the paper does
-    not have any ChIP technique.
+    Some papers report binding sites using ChIP techniques. For these
+    curations, this table contains information on ChIP experiment details. The
+    curation table has a link (chip_info) to this table and it is NULL if the
+    paper does not have any ChIP technique.
+
     """
 
     # The identifier.
@@ -695,20 +697,23 @@ class ChipInfo(models.Model):
         """Returns the unicode representation of the object."""
         return u'[%d] %s' % (self.chip_info_id, self.assay_conditions[:20])
 
+
 class ExternalDatabase(models.Model):
     """The external database table.
 
     Sometimes, authors prefers uploading additional data (e.g. DNA-array data,
-    gene expression data) to a database. To capture that information, during the
-    submission process, the curator is asked to provide the external database
-    name and the accession number of the specific data reported. This table
-    stores the information to access reported additional data.
+    gene expression data) to a database. To capture that information, during
+    the submission process, the curator is asked to provide the external
+    database name and the accession number of the specific data reported. This
+    table stores the information to access reported additional data.
+
     """
     # External database identifier.
     ext_database_id = models.AutoField(primary_key=True)
 
     # The external database name.
-    ext_database_name = models.CharField(max_length=50, null=False, unique=True)
+    ext_database_name = models.CharField(max_length=50, null=False,
+                                         unique=True)
 
     # The external database description.
     ext_database_descripton = models.CharField(max_length=500)
@@ -719,6 +724,7 @@ class ExternalDatabase(models.Model):
     def __unicode__(self):
         """Returns the unicode representation of the external database."""
         return u'%s' % self.ext_database_name
+
 
 class Curation_ExternalDatabase(models.Model):
     """'Through' table between Curation and ExternalDatabase tables."""
@@ -739,12 +745,14 @@ class Curation_ExternalDatabase(models.Model):
                  self.external_database.ext_database_name,
                  self.accession_number))
 
+
 class NCBISubmission(models.Model):
     """NCBI submission table.
 
-    The curated data in CollecTF is integrated into NCBI RefSeq database through
-    periodic genome-specific submissions. This internal table keeps track of all
-    the data that has been submitted to the NCBI RefSeq database.
+    The curated data in CollecTF is integrated into NCBI RefSeq database
+    through periodic genome-specific submissions. This internal table keeps
+    track of all the data that has been submitted to the NCBI RefSeq database.
+
     """
     # The time of the submission.
     submission_time = models.DateTimeField(auto_now_add=True)
@@ -757,4 +765,3 @@ class NCBISubmission(models.Model):
 
     class Meta:
         verbose_name = 'NCBI Submission'
-
