@@ -12,6 +12,9 @@ its ability to customize navigation and data extraction, its relevance to the
 community, the quality and detail of the stored data and the up-to-date nature
 of the stored information.
 
+To read more about CollecTF, please see the `paper`_.
+
+.. _paper: http://www.ncbi.nlm.nih.gov/pubmed/24234444
 .. _CollecTF: http://collectf.org
 
 Contents:

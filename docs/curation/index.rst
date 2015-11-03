@@ -4,6 +4,8 @@ Data submission
 .. toctree::
    :maxdepth: 1
 
+.. _curation_submission_guide:
+
 Curation submission guide
 =========================
 
@@ -112,14 +114,59 @@ Step 8: Curation information
 High-throughput submission guide
 ================================
 
+This section is intended as a short annex to the main curation guide, providing
+specific details regarding the submission of high‐throughput data. For further
+reference on the different aspects of the curation process, please see the
+`curation_submission_guide`_.
+
 Why?
 -----
+
+A significant fraction of the experimental data on transcription factor‐binding
+sites currently being generated relies to more or less extent on
+high‐throughput technologies and, in particular, on ChIP‐based methods (e.g.,
+ChIP‐chip, ChIP‐Seq). The main goal of CollecTF is to compile and make
+available through its web interface and through RefSeq genomes as much
+experimental data as possible on TF‐binding sites. The CollecTF high‐throughput
+submission pipeline aims at streamlining the submission of high‐throughput
+data, capturing high‐ throughput specific meta‐data and incorporating it into
+high‐quality annotation for TF‐binding sites.
 
 What?
 -----
 
+High‐throughput experiments typically generate multiple layers of data. For
+instance, ChIP‐Seq experiments generate raw read data, which is mapped to a
+reference genome. Mapped fragments are typically assigned enrichment values
+with respect to a control and fed to a peak calling algorithm to identify
+consistently enriched regions. Authors typically define a minimum threshold for
+enrichment, and peaks above this threshold are referred to as binding sites.
+Lastly, researchers may use motif discovery and/or site search algorithms to
+identify the specific sequence elements targeted by the transcription factor of
+interest.
+
+CollecTF is not a repository for raw high‐throughput data (e.g. ChIP‐seq
+reads). We compile only TF‐binding sites as defined by the researchers that
+report them. For ChIP data, this includes peaks above the enrichment threshold
+defined by the authors as well as specific sequence elements within such bound
+regions identified by the authors through in silico and/or in vitro methods.
+
 How?
 ----
+
+In most high‐throughput experiments, both enriched peaks and specific sequence
+elements are identified through the combination of ChIP protocols with
+bioinformatics approaches and other experimental sources of evidence. Peaks
+typically incorporate quantitative enrichment data, which can be transferred to
+sequence elements identified within the bound region. The CollecTF
+high‐throughput pipeline allows submitting both peak and sequence elements in a
+single step, and automatically assigns peak‐associated data, if available, to
+sequence elements.
+
+Regulatory mode, additional sources of evidence for specific sites and
+information on regulated genes can be submitted simultaneously, or may be
+submitted in a separate curation.  CollecTF will seamlessly integrate all
+available annotation information for TF‐binding sites.
 
 The process
 -----------
