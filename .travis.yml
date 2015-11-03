@@ -18,7 +18,7 @@ before_script:
   - flake8 .
   - mysql -e 'create database collectfdb_devel;'
   - python src/manage.py makemigrations --settings=$DJANGO_SETTINGS
-  - python src/manage.py migrate --settings=$DJANGO_SETTINGS --fake
+  - python src/manage.py migrate --settings=$DJANGO_SETTINGS
 
 script:
   coverage run --source='src/' src/manage.py test --settings=$DJANGO_SETTINGS
