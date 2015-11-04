@@ -99,7 +99,9 @@ class GenomeForm(forms.Form):
                                    help_text=help_dict['TF_accession'])
     TF_refseq_accession = forms.CharField(label="TF RefSeq accession number",
                                           help_text='',
-                                          widget=forms.HiddenInput)
+                                          widget=forms.HiddenInput,
+                                          required=False)
+                                          
 
     # 'TF_species_same' field is checked if TF species is the same with the
     # reported genome.
@@ -274,7 +276,7 @@ class GenomeForm(forms.Form):
         for i in range(1, settings.NUMBER_OF_GENOME_ACCESSION_FIELDS):
             field_name = 'genome_accession_%d' % i
             if cleaned_data.get(field_name, None):
-                self.genome_accession_helper(cleaned_data[field_name].strip())
+                self.clean_genome_accession_helper(cleaned_data[field_name].strip())
                 genome_accessions.append(cleaned_data[field_name].strip())
         # Get all genomes from the database.
         genomes = [Genome.objects.get(genome_accession=acc)
