@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-md-3">
+    <ul class="nav nav-pills nav-stacked">
+      <li role="presentation" class="active"><a href="#about">About</a></li>
+      <li role="presentation"><a href="#browse">Browse</a></li>
+      <li role="presentation"><a href="#search">Search</a></li>
+      <li role="presentation"><a href="#">Compare</a></li>
+      <li role="presentation"><a href="#">Contribute</a></li>
+      <li role="presentation"><a href="#">Stats</a></li>
+      <li role="presentation"><a href="#">Links</a></li>
+      <li role="presentation"><a href="#">Feedback</a></li>
+      <li role="presentation"><a href="#">Cite</a></li>
+      <li role="presentation"><a href="#">Acknowledgements</a></li>
+    </ul>
+  </div>
+
+  <div class="col-md-9">
+    <div class="tab-content">
+      <div class="tab-pane active" id="about">
+        {% include "homepage_about.html" %}
+      </div>
+
+      <div class="tab-pane" id="browse">
+        hehe
+      </div>
+
+      <div class="tab-pane" id="search">
+        hehe
+      </div>
+    </div><!-- /.tab-content -->
+  </div><!-- /.col-md-9 -->
+
+{% endblock %}
