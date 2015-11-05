@@ -30,7 +30,7 @@
     {% endcomment %}
     {% csrf_token %}
     <input type="hidden" name="csi_list"
-           value="{% for report in reports %}{% for csi in report.curation_site_instance_ids %}{{ csi }}{% if not forloop.last %},{% endif %}{% endfor %}{% endfor %}">
+           value="{% for report in reports %}{% for csi in report.curation_site_instance_ids %}{{ csi }}{% if not forloop.last %},{% endif %}{% endfor %}{% if not forloop.last %},{% endif %}{% endfor %}">
   </form>
 
   <table class="table table-condensed table-striped">
