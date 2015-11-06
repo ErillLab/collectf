@@ -2,9 +2,11 @@ from django.conf.urls import url
 
 from . import test_view
 from . import homepage_views
+from . import browse_by_TF
 
 urlpatterns = [
     url(r'^test_view$', test_view.test_view),
+    # homepage view
     url(r'^home$', homepage_views.home, name='homepage_home'),
     url(r'^about$', homepage_views.about, name='homepage_about'),
     url(r'^browse$', homepage_views.browse, name='homepage_browse'),
@@ -17,6 +19,6 @@ urlpatterns = [
     url(r'^cite$', homepage_views.cite, name='homepage_cite'),
     url(r'^acknowledgements$', homepage_views.acknowledgements,
         name='homepage_acknowledgements'),
-
-    
+    # browse by TF
+    url(r'^browse_by_TF$', browse_by_TF.browse_by_TF, name='browse_by_TF'),
 ]

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-md-3">
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <ul id="tree" class="list-unstyled">
+          {% for TF_family in TF_families %}
+          <li>
+            <div class="node" {% if TF_family.TFs.all %}"expandable"{% endif %}>
+              <i class=""></i>
+              <a href="" onclick="getMotifReportsByTFFamily({{ TF_family.TF_family_id }); return false;">
+                {{ TF_family.name}}
+              </a>
+            </div>
+
+            <ul class="list-unstyled">
+              {% for TF in TF_family.TFs.all %}
+              <li>
+                <div class="node">
+                  <i class=""></i>
+                  <a href="#" onclick="getMotifReportsByTF({{ TF.TF_id }}); return false;">
+                    {{ TF.name }}
+                  </a>
+                </div>
+              </li>
+              {% endfor %}
+            </ul>
+          </li>
+          {% endfor %}
+        </ul> <!-- /#tree -->
+      </div><!-- /.panel-body -->
+    </div><!-- /.col-md-3 -->
+  </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+<script src="{% static 'bootstrap_treeview.js' %}"></script>
+<script src="{% static 'browse_tree.js' %}"></script>
+{% endblock %}
+

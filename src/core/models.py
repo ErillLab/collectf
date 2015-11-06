@@ -371,7 +371,7 @@ class TF(models.Model):
     name = models.CharField(max_length=50)
 
     # The TF family.
-    family = models.ForeignKey('TFFamily')
+    family = models.ForeignKey('TFFamily', related_name='TFs')
 
     # The description of the TF.
     description = models.TextField()
