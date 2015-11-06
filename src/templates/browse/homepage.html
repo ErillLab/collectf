@@ -1,65 +1,43 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 
 {% block content %}
 
 <div class="row">
   <div class="col-md-3">
-    <ul class="nav nav-pills nav-stacked">
-      <li role="presentation" class="active"><a href="#about" data-toggle="tab">About</a></li>
-      <li role="presentation"><a href="#browse" data-toggle="tab">Browse</a></li>
-      <li role="presentation"><a href="#search" data-toggle="tab">Search</a></li>
-      <li role="presentation"><a href="#compare" data-toggle="tab">Compare</a></li>
-      <li role="presentation"><a href="#contribute" data-toggle="tab">Contribute</a></li>
-      <li role="presentation"><a href="#stats" data-toggle="tab">Stats</a></li>
-      <li role="presentation"><a href="#links" data-toggle="tab">Links</a></li>
-      <li role="presentation"><a href="#feedback" data-toggle="tab">Feedback</a></li>
-      <li role="presentation"><a href="#cite" data-toggle="tab">Cite</a></li>
-      <li role="presentation"><a href="#acknowledgements" data-toggle="tab">Acknowledgements</a></li>
-    </ul>
-  </div>
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <ul class="nav nav-pills nav-stacked">
+          <li> <a href="{% url 'homepage_about' %}">About</a></li>
+          <li> <a href="{% url 'homepage_browse' %}">Browse</a></li>
+          <li> <a href="{% url 'homepage_search' %}">Search</a></li>
+          <li> <a href="{% url 'homepage_compare' %}">Compare</a></li>
+          <li> <a href="{% url 'homepage_contribute' %}">Contribute</a></li>
+          <li> <a href="{% url 'homepage_stats' %}">Stats</a></li>
+          <li> <a href="{% url 'homepage_links' %}">Links</a></li>
+          <li> <a href="{% url 'homepage_feedback' %}">Feedback</a></li>
+          <li> <a href="{% url 'homepage_cite' %}">Cite</a></li>
+          <li> <a href="{% url 'homepage_acknowledgements' %}">Acknowledgements</a></li>
+        </ul>
+      </div>
+    </div>
+  </div> <!-- /.col-md-3 -->
 
   <div class="col-md-9">
-    <div class="tab-content">
-      <div class="tab-pane active" id="about">
-        {% include "homepage_about.html" %}
+    <div class="panel panel-default">
+      <div class="panel-body">
+        {% block homepage_content %}
+        {% endblock %}
       </div>
+    </div>
+  </div>
 
-      <div class="tab-pane fade" id="browse">
-        {% include "homepage_browse.html" %}
-      </div>
+</div><!-- /.row -->
 
-      <div class="tab-pane fade" id="search">
-        {% include "homepage_search.html" %}
-      </div>
-
-      <div class="tab-pane fade" id="compare">
-        {% include "homepage_compare.html" %}
-      </div>
-
-      <div class="tab-pane fade" id="contribute">
-        {% include "homepage_contribute.html" %}
-      </div>
-
-      <div class="tab-pane active" id="stats">
-        {% include "homepage_stats.html" %}
-      </div>
-
-      <div class="tab-pane fade" id="links">
-        {% include "homepage_links.html" %}
-      </div>
-
-      <div class="tab-pane fade" id="feedback">
-        {% include "homepage_feedback.html" %}
-      </div>
-
-      <div class="tab-pane fade" id="cite">
-        {% include "homepage_cite.html" %}
-      </div>
-
-      <div class="tab-pane fade" id="acknowledgements">
-        {% include "homepage_acknowledgements.html" %}
-      </div>
-    </div><!-- /.tab-content -->
-  </div><!-- /.col-md-9 -->
+{% block js %}
+{{ block.super }}
+<script src="{% static 'homepage.js' %}"></script>
+{% endblock %}
 
 {% endblock %}
+
