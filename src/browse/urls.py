@@ -3,6 +3,8 @@ from django.conf.urls import url
 from . import test_view
 from . import homepage_views
 from . import browse_by_TF
+from . import browse_by_taxonomy
+from . import browse_by_technique
 
 urlpatterns = [
     url(r'^test_view$', test_view.test_view),
@@ -19,10 +21,24 @@ urlpatterns = [
     url(r'^cite$', homepage_views.cite, name='homepage_cite'),
     url(r'^acknowledgements$', homepage_views.acknowledgements,
         name='homepage_acknowledgements'),
-    # brwse by TF
-    url(r'^browse_by_TF$', browse_by_TF.browse_by_TF, name='browse_by_TF'),
+    # browse by TF
+    url(r'^browse_by_TF$', browse_by_TF.browse_TF, name='browse_by_TF'),
     url(r'^get_results_by_TF_family/(?P<object_id>\d+)$',
         browse_by_TF.get_results_by_TF_family),
     url(r'^get_results_by_TF/(?P<object_id>\d+)$',
         browse_by_TF.get_results_by_TF),
+    # browse by taxonomy
+    url(r'^browse_by_taxonomy$', browse_by_taxonomy.browse_taxonomy,
+        name='browse_by_taxonomy'),
+    url(r'^get_results_by_taxonomy/(?P<object_id>\d+)$',
+        browse_by_taxonomy.get_results_by_taxonomy),
+    # browse by experimental technique
+    url(r'^browse_by_technique$', browse_by_technique.browse_technique,
+        name='browse_by_technique'),
+    url(r'get_results_by_technique/(\d+)/$',
+        browse_by_technique.get_results_by_technique),
+    url(r'get_results_by_technique_function/(binding|expression)/$',
+        browse_by_technique.get_results_by_technique_function),
+    url(r'get_results_by_technique_category/(binding|expression)/(\d+)/$',
+        browse_by_technique.get_results_by_technique_category),
 ]

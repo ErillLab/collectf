@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-md-4">
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <ul class="list-unstyled">
+          {% for phylum in taxonomy.phyla %}
+          <li>
+	        <div class="node expandable">
+	          <i class=""></i>
+	          <a href="#" onclick="getMotifReportsByTaxonomy({{ phylum.pk }}); return false;">{{ phylum.name }}</a>
+	        </div>
+	        <ul class="list-unstyled">
+	          {% for class in phylum.children.all %}
+	          <li>
+	            <div class="node expandable">
+	              <i class=""></i>
+	              <a href="#" onclick="getMotifReportsByTaxonomy({{ class.pk }}); return false;">{{ class.name }}</a>
+	            </div>
+	            <ul class="list-unstyled">
+	              {% for order in class.children.all %}
+	              <li>
+		            <div class="node expandable">
+		              <i class=""></i>
+		              <a href="#" onclick="getMotifReportsByTaxonomy({{ order.pk }}); return false;">{{ order.name }}</a>
+		            </div>
+		            <ul class="list-unstyled">
+		              {% for family in order.children.all %}
+		              <li>
+		                <div class="node expandable">
+		                  <i class=""></i>
+		                  <a href="#" onclick="getMotifReportsByTaxonomy({{ family.pk }}); return false;">{{ family.name }}</a>
+		                </div>
+		                <ul class="list-unstyled">
+		                  {% for genus in family.children.all %}
+		                  <li>
+			                <div class="node expandable">
+			                  <i></i>
+			                  <a href="#" onclick="getMotifReportsByTaxonomy({{ genus.pk }}); return false;">{{ genus.name }}</a>
+			                </div>
+			                <ul class="list-unstyled">
+			                  {% for species in genus.children.all %}
+			                  <li>
+			                    <div class="node">
+			                      <i></i>
+			                      <a href="#" onclick="getMotifReportsByTaxonomy({{ species.pk }}); return false;">{{ species.name }}</a>
+			                    </div>
+			                  </li>
+			                  {% endfor %}
+			                </ul>
+		                  </li>
+		                  {% endfor %}
+		                </ul>
+		              </li>
+		              {% endfor %}
+		            </ul>
+	              </li>
+	              {% endfor %}
+	            </ul>
+	          </li>
+	          {% endfor %}
+	        </ul>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div> <!-- /.col-md-3 -->
+
+
+  <div class="col-md-8">
+    <div class="panel panel-default">
+      <div class="panel-body" id="browse">
+        <h1>Browse CollecTF by taxonomy</h1>
+        <p>
+          Browse the database using up-to-date NCBI taxonomy. Just click on each
+          taxonomical unit to expand it and see its associated information, and
+          link out to species-specific reports.
+        </p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+<script src="{% static 'bootstrap_treeview.js' %}"></script>
+<script src="{% static 'browse_tree.js' %}"></script>
+{% endblock %}

@@ -1,8 +1,10 @@
 // Used in left frame of 'Browse by TF/taxonomy/techniques' pages.
 
 
-function get_wiki(name) {
+function getWiki(name) {
     // Given title, returns first paragraph of Wikipedia article.
+    $(document).ajaxStop($.unblockUI); // unblock when ajax activity stops
+    $.blockUI();
     $.ajax({
         url: 'http://en.wikipedia.org/w/api.php',
         data: {
@@ -13,6 +15,7 @@ function get_wiki(name) {
         },
         dataType: 'jsonp',
         success: function (data) {
+            console.log(data);
             var wikiDOM = $("<document>" + data.parse.text['*'] + "</document>");
             var first_p = $(wikiDOM.children('p').get(0));
 
@@ -22,9 +25,8 @@ function get_wiki(name) {
                     .attr('href', 'http://en.wikipedia.org' + $(this).attr('href'))
                     .attr('target', 'wikipedia');
             });
-            var desc = $('#description');
+            var desc = $('#result_info_description');
             desc.text('');
-            desc.append('<h4>' + name + '</h4>');
             desc.append(first_p)
                 .append("<a href='http://en.wikipedia.org/wiki/" +
                         name +
@@ -33,7 +35,10 @@ function get_wiki(name) {
     });
 }
 
+// Performs AJAX call to retrieve list of motif reports by given TF family.
 function getMotifReportsByTFFamily(objectID) {
+    $(document).ajaxStop($.unblockUI); // unblock when ajax activity stops
+    $.blockUI();
     $.ajax({
         type: "GET",
         url: '/browse/get_results_by_TF_family/' + objectID,
@@ -43,7 +48,10 @@ function getMotifReportsByTFFamily(objectID) {
     });
 }
 
+// Performs AJAX call to retrieve list of motif reports by given TF.
 function getMotifReportsByTF(objectID) {
+    $(document).ajaxStop($.unblockUI); // unblock when ajax activity stops
+    $.blockUI();
     $.ajax({
         type: "GET",
         url: "/browse/get_results_by_TF/" + objectID,
@@ -53,6 +61,61 @@ function getMotifReportsByTF(objectID) {
     });
 }
 
+// Retrieves list of motif report links by the given taxonomy ID.
+function getMotifReportsByTaxonomy(objectId) {
+    // retrieve list of reports
+    $(document).ajaxStop($.unblockUI); // unblock when ajax activity stops
+    $.blockUI();
+    $.ajax({
+        type: "GET",
+        url: '/browse/get_results_by_taxonomy/' + objectId,
+        success: function (data) {
+            $("#browse").html(data);
+            getWiki($("#browse h1").text());
+        }
+    });
+}
+
+// Retrieves the list of motif report links by the given category.
+function getMotifReportsByTechniqueCategory(technique_function, objectId) {
+    $(document).ajaxStop($.unblockUI); // unblock when ajax activity stops
+    $.blockUI();
+    $.ajax({
+        type: "GET",
+        url: ('/browse/get_results_by_technique_category/' +
+              technique_function + '/' + objectId),
+        success: function (data) {
+            $("#browse").html(data);
+        }
+    });
+}
+
+// Retrieves the list of motif report links by binding/expression.
+function getMotifReportsByTechniqueFunction(technique_function) {
+    $(document).ajaxStop($.unblockUI); // unblock when ajax activity stops
+    $.blockUI();
+    $.ajax({
+        type: "GET",
+        url: '/browse/get_results_by_technique_function/' + technique_function,
+        success: function (data) {
+            $("#browse").html(data);
+        }
+    });
+}
+
+
+// Retrieves the list of motif report links by the given technique.
+function getMotifReportsByTechnique(objectId) {
+    $(document).ajaxStop($.unblockUI); // unblock when ajax activity stops
+    $.blockUI();
+    $.ajax({
+        type: "GET",
+        url: '/browse/get_results_by_technique/' + objectId,
+        success: function (data) {
+            $("#browse").html(data);
+        }
+    });
+}
 
 $(document).ready(function () {
     "use strict";

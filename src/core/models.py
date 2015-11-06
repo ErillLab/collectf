@@ -335,7 +335,7 @@ class Taxonomy(models.Model):
     name = models.CharField(max_length=100)
 
     # The parent node.
-    parent = models.ForeignKey('self', null=True)
+    parent = models.ForeignKey('self', null=True, related_name='children')
 
     def __unicode__(self):
         """Returns the unicode representation of the taxonomy. object."""
@@ -348,7 +348,7 @@ class Taxonomy(models.Model):
         node_queue.put(self)
         while not node_queue.empty():
             node = node_queue.get()
-            children = node.taxonomy_set.all()
+            children = node.children.all()
             if children:
                 for child in children:
                     node_queue.put(child)

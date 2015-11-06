@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-md-4">
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <ul id="tree" class="list-unstyled">
+	      <!-- binding -->
+	      <li>
+	        <div class="node expandable">
+	          <i class=""></i>
+	          <a href="" onclick="getMotifReportsByTechniqueFunction('binding'); return false;">
+                Detection of Binding
+              </a>
+            </div>
+	        <ul class="list-unstyled">
+              {% for category, techniques in techniques_dict.binding.items %}
+	          <li>
+	            <div class="node expandable">
+		          <i class=""></i>
+		          <a href="" onclick="getMotifReportsByTechniqueCategory('binding', {{ category.category_id }}); return false;">
+                    {{ category.name }}
+                  </a>
+	            </div>
+                
+	            <ul class="list-unstyled">
+		          {% for technique in techniques %}
+		          <li>
+		            <div class="node">
+		              <i class=""></i>
+		              <a href="" onclick="getMotifReportsByTechnique({{ technique.technique_id }}); return false;">
+	                    {{ technique.name }}
+                      </a>
+                    </div>
+		          </li>
+		          {% endfor %}
+	            </ul>
+	          </li>
+	          {% endfor %}
+	        </ul>
+	      </li>
+
+	      <!-- expression -->
+	      <li>
+	        <div class="node expandable">
+	          <i class=""></i>
+	          <a href="" onclick="getMotifReportsByTechniqueFunction('expression'); return false;">Assessment of Expression</a></div>
+	        <ul class="list-unstyled">
+	          {% for category, techniques in techniques_dict.expression.items %}
+	          <li>
+	            <div class="node expandable">
+		          <i class=""></i>
+		          <a href="" onclick="getMotifReportsByTechniqueCategory('expression', {{ category.category_id }} ); return false;">
+                    {{ category.name }}
+                  </a>
+	            </div>
+	            <ul class="list-unstyled">
+		          {% for technique in techniques %}
+		          <li>
+		            <div class="node">
+		              <i class=""></i>
+		              <a href="" onclick="getMotifReportsByTechnique({{ technique.technique_id }}); return false;">
+                        {{ technique.name }}
+                      </a>
+                    </div>
+		          </li>
+		          {% endfor %}
+	            </ul>
+	          </li>
+	          {% endfor %}
+	        </ul>
+	      </li>
+        </ul>
+      </div> <!-- /.panel-body -->
+    </div> <!-- /.panel -->
+  </div> <!-- /.col-md-5 -->
+
+  <div class="col-md-8">
+    <div class="panel panel-default">
+      <div class="panel-body" id="browse">
+        <h1>Browse CollecTF by experimental techniques</h1>
+        <p>
+          Click on different groups of experimental techniques to expand them
+          and see their associated information, and link out to technique.
+        </p>
+      </div>
+    </div>
+  </div>
+</div> <!-- /.row -->
+  
+
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+<script src="{% static 'bootstrap_treeview.js' %}"></script>
+<script src="{% static 'browse_tree.js' %}"></script>
+{% endblock %}
+
