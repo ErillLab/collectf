@@ -19,6 +19,10 @@ urlpatterns = [
     url(r'^cite$', homepage_views.cite, name='homepage_cite'),
     url(r'^acknowledgements$', homepage_views.acknowledgements,
         name='homepage_acknowledgements'),
-    # browse by TF
+    # brwse by TF
     url(r'^browse_by_TF$', browse_by_TF.browse_by_TF, name='browse_by_TF'),
+    url(r'^get_results_by_TF_family/(?P<object_id>\d+)$',
+        browse_by_TF.get_results_by_TF_family),
+    url(r'^get_results_by_TF/(?P<object_id>\d+)$',
+        browse_by_TF.get_results_by_TF),
 ]

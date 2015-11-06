@@ -1,0 +1,26 @@
+<div id="result_info">
+  <h1>{{ title }}</h1>
+  <p>{{ description }}</p>
+</div>
+
+
+<hr>
+
+{% if TF_species_pairs %}
+<table class="table table-striped">
+  <thead>
+    <th>TF</th>
+    <th>Species</th>
+    <th>Motif report</th>
+  </thead>
+  <tbody>
+    {% for TF_species_pair in TF_species_pairs %}
+    <tr>
+      <td>{{ TF_species_pair.1 }}</td>
+      <td>{{ TF_species_pair.3 }}</td>
+      <td><a href="#">view report</a></td>
+    {% endfor %}
+</table>
+{% else %}
+<p>No motifs found.</p>
+{% endif %}

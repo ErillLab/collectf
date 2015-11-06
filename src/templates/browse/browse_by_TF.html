@@ -10,9 +10,9 @@
         <ul id="tree" class="list-unstyled">
           {% for TF_family in TF_families %}
           <li>
-            <div class="node" {% if TF_family.TFs.all %}"expandable"{% endif %}>
+            <div class="node {% if TF_family.TFs.all %}expandable{% endif %}">
               <i class=""></i>
-              <a href="" onclick="getMotifReportsByTFFamily({{ TF_family.TF_family_id }); return false;">
+              <a href="" onclick="getMotifReportsByTFFamily({{ TF_family.TF_family_id }}); return false;">
                 {{ TF_family.name}}
               </a>
             </div>
@@ -32,10 +32,23 @@
           </li>
           {% endfor %}
         </ul> <!-- /#tree -->
-      </div><!-- /.panel-body -->
-    </div><!-- /.col-md-3 -->
+      </div> <!-- /.panel-body -->
+    </div> <!-- /.panel -->
+  </div> <!-- /.col-md-3 -->
+
+  <div class="col-md-9">
+    <div class="panel panel-default">
+      <div class="panel-body" id="browse">
+        <p>
+          Browse the database by transcription factor families. Click on each
+	      family to expand it and see its associated information, and link out to
+	      TF-family or TF-based reports.
+        </p>
+      </div>
+    </div>
   </div>
-</div>
+</div> <!-- /.row -->
+  
 
 {% endblock %}
 

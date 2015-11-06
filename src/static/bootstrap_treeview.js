@@ -1,10 +1,6 @@
 !function ($) {
     "use strict";
-    $("<style type='text/css'> .tree-node{ display:inline-block; width:1em; margin-right:0.5em; text-align: right;cursor: pointer;} </style>").appendTo("head");
-    $("<style type='text/css'> .tree-node-label{ display:inline-block; text-align: left;} </style>").appendTo("head");
-
-    var Node, Root;
-    Node = function (element, options) {
+    var Node = function (element, options) {
         this.element = $(element);
 
         // If the node has a subroot / children
@@ -55,6 +51,8 @@
 
                 inputSpan.prepend(customSpan);
             }
+
+
 
             this.element.prepend(inputSpan);
 
@@ -341,7 +339,7 @@
     $.fn.node.Constructor = Node;
 
 
-    Root = function (element, options) {
+    var Root = function (element, options) {
         this.element = $(element);
 
         this.element.css('list-style', 'none');
