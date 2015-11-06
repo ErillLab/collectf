@@ -1,11 +1,15 @@
 """Functions to fetch information from NCBI via Entrez."""
 
+from urllib.error import HTTPError
+
 from Bio import Entrez
 from Bio import SeqIO
 Entrez.email = 'sefa1@umbc.edu'
 
+
 class EntrezException(Exception):
     pass
+
 
 def get_pubmed(pmid):
     """Retrieves the PubMed publication from NCBI database."""
@@ -15,6 +19,7 @@ def get_pubmed(pmid):
         return record[0]
     except RuntimeError:
         raise EntrezException
+
 
 def get_genome(accession):
     """Retrieves the genome from RefSeq database."""

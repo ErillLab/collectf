@@ -15,7 +15,6 @@ def browse_technique(request):
     for category in categories:
         techniques = models.ExperimentalTechnique.objects.filter(
             categories=category)
-        category_id = category.category_id
         binding_techs = techniques.filter(preset_function='binding')
         if binding_techs:
             techniques_dict['binding'][category] = binding_techs
@@ -24,6 +23,7 @@ def browse_technique(request):
             techniques_dict['expression'][category] = expression_techs
     return render(request, 'browse_by_technique.html',
                   {'techniques_dict': techniques_dict})
+
 
 def get_results_by_technique_function(request, function):
     """Returns motif reports of sites validated by binding or expression."""
@@ -56,6 +56,7 @@ def get_results_by_technique_category(request, category_function, object_id):
                   {'title': category.name,
                    'description': category.description,
                    'TF_species_pairs': TF_species_pairs})
+
 
 def get_results_by_technique(request, object_id):
     """Returns motif reports by experimental technique ID."""

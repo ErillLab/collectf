@@ -6,11 +6,13 @@ from django.shortcuts import get_object_or_404
 from core import models
 from .browse_by_utils import curation_site_instances_values_list
 
+
 def browse_TF(request):
     """Returns the TF treeview for browsing by TF and family."""
     context = {'TF_families': models.TFFamily.objects.all().order_by('name')}
     print context
     return render(request, 'browse_by_TF.html', context)
+
 
 def get_results_by_TF_family(request, object_id):
     """Returns TF-species pairs that have binding sites for a given family."""
@@ -22,6 +24,7 @@ def get_results_by_TF_family(request, object_id):
                   {'title': TF_family.name,
                    'description': TF_family.description,
                    'TF_species_pairs': TF_species_pairs})
+
 
 def get_results_by_TF(request, object_id):
     """Returns TF-species pairs that have binding sites for a given TF."""

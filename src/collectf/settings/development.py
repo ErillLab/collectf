@@ -13,3 +13,9 @@ DATABASES = {
         'PORT': ''
     }
 }
+
+# INSTALLED_APPS += ['debug_toolbar']
+DEBUG_TOOLBAR_PANELS = [
+    'debug_toolbar.panels.sql.SQLPanel',
+    'debug_toolbar.panels.profiling.ProfilingPanel'
+]

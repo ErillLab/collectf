@@ -12,6 +12,7 @@ def browse_taxonomy(request):
     taxonomy = {'phyla': models.Taxonomy.objects.filter(rank='phylum')}
     return render(request, 'browse_by_taxonomy.html', {'taxonomy': taxonomy})
 
+
 def get_results_by_taxonomy(request, object_id):
     """Returns motif reports for a given taxonomy ID."""
     taxon = get_object_or_404(models.Taxonomy, pk=object_id)

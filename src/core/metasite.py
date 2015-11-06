@@ -1,8 +1,7 @@
-from . import models
 
 class MetaSite:
     """MetaSite class definition.
-    
+
     A site could be reported in multiple papers. To avoid redundancy
     (i.e. presenting the same site sequence multiple times, one per paper), the
     Curation_SiteInstance objects are collapsed into one entity called a
@@ -44,7 +43,7 @@ class MetaSite:
 
     def membership_test(self, curation_site_instance):
         """Checks if curation_site_instance can be member of the meta-site.
-        
+
         Based on the type of Curation_SiteInstance object, performs
         motif_associated_overlap_test or non_motif_associated_overlap_test.
         """
@@ -55,7 +54,7 @@ class MetaSite:
                 self.TF_instances_test(curation_site_instance) and
                 self.motif_id_test(curation_site_instance) and
                 self.motif_associated_overlap_test(curation_site_instance))
-        elif cur_site_inst.site_type == 'non_motif_associated':
+        elif curation_site_instance.site_type == 'non_motif_associated':
             return (
                 self.genome_test(curation_site_instance) and
                 self.TF_instances_test(curation_site_instance) and
@@ -78,7 +77,7 @@ class MetaSite:
 
     def motif_associated_overlap_test(self, curation_site_instance):
         """Checks if the meta-site and the Curation_SiteInstance overlaps.
-        
+
         Includes the new Curation_SiteInstance into this meta-site if the
         overlap between new site and the delegate site is more than 75%.
         """
@@ -108,7 +107,7 @@ class MetaSite:
                 self.delegate.site_instance.end)
         return (min(loca[0], loca[1]) <= min(locb[0], locb[1]) and
                 max(loca[0], loca[1]) >= max(locb[0], locb[1]))
-    
+
 
 def create_meta_sites(curation_site_instances):
     """Creates meta sites from given Curation_SiteInstance objects.
