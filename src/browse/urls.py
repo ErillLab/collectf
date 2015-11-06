@@ -5,6 +5,7 @@ from . import homepage_views
 
 urlpatterns = [
     url(r'^test_view$', test_view.test_view),
+    url(r'^home$', homepage_views.home, name='homepage_home'),
     url(r'^about$', homepage_views.about, name='homepage_about'),
     url(r'^browse$', homepage_views.browse, name='homepage_browse'),
     url(r'^search$', homepage_views.search, name='homepage_search'),

@@ -1,5 +1,9 @@
 from django.shortcuts import render
 
+def home(request):
+    """CollecTF homepage."""
+    return render(request, 'homepage_home.html')
+
 def about(request):
     """Returns the 'about' page."""
     return render(request, 'homepage_about.html')
