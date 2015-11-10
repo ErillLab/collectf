@@ -9,41 +9,16 @@ from django.shortcuts import get_list_or_404
 from django.shortcuts import render
 
 from core import models
-from . import motif_report
-
-
-def group_curation_site_instances(curation_site_instances):
-    """Groups Curation_SiteInstance objects by TF-instance and genome."""
-    TF_genome_pairs = curation_site_instances.filter(
-        site_type='motif_associated').values_list(
-        'site_instance__genome', 'curation__TF_instances').distinct()
-    return [curation_site_instances.filter(site_instance__genome=genome,
-                                           curation__TF_instances=TF_instances)
-            for genome, TF_instances in TF_genome_pairs]
+from .motif_report import build_motif_reports, build_ensemble_report
 
 
 def render_motif_report(request, curation_site_instances):
     """Renders the motif report page."""
     motif_reports = build_motif_reports(curation_site_instances)
     for motif_report in motif_reports:
-        motif_report.meta_sites[0].techniques
+        motif_report.meta_sites[0].curation_site_instances
     return render(request, 'view_motif_reports.html',
                   {'motif_reports': motif_reports})
-
-
-def build_motif_reports(curation_site_instances):
-    """Given a list of Curation_SiteInstance objects, returns MotifReports."""
-    curation_site_instance_grps = group_curation_site_instances(
-        curation_site_instances)
-    for grp in curation_site_instance_grps:
-        print len(grp)
-    return [motif_report.MotifReport(curation_site_instance_grp)
-            for curation_site_instance_grp in curation_site_instance_grps]
-
-
-def build_ensemble_report(curation_site_instances):
-    """Given Curation_SiteInstance objects, returns the EnsembleMotifReport."""
-    return motif_report.EnsembleMotifReport(curation_site_instances)
 
 
 def view_reports_by_TF_and_species(request, TF_id, species_id):
@@ -103,4 +78,13 @@ def view_reports_by_taxonomy(request, object_id):
     taxonomy = get_object_or_404(models.Taxonomy, pk=object_id)
     curation_site_instances = models.Curation_SiteInstance.objects.filter(
         site_instance__genome__taxonomy__in=taxonomy.get_all_species())
+    return render_motif_report(request, curation_site_instances)
+
+
+def view_reports_by_curation_site_instance_ids(request):
+    """Returns motif reports from given Curation_SiteInstance object IDs."""
+    curation_site_instance_ids = [
+        x.strip() for x in request.POST['curation_site_instance_list'].split()]
+    curation_site_instances = models.Curation_SiteInstance.objects.filter(
+        pk__in=curation_site_instance_ids)
     return render_motif_report(request, curation_site_instances)

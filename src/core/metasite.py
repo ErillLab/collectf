@@ -12,6 +12,7 @@ from django.utils.safestring import mark_safe
 
 import models
 
+
 class MetaSite:
     """MetaSite class definition.
 
@@ -122,8 +123,7 @@ class MetaSite:
                  fragments=1,
                  start=min(map(lambda r: r.gene.start, regulations)) - 150,
                  end=max(map(lambda r: r.gene.end, regulations)) + 150,
-        pagesize = (2*cm, 12*cm))
-        print id(self)
+                 pagesize=(2*cm, 12*cm))
         return mark_safe(gdd.write_to_string('svg'))
 
     @property
@@ -148,7 +148,6 @@ class MetaSite:
         """Returns curations reporting this meta-site."""
         return [curation_site_instance.curation.curation_id
                 for curation_site_instance in self.curation_site_instances]
-
 
     def add(self, curation_site_instance):
         """Adds the given Curation_SiteInstance object to the meta-site."""

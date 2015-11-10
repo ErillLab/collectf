@@ -52,13 +52,19 @@
             <li><a href="#">Link</a></li>
           </ul>
         </div>
-        
+
       </div><!-- /.container-default -->
     </nav>
 
     <div class="container">
-    {% block content %}
-    {% endblock %}
+      {% for message in messages %}
+      <div class="alert alert-block alert-{{message.tags}}">
+        <button type="button" class="close" data-dismiss="alert">x</button>
+        {{ message }}
+      </div>
+      {% endfor %}
+      {% block content %}
+      {% endblock %}
     </div>
 
     {% block js %}
@@ -68,7 +74,8 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
     <!-- BlockUI - http://jquery.malsup.com/block/ -->
     <script src="{% static 'jquery.blockUI.js' %}"></script>
-    
+    <!-- CollecTF custom js. -->
+    <script src="{% static 'collectf.js' %}"></script>
     {% endblock %}
   </body>
 </html>

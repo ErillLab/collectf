@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<p class="lead">
+  Search results can be seen as individual reports (one report per
+  TF/species) or as ensemble reports (multiple TF/species).
+</p>
+
+<div id="report_table" class="boxed">
+  {% if motif_reports %}
+  {# 'View all' link #}
+  <p>
+    <a class="block_before_load" href="#"  onclick="$('#view_all').submit(); return false;">
+      Combined report
+    </a>
+  </p>
+  <form style="display:inline;" method="post"
+        action="{% url 'view_reports_by_id' %}" target="_blank" id="view_all"
+        target="_blank">
+    {% comment %}
+    Hidden input listing all motif-associated-curation-site-instance and
+    non-motif-associated curation-site-instance-ids
+    {% endcomment %}
+    {% csrf_token %}
+    <input type="hidden" name="curation_site_instance_list"
+           value="{% for meta_site in ensemble_report.meta_sites %}
+                  {% for curation_site_instance in meta_site.curation_site_instances %}
+                  {{ curation_site_instance.pk }}
+                  {% endfor %}
+                  {% endfor %}">
+  </form>
+
+  <table class="table table-condensed table-striped">
+    <thead>
+      <th>TF</th>
+      <th>Species</th>
+      <th>Report</th>
+    </thead>
+    <tbody>
+      {% for motif_report in motif_reports %}
+      <tr>
+        <td>{{ motif_report.TF_name }}</td>
+        <td>{{ motif_report.species_name }}</td>
+        <td>
+	      <a class="" href="#" onclick="$('#{{ motif_report.id }}').submit(); return false;">
+            view
+          </a>
+	      <form style="display:inline;" method="post"
+                action="{% url 'view_reports_by_id' %}" id="{{ motif_report.id }}" target="_blank">
+            {% csrf_token %}
+	        <input type="hidden" name="curation_site_instance_list"
+                   value="{% for meta_site in motif_report.meta_sites %}
+                          {% for curation_site_instance in meta_site.curation_site_instances %}
+                          {{ curation_site_instance.pk }}
+                          {% endfor %}
+                          {% endfor %}">
+	      </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% else %}
+  <p class="lead">No record was found.</p>
+  {% endif %}
+</div>
+
+
+{% endblock %}

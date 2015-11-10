@@ -51,6 +51,6 @@ def cite(request):
     return render(request, 'homepage_cite.html')
 
 
-def acknowledgements(request):
-    """Returns the 'acknowledgements' page."""
-    return render(request, 'homepage_acknowledgements.html')
+def acknowledgments(request):
+    """Returns the 'acknowledgments' page."""
+    return render(request, 'homepage_acknowledgments.html')

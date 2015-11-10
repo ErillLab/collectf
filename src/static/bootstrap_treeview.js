@@ -1,5 +1,7 @@
 !function ($) {
     "use strict";
+    $("<style type='text/css'> .tree-node{ display:inline-block; width:1em; margin-right:0.5em; text-align: right;cursor: pointer;} </style>").appendTo("head");
+    $("<style type='text/css'> .tree-node-label{ display:inline-block; text-align: left;} </style>").appendTo("head");
     var Node = function (element, options) {
         this.element = $(element);
 

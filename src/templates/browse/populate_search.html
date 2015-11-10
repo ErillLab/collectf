@@ -1,0 +1,168 @@
+<script type="text/javascript">
+
+var tf_data = {
+    'child': [
+	    {% for TF_family in TF_families %}
+	    {	
+            'text': '{{ TF_family.name }}',
+	        'child': [
+		        {% for TF in TF_family.TFs.all %}
+		        {
+		            'text': '{{ TF.name }}',
+                    'value': '{{ TF.TF_id }}'
+		        }{% if not forloop.end %},{% endif %}
+		        {% endfor %}
+	        ]
+	    }{% if not forloop.last %},{% endif %}
+	    {% endfor %}
+    ]
+};
+
+var species_data = {
+    'child': [
+	    {% for phylum in phyla %}
+	    {
+	        'text': '{{ phylum.name }}',
+            'value': '{{ phylum.pk }}',
+	        'child': [
+		        {% for class_ in phylum.children.all %}
+		        {
+		            'text': '{{ class_.name }}',
+                    'value': '{{ class_.pk }}',
+		            'child': [
+			            {% for order in class_.children.all %}
+			            {
+			                'text': '{{ order.name }}',
+                            'value': '{{ order.pk }}',
+			                'child': [
+				                {% for family in order.children.all %}
+				                {
+				                    'text': '{{ family.name }}',
+                                    'value': '{{ family.pk }}',
+				                    'child': [
+					                    {% for genus in family.children.all %}
+					                    {
+					                        'text': '{{ genus.name }}',
+                                            'value': '{{ genus.pk }}',
+					                        'child': [
+						                        {% for species in genus.children.all %}
+						                        {
+						                            'text': '{{ species.name }}',
+						                            'value': '{{ species.pk }}'
+						                        }{% if not forloop.last %},{% endif %}
+                                                {% endfor %}
+					                        ]
+					                    }{% if not forloop.last %},{% endif %}
+					                    {% endfor %}
+				                    ]
+				                }{% if not forloop.last %},{% endif %}
+				                {% endfor %}
+			                ]
+			            }{% if not forloop.last %},{% endif %}
+			            {% endfor %}
+		            ]
+		        }{% if not forloop.last %},{% endif %}
+		        {% endfor %}
+	        ]
+	    }{% if not forloop.last %},{% endif %}
+	    {% endfor %}
+    ]
+};
+
+var binding_techniques = {
+    'child': [
+	    {% for subcategory,techniques in all_techniques.binding.items %}
+	    {
+	        'text': '{{ subcategory }}',
+	        'child': [
+		        {% for technique in techniques %}
+		        {
+		            'text': '{{ technique.name}}',
+		            'value': '{{ technique.technique_id }}'
+		        }{% if not forloop.last %},{% endif %}
+		        {% endfor %}
+	        ]
+	    }{% if not forloop.last %},{% endif %}
+	    {% endfor %}
+    ]
+};
+
+var expression_techniques = {
+    'child': [
+	    {% for subcategory,techniques in all_techniques.expression.items %}
+	    {
+	        'text': '{{ subcategory }}',
+	        'child': [
+		        {% for technique in techniques %}
+		        {
+		            'text': '{{ technique.name}}',
+		            'value': '{{ technique.technique_id }}'
+		        }{% if not forloop.last %},{% endif %}
+		        {% endfor %}
+	        ]
+	    }{% if not forloop.last %},{% endif %}
+	    {% endfor %}
+    ]
+};
+
+var insilico_techniques = {
+    'child': [
+	    {% for subcategory,techniques in all_techniques.insilico.items %}
+	    {
+	        'text': '{{ subcategory }}',
+	        'child': [
+		        {% for technique in techniques %}
+		        {
+		            'text': '{{ technique.name}}',
+		            'value': '{{ technique.technique_id }}'
+		        }{% if not forloop.last %},{% endif %}
+		        {% endfor %}
+	        ]
+	    }{% if not forloop.last %},{% endif %}
+	    {% endfor %}
+    ]
+};
+
+$('#tf_tree').tree({
+    values: tf_data,
+    type: 'checkbox',
+    input: {name: 'tf_input'},
+    toggleLI: true
+});
+
+$('#tf_tree').tree('collapseAll');
+
+$('#species_tree').tree({
+    values: species_data,
+    type: 'checkbox',
+    input: {name: 'species_input'},
+    toggleLI: true
+});
+
+$('#species_tree').tree('collapseAll');
+
+$('.binding').tree({
+    values: binding_techniques,
+    type: 'checkbox',
+    toggleLI: true
+});
+
+$('.binding').tree('collapseAll');
+
+$('.expression').tree({
+    values: expression_techniques,
+    type: 'checkbox',
+    toggleLI: true
+});
+
+$('.expression').tree('collapseAll');
+
+$('.insilico').tree({
+    values: insilico_techniques,
+    type: 'checkbox',
+    toggleLI: true
+});
+$('.insilico').tree('collapseAll');
+
+
+</script>

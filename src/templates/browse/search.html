@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Search binding motifs in CollecTF</h1>
+
+<p class="lead">
+  Search in CollecTF is fully customizable. Just select a taxonomic unit (e.g. the Vibrio genus), a
+  transcription factor family or instance (e.g. LexA) and the set of experimental techniques that
+  reported sites should be backed by and click Search.
+</p>
+
+<form class="form" role="form" id="search_form" method="POST"
+      action="{% url 'browse.search.search' %}">{% csrf_token %}
+  {% include "search_form_fields.html" %}
+  <input type="submit"  class="btn btn-primary btn-block" value="Search" />
+</form>
+
+{% endblock %}
+
+{% load staticfiles %}
+{% block js %}
+{{ block.super }}
+<script src="{% static 'bootstrap_treeview.js' %}"></script>
+{% include "populate_search.html" %}
+<script src="{% static 'search.js' %}"></script>
+{% endblock %}

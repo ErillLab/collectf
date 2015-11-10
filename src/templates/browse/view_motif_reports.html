@@ -115,7 +115,7 @@
                   {% with TF_instances=meta_site.TF_instances.all %}
                   <td class="TF_col">
                     {% for TF_instance in TF_instances %}
-                    <a href="http://uniprot.org/uniprot/{{ TF_acc }}" target="_blank">
+                    <a href="http://uniprot.org/uniprot/{{ TF_instance.uniprot_accession }}" target="_blank">
                       <span class="fixed-width">{{ TF_instance.uniprot_accession }}</span>
                     </a>{% if not forloop.last %}, {% endif %}
                     {% endfor %}
@@ -128,7 +128,7 @@
 
                   <td class="techniques_col">
 		            {% for technique in meta_site.techniques %}
-                    {% include "experimental_technique.html" %}                    
+                    {% include "experimental_technique.html" %}
                     {% if not forloop.last %} - {% endif %}
 		            {% endfor %}
 		          </td>
