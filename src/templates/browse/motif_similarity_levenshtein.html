@@ -1,0 +1,30 @@
+<div class="accordion" id="levenshtein_accordion">
+  <div class="accordion-heading">
+    <a href="#levenshtein_collapse" data-toggle="collapse" data-parent="levenshtein_accordion">
+      <span class="pull-right"><small>[expand/collapse]</small></span></a>
+
+    <p>In addition to motif-based similarity/distance measures
+      (i.e. Kullback-Leibler Divergence, Pearson Correlation Coefficient), two
+      motifs can be compared by measuring the similarity/distance between all
+      pairs of sites from the two motifs. CollecTF uses Levenshtein distance
+      (also known as "edit distance") to measure the distance between two sites.
+    </p>
+  </div>
+
+  <div id="levenshtein_collapse" class="accordion-body collapse">
+    Given two strings (two TF binding sites), the Levenshtein distance is
+    defined as the minimum number of character edits (insertion, deletion and
+    substitution) required to change one string into the other.
+
+    The following plots show the Levenshtein distance distribution of all pairs
+    of sites, one from the first motif and one from the second one.
+  </div>
+</div>
+
+<div>
+  <img src="{{ boxplot }}" />
+</div>
+
+<div>
+  <img src="{{ histogram }}" />
+</div>

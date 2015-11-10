@@ -6,7 +6,8 @@ from . import browse_by_TF
 from . import browse_by_taxonomy
 from . import browse_by_technique
 from . import view_motif_reports
-from . import search
+from . import search_motifs
+from . import compare_motifs
 
 urlpatterns = [
     url(r'^test_view$', test_view.test_view),
@@ -98,6 +99,16 @@ urlpatterns = [
         name='view_reports_by_id'),
 
     # Search
-    url(r'^search_motifs/$', search.search),
+    url(r'^search_motifs/$', search_motifs.search),
 
+    # Motif comparison
+    url(r'^compare_motifs/$',
+        compare_motifs.motif_comparison_search_first_motif,
+        name='motif_comparison_first_step'),
+    url(r'^compare_motifs/2/$',
+        compare_motifs.motif_comparison_search_second_motif,
+        name='motif_comparison_second_step'),
+    url(r'^motif_similarity_measure/$',
+        compare_motifs.motif_similarity_measure,
+        name='motif_similarity_measure'),
 ]

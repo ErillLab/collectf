@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>{{ form_title }}</h1>
+<p class="lead">{{ form_description }}</p>
+
+<div class="">
+<form class="form" method="POST">{% csrf_token %}
+  {% include "search_form_fields.html" %}
+  <input type="submit"  class="btn btn-primary btn-block" value="Next step" />
+</form>
+</div>
+
+{% endblock %}
+
+
+{% load staticfiles %}
+{% block js %}
+{{ block.super }}
+<script src="{% static 'bootstrap_treeview.js' %}"></script>
+{% include "populate_search.html" %}
+<script src="{% static 'search.js' %}"></script>
+{% endblock %}

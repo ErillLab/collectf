@@ -10,6 +10,7 @@ from django.shortcuts import render
 from core import models
 from .motif_report import build_motif_reports, build_ensemble_report
 
+
 def search(request):
     """Handler for search view.
 

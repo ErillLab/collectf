@@ -116,3 +116,6 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
     os.path.join(BASE_DIR, 'static', 'browse'),
 )
+
+# https://docs.djangoproject.com/en/1.9/topics/http/sessions/#session-serialization
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
