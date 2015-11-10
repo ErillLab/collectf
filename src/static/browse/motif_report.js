@@ -5,12 +5,12 @@ function hideCol(colClass) {
     $('table .'+colClass).each(function() {
         $(this).toggle();
     });
-    $('ul#hiddenCols').append(
-        '<li id="' + colClass +
-		'"><a href="javascript:;" onclick="showCol(\'' +
-	    colClass + '\');">Show ' +
-        colClass.substr(0, colClass.length-4) +
-        ' column</a></li>');
+    var li = ('<li id="' + colClass +
+              '"><a href="javascript:;" onclick="showCol(\'' +
+	          colClass + '\');">Show ' +
+              colClass.substr(0, colClass.length-4) +
+              ' column</a></li>');
+    $('ul#hiddenCols').append(li);
 }
 
 function showCol(columnClass){
