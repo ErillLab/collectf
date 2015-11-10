@@ -1,7 +1,187 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 
 {% block content %}
 
-{{ csi }}
+{% if motif_reports %}
 
+<div>
+  <ul class="nav nav-pills">
+    <li class="active"><a href="#split_view" data-toggle="tab">Split view</a></li>
+    <li><a href="#ensemble_view" data-toggle="tab">Ensemble view</a></li>
+    <li><a href="#export" data-toggle="tab">Export data</a></li>
+  </ul>
+</div>
+
+<p></p>
+
+<div class="tab-content">
+    <div class="tab-pane active" id="split_view">
+      {% for motif_report in motif_reports %}
+      <div class="box">
+        <h3>{{ motif_report.TF_name }}
+          - {% for accession in motif_report.TF_accessions %}
+          <a href="http://uniprot.org/uniprot/{{accession}}" target="_blank"><span class="fixed-width">
+              UniProtKB: {{ accession }}</span>{% if not forloop.last %},{% endif %}
+          </a>
+          {% endfor %}
+          binding site collection of <i>{{ motif_report.species_name }}</i>
+        </h3>
+
+        <ul class="nav nav-tabs" id="split_view_sites_tab">
+	      <li>
+            <a href="#{{motif_report.id}}_sites" data-toggle="tab">Binding sites</a>
+          </li>
+	      <li>
+            <a href="#{{motif_report.id}}_aligned_sites" data-toggle="tab">Aligned binding sites</a>
+          </li>
+	      <li class="active">
+            <a href="#{{motif_report.id}}_weblogo" data-toggle="tab">Sequence logo</a>
+          </li>
+	      <li>
+            <a href="#{{motif_report.id}}_detail" data-toggle="tab">Detailed view</a>
+          </li>
+        </ul> <!-- /#split_view_sites -->
+
+        <div class="tab-content">
+          <br/>
+          <div class="tab-pane" id="{{ motif_report.id }}_sites">
+            <p>Sites are listed as curated.</p>
+
+            <div class="sequence box shaded-background">
+              {% for meta_site in motif_report.meta_sites %}
+              {{ meta_site.delegate_sequence }}<br/>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="tab-pane" id="{{ motif_report.id }}_aligned_sites">
+            <p>Sites are listed after the alignment process. For alignment of
+	          variable-length binding
+	          sites, <a href="http://www.biomedcentral.com/1471-2105/14/108/"
+	          target="_blank">LASAGNA</a> is used.
+	        </p>
+            <div class="sequence box shaded-background">
+            {% for seq in motif_report.aligned_sites %}
+            {{ seq }}<br/>
+            {% endfor %}
+            </div>
+          </div>
+
+          <div class="tab-pane active" id="{{motif_report.id}}_weblogo">
+	        <p>To generate the weblogo, aligned binding sites are used.</p>
+            <img src="{{ motif_report.weblogo }}">
+          </div>
+
+
+          <div class="tab-pane" id="{{ motif_report.id }}_detail">
+            <p>For the selected transcription factor and species, the list of curated binding sites
+	          in the database are displayed below. The binding site is displayed as red bar. Genes
+	          that are reported to be regulated by TF are colored with green.
+            </p>
+
+            <ul id="hiddenCols"></ul>
+            <table class="table table-bordered table-striped">
+	          <thead>
+                <tr>
+		          <th class="genome_col">
+                    Genome [<a href="#" class="" onclick="hideCol('genome_col');">x</a>]
+                  </th>
+		          <th class="TF_col">
+                    TF [<a href="#" class="" onclick="hideCol('TF_col');">x</a>]
+                  </th>
+		          <th>Site sequence</th>
+		          <th class="techniques_col">
+                    Experimental techniques [<a href="#" onclick="hideCol('techniques_col');">x</a>]
+                  </th>
+		          <th class="regulation_col">
+                    Gene regulation [<a href="" id="regulation_diagram_switch"><small>Toggle
+                    diagrams</small></a>][<a href="#" onclick="hideCol('regulation_col');">x</a>]</th>
+		          <th>Curations</th>
+		        </tr>
+	          </thead>
+
+              <tbody>
+                {% for meta_site in motif_report.meta_sites %}
+                <tr>
+                  {% with genome_acc=meta_site.genome.genome_accession %}
+                  <td class="genome_col">
+                    <a href="http://www.ncbi.nlm.nih.gov/nuccore/?term={{ genome_acc }}" target="_blank">
+                      <span class="fixed-width">{{ genome_acc }}</span>
+                    </a>
+                  </td>
+                  {% endwith %}
+
+                  {% with TF_instances=meta_site.TF_instances.all %}
+                  <td class="TF_col">
+                    {% for TF_instance in TF_instances %}
+                    <a href="http://uniprot.org/uniprot/{{ TF_acc }}" target="_blank">
+                      <span class="fixed-width">{{ TF_instance.uniprot_accession }}</span>
+                    </a>{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                  </td>
+                  {% endwith %}
+
+                  <td>
+                    <span class="sequence">{{ meta_site.delegate_sequence }}</span>
+                  </td>
+
+                  <td class="techniques_col">
+		            {% for technique in meta_site.techniques %}
+                    {% include "experimental_technique.html" %}                    
+                    {% if not forloop.last %} - {% endif %}
+		            {% endfor %}
+		          </td>
+
+                  <td class="regulation_col">
+                    {% for regulation in meta_site.regulations %}
+                    <a href="http://www.ncbi.nlm.nih.gov/gene/{{ reg.gene.gene_accession }}" target="_blank">
+		              <span class="fixed-width">
+                        {% with gene_name=regulation.gene.name locus_tag=regulation.gene.locus_tag %}
+			            {{ gene_name }} {% if gene_name != locus_tag %} ({{locus_tag }}) {% endif %}
+                        {% endwith %}
+                      </span>
+                    </a>{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                    <div class="regulation_diagram">
+                      {{ meta_site.regulation_diagram }}
+		            </div>
+                  </td>
+
+                  <td>
+                    {% for curation_id in meta_site.curation_ids %}
+		            <span class="fixed-width">
+		              <a href="#" target="_blank">
+                        {{curation_id}}
+                      </a>{% if not forloop.last %}, {% endif %}
+		            </span>
+		            {% endfor %}
+                  </td>
+
+                  {% endfor %} {# for meta_site in motif_report.meta_sites #}
+              </tbody>
+            </table>
+          </div><!-- /#{{ motif_report.id }}_detail -->
+
+        </div> <!-- /.tab-content -->
+
+      </div>
+      {% endfor %} {# motif_reports #}
+    </div> <!-- /#split_view -->
+
+    <div class="tab-pane" id="ensemble_view">
+    </div> <!-- /#ensemble_view -->
+
+    <div class="tab-pane" id="export">
+    </div> <!-- /#export -->
+</div> <!-- /.tab-content -->
+
+{% else %}
+<p>No results found.</p>
+{% endif %} {# motif_reports #}
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+<script src="{% static 'motif_report.js' %}"></script>
 {% endblock %}

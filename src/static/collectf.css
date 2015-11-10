@@ -1,4 +1,20 @@
 
+.box {
+  position: relative;
+  padding: 20px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+}
 
+.sequence {
+    font-family: Monaco, monospace, Courier;
+}
 
+.shaded-background {
+    background-color: #eee;
+}
 
+* {
+    border-radius: 0px !important;
+}

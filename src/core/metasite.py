@@ -1,3 +1,16 @@
+"""Metasite class definition."""
+
+# TODO(sefa): Use cached_property wherever possible
+
+from Bio.SeqFeature import SeqFeature
+from Bio.SeqFeature import FeatureLocation
+from Bio.Graphics import GenomeDiagram
+from reportlab.lib import colors
+from reportlab.lib.units import cm
+
+from django.utils.safestring import mark_safe
+
+import models
 
 class MetaSite:
     """MetaSite class definition.
@@ -18,6 +31,16 @@ class MetaSite:
         return self.curation_site_instances[0]
 
     @property
+    def delegate_site_instance(self):
+        """Returns the delegate SiteInstance object."""
+        return self.curation_site_instances[0].site_instance
+
+    @property
+    def delegate_sequence(self):
+        """Returns the delegate Curation_SiteInstance object."""
+        return self.curation_site_instances[0].site_instance._seq
+
+    @property
     def genome(self):
         """Returns the Genome object of the meta-site."""
         return self.delegate.site_instance.genome
@@ -26,6 +49,82 @@ class MetaSite:
     def TF_instances(self):
         """Returns the TF instances of the meta-site."""
         return self.delegate.curation.TF_instances
+
+    @property
+    def techniques(self):
+        """Returns experimental techniques for all Curation_SiteInstances."""
+        technique_ids = set(
+            technique.technique_id
+            for curation_site_instance in self.curation_site_instances
+            for technique in curation_site_instance.experimental_techniques.all())
+        return models.ExperimentalTechnique.objects.filter(
+            technique_id__in=technique_ids)
+
+    @property
+    def regulations(self):
+        """Returns the regulations of the meta-site."""
+        regulations = models.Regulation.objects.filter(
+            curation_site_instance__in=self.curation_site_instances)
+        exp_verified_regulations = regulations.filter(
+            evidence_type='exp_verified')
+        exp_verified_genes = exp_verified_regulations.values_list(
+            'gene', flat=True)
+        inferred_regulations = regulations.filter(evidence_type='inferred')
+        inferred_genes = inferred_regulations.values_list('gene', flat=True)
+        meta_site_regulations = (
+            [regulation
+             for i, (gene, regulation) in
+             enumerate(zip(exp_verified_genes, exp_verified_regulations))
+             if gene not in exp_verified_genes[:i]] +
+            [regulation
+             for i, (gene, regulation)
+             in enumerate(zip(inferred_genes, inferred_regulations))
+             if gene not in exp_verified_genes and
+             gene not in inferred_genes[:i]])
+        return meta_site_regulations
+
+    @property
+    def regulation_diagram(self):
+        """Draws the regulation diagram of the given regulation."""
+        gdd = GenomeDiagram.Diagram('Regulation Diagram')
+        gdt_features = gdd.new_track(1, greytrack=False)
+        gds_features = gdt_features.new_set()
+        regulations = self.regulations
+        # Draw genes.
+        for regulation in regulations:
+            feature = SeqFeature(
+                FeatureLocation(regulation.gene.start, regulation.gene.end),
+                strand=regulation.gene.strand)
+            gds_features.add_feature(
+                feature,
+                name=regulation.gene.name,
+                label=True,
+                label_size=10,
+                label_angle=0 if regulation.gene.strand == 1 else 180,
+                label_position='middle',
+                sigil="ARROW",
+                arrowshaft_height=1.0,
+                color=(colors.green
+                       if regulation.evidence_type == 'exp_verified'
+                       else colors.grey))
+
+        # Draw binding site
+        site_instance = regulations[0].curation_site_instance.site_instance
+        feature = SeqFeature(
+            FeatureLocation(site_instance.start, site_instance.end),
+            strand=site_instance.strand)
+        gds_features.add_feature(feature,
+                                 color=colors.red,
+                                 name='site',
+                                 label=False,
+                                 label_size=12)
+        gdd.draw(format='linear',
+                 fragments=1,
+                 start=min(map(lambda r: r.gene.start, regulations)) - 150,
+                 end=max(map(lambda r: r.gene.end, regulations)) + 150,
+        pagesize = (2*cm, 12*cm))
+        print id(self)
+        return mark_safe(gdd.write_to_string('svg'))
 
     @property
     def motif_id(self):
@@ -37,6 +136,20 @@ class MetaSite:
         """
         return self.delegate.motif_id
 
+    @property
+    def site_type(self):
+        """Returns the site type of the meta-site.
+        The site type is the site type of the delegate site.
+        """
+        return self.delegate.site_type
+
+    @property
+    def curation_ids(self):
+        """Returns curations reporting this meta-site."""
+        return [curation_site_instance.curation.curation_id
+                for curation_site_instance in self.curation_site_instances]
+
+
     def add(self, curation_site_instance):
         """Adds the given Curation_SiteInstance object to the meta-site."""
         self.curation_site_instances.append(curation_site_instance)
@@ -47,6 +160,7 @@ class MetaSite:
         Based on the type of Curation_SiteInstance object, performs
         motif_associated_overlap_test or non_motif_associated_overlap_test.
         """
+        return False
         if curation_site_instance.site_type in ['motif_associated',
                                                 'var_motif_associated']:
             return (
@@ -64,8 +178,7 @@ class MetaSite:
 
     def TF_instances_test(self, curation_site_instance):
         """True if the curation_site_instance and has the same TF-instances."""
-        return (self.TF_instances ==
-                curation_site_instance.curation.TF_instances)
+        return (self.TF_instances == curation_site_instance.curation.TF_instances)
 
     def genome_test(self, curation_site_instance):
         """Checks if the curation_site_instance the same genome."""
@@ -151,5 +264,4 @@ def create_meta_sites(curation_site_instances):
             # None of the existing meta-sites are good. In the case of
             # non-motif-associated sites, DO NOT do anything.
             pass
-
     return meta_sites

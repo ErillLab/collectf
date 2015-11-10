@@ -5,30 +5,26 @@
 
 <div class="row">
   <div class="col-md-3">
-    <div class="panel panel-default">
-      <div class="panel-body">
-        <ul class="nav nav-pills nav-stacked">
-          <li> <a href="{% url 'homepage_about' %}">About</a></li>
-          <li> <a href="{% url 'homepage_browse' %}">Browse</a></li>
-          <li> <a href="{% url 'homepage_search' %}">Search</a></li>
-          <li> <a href="{% url 'homepage_compare' %}">Compare</a></li>
-          <li> <a href="{% url 'homepage_contribute' %}">Contribute</a></li>
-          <li> <a href="{% url 'homepage_stats' %}">Stats</a></li>
-          <li> <a href="{% url 'homepage_links' %}">Links</a></li>
-          <li> <a href="{% url 'homepage_feedback' %}">Feedback</a></li>
-          <li> <a href="{% url 'homepage_cite' %}">Cite</a></li>
-          <li> <a href="{% url 'homepage_acknowledgements' %}">Acknowledgements</a></li>
-        </ul>
-      </div>
+    <div class="box">
+      <ul class="nav nav-pills nav-stacked">
+        <li> <a href="{% url 'homepage_about' %}">About</a></li>
+        <li> <a href="{% url 'homepage_browse' %}">Browse</a></li>
+        <li> <a href="{% url 'homepage_search' %}">Search</a></li>
+        <li> <a href="{% url 'homepage_compare' %}">Compare</a></li>
+        <li> <a href="{% url 'homepage_contribute' %}">Contribute</a></li>
+        <li> <a href="{% url 'homepage_stats' %}">Stats</a></li>
+        <li> <a href="{% url 'homepage_links' %}">Links</a></li>
+        <li> <a href="{% url 'homepage_feedback' %}">Feedback</a></li>
+        <li> <a href="{% url 'homepage_cite' %}">Cite</a></li>
+        <li> <a href="{% url 'homepage_acknowledgements' %}">Acknowledgements</a></li>
+      </ul>
     </div>
   </div> <!-- /.col-md-3 -->
 
   <div class="col-md-9">
-    <div class="panel panel-default">
-      <div class="panel-body">
-        {% block homepage_content %}
-        {% endblock %}
-      </div>
+    <div class="box">
+      {% block homepage_content %}
+      {% endblock %}
     </div>
   </div>
 
@@ -40,4 +36,3 @@
 {% endblock %}
 
 {% endblock %}
-

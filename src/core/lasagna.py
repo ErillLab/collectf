@@ -25,9 +25,8 @@ def lasagna(site_instances):
 
 def fill_gaps(site_instance, aligned_site, aligned_strand):
     """Fills the gaps in the LASAGNA alignment."""
-    genome_seq = site_instance.get_genome_sequence()
-    original_seq = (site_instance.seq if aligned_strand == '+'
-                    else reverse_complement(site_instance.seq))
+    original_seq = (site_instance.sequence if aligned_strand == '+'
+                    else reverse_complement(site_instance.sequence))
     num_left_gaps = 0
     num_right_gaps = 0
     # Count left and right gaps
@@ -40,7 +39,7 @@ def fill_gaps(site_instance, aligned_site, aligned_strand):
             '-'*num_right_gaps == aligned_site)
     # Extend site to both sides.
     max_gaps = max(num_left_gaps, num_right_gaps)
-    extended_site = extend_site(site_instance, genome_seq, max_gaps)
+    extended_site = site_instance.extend_sequence(max_gaps)
     if aligned_strand == '-':
         extended_site = reverse_complement(extended_site)
     if num_right_gaps == max_gaps:
@@ -54,7 +53,4 @@ def fill_gaps(site_instance, aligned_site, aligned_strand):
     return str(recovered_site)
 
 
-def extend_site(site_instance, genome_seq, n=250):
-    """Extends the SiteInstance sequence by n bases both sides."""
-    seq = genome_seq[site_instance.start-n: site_instance.end+n+1]
-    return seq if site_instance.strand == 1 else reverse_complement(seq)
+

@@ -6,6 +6,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.cache import cache
 
+from bioutils import reverse_complement
+
 
 class Curation(models.Model):
     """Curation model.
@@ -279,7 +281,8 @@ class Genome(models.Model):
         """Returns the unicode representation of the Genome."""
         return self.genome_accession + ' ' + self.organism
 
-    def get_sequence(self):
+    @property
+    def sequence(self):
         """Gets genome sequence from the cache."""
         key = 'genome_sequence_%s' % self.genome_accession
         if key not in cache:
@@ -463,9 +466,16 @@ class SiteInstance(models.Model):
         """Returns the unicode representation of binding site."""
         return u'%s [%s]' % (self.site_id, self._seq)
 
-    def get_genome_sequence(self):
-        """Returns the genome sequence that binding site belongs to."""
-        return self.genome.get_sequence()
+    @property
+    def sequence(self):
+        """Returns the sequence of the SiteInstance."""
+        # TODO(sefa): don't use _seq
+        return str(self._seq)
+
+    def extend_sequence(self, n=250):
+        """Extends the SiteInstance sequence by n bases both sides."""
+        seq = self.genome.sequence[self.start-n: self.end+n+1]
+        return seq if self.strand == 1 else reverse_complement(seq)
 
 
 class Curation_SiteInstance(models.Model):
@@ -513,8 +523,9 @@ class Curation_SiteInstance(models.Model):
     regulates = models.ManyToManyField("Gene", through='Regulation')
 
     # The experimental techniques used to determine this site instance.
-    experimental_techniques = models.ManyToManyField('ExperimentalTechnique')
-
+    experimental_techniques = models.ManyToManyField('ExperimentalTechnique',
+                                                     related_name='csis')
+    
     # The associated quantitative value that the binding site could have if the
     # paper reports sites that are identified through high-throughput methods
     # (e.g. peak density).

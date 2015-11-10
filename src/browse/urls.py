@@ -63,7 +63,31 @@ urlpatterns = [
     url(r'get_results_by_technique_category/(binding|expression)/(\d+)/$',
         browse_by_technique.get_results_by_technique_category),
 
-    # View motif reports
+    # View motif reports by TF and species
+    url(r'^view_motif_reports_by_TF_and_species/(\d+)/(\d+)$',
+        view_motif_reports.view_reports_by_TF_and_species),
+
+    # View motif reports by TF family
     url(r'^view_motif_reports_by_TF_family/(\d+)$',
         view_motif_reports.view_reports_by_TF_family),
+
+    # View motif reports by TF
+    url(r'^view_motif_reports_by_TF/(\d+)$',
+        view_motif_reports.view_reports_by_TF),
+
+    # View motif reports by technique function
+    url(r'^view_motif_reports_by_technique_function/(binding|expression)$',
+        view_motif_reports.view_reports_by_technique_function),
+
+    # View motif reports by technique category
+    url(r'^view_motif_reports_by_technique_category/(binding|expression)/(\d+)$',
+        view_motif_reports.view_reports_by_technique_category),
+
+    # View motif reports by technique
+    url(r'^view_motif_reports_by_technique/(\d+)$',
+        view_motif_reports.view_reports_by_technique),
+
+    # View motif reports by taxonomy
+    url(r'^view_motif_reports_by_taxonomy/(\d+)$',
+        view_motif_reports.view_reports_by_taxonomy),
 ]
