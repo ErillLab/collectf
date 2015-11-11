@@ -14,12 +14,42 @@
 <hr>
 
 <p class="lead">
-  A record from CollecTF | <a href="#">View full record</a>
+  A record from CollecTF |
+  <a href="{% url 'view_motif_reports_by_TF_and_species' motif_report.TF.TF_id motif_report.species.pk %}">
+    View full record</a>
+  <table class="table table-striped table-condensed">
+    <tbody>
+      <tr>
+        <td>Transcription factor</td>
+        <td>{{ motif_report.TF_name }}</td>
+      </tr>
+      <tr>
+        <td>Protein record at UniProtKB</td>
+        <td>
+          <a href="http://www.uniprot.org/uniprot/{{ motif_report.TF_accessions.0 }}" target="_blank">
+            {{ motif_report.TF_accessions.0 }}
+          </a>
+        </td>
+      </tr>
+      <tr>
+        <td>Species</td>
+        <td>{{ motif_report.species_name }}</td>
+      </tr>
+      <tr>
+        <td>Genome record at NCBI</td>
+        <td>
+          <a href="http://www.ncbi.nlm.nih.gov/nuccore/?term={{ motif_report.genome_accession }}" target="_blank">
+            {{ motif_report.genome_accession }}
+          </a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div>
+    <img src="{{ motif_report.weblogo }}">
+  </div>
 </p>
 
-panel body here
 </div>
 
 {% endblock %}
-
-

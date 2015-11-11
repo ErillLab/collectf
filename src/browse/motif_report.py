@@ -2,11 +2,14 @@
 This module contains the class implementation for motif reports.
 """
 
+import random
+
 from django.utils.functional import cached_property
 
 from core import bioutils
 from core import metasite
 from core import lasagna
+from core import models
 
 
 class MotifReportBase:
@@ -51,9 +54,19 @@ class MotifReport(MotifReportBase):
             'uniprot_accession', flat=True).distinct()
 
     @property
+    def species(self):
+        """Returns the species of the sites in this motif report."""
+        return self.meta_sites[0].delegate.site_instance.genome.taxonomy
+
+    @property
     def species_name(self):
         """Returns the name of the species."""
         return self.meta_sites[0].delegate.site_instance.genome.organism
+
+    @property
+    def genome_accession(self):
+        """Returns the genome accession of the sites in the motif report."""
+        return self.meta_sites[0].delegate.genome_accession
 
 
 class EnsembleMotifReport(MotifReportBase):
@@ -82,3 +95,24 @@ def build_motif_reports(curation_site_instances):
 def build_ensemble_report(curation_site_instances):
     """Given Curation_SiteInstance objects, returns the EnsembleMotifReport."""
     return EnsembleMotifReport(curation_site_instances)
+
+
+def random_motif_report(max_len=30, min_size=10):
+    """Returns a random motif report.
+
+    Randomly selects a motif until finds a good one.
+    """
+    TF_genome_pairs = models.Curation_SiteInstance.objects.values_list(
+        'curation__TF_instances', 'site_instance__genome').distinct()
+    while True:
+        TF_instances, genome = random.choice(TF_genome_pairs)
+        curation_site_instances = models.Curation_SiteInstance.objects.filter(
+            curation__TF_instances=TF_instances,
+            site_instance__genome=genome,
+            site_type='motif_associated')
+        if curation_site_instances.count() < min_size:
+            continue
+        reports = build_motif_reports(curation_site_instances)
+        if len(reports[0].aligned_sites[0]) > max_len:
+            continue
+        return reports[0]

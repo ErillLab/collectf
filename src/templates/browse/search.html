@@ -11,7 +11,7 @@
 </p>
 
 <form class="form" role="form" id="search_form" method="POST"
-      action="{% url 'browse.search.search' %}">{% csrf_token %}
+      action="{% url 'motif_search' %}">{% csrf_token %}
   {% include "search_form_fields.html" %}
   <input type="submit"  class="btn btn-primary btn-block" value="Search" />
 </form>

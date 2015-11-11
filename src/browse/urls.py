@@ -67,7 +67,8 @@ urlpatterns = [
 
     # View motif reports by TF and species
     url(r'^view_motif_reports_by_TF_and_species/(\d+)/(\d+)/$',
-        view_motif_reports.view_reports_by_TF_and_species),
+        view_motif_reports.view_reports_by_TF_and_species,
+        name='view_motif_reports_by_TF_and_species'),
 
     # View motif reports by TF family
     url(r'^view_motif_reports_by_TF_family/(\d+)/$',
@@ -99,7 +100,7 @@ urlpatterns = [
         name='view_reports_by_id'),
 
     # Search
-    url(r'^search_motifs/$', search_motifs.search),
+    url(r'^search_motifs/$', search_motifs.search, name='motif_search'),
 
     # Motif comparison
     url(r'^compare_motifs/$',

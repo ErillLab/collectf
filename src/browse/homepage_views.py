@@ -1,10 +1,13 @@
 from django.shortcuts import render
 
+from . import motif_report
+
 
 def home(request):
     """CollecTF homepage."""
-    return render(request, 'homepage_home.html')
-
+    # Choose a random motif to be displayed on the main page.
+    return render(request, 'homepage_home.html',
+                  {'motif_report': motif_report.random_motif_report()})
 
 def about(request):
     """Returns the 'about' page."""
