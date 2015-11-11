@@ -1,6 +1,9 @@
 $(document).ready(function() {
     // Alias for alert-error class: alert-danger
     $('.alert-error').addClass('alert-danger');
+
+    // Override blockUI defaults
+    overrideBlockUIDefaults();
 });
 
 function overrideBlockUIDefaults() {

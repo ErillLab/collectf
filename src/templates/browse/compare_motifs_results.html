@@ -42,7 +42,7 @@
 
       <li>
         <a href="#motif_similarity" data-toggle="tab"
-           onclick="motifSimilarityAJAX('PCC'); return false;">
+           onclick="motifSimilarityAJAX('pearson'); return false;">
           Motif similarity
         </a>
       </li>
@@ -71,11 +71,11 @@
           <tbody>
             <tr>
               <td>First motif</td>
-              <td><img src="{{ first_ensemble_report.weblogo }}"></td>
+              <td><img src="{{ aligned_weblogos.0 }}"></td>
             </tr>
             <tr>
               <td>Second motif</td>
-              <td><img src="{{ second_ensemble_report.weblogo }}"></td>
+              <td><img src="{{ aligned_weblogos.1 }}"></td>
             </tr>
           </tbody>
         </table>
@@ -83,20 +83,21 @@
 
       <div class="tab-pane" id="motif_similarity">
         <ul class="nav nav-tabs">
-          <li class="active"> <a href="#PCC" data-toggle="tab" onclick="motifSimilarityAJAX('PCC'); return false;">
+          <li class="active"> <a href="#pearson" data-toggle="tab" onclick="motifSimilarityAJAX('pearson'); return false;">
               Pearson Correlation Coefficient</a></li>
-          <li><a href="#ALLR" data-toggle="tab" onclick="motifSimilarityAJAX('ALLR'); return false;">
+          <li><a href="#average_log_likelihood" data-toggle="tab" onclick="motifSimilarityAJAX('average_log_likelihood'); return false;">
               Average Log Likelihood Ratio</a></li>
-          <li><a href="#KL" data-toggle="tab" onclick="motifSimilarityAJAX('KL'); return false;">
+          <li><a href="#kullback_leibler" data-toggle="tab" onclick="motifSimilarityAJAX('kullback_leibler'); return false;">
               Kullback-Leibler Divergence</a></li>
-          <li><a href="#ED" data-toggle="tab" onclick=" motifSimilarityAJAX('ED'); return false;">
+          <li><a href="#euclidean" data-toggle="tab" onclick=" motifSimilarityAJAX('euclidean'); return false;">
               Euclidean Distance</a></li>
         </ul>
+        <br/>
         <div class="tab-content">
-          <div class="tab-pane active" id="PCC"></div>
-          <div class="tab-pane" id="ALLR"></div>
-          <div class="tab-pane" id="KL"></div>
-          <div class="tab-pane" id="ED"></div>
+          <div class="tab-pane active" id="pearson"></div>
+          <div class="tab-pane" id="average_log_likelihood"></div>
+          <div class="tab-pane" id="kullback_leibler"></div>
+          <div class="tab-pane" id="euclidean"></div>
         </div>
       </div> <!-- /#motif_similarity -->
 
@@ -140,8 +141,7 @@
   </div> <!-- /#motif_based -->
 
 
-  <div class="tab-pane" id="site_based">
-  </div> <!-- /#site_based -->
+  <div class="tab-pane" id="site_based"></div> <!-- /#site_based -->
 
   <div class="tab-pane" id="compared_motifs">
      <p>
@@ -219,6 +219,13 @@
 
 {% block js %}
 {{ block.super }}
+<!-- mathjax -->
+<script type="text/javascript"
+        src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+</script>
+  
 <script type="text/javascript">
 {# Javascript code HTML file because of using dynamic data. #}
 function motifSimilarityAJAX(el) {
@@ -235,7 +242,7 @@ function motifSimilarityAJAX(el) {
             first_aligned: "{% for site in first_ensemble_report.aligned_sites %}{{ site }} {% endfor %}",
             second_aligned: "{% for site in second_ensemble_report.aligned_sites %}{{ site }} {% endfor %}",
             first_unaligned: "{% for meta_site in first_ensemble_report.meta_sites %}{{ meta_site.delegate_sequence }} {% endfor %}",
-            unaligned_sites_b: "{% for meta_site in second_ensemble_report.meta_sites %}{{ meta_site.delegate_sequence }} {% endfor %}",
+            second_unaligned: "{% for meta_site in second_ensemble_report.meta_sites %}{{ meta_site.delegate_sequence }} {% endfor %}",
             csrfmiddlewaretoken: '{{csrf_token}}'
         },
         success: function(data) {

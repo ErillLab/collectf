@@ -1,0 +1,44 @@
+<div class="accordion" id="euclidean_accordion">
+  <div class="accordion-heading">
+    <a href="#euclidean_collapse" data-toggle="collapse" data-parent="euclidean_accordion">
+      <span class="pull-right"><small>[expand/collapse]</small></span></a>
+
+    Euclidean distance (ED) is the distance between two points in $n$-dimensional space.
+    <div id="euclidean_collapse" class="accordion-body collapse">
+
+      <p>
+        
+        The ED for two DNA motif columns $X$ and $Y$ is defined as
+        
+        <div class="eq">
+          $$
+          ED(X,Y) = \sqrt{\sum_{b\in B} (f_X(b)-f_Y(b))^2}
+          $$
+        </div>
+        where $B = (A,C,G,T)$, $f_X(b)$ is the frequency of base $b$ in column $X$.
+      </p>
+
+      <p>
+        The ED between two motifs is defined as the sum of the column comparison scores of the
+        ungapped alignment of the two motifs.
+      </p>
+    </div>
+
+
+  </div>
+</div>
+
+<hr />
+<p>
+  ED score histogram for random permutations on the two motifs.  For each test, 100
+  replicates of each motif are obtained by randomly sampling without replacement.
+  Motif similarity is computed using the ED statistic.  Blue bars denote frequencies
+  of ED values for replicate pair comparisons. The red dashed lines corresponds to
+  the ED of compared motifs.  
+</p>
+<p>$ED(M_a, M_b) = {{ score }}$ and $p = {{p_value}}$</p>
+<div>
+  <img src="{{ plot }}" />
+</div>
+
+

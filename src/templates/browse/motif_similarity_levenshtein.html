@@ -21,10 +21,57 @@
   </div>
 </div>
 
-<div>
-  <img src="{{ boxplot }}" />
-</div>
+<ul class="nav nav-tabs">
+  <li class="active"><a href="#Levenshtein_similarity" data-toggle="tab">Motif similarity</a></li>
+  <li><a href="#Levenshtein_unaligned" data-toggle="tab">Unaligned binding sites</a></li>
+  <li><a href="#Levenshtein_aligned" data-toggle="tab">Aligned binding sites</a></li>
+</ul>
 
-<div>
-  <img src="{{ histogram }}" />
-</div>
+<div class="tab-content">
+  <div class="tab-pane active" id="Levenshtein_similarity">
+    <div>
+      <img src="{{ boxplot }}" />
+    </div>
+    
+    <div>
+      <img src="{{ hist }}" />
+    </div>
+  </div> <!-- /#Levenshtein_similarity -->
+  
+  <div class="tab-pane" id="Levenshtein_unaligned">
+    <p>The list of binding sites for two motifs as curated</p>
+    <div class="row">
+      <div class="col-md-6 box">
+        {% for site in first_unaligned %}
+        <span class="sequence">{{ site }}</span><br/>
+        {% endfor %}
+      </div>
+      <div class="col-md-6 box">
+        {% for site in second_unaligned %}
+        <span class="sequence">{{ site }}</span><br/>
+        {% endfor %}
+      </div>
+    </div>
+  </div> <!-- /#Levenshtein_unaligned -->
+      
+  <div class="tab-pane" id="Levenshtein_aligned">
+    <p>The collection of binding sites for the two motifs. For the alignment of variable-length
+      binding sites,
+      <a href="http://www.biomedcentral.com/1471-2105/14/108/">LASAGNA</a> is used.
+    </p>
+
+    <div class="row">
+      <div class="col-md-6 box">
+        {% for site in first_aligned %}
+        <span class="sequence">{{ site }}</span><br/>
+        {% endfor %}
+      </div>
+      <div class="col-md-6 box">
+        {% for site in second_aligned %}
+        <span class="sequence">{{ site }}</span><br/>
+        {% endfor %}
+      </div>
+    </div>
+  </div> <!-- /#Levenshtein_aligned -->
+</div> <!-- /.tab-content -->
+

@@ -1,0 +1,41 @@
+<div class="accordion" id="kullback-leibler_accordion">
+  <div class="accordion-heading">
+    <a href="#kullback-leibler_collapse" data-toggle="collapse" data-parent="kullback-leibler_accordion">
+      <span class="pull-right"><small>[expand/collapse]</small></span></a> Kullback-Leibler
+    Divergence (KLD) is a non-symmetric measure of the difference between two probability
+    distributions. Symmetric form of KLD is used to measure the difference between two motifs.
+
+  </div>
+  <div id="kullback-leibler_collapse" class="accordion-body collapse">
+    <p>
+      The KLD between two motif columns $X$ and $Y$ is defined as
+      <div class="eq">
+        $$
+        KLD(X,Y) = \frac{1}{2} \left( \sum_{b \in B} f_X(b) \log{\frac{f_X(b)}{f_Y(b)}} +
+        \sum_{b \in B} f_Y(b) \log{\frac{f_Y(b)}{f_X(b)}}
+        \right)
+        $$
+      </div>
+      where $B = (A,C,G,T)$, $f_X(b)$ is the frequency of base $b$ in column $X$.
+    </p>
+    <p>
+      The KLD between two motifs is defined as the sum of the column comparison scores of
+      the ungapped alignment of the two motifs.
+    </p>
+  </div>
+</div>
+
+<hr />
+<p>
+  KLD score histogram for random permutations on the two motifs.  For each test, 100
+  replicates of each motif are obtained by randomly sampling without replacement.
+  Motif similarity is computed using the KLD statistic.  Blue bars denote frequencies
+  of KLD values for replicate pair comparisons. The red dashed lines corresponds to
+  the KLD of compared motifs.  
+</p>
+<p>$KLD(M_a, M_b) = {{ score }}$ and $p = {{p_value}}$</p>
+
+<div>
+  <img src="{{ plot }}" />
+</div>
+

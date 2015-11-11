@@ -4,6 +4,8 @@ from base64 import b64encode
 from subprocess import Popen
 from subprocess import PIPE
 
+from Bio import motifs
+from Bio.Seq import Seq
 
 def reverse_complement(seq):
     """Returns the reverse complement of the given sequence."""
@@ -39,3 +41,10 @@ def weblogo_uri(sequences):
     encoded = b64encode(image_data)
     mime = 'image/png'
     return 'data:' + mime + ';' + 'base64,' + encoded
+
+
+def build_motif(sites):
+    """Creates Biopython Motif object from the given sites."""
+    instances = [Seq(site) for site in sites]
+    return motifs.create(instances)
+
