@@ -78,10 +78,11 @@ def group_curation_site_instances(curation_site_instances):
     """Groups Curation_SiteInstance objects by TF-instance and genome."""
     TF_genome_pairs = curation_site_instances.filter(
         site_type='motif_associated').values_list(
-        'site_instance__genome', 'curation__TF_instances').distinct()
-    return [curation_site_instances.filter(site_instance__genome=genome,
-                                           curation__TF_instances=TF_instances)
-            for genome, TF_instances in TF_genome_pairs]
+        'site_instance__genome__organism', 'curation__TF_instances').distinct()
+    return [curation_site_instances.filter(
+        site_instance__genome__organism=genome,
+        curation__TF_instances=TF_instances)
+        for genome, TF_instances in TF_genome_pairs]
 
 
 def build_motif_reports(curation_site_instances):

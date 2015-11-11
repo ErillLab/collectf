@@ -8,6 +8,7 @@ from . import browse_by_technique
 from . import view_motif_reports
 from . import search_motifs
 from . import compare_motifs
+from . import view_curation
 
 urlpatterns = [
     url(r'^test_view$', test_view.test_view),
@@ -112,4 +113,9 @@ urlpatterns = [
     url(r'^motif_similarity_measure/$',
         compare_motifs.motif_similarity_measure,
         name='motif_similarity_measure'),
+
+    # View curation
+    url(r'^view_curation/(\d+)/$', view_curation.view_curation,
+        name='view_curation'),
+
 ]

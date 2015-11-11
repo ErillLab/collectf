@@ -6,7 +6,7 @@ def curation_site_instances_values_list(curation_site_instances):
     return curation_site_instances.values_list(
         'curation__TF_instances__TF__TF_id',
         'curation__TF_instances__TF__name',
-        'site_instance__genome__taxonomy__taxonomy_id',
+        'site_instance__genome__taxonomy__pk',
         'site_instance__genome__taxonomy__name').distinct().order_by(
             'curation__TF_instances__TF__name',
             'site_instance__genome__taxonomy__name')

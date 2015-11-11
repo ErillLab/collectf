@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<div class="box">
+  <h1>Curation Information</h1>
+
+  <dl class="dl-horizontal">
+    <dt>Publication</dt>
+    <dd>
+      {% with pub=curation.publication %}
+      {{ pub.title }};{{ pub.authors }};{{ pub.journal }} {{pub.publication_date}};
+      {{pub.volume}}({{pub.issue}}):{{pub.pages}}
+      {% endwith %}
+      <a href="http://www.ncbi.nlm.nih.gov/pubmed/?term={{ curation.publication.pmid }}" target="_blank">
+        [{{ curation.publication.pmid }}]
+      </a>
+    </dd>
+
+    <dt>TF</dt>
+    <dd>
+      {{ curation.TF.name }}
+      {% for TF_instance in curation.TF_instances.all %}
+      <a href="http://uniprot.org/uniprot/{{ TF_instance.uniprot_accession }}" target="_blank">
+        [{{ TF_instance.uniprot_accession }}]</a>{% if not forloop.last %}, {% endif %}{% endfor %}
+    </dd>
+
+    <dt>Reported TF sp.</dt>
+    <dd>{{ curation.TF_species|default:"-" }}</dd>
+
+    <dt>Reported site sp.</dt>
+    <dd>{{ curation.site_species|default:"-"}}</dd>
+
+    <dt>Created by</dt>
+    <dd>{{ curation.curator.user.first_name }} {{ curation.curator.user.last_name }}</dd>
+
+    <dt>Curation notes</dt>
+    <dd>{{ curation.notes|default:"-" }}</dd>
+  </dl>
+</div>
+
+<div class="box">
+  <h1>Experimental Process</h1>
+
+  <p>
+    {{ curation.experimental_process|default:"-" }}
+  </p>
+
+  {% if curation.forms_complex %}
+  <p>
+    The paper reports that TF forms complex with other proteins for binding with
+    reported sites.
+  </p>
+  <p>
+    {{ curation.complex_notes }}
+  </p>
+  {% endif %}
+
+  {% if curation.chip_info %}
+  <dl class="dl-horizontal">
+    <dt>ChIP assay conditions</dt>
+    <dd>{{ curation.chip_info.assay_conditions }}</dd>
+    <dt>ChIP notes</dt>
+    <dd>{{ curation.chip_info.method_notes }}</dd>
+  </dl>
+{% endif %}
+
+</div>
+
+
+<div class="box">
+  <h1>Transcription Factor Binding Sites</h1>
+  <ul class="nav nav-tabs" id="sites_tab">
+    <li>
+      <a href="#reported" data-toggle="tab">
+        Sites reported in the paper
+    </a>
+    </li>
+
+    <li class="active">
+      <a href="#curated" data-toggle="tab">
+        Sites matched in the genome
+      </a>
+    </li>
+
+    {% if curation.quantitative_data_format %}
+    <li>
+      <a href="#quantitative_data" data-toggle="tab">
+        Site-specific quantitative values
+      </a>
+    </li>
+    {% endif %}
+
+    {% if curation.chip_info %}
+    {# if curation has high_throughput data #}
+    <li>
+      <a href="#high-throughput" data-toggle="tab">
+        High-throughput data
+      </a>
+    </li>
+    {% endif %}
+  </ul>
+
+  <div class="tab-content">
+    <br/>
+    <div class="tab-pane" id="reported">
+      {% for curation_site_instance in curation.curation_siteinstance_set.all %}
+      {% if not curation_site_instance.is_high_throughput %}
+      <span class="sequence">{{ curation_site_instance.annotated_seq }}</span><br/>
+      {% endif %}
+      {% endfor %}
+    </div>
+
+    <div class="tab-pane active" id="curated">
+      {% for curation_site_instance in curation.curation_siteinstance_set.all %}
+      {% if not curation_site_instance.is_high_throughput %}
+      <span class="sequence">{{ curation_site_instance.site_instance.sequence }}</span><br/>
+      {% endif %}
+      {% endfor %}
+    </div>
+
+    {% if curation.quantitative_data_format %}
+    <div class="tab-pane" id="quantitative_data">
+      <p><b>Quantitative data format:</b> {{ curation.quantitative_data_format }}</p>
+      {% for curation_site_instance in curation.curation_siteinstance_set.all %}
+      {% if not curation_site_instance.is_high_throughput %}
+      <span class="sequence">
+        {{ curation_site_instance.annotated_seq }}
+        {{ curation_site_instance.quantitative_value }}
+      </span><br/>
+      {% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if curation.chip_info %}
+    <div class="tab-pane" id="high-throughput">
+      {% for curation_site_instance in curation.curation_siteinstance_set.all %}
+      {% if curation_site_instance.is_high_throughput %}
+      <span class="sequence">
+        {{ curation_site_instance.site_instance.sequence }}
+        {{ curation_site_instance.quantitative_value }}
+      </span><br/>
+      {% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="box">
+  <h1>Gene Regulation</h1>
+  <p>
+    Regulated genes for each binding site are displayed below. Genes that are
+    reported for TF-site mediated regulation are displayed
+    in <span style="background-color:green; color:white">green</span>.  For each indvidual
+    site, experimental techniques used to determine the site are also given.
+  </p>
+
+  <table class="table table-striped table-bordered">
+    <thead>
+      <th>Site sequence</th>
+      <th>Regulated genes</th>
+      <th>Gene diagram</th>
+      <th>Experimental techniques</th>
+      <th>TF function</th>
+      <th>TF type</th>
+    </thead>
+    <tbody>
+      {% for meta_site in meta_sites %}
+      <tr>
+        <td><span class="sequence">{{ meta_site.delegate_sequence }}</span></td>
+        <td>
+	      {% for regulation in meta_site.regulations %}
+	      {% if regulation.evidence_type == "exp_verified" %}
+	      <a href="http://www.ncbi.nlm.nih.gov/gene/{{ regulation.gene.gene_accession }}" target="_blank">{{ regulation.gene.name }}</a>{% if not forloop.last %},{% endif %}{% endif %}
+	      {% endfor %}
+        </td>
+        <td><div>{{ meta_site.regulation_diagram }}</div></td>
+        <td>
+          {% for technique in meta_site.techniques %}
+          {% include "experimental_technique.html" %}-
+          {% endfor %}
+        </td>
+        <td>{{ meta_site.delegate.TF_function_verbose }}</td>
+        <td>{{ meta_site.delegate.TF_type_verbose }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+
+{% endblock %}

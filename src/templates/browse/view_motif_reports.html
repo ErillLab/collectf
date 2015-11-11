@@ -151,7 +151,7 @@
                   <td>
                     {% for curation_id in meta_site.curation_ids %}
 		            <span class="fixed-width">
-		              <a href="#" target="_blank">
+		              <a href="{% url 'view_curation' curation_id %}" target="_blank">
                         {{curation_id}}
                       </a>{% if not forloop.last %}, {% endif %}
 		            </span>

@@ -525,7 +525,7 @@ class Curation_SiteInstance(models.Model):
     # The experimental techniques used to determine this site instance.
     experimental_techniques = models.ManyToManyField('ExperimentalTechnique',
                                                      related_name='csis')
-    
+
     # The associated quantitative value that the binding site could have if the
     # paper reports sites that are identified through high-throughput methods
     # (e.g. peak density).
