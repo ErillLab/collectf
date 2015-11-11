@@ -20,9 +20,14 @@ from django.core.urlresolvers import reverse_lazy
 from django.views.generic import RedirectView
 
 from browse import urls as browse_urls
+from browse import view_site
 
 urlpatterns = [
     url(r'^$', RedirectView.as_view(url=reverse_lazy('homepage_home'))),
     url(r'^admin/', admin.site.urls),
     url(r'^browse/', include(browse_urls)),
+
+    # dbxref links from NCBI don't have browse/ prefix, being served from here.
+    url(r'^expsite_(?P<dbxref_id>\w+)$', view_site.view_site),
+    url(r'^EXPSITE_(?P<dbxref_id>\w+)$', view_site.view_site),
 ]

@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section>
+<h1>Transcription Factor Binding Site Information</h1>
+<dl class="dl-horizontal">
+  <dt>dbxref</dt>
+  <dd>CollecTF:EXPSITE_{{ dbxref }}</dd>
+  <dt>Genome</dt>
+  <dd>
+    <i>{{ meta_site.delegate_site_instance.genome.taxonomy.name }}</i> -
+    <a href="http://www.ncbi.nlm.nih.gov/nuccore/?term={{ meta_site.delegate_site_instance.genome.genome_accession }}"
+       target="_blank">
+      {{ meta_site.delegate_site_instance.genome.genome_accession }}
+    </a>
+</dd>
+  <dt>TF</dt>
+  <dd>
+    {{ meta_site.delegate.curation.TF.name }} -
+    <a href="http://uniprot.org/uniprot/{{meta_site.delegate.curation.TF_instances.all.0.uniprot_accession }}"
+       target="_blank">
+      UniProtKB:{{ meta_site.delegate.curation.TF_instances.all.0.uniprot_accession }}
+    </a>
+
+  </dd>
+</dl>
+</section>
+
+<section>
+<h1>Supporting Evidence</h1>
+<table class="table table-striped table-condensed">
+  <thead>
+    <tr>
+      <th>Binding site</th>
+      <th>Location</th>
+      <th>Publication</th>
+      <th>Experimental techniques used</th>
+      <th>Curation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="sequence">{{ meta_site.delegate_sequence }}</span></td>
+      <td>
+        <span class="fixed-width">
+          {% if meta_site.delegate_site_instance.strand == 1%}+{% else %}-{% endif %}
+          [{{ meta_site.delegate_site_instance.start|add:1 }},
+          {{meta_site.delegate_site_instance.end|add:1 }}]
+        </span>
+      </td>
+      <td><a href="http://www.ncbi.nlm.nih.gov/pubmed/?term={{ meta_site.delegate.curation.publication.pmid }}"
+             target="_blank">
+          {{ meta_site.delegate.curation.publication.pmid }}</a></td>
+      <td>
+	    {% for technique in meta_site.techniques %}
+        {% include "experimental_technique.html" %}-
+	    {% endfor %}
+      </td>
+      <td>
+        <a href="{% url 'view_curation' meta_site.delegate.curation.curation_id %}" target="_blank">
+          {{ meta_site.delegate.curation.curation_id }}
+        </a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<section>
+<h1>Regulated genes</h1>
+
+Regulated genes for each binding site are displayed below. Genes that are
+reported for TF-site mediated regulation are displayed in green.
+
+<div class="box">
+  {{ meta_site.regulation_diagram }}
+
+  <hr/>
+
+  <table class="table table-condensed table-striped">
+    <thead>
+      <th>Gene</th>
+      <th>Locus tag</th>
+      <th>Description</th>
+    </thead>
+
+    <tbody>
+      {% for regulation in meta_site.regulations %}
+      <tr>
+        <td>
+          <a href="http://www.ncbi.nlm.nih.gov/gene/{{ regulation.gene.gene_accession }}" target="_blank">
+            {{ regulation.gene.name }}
+          </a>
+        </td>
+        <td>{{ regulation.gene.locus_tag }}</td>
+        <td>{{ regulation.gene.description }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+</section>
+
+{% endblock %}
