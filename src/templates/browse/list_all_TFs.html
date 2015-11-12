@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+
+<div class="box">
+  <h1>List of transcription factors in CollecTF</h1>
+  <hr/>
+  <ul>
+    {% for TF_family in  TF_families %}
+    <li>
+      {{ TF_family.name }}
+      <ul>
+        {% for TF in TF_family.TFs.all %}
+        <li>{{ TF.name }}</li>
+        {% endfor %}
+      </ul>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+
+{% endblock %}

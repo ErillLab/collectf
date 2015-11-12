@@ -9,6 +9,7 @@ from . import view_motif_reports
 from . import search_motifs
 from . import compare_motifs
 from . import view_curation
+from . import list_all
 
 urlpatterns = [
     url(r'^test_view$', test_view.test_view),
@@ -117,5 +118,18 @@ urlpatterns = [
     # View curation
     url(r'^view_curation/(\d+)/$', view_curation.view_curation,
         name='view_curation'),
+
+    # List all TFs
+    url(r'^list_all_TFs/$', list_all.list_all_TFs,
+        name='list_all_TFs'),
+
+    # List all species
+    url(r'^list_all_species/$', list_all.list_all_species,
+        name='list_all_species'),
+
+    # List all experimental techniques
+    url(r'^list_all_experimental_techniques/$',
+        list_all.list_all_experimental_techniques,
+        name='list_all_experimental_techniques'),
 
 ]

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="box">
+  <h1>List of experimental techniques in CollecTF</h1>
+  <hr/>
+  <dl class="">
+    {% for t in techniques %}
+    <dt>
+      {{ t.name }}
+      {% if t.EO_term %} -  <a href="#">{{ t.EO_term }}</a>{% endif %}
+    </dt>
+    <dd>
+      {{ t.description }}
+    </dd>
+    <hr />
+    {% endfor %}
+  </dl>
+</div>
+
+{% endblock %}

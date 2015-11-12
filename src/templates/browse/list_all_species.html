@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="box">
+  <h1>CollecTF taxonomy</h1>
+  <hr/>
+  <ul>
+    {% for phylum in phyla %}
+    <li>
+      {{ phylum.name }} (phylum)
+      <ul>
+        {% for class in phylum.children.all %}
+        <li>
+          {{ class.name }} (class)
+          <ul>
+            {% for order in class.children.all %}
+            <li>
+              {{ order.name }} (order)
+              <ul>
+                {% for family in order.children.all %}
+                <li>
+                  {{ family.name }} (family)
+                  <ul>
+                    {% for genus in family.children.all %}
+                    <li>
+                      {{ genus.name }} (genus)
+                      <ul>
+                        {% for species in genus.children.all %}
+                        <li>
+                          {{ species.name }} (species)
+                        </li>
+                        {% endfor %}
+                      </ul>
+                    </li>
+                    {% endfor %}
+                  </ul>
+                </li>
+                {% endfor %}
+              </ul>
+            </li>
+            {% endfor %}
+          </ul>
+        </li>
+        {% endfor %}
+      </ul>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+
+{% endblock %}
