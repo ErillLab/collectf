@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="box">
+  <h1>List of publications in CollecTF</h1>
+  <hr>
+
+  <p>
+    All papers that are present in the database are displayed below. The rows colored
+    with <span class="label label-success">green</span>are papers that are already
+    curated. The <span class="label label-warning">yellow</span> ones are assigned to somebody and
+    waiting to be curated (hopefully) soon. The <span class="label label-danger">red</span> ones are
+    not assigned to anyone yet.
+  </p>
+  
+  <table class="table table-condensed table-hover table-bordered">
+    <thead>
+      <tr>
+        <th>PMID</th>
+        <th>Title</th>
+        <th>TF</th>
+        <th>Species</th>
+      </tr>
+    </thead>
+    
+    <tbody data-provides="rowlink">
+      {% for publication in publications %}
+      <tr class="{% if publication.curation_complete %}
+                 success
+                 {% else %}
+                 {% if publication.assigned_to %}
+                 warning
+                 {% else %}
+                 danger
+                 {% endif %}
+                 {% endif %}">
+        <td>
+          <a href="http://www.ncbi.nlm.nih.gov/pubmed/?term={{ publication.pmid }}">
+            {{ publication.pmid }}
+          </a>
+        </td>
+        <td>{{ publication.title }}</td>
+        <td>{{ publication.reported_TF }}</td>
+        <td>{{ publication.reported_species }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  
+</div>
+
+{% endblock %}

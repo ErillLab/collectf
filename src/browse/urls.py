@@ -132,4 +132,13 @@ urlpatterns = [
         list_all.list_all_experimental_techniques,
         name='list_all_experimental_techniques'),
 
+    # List all publications
+    url(r'^list_all_publications/$', list_all.list_all_publications,
+        name='list_all_publications'),
+
+    # List all curations
+    url(r'^list_all_curations/$', list_all.list_all_curations,
+        name='list_all_curations'),
+    
+
 ]

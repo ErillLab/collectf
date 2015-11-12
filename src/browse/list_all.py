@@ -28,3 +28,16 @@ def list_all_experimental_techniques(request):
     exp_techniques = models.ExperimentalTechnique.objects.all()
     return render(request, 'list_all_experimental_techniques.html',
                   {'techniques': exp_techniques})
+
+
+def list_all_publications(request):
+    """View function to see all publications in the database."""
+
+    publications = models.Publication.objects.all().order_by('-pmid')
+    return render(request, 'list_all_publications.html', 
+                  {"publications": publications})
+
+def list_all_curations(request):
+    """View function to see all curations."""
+    curations = models.Curation.objects.all().order_by('-curation_id')
+    return render(request, 'list_all_curations.html', {"curations": curations})

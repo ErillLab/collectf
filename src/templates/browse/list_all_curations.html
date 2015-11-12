@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="box">
+  
+  <h1>List of curations</h1>
+  <hr>
+
+  <table class="table table-hover table-bordered">
+    <thead>
+      <tr>
+        <th>Curation id</th>
+        <th>TF</th>
+        <th>Organism</th>
+        <th>PMID</th>
+        <th>Curated by</th>
+        <th></th>
+    </thead>
+
+    <tbody data-provides="rowlink">
+      {% for curation in curations %}
+      <tr>
+        <td>{{ curation.curation_id }}</td>
+        <td>{{ curation.TF.name }}</td>
+        <td>{{ curation.site_species }}</td>
+        {% with publication=curation.publication %}
+        <td><span title="{% with pub=publication %}{{ pub.title }}, {{ pub.authors }} {% endwith %}">
+            <a href="http://www.ncbi.nlm.nih.gov/pubmed/?term={{ publication.pmid }}">
+              {{ publication.pmid }}
+            </a>
+        </span></td>
+        {% endwith %}
+        <td>{{ curation.curator.user.first_name }} {{ curation.curator.user.last_name }}</td>
+        <td> <a href="{% url 'view_curation' curation.pk  %}">view</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div>
+
+{% endblock %}
