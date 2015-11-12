@@ -1,15 +1,16 @@
 from django.conf.urls import url
 
-from . import test_view
-from . import homepage_views
 from . import browse_by_TF
 from . import browse_by_taxonomy
 from . import browse_by_technique
-from . import view_motif_reports
-from . import search_motifs
 from . import compare_motifs
-from . import view_curation
+from . import homepage_views
 from . import list_all
+from . import search_motifs
+from . import stats_and_info
+from . import test_view
+from . import view_curation
+from . import view_motif_reports
 
 urlpatterns = [
     url(r'^test_view$', test_view.test_view),
@@ -139,6 +140,9 @@ urlpatterns = [
     # List all curations
     url(r'^list_all_curations/$', list_all.list_all_curations,
         name='list_all_curations'),
-    
 
+    # CollecTF curator roster
+    url(r'^curator_roster/$', stats_and_info.curator_roster,
+        name='curator_roster')
+    
 ]
