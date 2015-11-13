@@ -51,7 +51,19 @@
           <ul class="nav navbar-nav">
             <li><a href="#">Link</a></li>
           </ul>
+
+          <ul class="nav navbar-nav navbar-right">
+            {% if user.is_authenticated %}
+            <li class="navbar-text">Hello {{user.username}}</li>
+            <li><a href="{% url 'auth_logout' %}" class="navbar-link">Logout</a></li>
+            {% else %}
+            <li><a class="navbar-link" href="{% url 'registration_register' %}">Register</a></li>
+            <li><a class="navbar-link" href="{% url 'auth_login' %}">Login</a></li>
+            {% endif %}
+          </ul>
         </div>
+
+
 
       </div><!-- /.container-default -->
     </nav>

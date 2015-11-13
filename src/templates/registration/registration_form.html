@@ -1,0 +1,32 @@
+{% extends "registration/registration_base.html" %}
+{% load i18n %}
+{% load bootstrap %}
+
+{% block content %}
+<div class="box">
+<h1> {% trans "Register for an account" %}</h1>
+<hr>
+<form method="post" action="" class="form-horizontal">
+    {% csrf_token %}
+    {{ form|bootstrap_horizontal }}
+    <div class="form-group">
+      <div class="col-sm-10 col-sm-offset-2">
+        <button type="submit" class="btn btn-primary">{% trans 'Submit' %}</button>
+      </div>
+    </div>
+</form>
+{% endblock %}
+</div>
+
+
+{% comment %}
+**registration/registration_form.html**
+Used to show the form users will fill out to register. By default, has
+the following context:
+
+``form``
+    The registration form. This will be an instance of some subclass
+    of ``django.forms.Form``; consult `Django's forms documentation
+    <http://docs.djangoproject.com/en/dev/topics/forms/>`_ for
+    information on how to display this in a template.
+{% endcomment %}

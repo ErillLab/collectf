@@ -30,4 +30,7 @@ urlpatterns = [
     # dbxref links from NCBI don't have browse/ prefix, being served from here.
     url(r'^expsite_(?P<dbxref_id>\w+)$', view_site.view_site),
     url(r'^EXPSITE_(?P<dbxref_id>\w+)$', view_site.view_site),
+
+    # user account management
+    url(r'^accounts/', include('registration.backends.default.urls')),
 ]
