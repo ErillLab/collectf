@@ -33,6 +33,8 @@ urlpatterns = [
     url(r'^links/$', homepage_views.links, name='homepage_links'),
 
     url(r'^feedback/$', homepage_views.feedback, name='homepage_feedback'),
+    url(r'^feedback_send/$', homepage_views.feedback_send_email,
+        name='feedback_send_email'),
 
     url(r'^cite/$', homepage_views.cite, name='homepage_cite'),
 
@@ -144,5 +146,5 @@ urlpatterns = [
     # CollecTF curator roster
     url(r'^curator_roster/$', stats_and_info.curator_roster,
         name='curator_roster')
-    
+
 ]
