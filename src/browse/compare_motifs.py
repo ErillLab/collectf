@@ -13,10 +13,10 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 
 from core import bioutils
-from .search import get_all_TF_families
-from .search import get_all_phyla
-from .search import get_all_techniques
-from .search import search_post_helper
+from .search_motifs import get_all_TF_families
+from .search_motifs import get_all_phyla
+from .search_motifs import get_all_techniques
+from .search_motifs import search_post_helper
 from .motif_report import build_motif_reports
 from .motif_report import build_ensemble_report
 
