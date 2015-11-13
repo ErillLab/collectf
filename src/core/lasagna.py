@@ -12,7 +12,7 @@ def lasagna(site_instances):
     http://www.biomedcentral.com/1471-2105/14/108
     """
     aligned, idxAligned, strands = lasagna_lib.LASAGNA(
-        [site_instance.sequence.lower() for site_instance in site_instances], 0)
+        [site.sequence.lower() for site in site_instances], 0)
     aligned = [seq.upper() for seq in aligned]
 
     assert (map(int, idxAligned) == range(len(idxAligned)),
@@ -51,6 +51,3 @@ def fill_gaps(site_instance, aligned_site, aligned_strand):
     assert (len(recovered_site) == len(aligned_site))
     assert recovered_site in extended_site
     return str(recovered_site)
-
-
-
