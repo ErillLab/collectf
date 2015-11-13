@@ -5,11 +5,10 @@ properly.
 """
 
 from django.shortcuts import get_object_or_404
-from django.shortcuts import get_list_or_404
 from django.shortcuts import render
 
 from core import models
-from .motif_report import build_motif_reports, build_ensemble_report
+from .motif_report import build_motif_reports
 
 
 def render_motif_report(request, curation_site_instances):
@@ -56,7 +55,7 @@ def view_reports_by_technique_function(request, function):
 
 
 def view_reports_by_technique_category(request, category_function, object_id):
-    """Returns the motif reports for a given experimental technique category."""
+    """Returns motif reports for a given experimental technique category."""
     category = get_object_or_404(models.ExperimentalTechniqueCategory,
                                  category_id=object_id)
     curation_site_instances = models.Curation_SiteInstance.objects.filter(

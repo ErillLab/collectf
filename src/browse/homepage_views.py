@@ -53,6 +53,7 @@ def feedback(request):
     """Returns the 'feedback' page."""
     return render(request, 'homepage_feedback.html')
 
+
 def feedback_send_email(request):
     """Sends an email to CollecTF team containing a feedback form."""
     try:
@@ -70,6 +71,7 @@ def feedback_send_email(request):
             directly to collectfdb@umbc.edu""")
 
     return HttpResponseRedirect(reverse('homepage_home'))
+
 
 def cite(request):
     """Returns the 'cite' page."""

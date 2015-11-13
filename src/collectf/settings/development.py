@@ -14,7 +14,7 @@ DATABASES = {
     }
 }
 
-#INSTALLED_APPS += ['debug_toolbar']
+# INSTALLED_APPS += ['debug_toolbar']
 DEBUG_TOOLBAR_PANELS = [
     'debug_toolbar.panels.sql.SQLPanel',
     'debug_toolbar.panels.profiling.ProfilingPanel'

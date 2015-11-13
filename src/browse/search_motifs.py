@@ -94,12 +94,14 @@ def search_post_helper(request):
         """Gets the experimental technique input from the form."""
         # Get category inputs
         category_inputs = [
-            [cat_id for cat_id in request.POST.getlist(field) if cat_id != 'on']
+            [cat_id for cat_id in request.POST.getlist(field)
+             if cat_id != 'on']
             for field in ['cat_input_1', 'cat_input_2', 'cat_input_3']]
         techniques = [models.ExperimentalTechnique.objects.filter(
             pk__in=category_input) for category_input in category_inputs]
         if not any(techniques):
-            raise ValidationError("Select at least one experimental technique.")
+            raise ValidationError(
+                "Select at least one experimental technique.")
         return techniques
 
     def techniques_to_Q(techniques):
@@ -120,14 +122,18 @@ def search_post_helper(request):
         # Create filter queries
         q1, q2, q3 = map(techniques_to_Q, get_technique_input())
         if boolean1 == 'and' and boolean2 == 'and':
-            curation_site_instances = curation_site_instances.filter(q1, q2, q3)
+            curation_site_instances = curation_site_instances.filter(
+                q1, q2, q3)
         elif boolean1 == 'and' and boolean2 == 'or':
             # (A and B) or C <-> (A or C) and (B or C)
-            curation_site_instances = curation_site_instances.filter(q1|q2, q2|q3)
+            curation_site_instances = curation_site_instances.filter(
+                q1 | q2, q2 | q3)
         elif boolean1 == 'or' and boolean2 == 'and':
-            curation_site_instances = curation_site_instances.filter(q1|q2).filter(q3)
+            curation_site_instances = curation_site_instances.filter(
+                q1 | q2).filter(q3)
         elif boolean1 == 'or' and boolean2 == 'or':
-            curation_site_instances = curation_site_instances.filter(q1|q2|q3)
+            curation_site_instances = curation_site_instances.filter(
+                q1 | q2 | q3)
         else:
             assert False, 'Shouldnt be here, unhandled case.'
         return curation_site_instances

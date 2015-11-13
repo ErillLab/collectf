@@ -74,7 +74,8 @@ def motif_comparison_post(request, step):
         return motif_comparison_get(request, step)
 
     # Store search results
-    request.session['motif_comparison_step_%d' % step] = curation_site_instances
+    request.session['motif_comparison_step_%d' % step] = (
+        curation_site_instances)
     request.session.modified = True
 
     if step == 1:
@@ -109,7 +110,6 @@ def motif_comparison_post(request, step):
              'second_motif_reports': second_motif_reports,
              'second_ensemble_report': second_ensemble_report,
              'aligned_weblogos': aligned_weblogos})
-
 
 
 def motif_similarity_measure(request):
@@ -162,15 +162,14 @@ def motif_similarity_measure(request):
              'p_value': '%.3lf' % p_value})
 
 
-
 def levenshtein_distances(motif_a, motif_b):
     """Levenshtein distances between all pairss of sites from two motifs.
-    
+
     Given two sets of binding sites (motif_a and motif_b), measures Levenshtein
     distance between all pairs of sequences from two motifs, to measure the
     distance between two motifs.
     """
-    def minimum_edit_distance(s1,s2):
+    def minimum_edit_distance(s1, s2):
         """Edit distance between two sequences."""
         if len(s1) > len(s2):
             s1, s2 = s2, s1
@@ -188,13 +187,13 @@ def levenshtein_distances(motif_a, motif_b):
         return distances[-1]
 
     dists = [float(minimum_edit_distance(seqa, seqb)) / (len(seqa) * len(seqb))
-            for seqa in motif_a for seqb in motif_b]
+             for seqa in motif_a for seqb in motif_b]
     return dists
 
 
 def levenshtein_measure(motif_a, motif_b):
     """Levenshtein distance between two motifs."""
-    
+
     a_vs_a = levenshtein_distances(motif_a, motif_a)
     a_vs_b = levenshtein_distances(motif_a, motif_b)
     b_vs_b = levenshtein_distances(motif_b, motif_b)
@@ -283,14 +282,15 @@ def kullback_leibler_divergence(sites_a, sites_b):
 
 def motif_alignment(sites_a, sites_b):
     """Aligns two motifs that gives the maximum similarity.
-    
+
     Returns two sets of sites that are aligned and of same length.
     """
     return motif_SW(sites_a, sites_b)
-    
+
+
 def motif_SW(sites_a, sites_b):
     """Smith-Waterman alignment of two motifs."""
-    
+
     len_motif_a = len(sites_a[0])
     len_motif_b = len(sites_b[0])
     M = [[None for i in xrange(len_motif_b+1)] for j in xrange(len_motif_a+1)]
@@ -314,7 +314,7 @@ def motif_SW(sites_a, sites_b):
         for j in xrange(len(M[0])):
             if M[i][j] > opt_score:
                 opt_score = M[i][j]
-                opt_i, opt_j = i,j
+                opt_i, opt_j = i, j
 
     alignment_a_start = opt_i-1
     alignment_a_end = opt_i
@@ -326,7 +326,7 @@ def motif_SW(sites_a, sites_b):
         alignment_b_start = opt_j-1
         opt_i -= 1
         opt_j -= 1
-    
+
     return ([site[alignment_a_start:alignment_a_end] for site in sites_a],
             [site[alignment_b_start:alignment_b_end] for site in sites_b])
 
@@ -349,11 +349,11 @@ def permutation_test(request, ma, mb, fnc):
     # calc p-value
     if fnc in [euclidean_distance, kullback_leibler_divergence]:
         p_value = (
-            (sum(1 if pd<true_dist else 0 for pd in permuted_dists) + 1.0) /
+            (sum(1 if pd < true_dist else 0 for pd in permuted_dists) + 1.0) /
             (len(permuted_dists) + 1))
     else:
         p_value = (
-            (sum(1 if pd>true_dist else 0 for pd in permuted_dists) + 1.0) /
+            (sum(1 if pd > true_dist else 0 for pd in permuted_dists) + 1.0) /
             (len(permuted_dists)+1))
     return fig2img(plt.gcf()), p_value
 
@@ -371,6 +371,7 @@ def sample(n, xs, replace=True):
             ys.remove(y)
         return samp
 
+
 def permute_sites(sites):
     """Permutes columns of the binding motif."""
     sites = sites[:]
@@ -383,7 +384,7 @@ def permute_sites(sites):
 
 def permuted_distances(request, motif_a, motif_b, dist_fun, n=100):
     """Permutes columns of two motifs and measures the distances.
-    
+
     Performs this for n times and returns the list of scores."""
 
     # Don't permute if already done.
@@ -393,7 +394,8 @@ def permuted_distances(request, motif_a, motif_b, dist_fun, n=100):
             [permute_sites(motif_b) for i in xrange(n)])
         request.session.modified = True
         print 'calcluating'
-    dists = [dist_fun(a,b) for a,b in zip(*request.session['permuted_motifs'])]
+    dists = [dist_fun(a, b)
+             for a, b in zip(*request.session['permuted_motifs'])]
     return dists
 
 
@@ -402,7 +404,7 @@ def fig2img(fig):
     imgdata = StringIO.StringIO()
     fig.savefig(imgdata, format='png')
     plt.clf()
-    imgdata.seek(0) # rewind the data
+    imgdata.seek(0)             # rewind the data
     return "data:image/png;base64,%s" % b64encode(imgdata.buf)
 
 

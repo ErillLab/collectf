@@ -11,6 +11,7 @@ from django.shortcuts import render
 
 from core import models
 
+
 def list_all_TFs(request):
     """Returns the list of all TFs."""
     TF_families = models.TFFamily.objects.all()
@@ -34,8 +35,9 @@ def list_all_publications(request):
     """View function to see all publications in the database."""
 
     publications = models.Publication.objects.all().order_by('-pmid')
-    return render(request, 'list_all_publications.html', 
+    return render(request, 'list_all_publications.html',
                   {"publications": publications})
+
 
 def list_all_curations(request):
     """View function to see all curations."""

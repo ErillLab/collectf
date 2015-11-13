@@ -88,7 +88,7 @@ urlpatterns = [
         view_motif_reports.view_reports_by_technique_function),
 
     # View motif reports by technique category
-    url(r'^view_motif_reports_by_technique_category/(binding|expression)/(\d+)/$',
+    url(r'^view_motif_reports_by_technique_category/(binding|expression)/(\d+)/$',  # noqa
         view_motif_reports.view_reports_by_technique_category),
 
     # View motif reports by technique
@@ -146,5 +146,4 @@ urlpatterns = [
     # CollecTF curator roster
     url(r'^curator_roster/$', stats_and_info.curator_roster,
         name='curator_roster')
-
 ]

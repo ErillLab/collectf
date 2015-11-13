@@ -7,6 +7,7 @@ from subprocess import PIPE
 from Bio import motifs
 from Bio.Seq import Seq
 
+
 def reverse_complement(seq):
     """Returns the reverse complement of the given sequence."""
     complement_dict = {'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'}
@@ -47,4 +48,3 @@ def build_motif(sites):
     """Creates Biopython Motif object from the given sites."""
     instances = [Seq(site) for site in sites]
     return motifs.create(instances)
-

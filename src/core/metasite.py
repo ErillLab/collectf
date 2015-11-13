@@ -57,7 +57,8 @@ class MetaSite:
         technique_ids = set(
             technique.technique_id
             for curation_site_instance in self.curation_site_instances
-            for technique in curation_site_instance.experimental_techniques.all())
+            for technique in
+            curation_site_instance.experimental_techniques.all())
         return models.ExperimentalTechnique.objects.filter(
             technique_id__in=technique_ids)
 
@@ -177,7 +178,8 @@ class MetaSite:
 
     def TF_instances_test(self, curation_site_instance):
         """True if the curation_site_instance and has the same TF-instances."""
-        return (self.TF_instances == curation_site_instance.curation.TF_instances)
+        return (
+            self.TF_instances == curation_site_instance.curation.TF_instances)
 
     def genome_test(self, curation_site_instance):
         """Checks if the curation_site_instance the same genome."""
