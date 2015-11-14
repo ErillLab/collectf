@@ -12,12 +12,6 @@
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
 
-    <!-- Optional theme -->
-    <link rel="stylesheet"
-          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css"
-          integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX"
-          crossorigin="anonymous">
-
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 
@@ -45,12 +39,22 @@
             <span class="icon-bar"></span>
           </button>
           <a class="navbar-brand" href="{% url 'homepage_home' %}">
-            <img src="{% static 'collectf_logo.png' %}"></a>
+            CollecTF
+          </a>
         </div>
 
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
-            <li><a href="#">Link</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                Data submission<span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="{% url 'add_TF' %}">Add TF</a></li>
+                <li><a href="{% url 'add_TF_family' %}">Add TF family</a></li>
+                <li><a href="{% url 'add_technique' %}">Add technique</a></li>
+              </ul>
+            </li>
           </ul>
 
           <ul class="nav navbar-nav navbar-right">
@@ -63,8 +67,6 @@
             {% endif %}
           </ul>
         </div>
-
-
 
       </div><!-- /.container-default -->
     </nav>

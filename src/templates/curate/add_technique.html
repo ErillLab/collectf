@@ -13,6 +13,28 @@
       </div>
     </div>
   </form>
+
+  <p class=" col-sm-offset-2 col-sm-10 col-lg-offset-2 col-lg-10">
+	Use the following tree to search for classes in Evidence Ontology.
+  </p>
+
+  <div id="widget_tree" class=" col-sm-offset-2 col-sm-10 col-lg-offset-2 col-lg-10">
+	<div class="ncboTree" style="width: 350px">	</div>
+  </div>
+
 </div>
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+<script src="http://bioportal.bioontology.org/widgets/jquery.ncbo.tree-2.0.0.js"></script>
+<link rel="stylesheet" href="http://bioportal.bioontology.org/widgets/jquery.ncbo.tree.css">
+<script type="text/javascript">
+var widget_tree = $("#widget_tree").NCBOTree({
+    apikey: "b704adac-1ab2-4589-b190-9e15f805367d",
+    ontology: "ECO",
+    startingRoot: "http://purl.obolibrary.org/obo/ECO_0000000"
+});
+</script>
 
 {% endblock %}

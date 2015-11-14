@@ -4,6 +4,9 @@ $(document).ready(function() {
 
     // Override blockUI defaults
     overrideBlockUIDefaults();
+
+    // Activate dropdowns
+    $('.dropdown-toggle').dropdown();
 });
 
 function overrideBlockUIDefaults() {
