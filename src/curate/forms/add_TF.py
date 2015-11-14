@@ -2,6 +2,7 @@ from django.forms import ModelForm
 
 from core import models
 
+
 class TFForm(ModelForm):
     class Meta:
         model = models.TF
@@ -12,4 +13,3 @@ class TFFamilyForm(ModelForm):
     class Meta:
         model = models.TFFamily
         fields = '__all__'
-        

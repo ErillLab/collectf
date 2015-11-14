@@ -14,7 +14,7 @@ def add_TF(request):
             return redirect('homepage_home')
 
     else:
-        form  = add_TF_form.TFForm()
+        form = add_TF_form.TFForm()
     return render(request, 'add_TF.html', {'form': form})
 
 
@@ -27,5 +27,5 @@ def add_TF_family(request):
             return redirect('homepage_home')
 
     else:
-        form  = add_TF_form.TFFamilyForm()
+        form = add_TF_form.TFFamilyForm()
     return render(request, 'add_TF_family.html', {'form': form})

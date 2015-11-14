@@ -14,7 +14,5 @@ def add_technique(request):
             return redirect('homepage_home')
 
     else:
-        form  = add_technique_form.ExperimentalTechniqueForm()
+        form = add_technique_form.ExperimentalTechniqueForm()
     return render(request, 'add_technique.html', {'form': form})
-
-
