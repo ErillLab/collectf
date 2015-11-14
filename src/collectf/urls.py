@@ -21,11 +21,13 @@ from django.views.generic import RedirectView
 
 from browse import urls as browse_urls
 from browse import view_site
+from curate import urls as curate_urls
 
 urlpatterns = [
     url(r'^$', RedirectView.as_view(url=reverse_lazy('homepage_home'))),
     url(r'^admin/', admin.site.urls),
     url(r'^browse/', include(browse_urls)),
+    url(r'^curate/', include(curate_urls)),
 
     # dbxref links from NCBI don't have browse/ prefix, being served from here.
     url(r'^expsite_(?P<dbxref_id>\w+)$', view_site.view_site),

@@ -65,6 +65,7 @@ TEMPLATES = [
         'DIRS': [
             os.path.join(BASE_DIR, 'templates'),
             os.path.join(BASE_DIR, 'templates', 'browse'),
+            os.path.join(BASE_DIR, 'templates', 'curate'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
