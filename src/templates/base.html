@@ -98,6 +98,37 @@
       {% endblock %}
     </div>
 
+    <footer class="footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-2">
+            <img src="{% static 'collectf_logo.png' %}" alt="collectf_logo" class="img-responsive"/>
+          </div>
+          <div class="col-md-7">
+            <p>Please send comments to <a href="mailto:collectfdb@umbc.edu">collectfdb@umbc.edu</a>.
+            For feedback or bug/errors, you can use the form
+            <a href="{% url 'homepage_feedback'%}" target="_blank">here</a>.
+            </p>
+
+            <p class="muted">
+            <small>
+              This material is based upon work supported by the National Science Foundation under
+              Grant Number MCB-1158056.  Any opinions, findings, and conclusions or recommendations
+              expressed in this material are those of the author(s) and do not necessarily reflect
+              the views of the National Science Foundation.
+            </small>
+          </p>
+          </div>
+
+          <div class="col-md-3">
+            <a href="http://compbio.umbc.edu">
+              <img src="{% static 'erilllab_logo.png' %}" alt="erilllab_logo" class="img-responsive"/>
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
     {% block js %}
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
