@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+
+{% if wizard.steps.step1 == 1 %}
+<div class="box">
+  <h1>Welcome to the CollecTF curation wizard.</h1>
+  <p>
+    Please do not use "Back" or "Forward" button of your browser during the
+    submission process. Instead, please use the navigation buttons at the bottom
+    of the page.
+  </p>
+
+  <p>
+    If you need any help during your curation, please refer to the
+    <a href="#" target="_blank" class="alert-link"> submission guide</a> (or <a href="#"
+    target="_blank" class="alert-link"> high-throughput submission guide</a>, if you are submitting
+    high-throughput data). If you have further questions, please
+    <a href="{% url 'homepage_feedback'%}" target="_blank" class="alert-link"> let us
+    know</a>!
+  </p>
+
+</div>
+{% endif %}
+
+<div class="progress progress-striped">
+  <div class="progress-bar progress-bar-info" role="progressbar"
+       aria-valnow="{{ wizard.steps.step1 }}"
+       aria-valmin="0"
+       aria-valmax="{{ wizard.steps.step1 }}"
+       style="width:{% widthratio wizard.steps.step1 wizard.steps.count 100%}%">
+    <span class=""> Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}</span>
+  </div>
+</div>
+
+{% with step=wizard.steps.current|slugify %}
+{% with fname="curation_step_"|add:step|add:"_title.html" %}
+<h2>
+  {% include fname %}
+  <small>
+    <a href="#form-description-collapse" data-toggle="collapse"
+       data-parent="form-description">
+      [help]
+    </a>
+  </small>
+</h2>
+{% endwith %}
+
+{% with fname="curation_step_"|add:step|add:"_description.html" %}
+<div class="accordion" id="form-description">
+  <div class="accordion-body collapse" id="form-description-collapse">
+    {% include fname %}
+  </div>
+</div>
+{% endwith %}
+{% endwith %}
+
+<div class="box">
+  <form method="post" action="" class="form-horizontal">  {% csrf_token %}
+
+    {{ wizard.management_form }}
+    {% block form %}
+
+    {% endblock %}
+
+    <div class="form-group">
+      <div class=" col-sm-offset-2 col-sm-10 col-lg-offset-2 col-lg-10">
+        {% if wizard.steps.prev %}
+        <button class="btn btn-primary" name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">prev step</button>
+        {% endif %}
+        <input class="btn btn-primary" type="submit" value="next step"/>
+      </div>
+    </div>
+  </form>
+</div>
+
+{% endblock %}

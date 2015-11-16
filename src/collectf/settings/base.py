@@ -127,6 +127,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
     os.path.join(BASE_DIR, 'static', 'browse'),
+    os.path.join(BASE_DIR, 'static', 'curate'),
 )
 
 # https://docs.djangoproject.com/en/1.9/topics/http/sessions/#session-serialization

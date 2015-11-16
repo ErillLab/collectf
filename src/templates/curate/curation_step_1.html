@@ -1,0 +1,16 @@
+{% extends "curation_base.html" %}
+{% load bootstrap %}
+{% load staticfiles %}
+
+{% block form %}
+
+{{ wizard.form|bootstrap_horizontal }}
+
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+<!-- typeahead -->
+<script type="text/javascript" src="{% static "bootstrap3-typeahead.min.js" %}"></script>
+<script src="{% static 'curation_step_1.js' %}"></script>
+{% endblock %}
