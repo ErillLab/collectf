@@ -170,6 +170,56 @@
     </div> <!-- /#split_view -->
 
     <div class="tab-pane" id="ensemble_view">
+       
+      <div class="box">
+        <p>
+          All binding sites in split view are combined and a sequence logo is generated. Note that it
+	      may contain binding site sequences from different transcription factors and different
+	      species. To see individiual sequence logos and curation details go to split view.
+        </p>
+	     <ul class="nav nav-tabs" id="sites_tab">
+	       <li>
+             <a href="#ensemble_view_sites" data-toggle="tab">Binding sites</a>
+           </li>
+	       <li>
+             <a href="#ensemble_view_aligned_sites" data-toggle="tab">Aligned binding sites</a>
+           </li>
+	       <li class="active">
+             <a href="#ensemble_view_weblogo" data-toggle="tab">Sequence logo</a>
+           </li>
+	     </ul>
+         <div class="tab-content">
+           <div class="tab-pane" id="ensemble_view_sites">
+             <br/>
+             <p>Sites are listed as curated.</p>
+             <div class="sequence box shaded-background">
+               {% for meta_site in ensemble_motif_report.meta_sites %}
+               {{ meta_site.delegate_sequence }}<br/>
+               {% endfor %}
+             </div>
+           </div>
+
+           <div class="tab-pane" id="ensemble_view_aligned_sites">
+             <br/>
+             <p>Sites are listed after the alignment process. For alignment of variable-length
+	          binding sites, <a href="http://www.biomedcentral.com/1471-2105/14/108/"
+	          target="_blank">LASAGNA</a> is used.
+	         </p>
+
+             <div class="sequence box shaded-background">
+               {% for seq in ensemble_motif_report.aligned_sites %}
+               {{ seq }}<br/>
+               {% endfor %}
+             </div>
+           </div>
+
+           <div class="tab-pane" id="ensemble_view_weblogo">
+             <br>
+             <p>To generate the weblogo, aligned binding sites are used.</p>
+             <img src="{{ ensemble_motif_report.weblogo }}">
+           </div>
+         </div> <!-- /.tab-content -->
+       </div> 
     </div> <!-- /#ensemble_view -->
 
     <div class="tab-pane" id="export">

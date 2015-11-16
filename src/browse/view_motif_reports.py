@@ -9,6 +9,7 @@ from django.shortcuts import render
 
 from core import models
 from .motif_report import build_motif_reports
+from .motif_report import build_ensemble_report
 
 
 def render_motif_report(request, curation_site_instances):
@@ -16,8 +17,10 @@ def render_motif_report(request, curation_site_instances):
     motif_reports = build_motif_reports(curation_site_instances)
     for motif_report in motif_reports:
         motif_report.meta_sites[0].curation_site_instances
+    ensemble_motif_report = build_ensemble_report(curation_site_instances)
     return render(request, 'view_motif_reports.html',
-                  {'motif_reports': motif_reports})
+                  {'motif_reports': motif_reports,
+                   'ensemble_motif_report': ensemble_motif_report})
 
 
 def view_reports_by_TF_and_species(request, TF_id, species_id):
