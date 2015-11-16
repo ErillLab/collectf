@@ -1,6 +1,6 @@
 """Functions to fetch information from NCBI via Entrez."""
 
-from urllib.error import HTTPError
+import urllib
 
 from Bio import Entrez
 from Bio import SeqIO
@@ -29,5 +29,5 @@ def get_genome(accession):
         record = SeqIO.read(handle, 'gb')
         handle.close()
         return record
-    except HTTPError:
+    except urllib.error.HTTPError:
         raise EntrezException

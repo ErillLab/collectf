@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     # Utility apps
     'registration',
     'bootstrapform',
+    'formtools',
     # CollecTF apps
     'core',
     'browse',
