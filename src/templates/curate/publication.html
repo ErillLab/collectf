@@ -1,0 +1,10 @@
+
+<div>
+  {{ publication.title }}
+  <a href="https://www.ncbi.nlm.nih.gov/pubmed/?term={{publication.pmid}}" target="_blank">
+    [{{ publication.pmid }}]</a><br/>
+  {{ publication.authors }}<br/>
+  <i>{{ publication.journal }}</i>
+  {{publication.publication_date}};
+  {{publication.volume}}({{publication.issue}}):{{publication.pages}}
+</div>

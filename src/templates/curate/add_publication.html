@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load bootstrap %}
+{% block content %}
+
+<div class="box">
+<h1>PubMed publication submission.</h1>
+<hr>
+<div class="alert alert-info">
+Please provide a PMID identifier for your publication and enter name of the transcription factor and
+species for which the sites are reported. You can indicate, using the appropriate checkboxes,
+whether your manuscript contains specific promoter information (e.g. Pribnow boxes, transcriptional
+start site position...) and whether it reports expression data (evidence of TF-mediated regulation).
+</div>
+
+<form class="form-horizontal" role="form" action="" method="post">{% csrf_token %}
+  {{ form|bootstrap_horizontal }}
+  <div class="form-group">
+      <input type="hidden" name="{{ stage_field }}" value="1"/>
+      <input type="submit" class="btn btn-primary btn-block" role="button" value="Preview" />
+  </div>
+</form>
+
+{% endblock %}
