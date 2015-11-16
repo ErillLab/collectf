@@ -93,6 +93,9 @@
           <ul class="nav navbar-nav navbar-right">
             {% if user.is_authenticated %}
             <li class="navbar-text">Hello {{user.username}}</li>
+            {% if user.is_superuser %}
+            <li><a href="{% url 'admin:index' %}">Admin page</a></li>
+            {% endif %}
             <li><a href="{% url 'auth_logout' %}" class="navbar-link">Logout</a></li>
             {% else %}
             <li><a class="navbar-link" href="{% url 'registration_register' %}">Register</a></li>
