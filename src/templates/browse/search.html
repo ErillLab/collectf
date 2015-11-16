@@ -13,18 +13,18 @@
 <form class="form" role="form" id="search_form" method="POST"
       action="{% url 'motif_search' %}">{% csrf_token %}
   {% include "search_form_fields.html" %}
+  
+  <div class="alert alert-warning alert-block">
+    <button type="button" class="close" data-dismiss="alert">x</button>
+    <p class="lead">
+      CollecTF generates search and browse reports on the fly to provide
+      maximum up-to-date information. This includes real-time alignment and logo
+      generation. Reports for large taxonomical families or multiple TFs make take some
+      time. Please be patient!
+    </p>
+  </div>
   <input type="submit"  class="btn btn-primary btn-block" value="Search" />
 </form>
-
-<div class="alert alert-warning alert-block">
-  <button type="button" class="close" data-dismiss="alert">x</button>
-  <p class="lead">
-    CollecTF generates search and browse reports on the fly to provide
-    maximum up-to-date information. This includes real-time alignment and logo
-    generation. Reports for large taxonomical families or multiple TFs make take some
-    time. Please be patient!
-  </p>
-</div>
 
 {% endblock %}
 
