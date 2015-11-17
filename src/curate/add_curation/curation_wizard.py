@@ -21,10 +21,13 @@ For more information, see django-formtools documentation.
 from django.contrib.auth.decorators import login_required
 from formtools.wizard.views import SessionWizardView
 
-from curate.forms import add_curation as curation_forms
+from curate.forms.add_curation.publication import PublicationForm
+from curate.forms.add_curation.genome import GenomeForm
+from curate.forms.add_curation.techniques import TechniquesForm
 
 from . import get_form
 from . import process_step
+
 
 class CurationWizard(SessionWizardView):
     """Form wizard to handle curation forms."""
@@ -42,6 +45,7 @@ class CurationWizard(SessionWizardView):
         handlers = {
             '0': get_form.publication_get_form,
             '1': get_form.genome_get_form,
+            '2': get_form.techniques_get_form,
         }
         return handlers[step](self, form)
 
@@ -49,6 +53,8 @@ class CurationWizard(SessionWizardView):
         """Post-processes data after each step."""
         handlers = {
             '0': process_step.publication_process_step,
+            '1': process_step.genome_process_step,
+            '2': process_step.techniques_process_step,
         }
         handlers[self.steps.current](self, form)
         return self.get_form_step_data(form)
@@ -59,8 +65,9 @@ def curation(request):
     request.session['is_high_throughput_curation'] = False
 
     view = CurationWizard.as_view([
-        curation_forms.PublicationForm,
-        curation_forms.GenomeForm,
+        PublicationForm,
+        GenomeForm,
+        TechniquesForm,
     ])
 
     return view(request)

@@ -1,0 +1,14 @@
+{% extends "curation_base.html" %}
+{% load bootstrap %}
+{% load staticfiles %}
+
+{% block form %}
+
+{{ wizard.form|bootstrap_horizontal }}
+
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+<script src="{% static 'curation_step_2.js' %}"></script>
+{% endblock %}

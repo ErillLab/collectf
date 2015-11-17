@@ -59,3 +59,35 @@ def genome_get_form(wiz, form):
     form.fields['contains_expression_data'].initial = pub.contains_expression_data
 
     return form
+
+
+def techniques_get_form(wiz, form):
+    """Constructs the form for experiemental techniques step."""
+    curation = wiz.request.session.get('previously_curated_paper')
+    # If selected paper is previously curated, prepopulate experimental
+    # techniques
+    if curation:
+        # get all techniques used in this curation
+        curation_site_instances = models.Curation_SiteInstance.objects.filter(
+            curation=curation)
+        techniques = list(set(
+            tech.technique_id
+            for csi in curation_site_instances
+            for tech in csi.experimental_techniques.all()))
+        form.fields['techniques'].initial = techniques
+
+        form.fields['experimental_process'].initial = (
+            curation.experimental_process)
+        try:
+            external_dbs = models.Curation_ExternalDatabase.objects.filter(
+                curation=curation)
+            for i, external_db in enumerate(external_dbs):
+                form.fields['external_db_type_%d'%i].initial = (
+                    external_db.external_database.ext_database_id)
+                form.fields['external_db_accession_%d'%i].initial = (
+                    external_db.accession_number)
+        except models.Curation_ExternalDatabase.DoesNotExist:
+            pass
+        form.fields['forms_complex'].initial = curation.forms_complex
+        form.fields['complex_notes'].initial = curation.complex_notes
+    return form

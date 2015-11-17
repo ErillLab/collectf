@@ -82,6 +82,35 @@ function toggleTFFields() {
             t.closest('.form-group').toggle('fast');
         }
     }
+
+    var TF_refseq_accessions = $("[id^='id_1-TF_refseq_accession_']");
+    for (i=0; i<TF_refseq_accessions.length; i++) {
+        t = $(TF_refseq_accessions[i]);
+        if (!(t.val())) {
+            t.closest('.form-group').toggle('fast');
+        }
+    }
+}
+
+function getRefseqAccession() {
+    // Gets the RefSeq accession number using the UniProt field.
+    var TF_accessions = $("[id^='id_1-TF_accession']").sort();
+    var TF_refseq_accessions = $("[id^='id_1-TF_refseq_accession']").sort();
+    for (i=0; i<TF_accessions.length; i++) {
+        (function(i) {
+            var uniprot = $(TF_accessions[i]);
+            var refseq = $(TF_refseq_accessions[i]);
+            uniprot.change(function() {
+                $.getJSON("/curate/json_uniprot_to_refseq/" + this.value,
+                          function(data) {
+                              if (data) {
+                                  console.log(refseq);
+                                  refseq.val(data);
+                              }
+                          });
+            });
+        })(i);
+    }
 }
 
 $(document).ready(function() {
@@ -92,4 +121,5 @@ $(document).ready(function() {
     addToggleLinks();
     toggleGenomeFields();
     toggleTFFields();
+    getRefseqAccession();
 });

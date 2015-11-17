@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="box">
+  <h1>CollecTF statistics</h1>
+  <hr/>
+  <ul class="nav nav-pills">
+    <li class=""><a href="#global" class="nav-li" id="global">Global statistics</a></li>
+    <li><a href="#curations" class="nav-li" id="curations">Curation statistics</a></li>
+    <li><a href="#site" class="nav-li" id="site">Site statistics</a></li>
+  </ul>
+
+  <div id="global">
+    <table class="table table-striped">
+      <tbody>
+        <tr>
+	      <td>Number of TFs</td>
+	      <td>{{ TF_count }}</td>
+        </tr>
+        <tr>
+	      <td>Number of species</td>
+	      <td>{{ species_count }}</td>
+        </tr>
+        <tr>
+	      <td>Number of curations</td>
+	      <td>{{ curation_count }}</td>
+        </tr>
+      <tr>
+	    <td>Number of binding sites</td>
+	    <td> {{ sites_count }}</td>
+      </tr>
+        <tr>
+	      <td>Number of publications</td>
+	      <td>{{ publication_count }} ({{publication_complete_ratio}}% completed)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+
+google.load('visualization', '1', {'packages':['corechart']});
+
+// Set a callback to run when the Google Visualization API is loaded.
+google.setOnLoadCallback(drawChart);
+
+function drawCurationChart {
+    var data = google.visualization.arrayToDataTable([
+	    ['species', {% for TF in TFs %} '{{ TF }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+	    {% for sp in species %}
+	    ['{{ sp }}',
+         {% for TF in TFs %}
+         {{ num_curations_by_TF_species|get_item:TF|get_item:sp }}{% if not forloop.last %},{% endif %}
+         {% endfor %}
+         ]{% if not forloop.last %}, {% endif %}
+	    {% endfor %}
+    ]);
+    var options = {
+        title: 'CollecTF curation number by TF and species',
+        vAxis: {title: 'Species'},
+	hAxis: {title: 'Number of curations'},
+        chartArea: {height:"90%"},
+        height: 1500,
+	isStacked: true
+    };
+    var chart = new google.visualization.BarChart(document.getElementById('num_curations_div'));
+    chart.draw(data, options);
+}
+
+</script>
+{% endblock %}

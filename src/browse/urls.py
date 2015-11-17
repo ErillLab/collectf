@@ -145,5 +145,12 @@ urlpatterns = [
 
     # CollecTF curator roster
     url(r'^curator_roster/$', stats_and_info.curator_roster,
-        name='curator_roster')
+        name='curator_roster'),
+
+    # Release history
+    url(r'^release_history/$', stats_and_info.release_history,
+        name='release_history'),
+
+    # Database statistics
+    url(r'^database_stats/$', stats_and_info.stats, name='stats'),
 ]

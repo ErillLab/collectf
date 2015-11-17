@@ -3,7 +3,20 @@
 
 {% block homepage_content %}
 
-lorem ipsum
+<h1>CollecTF statistics</h1>
+
+<ul>
+  <li> <a href="{% url 'stats' %}#global">CollecTF global statistics</a></li>
+  <li> <a href="{% url 'stats' %}#curations">Curation statistics</a></li>
+  <li> <a href="{% url 'stats' %}#site">Site statistics</a></li>
+  <li> <a href="{% url 'list_all_curations' %}">List of all curations</a></li>
+  <li> <a href="{% url 'list_all_publications' %}">List of all publications</a></li>
+  <li> <a href="{% url 'list_all_TFs' %}">List of transcription factors</a></li>
+  <li> <a href="{% url 'list_all_species' %}">List of species</a></li>
+  <li> <a href="{% url 'list_all_experimental_techniques' %}">List of experimental techniques</a></li>
+  <li> <a href="{% url 'curator_roster' %}">Curators roster</a></li>
+  <li> <a href="{% url 'release_history' %}">Release history</a></li>
+</ul>
 
 {% endblock %}
 

@@ -5,7 +5,13 @@ from subprocess import Popen
 from subprocess import PIPE
 
 from Bio import motifs
+from Bio import SeqUtils
 from Bio.Seq import Seq
+
+
+def GC(seq):
+    """GC content of the sequence"""
+    return SeqUtils.GC(seq)
 
 
 def reverse_complement(seq):

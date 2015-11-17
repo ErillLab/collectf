@@ -32,4 +32,5 @@ urlpatterns = [
     # Helper JSON views
     url(r'^json_get_genomes$', json_views.get_genomes),
     url(r'^json_get_TF_instances$', json_views.get_TF_instances),
+    url(r'^json_uniprot_to_refseq/(\w+)$', json_views.uniprot_to_refseq),
 ]
