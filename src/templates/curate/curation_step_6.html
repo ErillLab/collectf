@@ -1,0 +1,191 @@
+{% extends "add_curation.html" %}
+
+{% load bootstrap %}
+{% load utiltags %}
+
+{% block form %}
+
+{% comment %}
+This form is not generated using django-bootstrap-form, because the default
+layout is not used. Instead, form fields are displayed as cells of a table.
+{% endcomment %}
+
+{% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        <a class="close" data-dismiss="alert">&times;</a>
+        {% for non_field_error in form.non_field_errors %}
+             {{ non_field_error }}
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% for field in form.hidden_fields %}
+    {{ field }}
+{% endfor %}
+
+<table class="table table-bordered table-striped">
+<thead>
+  <tr>
+    <th>Site</th>
+    <th>TF-type</th>
+    <th>TF-function</th>
+    <th colspan="{{ techniques|length }}"><span>Experimental techniques</span></th>
+    {% if has_quantitative_data %}
+    <th>Quantitative value</th>
+    {% endif %}
+  </tr>
+  <tr>
+
+    <th class="small"> <small> <a href="#" onclick="selectAllSites(); return false;">Select/Unselect all</a>
+         </small></th>
+    <th class="small">
+      <select class="form-control" id="TF_type_selected">
+        <option value="MONOMER">monomer</option>
+        <option value="DIMER">dimer</option>
+        <option value="TETRAMER">tetramer</option>
+        <option value="OTHER">other</option>
+        <option value="N/A">not-specified</option>
+      </select><br/>
+      <small> <a href="#" onclick="applyTFTypeToSelectedSites(); return false;">Apply to selected</a></small>
+    </th>
+
+    <th class="small">
+      <select class="form-control" id="TF_function_selected">
+        <option value="ACT">activator</option>
+        <option value="REP">repressor</option>
+        <option value="DUAL">dual</option>
+        <option value="N/A">not specified</option>
+      </select><br/>
+      <small> <a href="#" onclick="applyTFFunctionToSelectedSites(); return false;">Apply to selected</a></small>
+    </th>
+
+    {% for t in techniques %}
+    <th class="rotate-45 small">
+        {{ t.name }} <small> <a href="#" onclick="applyToSelectedSites({{forloop.counter0}}); return false;">Apply to selected</a> /
+          <a href="#" onclick="clearAll({{ forloop.counter0 }}); return false;">Clear all</a></small>
+    </th>
+    {% endfor %}
+    {% if has_quantitative_data %}
+    <th></th>
+    {% endif %}
+  </tr>
+</thead>
+
+<tbody>
+  {% for site in sites %}
+  {% with i=site.key|slugify %}
+  <tr class="small">
+    <th><div class="sequence-block">{% with i|add:"_site" as field_name %}{{ form|get:field_name|bootstrap }}{% endwith %}</div></th>
+    <th>{% with i|add:"_TF_type" as field_name %}{{ form|get:field_name|bootstrap_inline }}{% endwith %}</th>
+    <th>{% with i|add:"_TF_function" as field_name %}{{ form|get:field_name|bootstrap_inline }}{% endwith %}</th>
+    {% for t in techniques %}
+    {% with j=forloop.counter0|slugify %}
+    <th>{% with i|add:"_technique_"|add:j as field_name %}{{ form|get:field_name|bootstrap_inline }}{% endwith %}</th>
+    {% endwith %}
+    {% endfor %}
+    {% if has_quantitative_data %}
+    <th>{% with i|add:"_qval" as field_name %}{{ form|get:field_name|bootstrap_inline }}{% endwith %}</th>
+    {% endif %}
+  </tr>
+  {% endwith %}
+  {% endfor %}
+</tbody>
+</table>
+
+<script type="text/javascript">
+function selectAllSites() {
+    var checkboxes = $("[id$='_site']");
+    checkboxes.prop('checked', !checkboxes.prop('checked'));
+}
+
+function applyToSelectedSites(techniqueId) {
+    // Given a technique ID, check checkboxes of selected sites for that technique.
+    var checkboxes = $("[id$='_site']");
+    for(i=0; i<checkboxes.length; i++) {
+        if (checkboxes[i].checked) {
+            var t = i + '_technique_' + techniqueId;
+            var technique = $('#id_6-' + t );
+            technique.prop('checked', 'checked');
+        }
+    }
+}
+
+function applyTFFunctionToSelectedSites() {
+    // Apply TF function to the selected sites.
+    var checkboxes = $("[id$='_site']");
+    var v = $("#TF_function_selected").val();
+    for(i=0; i<checkboxes.length; i++) {
+        if (checkboxes[i].checked) {
+            $("#id_6-" + i + '_TF_function').val(v);
+        }
+    }
+}
+
+function applyTFTypeToSelectedSites() {
+    // Apply TF function to the selected sites.
+    var checkboxes = $("[id$='_site']");
+    var v = $("#TF_type_selected").val();
+    for(i=0; i<checkboxes.length; i++) {
+        if (checkboxes[i].checked) {
+            $("#id_6-" + i + '_TF_type').val(v);
+        }
+    }
+}
+
+function diagramsOnHover() {
+    // make diagrams to be visible on hover
+    var seqs = $('.sequence');
+
+    for (i=0; i<seqs.length; i++) {
+        var seq = $(seqs[i]);
+        seq.popover({title:'',
+                     content:seq.next().append(seq.next().next()),
+                     html:true,
+                     trigger:'hover',
+                     placement:'right'});
+        seq.popover('show');
+        seq.popover('hide');
+
+    }
+}
+
+function clearAll(techniqueId) {
+    var t = '_technique_' + techniqueId 
+    $("[id$=" + "'" + t + "']").removeAttr('checked');
+}
+
+
+var lastChecked = null;
+
+$(document).ready(function() {
+    // remove class from all elements
+    $('div').removeClass('form-group');
+    // Add it back to the button
+    $('.btn').parent().parent().addClass('form-group');
+    // remove class form-control
+    $('.form-control').removeClass('form-control');
+    // Hide gene diagrams by default
+    diagramsOnHover();
+    // shift select multiple checkboxes
+    var checkboxes = $('[id^=id_6-][id$=_site]');
+    console.log(checkboxes);
+    $(checkboxes).click(function(e) {
+        console.log(lastChecked);
+        if (!lastChecked) {
+            lastChecked = this;
+            return;
+        }
+        if (e.shiftKey) {
+            var start = $(checkboxes).index(this);
+            var end = $(checkboxes).index(lastChecked);
+            console.log(start + ' ' + end);
+            $(checkboxes.slice(Math.min(start, end), Math.max(start, end)+1)).prop('checked', $(lastChecked).is(':checked'));
+        }
+        lastChecked = this;
+        console.log(lastChecked)
+    });
+
+});
+</script>
+
+{% endblock %}

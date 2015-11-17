@@ -68,6 +68,8 @@
                 Data submission<span class="caret"></span>
               </a>
               <ul class="dropdown-menu" role="menu">
+                <li><a href="{% url 'curation' %}">New curation</a></li>
+                <li><a href="{% url 'high_throughput_curation' %}">New high-throughput curation</a></li>
                 <li><a href="{% url 'add_pubmed_publication' %}">New PubMed publication</a></li>
                 <li><a href="{% url 'add_non_pubmed_publication' %}">New non-PubMed publication</a></li>
                 <li role="separator" class="divider"></li>

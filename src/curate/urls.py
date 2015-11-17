@@ -4,7 +4,7 @@ from . import add_TF
 from . import add_publication
 from . import add_technique
 from . import json_views
-from .add_curation import curation_wizard
+from . import add_curation
 
 urlpatterns = [
     # Add TF
@@ -27,7 +27,9 @@ urlpatterns = [
         name='add_non_pubmed_publication'),
 
     # Curation
-    url(r'^curation/$', curation_wizard.curation, name='curation'),
+    url(r'^curation/$', add_curation.curation, name='curation'),
+    url(r'^high_throughput_curation/$', add_curation.high_throughput_curation,
+        name='high_throughput_curation'),
 
     # Helper JSON views
     url(r'^json_get_genomes$', json_views.get_genomes),

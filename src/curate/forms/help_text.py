@@ -43,7 +43,7 @@ non_pubmed_publication_form = dict(
 
 # Curation help texts
 publication_form = dict(
-    publication='',
+    pub='',
     no_data= """
     Check this button if, after examining the paper, you find that the paper
     does not have data on binding sites. Checking this button will mark the
