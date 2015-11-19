@@ -10,3 +10,4 @@ django-formtools==1.0
 uniprot_tools==0.4.1
 requests==2.8.1
 regex==2015.11.14
+django-extensions==1.5.9
