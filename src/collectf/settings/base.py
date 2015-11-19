@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'registration',
     'bootstrapform',
     'formtools',
+    'django_extensions',
     # CollecTF apps
     'core',
     'browse',

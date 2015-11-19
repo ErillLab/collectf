@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic import RedirectView
 
@@ -38,6 +39,8 @@ urlpatterns = [
         view_motif_reports.view_reports_by_uniprot_dbxref),
     url(r'^uniprot/(?P<uniprot_accession>\w+)$',
         view_motif_reports.view_reports_by_uniprot_accession),
+    url(r'^uniprotkbmap$',
+        RedirectView.as_view(url=static('uniprot_dbxref.txt'))),
 
     # user account management
     url(r'^accounts/', include('registration.backends.default.urls')),
