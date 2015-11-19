@@ -435,7 +435,7 @@ class TechniquesForm(forms.Form):
     # Generate techniques field by getting available techniques from db
     template = get_template('experimental_technique_field.html')
     choices = [(technique.technique_id,
-                template.render(Context({'technique': technique})))
+                template.render({'technique': technique}))
                for technique in ExperimentalTechnique.objects.order_by('name')]
 
     techniques = forms.MultipleChoiceField(
