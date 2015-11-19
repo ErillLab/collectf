@@ -6,10 +6,13 @@ properly.
 
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
+from django.shortcuts import redirect
 
 from core import models
+from core import dbxref
 from .motif_report import build_motif_reports
 from .motif_report import build_ensemble_report
+
 
 
 def render_motif_report(request, curation_site_instances):
@@ -90,3 +93,23 @@ def view_reports_by_curation_site_instance_ids(request):
     curation_site_instances = models.Curation_SiteInstance.objects.filter(
         pk__in=curation_site_instance_ids)
     return render_motif_report(request, curation_site_instances)
+
+
+def view_reports_by_TF_instance(request, TF_instance_id):
+    """Returns motif report for the given TF instance."""
+    curation_site_instances = models.Curation_SiteInstance.objects.filter(
+        curation__TF_instances=TF_instance_id)
+    return render_motif_report(request, curation_site_instances)
+
+
+def view_reports_by_uniprot_dbxref(request, uniprot_dbxref):
+    """Builds motif report for the given UniProt dbxref identifier."""
+    TF_instance_id = dbxref.from_uniprot_dbxref(uniprot_dbxref)
+    return redirect(view_reports_by_TF_instance, TF_instance_id)
+
+
+def view_reports_by_uniprot_accession(request, uniprot_accession):
+    """Builds motif report for the given UniProt accession number."""
+    TF_instance = get_object_or_404(models.TFInstance,
+                                    uniprot_accession=uniprot_accession)
+    return redirect(view_reports_by_TF_instance, TF_instance.TF_instance_id)

@@ -21,6 +21,7 @@ from django.views.generic import RedirectView
 
 from browse import urls as browse_urls
 from browse import view_site
+from browse import view_motif_reports
 from curate import urls as curate_urls
 
 urlpatterns = [
@@ -30,8 +31,13 @@ urlpatterns = [
     url(r'^curate/', include(curate_urls)),
 
     # dbxref links from NCBI don't have browse/ prefix, being served from here.
-    url(r'^expsite_(?P<dbxref_id>\w+)$', view_site.view_site),
-    url(r'^EXPSITE_(?P<dbxref_id>\w+)$', view_site.view_site),
+    url(r'^(expsite|EXPSITE)_(?P<dbxref_id>\w+)$', view_site.view_site),
+
+    # UniProt dbxref
+    url(r'^(expreg|EXPREG)_(?P<uniprot_dbxref>\w+)$',
+        view_motif_reports.view_reports_by_uniprot_dbxref),
+    url(r'^uniprot/(?P<uniprot_accession>\w+)$',
+        view_motif_reports.view_reports_by_uniprot_accession),
 
     # user account management
     url(r'^accounts/', include('registration.backends.default.urls')),

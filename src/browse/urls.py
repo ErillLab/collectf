@@ -70,6 +70,10 @@ urlpatterns = [
     url(r'get_results_by_technique_category/(binding|expression)/(\d+)/$',
         browse_by_technique.get_results_by_technique_category),
 
+    # View motif reports by TF instance
+    url(r'view_reports_by_TF_instance/(\d+)/$',
+        view_motif_reports.view_reports_by_TF_instance),
+
     # View motif reports by TF and species
     url(r'^view_motif_reports_by_TF_and_species/(\d+)/(\d+)/$',
         view_motif_reports.view_reports_by_TF_and_species,
