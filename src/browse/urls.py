@@ -106,6 +106,7 @@ urlpatterns = [
 
     # Search
     url(r'^search_motifs/$', search_motifs.search, name='motif_search'),
+    url(r'^search_terms/$', search_motifs.search_terms, name='term_search'),
 
     # Motif comparison
     url(r'^compare_motifs/$',

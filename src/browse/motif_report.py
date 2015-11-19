@@ -77,8 +77,11 @@ class EnsembleMotifReport(MotifReportBase):
 def group_curation_site_instances(curation_site_instances):
     """Groups Curation_SiteInstance objects by TF-instance and genome."""
     TF_genome_pairs = curation_site_instances.filter(
-        site_type='motif_associated').values_list(
-        'site_instance__genome__organism', 'curation__TF_instances').distinct()
+        site_type='motif_associated').order_by(
+            'curation__TF_instances__TF',
+            'site_instance__genome__organism').values_list(
+                'site_instance__genome__organism',
+                'curation__TF_instances').distinct()
     return [curation_site_instances.filter(
         site_instance__genome__organism=genome,
         curation__TF_instances=TF_instances)

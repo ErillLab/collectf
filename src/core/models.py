@@ -275,7 +275,7 @@ class Genome(models.Model):
     organism = models.CharField(max_length=500, null=False)
 
     # The taxonomy of the species that this genome belongs to.
-    taxonomy = models.ForeignKey('Taxonomy')
+    taxonomy = models.ForeignKey('Taxonomy', related_name='genome')
 
     def __unicode__(self):
         """Returns the unicode representation of the Genome."""

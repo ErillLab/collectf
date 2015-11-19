@@ -2,9 +2,8 @@
 
 from django.contrib import messages
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
 from django.db.models import Q
-from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
 from django.shortcuts import render
 
 from core import models
@@ -157,10 +156,62 @@ def search_post(request):
         motif_reports = build_motif_reports(curation_site_instances)
         motif_ensemble_report = build_ensemble_report(curation_site_instances)
         return render(
-            request, 'search_results.html',
+            request,
+            'search_results.html',
             {'motif_reports': motif_reports,
              'ensemble_motif_report': motif_ensemble_report})
 
     except ValidationError, e:
         messages.add_message(request, messages.ERROR, e.message)
-        return HttpResponseRedirect(reverse(search))
+        return redirect(search)
+
+
+def search_terms(request):
+    """View function for keyword-searching CollecTF."""
+    import operator
+    regex = '[[:<:]]{0}[[:>:]]'  # works with MySQL backend only.
+    terms = [term.strip() for term in request.GET.get('search-term').split()]
+    if not terms:
+        return redirect('homepage_home')
+
+    # Search taxonomy
+    taxonomy_qs = [Q(name__iregex=regex.format(term)) |
+                   Q(genome__genome_accession__istartswith=term)
+                   for term in terms]
+    taxonomy = (
+        models.Taxonomy.objects.filter(reduce(operator.or_, taxonomy_qs)) or
+        models.Taxonomy.objects.all())
+
+    # Search TF/TF-family
+    TF_qs = [Q(TF__name__iregex=regex.format(term)) |
+             Q(uniprot_accession__iregex=regex.format(term)) |
+             Q(refseq_accession__istartswith=term)
+             for term in terms]
+    TF_instances = (
+        models.TFInstance.objects.filter(reduce(operator.or_, TF_qs)) or
+        models.TFInstance.objects.all())
+
+    fail_msg = ("Your search (%s) did not match any motifs." %
+                request.GET.get('search-term'))
+
+    # If nothing is filtered, don't return the entire database content.
+    if (taxonomy.count() == models.Taxonomy.objects.count() and
+        TF_instances.count() == models.TFInstance.objects.count()):
+        messages.add_message(request, messages.INFO, fail_msg)
+        return redirect('homepage_home')
+
+    # Search curation site instances with the search criteria
+    curation_site_instances = models.Curation_SiteInstance.objects.filter(
+        site_instance__genome__taxonomy__in=taxonomy,
+        curation__TF_instances__in=TF_instances)
+    if curation_site_instances:
+        motif_reports = build_motif_reports(curation_site_instances)
+        motif_ensemble_report = build_ensemble_report(curation_site_instances)
+        return render(
+            request,
+            'search_results.html',
+            {'motif_reports': motif_reports,
+             'ensemble_motif_report': motif_ensemble_report})
+
+    messages.add_message(request, messages.INFO, fail_msg)
+    return redirect('homepage_home')
