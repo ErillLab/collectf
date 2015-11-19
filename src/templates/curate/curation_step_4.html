@@ -1,18 +1,15 @@
 {% extends "curation_base.html" %}
 
 {% load bootstrap %}
+{% load staticfiles %}
 
 {% block form %}
 
 {{ wizard.form|bootstrap_horizontal }}
 
-<script type="text/javascript">
+{% endblock %}
 
-$(document).ready(function() {
-    // Add sequence class to all fields (site matches), to make them fixed-width.
-    $('.form-group').find('label:first').addClass('sequence');
-});
-
-</script>
-
+{% block js %}
+{{ block.super }}
+<script src="{% static 'curation_step_4.js' %}"></script>
 {% endblock %}

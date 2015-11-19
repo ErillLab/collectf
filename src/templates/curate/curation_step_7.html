@@ -1,16 +1,15 @@
 {% extends "curation_base.html" %}
 
 {% load bootstrap %}
+{% load staticfiles %}
 
 {% block form %}
 
 {{ wizard.form|bootstrap_horizontal }}
 
-<script type="text/javascript">
+{% endblock %}
 
-// Change the ul style (hide bullet points on the list of gene regulations)
-$('ul').css('list-style-type', 'none');
-
-</script>
-
+{% block js %}
+{{ block.super }}
+<script src="{% static 'curation_step_7.js' %}"></script>
 {% endblock %}
