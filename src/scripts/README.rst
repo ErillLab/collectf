@@ -8,4 +8,5 @@ scripts is to put the script in this directory, define a ``run()`` function
 inside the file which will be run when the following command is executed.
 
 ::
+
    python manage.py runscript <script-filename>
