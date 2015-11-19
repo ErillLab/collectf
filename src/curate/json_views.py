@@ -1,4 +1,3 @@
-import json
 from django.http import JsonResponse
 
 from core import models
@@ -6,7 +5,7 @@ from core import models
 
 def get_genomes(request):
     """Gets the list of all genomes."""
-    genomes =  list(models.Genome.objects.values(
+    genomes = list(models.Genome.objects.values(
         'genome_accession', 'organism').distinct())
     return JsonResponse(genomes, safe=False)
 
@@ -30,5 +29,5 @@ def uniprot_to_refseq(request, uniprot_accession):
         pass
 
     # TODO(sefa): Try to fetch using UniProt mapping service.
-    
+
     return JsonResponse(refseq, safe=False)

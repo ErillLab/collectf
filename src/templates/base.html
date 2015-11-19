@@ -7,24 +7,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come
     *after* these tags -->
-    
+
     <meta name="description" content="CollecTF is a database of transcription factor binding sites
     (TFBS) in the Bacteria domain. It aims at becoming a reference, highly-accessed database by
     relying on its ability to customize navigation and data extraction, its relevance to the
     community, the quality and detail of the stored data and the up-to-date nature of the stored
     information.">
-    
+
     <title>CollecTF</title>
 
     <!-- Bootstrap -->
     <!-- Latest compiled and minified CSS -->
-    <!-- 
+    <!--
     <link rel="stylesheet"
     href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"
     integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ=="
           crossorigin="anonymous">
     -->
-    
+
     <!-- flatly theme from Bootswatch -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.5/flatly/bootstrap.min.css">
 
@@ -40,6 +40,10 @@
 
     <!-- CollecTF CSS -->
     <link rel="stylesheet" href="{% static 'collectf.css' %}">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}" />
+
   </head>
   <body>
 
@@ -59,7 +63,7 @@
           </a>
         </div>
 
-        
+
         <div class="collapse navbar-collapse">
           {% if user.is_authenticated %}
           <ul class="nav navbar-nav">
@@ -70,6 +74,7 @@
               <ul class="dropdown-menu" role="menu">
                 <li><a href="{% url 'curation' %}">New curation</a></li>
                 <li><a href="{% url 'high_throughput_curation' %}">New high-throughput curation</a></li>
+                <li role="separator" class="divider"></li>
                 <li><a href="{% url 'add_pubmed_publication' %}">New PubMed publication</a></li>
                 <li><a href="{% url 'add_non_pubmed_publication' %}">New non-PubMed publication</a></li>
                 <li role="separator" class="divider"></li>
@@ -91,7 +96,7 @@
               </div>
           </form>
           </div>
-          
+
           <ul class="nav navbar-nav navbar-right">
             {% if user.is_authenticated %}
             <li class="navbar-text">Hello {{user.username}}</li>

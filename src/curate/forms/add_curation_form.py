@@ -9,18 +9,19 @@ from django.template.loader import get_template
 from django.utils.safestring import mark_safe
 
 from core import bioutils
-from collectf import settings
-from curate import site_entry
-from curate.forms import help_texts
-
+from core import entrez_utils
 from core.models import Curation
 from core.models import ExperimentalTechnique
 from core.models import ExternalDatabase
 from core.models import Gene
 from core.models import Genome
+from core.models import GenomeSequence
 from core.models import TF
 from core.models import TFInstance
 from core.models import Taxonomy
+from curate import site_entry
+from curate.forms import help_texts
+
 
 class PublicationForm(forms.Form):
     """Form for publication selection step.
@@ -29,12 +30,18 @@ class PublicationForm(forms.Form):
     him/her.
     """
     helptext = help_texts.publication_form
-    pub = forms.ChoiceField(widget=forms.RadioSelect(),
-                            label="Publications", help_text=helptext['pub'])
-    no_data = forms.BooleanField(label="This paper contains no data.",
-                                 required=False, help_text=helptext['no_data'])
 
-    
+    pub = forms.ChoiceField(
+        widget=forms.RadioSelect(),
+        label="Publications",
+        help_text=helptext['pub'])
+
+    no_data = forms.BooleanField(
+        label="This paper contains no data.",
+        required=False,
+        help_text=helptext['no_data'])
+
+
 class GenomeForm(forms.Form):
     """Genome and TF accession number form."""
     NUM_EXTRA_GENOME_FIELDS = 3
@@ -162,7 +169,7 @@ class GenomeForm(forms.Form):
                 """)
             # Get taxonomy record
             try:
-                strain_tax = entrez_utils.get_organism_taxon(record)
+                entrez_utils.get_organism_taxon(record)
             except entrez_utils.EntrezException:
                 raise forms.ValidationError(
                     "Can not fetch strain taxonomy information.")
@@ -177,8 +184,8 @@ class GenomeForm(forms.Form):
 
             # Create genome object and genes.
             species_taxon = new_taxonomy(record)
-            genome = new_genome(record, genes, species_taxon)
-            
+            new_genome(record, genes, species_taxon)
+
         return genome_accession
 
     def clean_genome_accession(self):
@@ -197,7 +204,7 @@ class GenomeForm(forms.Form):
         except TFInstance.DoesNotExist:
             # Create new TFInstance object in the database.
             try:
-                TF_record = entrez_utils.get_uniprot_TF(TF_accession)
+                entrez_utils.get_uniprot_TF(TF_accession)
             except entrez_utils.EntrezException:
                 raise forms.ValidationError("""
                 Can not fetch protein record from UniProt. Check accession
@@ -215,7 +222,7 @@ class GenomeForm(forms.Form):
                 refseq_record = entrez_utils.get_refseq_TF(TF_refseq_accession)
             except entrez_utils.EntrezException:
                 raise forms.ValidationError("Invalid RefSeq accession.")
-                
+
             TFInstance.objects.create(
                 uniprot_accession=TF_accession,
                 refseq_accession=TF_refseq_accession,
@@ -230,7 +237,7 @@ class GenomeForm(forms.Form):
 
     def clean_TF_accession_helper(self, TF_accession):
         return TF_accession.strip()
-    
+
     def clean_TF_accession(self):
         return self.clean_TF_accession_helper(
             self.cleaned_data['TF_accession'])
@@ -251,7 +258,7 @@ class GenomeForm(forms.Form):
 
     def clean_species(self, field):
         """Helper function for clean_TF_species and clean_site_species.
-        
+
         When TF_species_same or site_species_same fields are selected, returns
         the organism information from the entered genome accession number.
         """
@@ -266,7 +273,7 @@ class GenomeForm(forms.Form):
 
     def clean_TF_species(self):
         """Cleans TF_species field.
-        
+
         If TF_species_same field is selected, assigns species data to the
         cleaned data. In that case, it is important that clean_genome is called
         BEFORE clean_TF_species, because the genome is needed to extract
@@ -278,7 +285,7 @@ class GenomeForm(forms.Form):
 
     def clean_site_species(self):
         """Cleans site_species field.
-        
+
         If site_species_same field is selected, assigns species data to the
         cleaned data.
         """
@@ -296,7 +303,7 @@ class GenomeForm(forms.Form):
 
         # Clean all TF accesion fields
         if ('TF_accession' in self.cleaned_data and
-            'TF_refseq_accession' in self.cleaned_data):
+                'TF_refseq_accession' in self.cleaned_data):
             self.check_TF_accession(
                 self.cleaned_data['TF_accession'],
                 self.cleaned_data['TF_refseq_accession'])
@@ -312,6 +319,17 @@ class GenomeForm(forms.Form):
             self.check_TF_accession(self.cleaned_data[uniprot],
                                     self.cleaned_data[refseq])
 
+        # Check if either TF_species or TF_species_same is filled
+        if not (self.cleaned_data['TF_species'] or
+                self.cleaned_data['TF_species_same']):
+            self._errors['TF_species'] = self.error_class(
+                ["Invalid TF species"])
+        # Check if either site_species or site_species_same is filed
+        if not (self.cleaned_data['site_species'] or
+                self.cleaned_data['site_species_same']):
+            self._errors['site_species'] = self.error_class(
+                ["Invalid site species"])
+
 
 def new_taxonomy(genome_record):
     """Creates all taxonomy items up to Bacteria, given the genome record.
@@ -324,7 +342,7 @@ def new_taxonomy(genome_record):
     # it here.
     lineage = []
     for rank in ['phylum', 'class', 'order', 'family', 'genus', 'species']:
-        taxon, = filter(lambda x: x['Rank']==rank, record['LineageEx'])
+        taxon, = filter(lambda x: x['Rank'] == rank, record['LineageEx'])
         lineage.append(taxon)
     parent = None
     for item in lineage:
@@ -334,17 +352,17 @@ def new_taxonomy(genome_record):
             name=item['ScientificName'],
             parent=parent)
         parent = taxon_obj
-        
+
     return taxon_obj
 
-        
+
 def new_genome(genome_record, genes, species_taxon):
     """Creates a models.Genome object from the given genome record.
 
     Returns the created genome object."""
     # Create genome sequence
     genome_seq = GenomeSequence.objects.create(
-        sequence = str(genome_record.seq))
+        sequence=str(genome_record.seq))
     # Create genome
     genome = Genome.objects.create(
         genome_accession=genome_record.id,
@@ -359,7 +377,7 @@ def new_genome(genome_record, genes, species_taxon):
         Gene.objects.create(genome=genome, **gene)
     return genome
 
-    
+
 class TechniquesForm(forms.Form):
     """Form to enter experimental techniques used to identify TFBS.
 
@@ -371,36 +389,37 @@ class TechniquesForm(forms.Form):
     Curators are also asked to provide a brief description of the experimental
     setup for the sites reported. In this new setup, the description should
     comprise the setup used for all the sites that are going to be reported,
-    even though they might used different techniques. For instance: "The binding
-    motif for XX was identified through phylogenetic footprinting and
+    even though they might used different techniques. For instance: "The
+    binding motif for XX was identified through phylogenetic footprinting and
     directed-mutagenesis + EMSA on the promoter of gene YY. Researchers then
     performed a computer search of sites with one mismatch in the genome. Of
-    those identified, they verified X through EMSA. Regulatory activity for four
-    of the sites was assessed with beta-gal assays.". In brief, the curator is
-    expected to provide a concise and logical summary of the experimental
-    process leading to the identification of all reported sites and the
-    determination (if any) of their regulatory activity.
+    those identified, they verified X through EMSA. Regulatory activity for
+    four of the sites was assessed with beta-gal assays.". In brief, the
+    curator is expected to provide a concise and logical summary of the
+    experimental process leading to the identification of all reported sites
+    and the determination (if any) of their regulatory activity.
 
     Curators, as before, will be prompted to specify any external DBs where
     high-throughput data might be stored (e.g. array data on GEO).
-    
-    Curators will also be given the option to specify whether the TF is shown to
-    interact with another protein/ligand that influences binding (and optionally
-    add notes on that [pop-up]).
+
+    Curators will also be given the option to specify whether the TF is shown
+    to interact with another protein/ligand that influences binding (and
+    optionally add notes on that [pop-up]).
     """
+
+    NUM_EXTRA_DB_FIELDS = 5
 
     def __init__(self, *args, **kwargs):
         """Overrides initialization"""
         super(TechniquesForm, self).__init__(*args, **kwargs)
         help_dict = help_texts.techniques_form
-        num_external_db_fields = settings.NUMBER_OF_EXTERNAL_DATABASE_FIELDS
         # Extra external-database fields
-        external_db_type_choices = [(None, 'None'),]
+        external_db_type_choices = [(None, 'None')]
         for db in ExternalDatabase.objects.all():
             external_db_type_choices.append(
                 (db.ext_database_id, db.ext_database_name))
         # Create extra fields
-        for i in range(num_external_db_fields):
+        for i in range(self.NUM_EXTRA_DB_FIELDS):
             self.fields['external_db_type_%d' % i] = forms.ChoiceField(
                 choices=external_db_type_choices,
                 required=False,
@@ -415,14 +434,10 @@ class TechniquesForm(forms.Form):
 
     # Generate techniques field by getting available techniques from db
     template = get_template('experimental_technique_field.html')
-    choices = [(t.technique_id,
-                template.render(Context({
-                    'technique_id': t.technique_id,
-                    'technique_name': t.name,
-                    'technique_description': t.description,
-                    'technique_EO_term': t.EO_term})))
-               for t in ExperimentalTechnique.objects.order_by('name')]
-    
+    choices = [(technique.technique_id,
+                template.render(Context({'technique': technique})))
+               for technique in ExperimentalTechnique.objects.order_by('name')]
+
     techniques = forms.MultipleChoiceField(
         choices=choices, label="Techniques", help_text=help_dict['techniques'],
         widget=forms.CheckboxSelectMultiple())
@@ -450,7 +465,6 @@ class TechniquesForm(forms.Form):
         database. (You can report up to 5 external resources.)""")
 
 
-
 class SiteEntryForm(forms.Form):
     """Form for reporting sites.
 
@@ -474,7 +488,7 @@ class SiteEntryForm(forms.Form):
     quantitative data once Next is clicked. If there is quantitative data, the
     system will prompt the user for a brief description of the field.
     """
-    
+
     help_dict = help_texts.site_entry_form
     # Type of sites to be entered
     # The curator is able to choose one of the available motifs or create a new
@@ -482,7 +496,10 @@ class SiteEntryForm(forms.Form):
     # non-motif-associated.
     # To be populated dynamically
     site_type = forms.ChoiceField(
-        choices=(), widget=forms.RadioSelect, required=True, label="Site type",
+        choices=(),
+        widget=forms.RadioSelect,
+        required=True,
+        label="Site type",
         help_text=mark_safe(help_dict['site_type']))
 
     sites = forms.CharField(
@@ -495,16 +512,23 @@ class SiteEntryForm(forms.Form):
         label="Quantitative data format",
         help_text=help_dict['quantitative_data_format'])
 
-    # Following fields will be visible only if the submission is high-throughput
-    peaks = forms.CharField(widget=forms.Textarea,
-                            label="High-throughput sequences",
-                            help_text=help_dict['peaks'])
-    assay_conditions = forms.CharField(label="Assay conditions",
-                                       help_text=help_dict['assay_conditions'],
-                                       widget=forms.Textarea)
-    method_notes = forms.CharField(label="Method notes",
-                                   help_text=help_dict['method_notes'],
-                                   widget=forms.Textarea)
+    # Following fields will be visible only if the submission is
+    # high-throughput
+    peaks = forms.CharField(
+        widget=forms.Textarea,
+        label="High-throughput sequences",
+        help_text=help_dict['peaks'])
+
+    assay_conditions = forms.CharField(
+        label="Assay conditions",
+        help_text=help_dict['assay_conditions'],
+        widget=forms.Textarea)
+
+    method_notes = forms.CharField(
+        label="Method notes",
+        help_text=help_dict['method_notes'],
+        widget=forms.Textarea)
+
     peak_techniques = forms.MultipleChoiceField(
         label="Techniques used to identify high-throughput data",
         help_text=help_dict['peak_techniques'],
@@ -530,7 +554,7 @@ class SiteEntryForm(forms.Form):
     def verify_only_sites(self, sites_cd):
         """Checks if all site sequences are valid."""
         try:
-            # Check if it is fasta format.
+            # Check if it is FASTA format.
             if sites_cd.startswith('>'):
                 site_entry.parse_fasta(sites_cd)
             else:
@@ -590,7 +614,7 @@ class SiteEntryForm(forms.Form):
         lines = [re.split('[\t ]+', line.strip())
                  for line in re.split('[\r\n]+', cd.strip())]
         sites_cd = '\n'.join(' '.join(wds for wds in line) for line in lines)
-        
+
         # By default, don't check the qval data format.
         self.check_qval_data_format = False
         # Check if it is in FASTA format.
@@ -620,17 +644,17 @@ class SiteEntryForm(forms.Form):
 
         # By default, don't check the qval data format.
         self.check_qval_data_format = False
-        if len(lines[0]) == 1: # sequence format
+        if len(lines[0]) == 1:  # sequence format
             # Same process with site verification.
             return self.verify_only_sites(peaks_cd)
         elif len(lines[0]) == 2:
             # Either coordinate format or sequence with qvals
-            if lines[0][0].isalpha(): # seq with qvals
+            if lines[0][0].isalpha():  # seq with qvals
                 self.check_qval_data_format = True
                 return self.verify_only_sites_and_values(peaks_cd)
             else:
                 return self.verify_only_coordinates(peaks_cd)
-        elif len(lines[0]) == 3: # coordinates with qval
+        elif len(lines[0]) == 3:  # coordinates with qval
             self.check_qval_data_format = True
             return self.verify_only_coordinates_and_values(peaks_cd)
 
@@ -638,13 +662,13 @@ class SiteEntryForm(forms.Form):
 
     def clean(self):
         """Cleans form fields."""
-        
         # If the site field contains quantitative data, make sure the format
         # field is filled.
         if 'sites' in self.cleaned_data and self.check_qval_data_format:
             self.check_quantitative_data_format(
                 self.cleaned_data.get('quantitative_data_format', None))
         return self.cleaned_data
+
 
 class SiteExactMatchForm(forms.Form):
     """Form to select and match reported sites in the genome.
@@ -658,12 +682,14 @@ class SiteExactMatchForm(forms.Form):
         """Cleans fields."""
         return self.cleaned_data
 
+
 class SiteSoftMatchForm(forms.Form):
     """Form displaying results of 'soft' search.
 
     Match sites are not exactly same with the query sequence, but similar."""
     # No static def here either.
     pass
+
 
 class SiteAnnotationForm(forms.Form):
     """Form asking the curator to fill the information regarding each site.
@@ -673,12 +699,12 @@ class SiteAnnotationForm(forms.Form):
     - toggle the graphical view (off by default)
     - edit the qualitative values
     - specify which techniques were used to determine this site
-    - define the site as repressed, activated or whether the effect of TF on the
-      site is unknown (not-determined)
+    - define the site as repressed, activated or whether the effect of TF on
+      the site is unknown (not-determined)
 
-    Each site and its set of fields that can be edited are represented as a form
-    (one form per site instance). The abstraction to work multiple forms in one
-    page is achieved via Django FormSets
+    Each site and its set of fields that can be edited are represented as a
+    form (one form per site instance). The abstraction to work multiple forms
+    in one page is achieved via Django FormSets
     (https://docs.djangoproject.com/en/1.6/topics/forms/formsets/).
     """
     def clean(self):
@@ -697,8 +723,8 @@ class GeneRegulationForm(forms.Form):
     regualates gene (or not).
 
     Like the previous two forms (SiteExactMatchForm and SiteSoftMatchForm), all
-    fields in this form are created dynamically, based on which genome positions
-    are selected in the previous two forms as site equivalents.
+    fields in this form are created dynamically, based on which genome
+    positions are selected in the previous two forms as site equivalents.
     """
     pass
 
@@ -714,7 +740,8 @@ class CurationReviewForm(forms.Form):
     revision_reasons = forms.ChoiceField(
         choices=choices,
         label="Revision required",
-        help_text=help_dict['revision_reasons'])
+        help_text=help_dict['revision_reasons'],
+        required=False)
 
     confidence = forms.BooleanField(
         required=False,

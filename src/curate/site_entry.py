@@ -5,19 +5,21 @@ First, the text is parsed to find out whether it is sequence-based or
 coordinate-based. In addition, the text will be checked to see if it contains
 any quantitative information. All fields must be separated by space or tab.  """
 
+from django.utils.safestring import mark_safe
+
 import re
 import regex
 import StringIO
-from core import bioutils
-from core import misc
-from core import models
 from Bio.SeqFeature import SeqFeature
 from Bio.SeqFeature import FeatureLocation
 from Bio.Graphics import GenomeDiagram
 from Bio import SeqIO
 from reportlab.lib import colors
 from reportlab.lib.units import cm
-from django.utils.safestring import mark_safe
+
+from core import bioutils
+from core import misc
+
 
 class Match:
     """Match class for site matches on the genome"""
@@ -29,9 +31,9 @@ class Match:
           different from the matched seq
         - start,end,strand: location of sequence in the genome
         """
-        self.genome = genome # the genome
+        self.genome = genome  # the genome
         self.seq = str(seq)  # the sequence in the genome
-        self.reported_seq = str(reported_seq) # the sequence originally reported
+        self.reported_seq = str(reported_seq)  # the sequence as reported
         self.start = start
         self.end = end
         self.strand = strand
@@ -92,16 +94,14 @@ class Match:
     def pprint(self, diagram_hover=True):
         """Given a match object, make the HTML snippet to display it
         properly."""
-        strand = '+' if self.strand == 1 else '-'
-        nearby_genes = ['%s (%s)' % (g.locus_tag, g.name)
-                        for g in self.nearby_genes]
         # Make the diagram and gene function table
         extra = (self.match_diagram() +
-                '<table class="table table-condensed small">' +
-                '<thead><tr><th>locus tag</th><th>gene name</th><th>function</th></tr></thead>' +
-                '<tbody>')
+                 """<table class="table table-condensed small">
+                 <thead><tr><th>locus tag</th><th>gene
+                 name</th><th>function</th></tr></thead> <tbody>""")
         for g in self.nearby_genes:
-            extra += "<tr><td>%s</td><td>%s</td><td>%s</td></tr>" % (g.locus_tag, g.name, g.description)
+            extra += ("<tr><td>%s</td><td>%s</td><td>%s</td></tr>" %
+                      (g.locus_tag, g.name, g.description))
         extra += ('</tbody>' + "</table><br/>")
         return_str = ""
         if self.is_exact():
@@ -128,16 +128,17 @@ class Match:
         for gene in self.nearby_genes:
             feature = SeqFeature(FeatureLocation(gene.start+1, gene.end+1),
                                  strand=gene.strand)
-            gds_features.add_feature(feature,
-                                     name=gene.name,
-                                     label=True,
-                                     label_size=10,
-                                     label_angle=0 if gene.strand == 1 else 180,
-                                     label_position='middle',
-                                     sigil='ARROW',
-                                     arrowshaft_height=1.0,
-                                     color=colors.lightblue)
-        # draw binding site
+            gds_features.add_feature(
+                feature,
+                name=gene.name,
+                label=True,
+                label_size=10,
+                label_angle=0 if gene.strand == 1 else 180,
+                label_position='middle',
+                sigil='ARROW',
+                arrowshaft_height=1.0,
+                color=colors.lightblue)
+        # Draw binding site
         feature = SeqFeature(FeatureLocation(self.start+1, self.end+1),
                              strand=self.strand)
         gds_features.add_feature(feature, color=colors.red, name='site',
@@ -164,12 +165,11 @@ class Match:
     def __repr__(self):
         return "%s %s (exact? %s)" % (self.seq, self.reported_seq, self.is_exact())
 
+
 class Site:
     @property
     def key(self):
         return self._key
-
-
 
     def set_nearby_genes_for_all_matches(self):
         """Find nearby genes for all matches for a site."""
@@ -303,13 +303,13 @@ class SequenceSite(Site):
 
     def _locate_seq_strand(self, genome, strand):
         """Search the site sequence only in one strand of the genome."""
-        genome_seq = genome.get_sequence()
         search_seq = self.seq if strand==1 else bioutils.reverse_complement(self.seq)
         matches = []
-        i = genome_seq.find(search_seq)
+        i = genome.sequence.find(search_seq)
         while i >= 0:
-            matches.append(Match(genome, self.seq, self.seq, i, i+len(search_seq)-1, strand))
-            i = genome_seq.find(search_seq, i+1)
+            matches.append(Match(
+                genome, self.seq, self.seq, i, i+len(search_seq)-1, strand))
+            i = genome.sequence.find(search_seq, i+1)
         return matches
 
     def search_soft_match(self, genomes, motif=None):
@@ -336,7 +336,7 @@ class SequenceSite(Site):
         """Soft search on one strand only. Return all matches that are upto
         <mismatch_th> away from the reported sequence."""
         # First, find all sequences on the genome that are similar enough
-        genome_sequence = genome.get_sequence()
+        genome_sequence = genome.sequence
         search_seq = self.seq if strand == 1 else bioutils.reverse_complement(self.seq)
         pattern = regex.compile('(%s){1<=s<=%d}' % (search_seq, mismatch_th))
         matches = []
@@ -371,7 +371,7 @@ class CoordinateSite(Site):
         start = self.start
         end = self.end
         for genome in genomes:
-            genome_sequence = genome.get_sequence()
+            genome_sequence = genome.sequence
             if self.start <= self.end:
                 # there is only one match
                 self.seq = genome_sequence[start:end+1]

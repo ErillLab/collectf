@@ -381,7 +381,7 @@ class TF(models.Model):
 
     def __unicode__(self):
         """Returns the unicode representation of the TF."""
-        return u'%s [family: %s]' % (self.name, self.family.name)
+        return u'%s (%s family)' % (self.name, self.family.name)
 
     class Meta:
         verbose_name_plural = "TFs"

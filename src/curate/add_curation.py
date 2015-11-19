@@ -15,20 +15,20 @@ wizard in the backend and redirects to the next step.
 3. Step 1 and 2 repeat, for every subsequent form in the wizard.
 
 4. Once the user has submitted all the forms and all the data has been
-validated, the wizard processes the data - saving it to the database, sending an
-email, or whatever the application needs to do.
+validated, the wizard processes the data - saving it to the database, sending
+an email, or whatever the application needs to do.
 """
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from formtools.wizard.views import SessionWizardView
-from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 
 from curate import add_curation_done
 from curate import add_curation_get_context_data
 from curate import add_curation_get_form
 from curate import add_curation_process_step
+from curate import session_utils
 from curate.forms.add_curation_form import CurationReviewForm
 from curate.forms.add_curation_form import GeneRegulationForm
 from curate.forms.add_curation_form import GenomeForm
@@ -39,19 +39,19 @@ from curate.forms.add_curation_form import SiteExactMatchForm
 from curate.forms.add_curation_form import SiteSoftMatchForm
 from curate.forms.add_curation_form import TechniquesForm
 
+
 class CurationWizard(SessionWizardView):
     """Form wizard to handle curation forms.
 
-    For methods and the session wizard logic, see Django docs:
-    https://docs.djangoproject.com/en/1.6/ref/contrib/formtools/form-wizard/
+    http://django-formtools.readthedocs.org/en/latest/wizard.html
     """
 
     def get_template_names(self):
-        """Override the default template name for each form"""
+        """Overrides the default template name for each form"""
         return ["curation_step_%s.html" % self.steps.current]
 
     def get_context_data(self, form, **kwargs):
-        """Return the template context for each step."""
+        """Returns the template context for each step."""
         context = super(CurationWizard, self).get_context_data(form=form,
                                                                **kwargs)
         # Call the associated function to update the context before rendering
@@ -77,7 +77,7 @@ class CurationWizard(SessionWizardView):
         instance.
         """
         form = super(CurationWizard, self).get_form(step, data, files)
-        if step == None:
+        if step is None:
             step = self.steps.current
 
         handlers = {'0': add_curation_get_form.publication_get_form,
@@ -122,11 +122,10 @@ class CurationWizard(SessionWizardView):
         context = self.get_context_data(form=form, **kwargs)
 
         session = self.request.session
-        if (session.get('paper_contains_no_data') and
-            session.get('paper_contains_no_data')):
+        if session_utils.get(session, 'paper_contains_no_data'):
             msg = "The publication was marked as having no data."
             messages.info(self.request, msg)
-            session.clear() # clear session data
+            session_utils.clear(session)     # clear session data
             return redirect('homepage_home')
 
         return self.render_to_response(context)
@@ -135,17 +134,15 @@ class CurationWizard(SessionWizardView):
         """Gets called after all forms. Inserts all data into the database."""
         return add_curation_done.master_done(self, form_list, **kwargs)
 
+
 @login_required
 def curation(request):
     """Entry point for the curation."""
 
-    # If user selects the old curation and then go back, the session will have
-    # the old_curation key in table, and it will cause trouble.
-    if request.session.get('old_curation'):
-        request.session['old_curation'] = None
+    session_utils.remove(request.session, 'old_curation')
 
     # This is not high-throughput submission.
-    request.session['high_throughput_curation'] = False
+    session_utils.put(request.session, 'high_throughput_curation', False)
 
     view = CurationWizard.as_view(
         [PublicationForm,
@@ -156,9 +153,13 @@ def curation(request):
          SiteSoftMatchForm,
          SiteAnnotationForm,
          GeneRegulationForm,
-         CurationReviewForm,],
+         CurationReviewForm],
         condition_dict={'5': inexact_match_form_condition})
+
+    session_utils.session_print(request.session)
+
     return view(request)
+
 
 @login_required
 def high_throughput_curation(request):
@@ -167,18 +168,19 @@ def high_throughput_curation(request):
     Curators can check ChIP and other high-throughput methodologies in the
     regular submission mode, but if they are submitting data that is primarily
     based on high-throughput binding assays (e.g. ChIP-seq genomic-SELEX, etc.)
-    they are then encouraged to use the high-throughput submission portal. First
-    few steps are identical to the ones in the regular submission portal. In the
-    site-entry step, two types of data are asked: sites and peaks. As in regular
-    submission portal, sites can be either motif-associated,
-    non-motif-associated or variable-motif-associated (e.g. variable spacing,
-    inverting, anything that is not gapless alignment), which can be entered in
-    sequence-based or coordinate-based modes. Below the site box, curators are
-    able to enter peak data (most likely in coordinate mode).
+    they are then encouraged to use the high-throughput submission
+    portal. First few steps are identical to the ones in the regular submission
+    portal. In the site-entry step, two types of data are asked: sites and
+    peaks. As in regular submission portal, sites can be either
+    motif-associated, non-motif-associated or variable-motif-associated
+    (e.g. variable spacing, inverting, anything that is not gapless alignment),
+    which can be entered in sequence-based or coordinate-based modes. Below the
+    site box, curators are able to enter peak data (most likely in coordinate
+    mode).
     """
 
     # This IS high-throughput submission
-    request.session['high_throughput_curation'] = True
+    session_utils.put(request.session, 'high_throughput_curation', True)
 
     view = CurationWizard.as_view(
         [PublicationForm,
@@ -189,16 +191,17 @@ def high_throughput_curation(request):
          SiteSoftMatchForm,
          SiteAnnotationForm,
          GeneRegulationForm,
-         CurationReviewForm,],
+         CurationReviewForm],
         condition_dict={'5': inexact_match_form_condition})
     return view(request)
+
 
 def inexact_match_form_condition(wizard):
     """Checks if inexact match form is necessary.
 
     If not, it means that all sites have been matched exactly; hide this step.
     """
-    sites = wizard.request.session.get('sites')
+    sites = session_utils.get(wizard.request.session, 'sites')
     all_exact_matched = (sites and
                          all(site.is_matched() and site.get_match().is_exact()
                              for site in sites))

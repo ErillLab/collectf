@@ -57,9 +57,8 @@ def get_taxonomy(genome_record):
     record['LineageEx'].append({'Rank': record['Rank'],
                                 'ScientificName': record['ScientificName'],
                                 'TaxId': record['TaxId']})
-    
-    return record
 
+    return record
 
 
 def get_genes(genome_record):
@@ -67,7 +66,7 @@ def get_genes(genome_record):
 
     def get_gene_annotation(id_list):
         """Gets gene annotations.
-        
+
         Uses Bio.Entrez epost to submit the data to NCBI, and esummary to
         retrieve the information. Returns a list gene summary objects.
         """
@@ -75,9 +74,9 @@ def get_genes(genome_record):
 
         # NCBI may refuse to return all gene summaries due to some sort of
         # query limit. Query summaries for 1000 genes at a time.
-        
+
         runtime_error = 0  # error couunt  during Entrez esummary
-        while runtime_error < 10: 
+        while runtime_error < 10:
             try:
                 request = Entrez.esummary(db="gene",
                                           webenv=epost_result["WebEnv"],

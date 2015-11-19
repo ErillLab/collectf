@@ -1,4 +1,4 @@
-{% extends "add_curation.html" %}
+{% extends "curation_base.html" %}
 
 {% load bootstrap %}
 {% load utiltags %}
@@ -23,7 +23,7 @@ layout is not used. Instead, form fields are displayed as cells of a table.
     {{ field }}
 {% endfor %}
 
-<table class="table table-bordered table-striped">
+<table class="table table-striped table-bordered">
 <thead>
   <tr>
     <th>Site</th>
@@ -34,12 +34,12 @@ layout is not used. Instead, form fields are displayed as cells of a table.
     <th>Quantitative value</th>
     {% endif %}
   </tr>
-  <tr>
 
+  <tr>
     <th class="small"> <small> <a href="#" onclick="selectAllSites(); return false;">Select/Unselect all</a>
          </small></th>
     <th class="small">
-      <select class="form-control" id="TF_type_selected">
+      <select class="" id="TF_type_selected">
         <option value="MONOMER">monomer</option>
         <option value="DIMER">dimer</option>
         <option value="TETRAMER">tetramer</option>
@@ -50,7 +50,7 @@ layout is not used. Instead, form fields are displayed as cells of a table.
     </th>
 
     <th class="small">
-      <select class="form-control" id="TF_function_selected">
+      <select class="" id="TF_function_selected">
         <option value="ACT">activator</option>
         <option value="REP">repressor</option>
         <option value="DUAL">dual</option>
@@ -60,7 +60,7 @@ layout is not used. Instead, form fields are displayed as cells of a table.
     </th>
 
     {% for t in techniques %}
-    <th class="rotate-45 small">
+    <th class="small">
         {{ t.name }} <small> <a href="#" onclick="applyToSelectedSites({{forloop.counter0}}); return false;">Apply to selected</a> /
           <a href="#" onclick="clearAll({{ forloop.counter0 }}); return false;">Clear all</a></small>
     </th>
@@ -75,16 +75,16 @@ layout is not used. Instead, form fields are displayed as cells of a table.
   {% for site in sites %}
   {% with i=site.key|slugify %}
   <tr class="small">
-    <th><div class="sequence-block">{% with i|add:"_site" as field_name %}{{ form|get:field_name|bootstrap }}{% endwith %}</div></th>
-    <th>{% with i|add:"_TF_type" as field_name %}{{ form|get:field_name|bootstrap_inline }}{% endwith %}</th>
-    <th>{% with i|add:"_TF_function" as field_name %}{{ form|get:field_name|bootstrap_inline }}{% endwith %}</th>
+    <td><div>{% with i|add:"_site" as field_name %}{{ form|get:field_name|bootstrap_inline}}{% endwith %}</div></td>
+    <td>{% with i|add:"_TF_type" as field_name %}{{ form|get:field_name }}{% endwith %}</td>
+    <td>{% with i|add:"_TF_function" as field_name %}{{ form|get:field_name }}{% endwith %}</td>
     {% for t in techniques %}
     {% with j=forloop.counter0|slugify %}
-    <th>{% with i|add:"_technique_"|add:j as field_name %}{{ form|get:field_name|bootstrap_inline }}{% endwith %}</th>
+    <td>{% with i|add:"_technique_"|add:j as field_name %}{{ form|get:field_name }}{% endwith %}</td>
     {% endwith %}
     {% endfor %}
     {% if has_quantitative_data %}
-    <th>{% with i|add:"_qval" as field_name %}{{ form|get:field_name|bootstrap_inline }}{% endwith %}</th>
+    <td>{% with i|add:"_qval" as field_name %}{{ form|get:field_name }}{% endwith %}</td>
     {% endif %}
   </tr>
   {% endwith %}
@@ -150,7 +150,7 @@ function diagramsOnHover() {
 }
 
 function clearAll(techniqueId) {
-    var t = '_technique_' + techniqueId 
+    var t = '_technique_' + techniqueId
     $("[id$=" + "'" + t + "']").removeAttr('checked');
 }
 
