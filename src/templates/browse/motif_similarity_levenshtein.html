@@ -41,12 +41,12 @@
   <div class="tab-pane" id="Levenshtein_unaligned">
     <p>The list of binding sites for two motifs as curated</p>
     <div class="row">
-      <div class="col-md-6 box">
+      <div class="col-md-6 box shaded-background">
         {% for site in first_unaligned %}
         <span class="sequence">{{ site }}</span><br/>
         {% endfor %}
       </div>
-      <div class="col-md-6 box">
+      <div class="col-md-6 box shaded-background">
         {% for site in second_unaligned %}
         <span class="sequence">{{ site }}</span><br/>
         {% endfor %}
@@ -61,12 +61,12 @@
     </p>
 
     <div class="row">
-      <div class="col-md-6 box">
+      <div class="col-md-6 box shaded-background">
         {% for site in first_aligned %}
         <span class="sequence">{{ site }}</span><br/>
         {% endfor %}
       </div>
-      <div class="col-md-6 box">
+      <div class="col-md-6 box shaded-background">
         {% for site in second_aligned %}
         <span class="sequence">{{ site }}</span><br/>
         {% endfor %}
