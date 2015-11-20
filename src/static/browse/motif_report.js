@@ -31,6 +31,9 @@ $(document).ready(function() {
     // Hide 'genome' and 'TF' columns in the table
     hideCol('genome_col');
     hideCol('TF_col');
+
+    // Initialize clipboard
+    new Clipboard('.btn');
     
 });
     

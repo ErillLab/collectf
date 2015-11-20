@@ -61,10 +61,16 @@
 	          sites, <a href="http://www.biomedcentral.com/1471-2105/14/108/"
 	          target="_blank">LASAGNA</a> is used.
 	        </p>
-            <div class="sequence box shaded-background">
-            {% for seq in motif_report.aligned_sites %}
-            {{ seq }}<br/>
-            {% endfor %}
+            <div class="box shaded-background">
+              <button class="btn btn-sm pull-right" data-clipboard-action="copy"
+                      data-clipboard-target="#aligned_sites_box_{{ motif_report.id }}">
+                <i class="fa fa-clipboard"></i>
+              </button>
+              <div id="aligned_sites_box_{{ motif_report.id }}">
+                {% for seq in motif_report.aligned_sites %}
+                <span class="sequence">{{ seq }}</span><br/>
+                {% endfor %}
+              </div>
             </div>
           </div>
 
@@ -219,10 +225,16 @@
 	          target="_blank">LASAGNA</a> is used.
 	         </p>
 
-             <div class="sequence box shaded-background">
-               {% for seq in ensemble_motif_report.aligned_sites %}
-               {{ seq }}<br/>
-               {% endfor %}
+             <div class="box shaded-background">
+               <button class="btn btn-sm pull-right" data-clipboard-action="copy"
+                       data-clipboard-target="#ensemble_aligned_sites_box">
+                 <i class="fa fa-clipboard"></i>
+               </button>
+               <div id="ensemble_aligned_sites_box">
+                 {% for seq in ensemble_motif_report.aligned_sites %}
+                 <span class="sequence">{{ seq }}</span><br/>
+                 {% endfor %}
+               </div>
              </div>
            </div>
 
@@ -260,5 +272,6 @@
 
 {% block js %}
 {{ block.super }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.3/clipboard.min.js"></script>
 <script src="{% static 'motif_report.js' %}"></script>
 {% endblock %}
