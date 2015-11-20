@@ -157,5 +157,5 @@ urlpatterns = [
         name='release_history'),
 
     # Database statistics
-    url(r'^database_stats/$', stats_and_info.stats, name='stats'),
+    url(r'^database_stats$', stats_and_info.stats, name='stats'),
 ]
