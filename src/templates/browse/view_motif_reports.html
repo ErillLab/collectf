@@ -69,7 +69,20 @@
           </div>
 
           <div class="tab-pane active" id="{{motif_report.id}}_weblogo">
-	        <p>To generate the weblogo, aligned binding sites are used.</p>
+            <div>
+	          To generate the weblogo, aligned binding sites are used.
+              <div class="btn-group pull-right" role="group">
+                <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  TFBS search
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                 <li><a href="#">CollecTF</a></li>
+                 <li><a href="#">MEME FIMO</a></li>
+                </ul>
+              </div>
+            </div>
+            
             <img src="{{ motif_report.weblogo }}">
           </div>
 
@@ -215,7 +228,21 @@
 
            <div class="tab-pane active" id="ensemble_view_weblogo">
              <br>
-             <p>To generate the weblogo, aligned binding sites are used.</p>
+             
+             <div>
+               To generate the weblogo, aligned binding sites are used.
+
+               <div class="btn-group pull-right" role="group">
+                 <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                   TFBS search
+                   <span class="caret"></span>
+                 </button>
+                 <ul class="dropdown-menu">
+                   <li><a href="#">CollecTF</a></li>
+                   <li><a href="#">MEME MAST</a></li>
+                 </ul>
+               </div>
+             </div>
              <img src="{{ ensemble_motif_report.weblogo }}">
            </div>
          </div> <!-- /.tab-content -->
