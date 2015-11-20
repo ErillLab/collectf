@@ -103,12 +103,12 @@
 
       <div class="tab-pane" id="unaligned_sites">
         <div class="row">
-          <div class="col-md-6 box">
+          <div class="col-md-6 box shaded-background">
             {% for meta_site in first_ensemble_report.meta_sites %}
             <span class="sequence">{{ meta_site.delegate_sequence }}</span><br/>
             {% endfor %}
           </div>
-          <div class="col-md-6 box">
+          <div class="col-md-6 box shaded-background">
             {% for meta_site in second_ensemble_report.meta_sites %}
             <span class="sequence">{{ meta_site.delegate_sequence }}</span><br/>
             {% endfor %}
@@ -125,12 +125,12 @@
         </p>
 
         <div class="row">
-          <div class="col-md-6 box">
+          <div class="col-md-6 box shaded-background">
             {% for site in first_ensemble_report.aligned_sites %}
             <span class="sequence">{{ site }}</span><br/>
             {% endfor %}
           </div>
-          <div class="col-md-6 box">
+          <div class="col-md-6 box shaded-background">
             {% for site in first_ensemble_report.aligned_sites %}
             <span class="sequence">{{ site }}</span><br/>
             {% endfor %}
