@@ -328,8 +328,6 @@ class SequenceSite(Site):
         search results by score."""
         matches = (self._soft_locate_seq_strand(genome, 1, mismatch_th) +
                    self._soft_locate_seq_strand(genome, -1, mismatch_th))
-        if motif: # sort results based on built PSSM
-            matches.sort(key=lambda m: score_sequence(motif, m.seq), reverse=True)
         return matches
 
     def _soft_locate_seq_strand(self, genome, strand, mismatch_th):
