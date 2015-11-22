@@ -11,6 +11,7 @@ from . import stats_and_info
 from . import test_view
 from . import view_curation
 from . import view_motif_reports
+from . import pssm_search
 
 urlpatterns = [
     url(r'^test_view$', test_view.test_view),
@@ -160,5 +161,8 @@ urlpatterns = [
     url(r'^database_stats$', stats_and_info.stats, name='stats'),
 
     # PSSM search
+    url(r'^pssm_search_from_report_page',
+        pssm_search.pssm_search_from_report_page,
+        name='report_to_pssm_search'),
     url(r'^pssm_search/$', pssm_search.pssm_search, name='pssm_search'),
 ]

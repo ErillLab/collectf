@@ -83,7 +83,13 @@
                   <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
-                 <li><a href="#">CollecTF</a></li>
+                  <li>
+                    <form id="pssm_search_{{motif_report.id}}"
+                          action="{% url 'report_to_pssm_search' %}" method="POST">{% csrf_token %}
+                      <input type="hidden" name="sites" value="{% for seq in motif_report.aligned_sites %} {{seq}} {% endfor %}">
+                    </form>
+                    <a href="#" onclick="$('#pssm_search_{{motif_report.id}}').submit();"> CollecTF </a>
+                  </li>
                  <li><a href="http://meme-suite.org/tools/fimo" target="_blank">MEME FIMO</a></li>
                 </ul>
               </div>

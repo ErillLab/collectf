@@ -64,9 +64,17 @@ def pssm_search(pssm, sequence, threshold=0.0):
     # TODO(sefa): Biopython pssm search doesn't work for ambiguous
     # sequences. Fix this function to handle genome sequences having ambiguous
     # bases.
-    
+
     dna_sequence = Seq(''.join(b if b in 'ACGT' else 'A' for b in sequence),
                        alphabet=unambiguous_dna)
-    print len(dna_sequence)
-    for pos, score in pssm.search(dna_sequence, threshold):
-        print pos, score
+    scores = pssm.calculate(dna_sequence)
+    rc_scores = pssm.reverse_complement().calculate(dna_sequence)
+    hits = []
+    for pos, (score, rc_score) in enumerate(zip(scores, rc_scores)):
+        if score > threshold or rc_score > threshold:
+            max_score = max(score, rc_score)
+            strand = 1 if score > rc_score else - 1
+            hits.append((pos, strand, max_score))
+    return hits
+                                 
+    

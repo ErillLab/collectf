@@ -6,7 +6,7 @@ from core import entrez_utils
 class BindingSiteSearchForm(forms.Form):
     sites = forms.CharField(
         label="Sites",
-        widget=forms.Textarea)
+        widget=forms.Textarea(attrs={'class': 'sequence'}))
 
     genome = forms.CharField(
         label='NCBI RefSeq accession number',

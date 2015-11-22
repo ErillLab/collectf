@@ -7,7 +7,7 @@
   <h1>TF Binding Site Search</h1>
   <p>Enter TF binding site collection and a genome accession number to scan.</p>
   <hr/>
-  <form class="form-horizontal" method="post" action="">{% csrf_token %}
+  <form class="form-horizontal" method="post" action="{% url 'pssm_search' %}">{% csrf_token %}
 
     {{ form|bootstrap_horizontal }}
     

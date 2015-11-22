@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+
+<div class="box">
+  <h1>Binding site search results</h1>
+  <p class="lead">
+    Showing {{matches.count}} binding sites scoring higher than selected threshold
+    (<mark>{{threshold}}</mark>) which satisfies the equality between -log of the false-positive
+    rate and the information content of the motif (i.e. -log(FPR) =
+    IC(motif)). See <a href="http://www.ncbi.nlm.nih.gov/pubmed/10487864">Hertz, Stormo (1999)</a>
+    for more details.
+  </p>
+
+  <p>
+    <img src="{{ weblogo }}">
+  </p>
+  <hr>
+
+  <table class="table table-striped" id="pssm-search-table">
+    <thead>
+      <tr>
+        <th>Start position</th>
+        <th>End position</th>
+        <th>Strand</th>
+        <th>Sequence</th>
+        <th>Score</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for match in matches %}
+      <tr>
+        <td>{{ match.start }}</td>
+        <td>{{ match.end }}</td>
+        <td>{% if match.strand == 1 %}forward {% else %} reverse {% endif %}</td>
+        <td><span class="sequence">{{ match.seq }}</span></td>
+        <td>{{ match.score }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+<script src="http://cdn.datatables.net/1.10.10/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.10/css/jquery.dataTables.min.css">
+<script src="{% static 'pssm_search_results.js' %}"></script>
+{% endblock %}
