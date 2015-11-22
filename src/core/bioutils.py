@@ -7,6 +7,7 @@ from subprocess import PIPE
 from Bio import motifs
 from Bio import SeqUtils
 from Bio.Seq import Seq
+from Bio.Alphabet.IUPAC import unambiguous_dna
 
 
 def GC(seq):
@@ -50,7 +51,22 @@ def weblogo_uri(sequences):
     return 'data:' + mime + ';' + 'base64,' + encoded
 
 
-def build_motif(sites):
+def build_motif(sites, alphabet=unambiguous_dna):
     """Creates Biopython Motif object from the given sites."""
-    instances = [Seq(site) for site in sites]
-    return motifs.create(instances)
+    instances = [Seq(site, alphabet) for site in sites]
+    motif = motifs.create(instances)
+    motif.pseudocounts = 0.5
+    return motif
+
+
+def pssm_search(pssm, sequence, threshold=0.0):
+    """Finds hits with PSSM score above the threshold."""
+    # TODO(sefa): Biopython pssm search doesn't work for ambiguous
+    # sequences. Fix this function to handle genome sequences having ambiguous
+    # bases.
+    
+    dna_sequence = Seq(''.join(b if b in 'ACGT' else 'A' for b in sequence),
+                       alphabet=unambiguous_dna)
+    print len(dna_sequence)
+    for pos, score in pssm.search(dna_sequence, threshold):
+        print pos, score

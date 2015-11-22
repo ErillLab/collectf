@@ -158,4 +158,7 @@ urlpatterns = [
 
     # Database statistics
     url(r'^database_stats$', stats_and_info.stats, name='stats'),
+
+    # PSSM search
+    url(r'^pssm_search/$', pssm_search.pssm_search, name='pssm_search'),
 ]

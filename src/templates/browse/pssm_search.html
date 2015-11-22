@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load bootstrap %}
+
+{% block content %}
+
+<div class="box">
+  <h1>TF Binding Site Search</h1>
+  <p>Enter TF binding site collection and a genome accession number to scan.</p>
+  <hr/>
+  <form class="form-horizontal" method="post" action="">{% csrf_token %}
+
+    {{ form|bootstrap_horizontal }}
+    
+    <div class="form-group">
+      <div class=" col-sm-offset-2 col-sm-10 col-lg-offset-2 col-lg-10">
+        <input type="submit" class="btn btn-block btn-primary" value="Submit" />
+      </div>
+    </div>
+    
+  </form>
+</div>
+
+{% endblock %}
