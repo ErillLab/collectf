@@ -1,8 +1,9 @@
 """Genomic sequence processing utilities."""
 
 from base64 import b64encode
-from subprocess import Popen
+from distutils.spawn import find_executable
 from subprocess import PIPE
+from subprocess import Popen
 
 from Bio import motifs
 from Bio import SeqUtils
@@ -35,7 +36,7 @@ def weblogo(sequences):
     Uses weblogo program that is locally installed.
     """
     al = to_fasta(sequences)
-    weblogo_path = '/usr/local/bin/weblogo'
+    weblogo_path = find_executable('weblogo')
     p = Popen([weblogo_path, '-F', 'png', '-s', 'LARGE', '-c',
                'classic', '--errorbars', 'YES'],
               stdout=PIPE, stdin=PIPE, stderr=PIPE, close_fds=True)
@@ -76,5 +77,3 @@ def pssm_search(pssm, sequence, threshold=0.0):
             strand = 1 if score > rc_score else - 1
             hits.append((pos, strand, max_score))
     return hits
-                                 
-    
