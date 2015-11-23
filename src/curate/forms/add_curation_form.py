@@ -4,7 +4,6 @@ import itertools
 import re
 
 from django import forms
-from django.template import Context
 from django.template.loader import get_template
 from django.utils.safestring import mark_safe
 
@@ -20,7 +19,7 @@ from core.models import TF
 from core.models import TFInstance
 from core.models import Taxonomy
 from curate import site_entry
-from curate.forms import help_texts
+from curate.forms import help_text
 
 
 class PublicationForm(forms.Form):
@@ -29,7 +28,7 @@ class PublicationForm(forms.Form):
     In this step, the curator is asked to select one of the papers assigned to
     him/her.
     """
-    helptext = help_texts.publication_form
+    helptext = help_text.publication_form
 
     pub = forms.ChoiceField(
         widget=forms.RadioSelect(),
@@ -86,7 +85,7 @@ class GenomeForm(forms.Form):
              'contains_promoter_data',
              'contains_expression_data'])
 
-    help_text_dict = help_texts.genome_form
+    help_text_dict = help_text.genome_form
 
     TF = forms.ModelChoiceField(
         queryset=TF.objects.order_by('name'),
@@ -412,7 +411,7 @@ class TechniquesForm(forms.Form):
     def __init__(self, *args, **kwargs):
         """Overrides initialization"""
         super(TechniquesForm, self).__init__(*args, **kwargs)
-        help_dict = help_texts.techniques_form
+        help_dict = help_text.techniques_form
         # Extra external-database fields
         external_db_type_choices = [(None, 'None')]
         for db in ExternalDatabase.objects.all():
@@ -430,7 +429,7 @@ class TechniquesForm(forms.Form):
                 label="External DB accession number [%d]" % (i+1),
                 help_text=help_dict['external_db_accession'])
 
-    help_dict = help_texts.techniques_form
+    help_dict = help_text.techniques_form
 
     # Generate techniques field by getting available techniques from db
     template = get_template('experimental_technique_field.html')
@@ -489,7 +488,7 @@ class SiteEntryForm(forms.Form):
     system will prompt the user for a brief description of the field.
     """
 
-    help_dict = help_texts.site_entry_form
+    help_dict = help_text.site_entry_form
     # Type of sites to be entered
     # The curator is able to choose one of the available motifs or create a new
     # one. Sites can also be curated as either variable-motif-associated or
@@ -734,7 +733,7 @@ class CurationReviewForm(forms.Form):
 
     This is the last step before submitting curation.
     """
-    help_dict = help_texts.curation_review_form
+    help_dict = help_text.curation_review_form
 
     choices = ((None, 'None'),) + Curation.REVISION_REASONS
     revision_reasons = forms.ChoiceField(
