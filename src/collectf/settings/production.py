@@ -10,3 +10,7 @@ DATABASES = {
         'PORT': ''
     }
 }
+
+DEBUG = False
+
+ALLOWED_HOSTS = ['.collectf-v2.umbc.edu']
