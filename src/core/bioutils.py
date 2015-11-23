@@ -1,7 +1,6 @@
 """Genomic sequence processing utilities."""
 
 from base64 import b64encode
-from distutils.spawn import find_executable
 from subprocess import PIPE
 from subprocess import Popen
 
@@ -36,8 +35,7 @@ def weblogo(sequences):
     Uses weblogo program that is locally installed.
     """
     al = to_fasta(sequences)
-    weblogo_path = find_executable('weblogo')
-    p = Popen([weblogo_path, '-F', 'png', '-s', 'LARGE', '-c',
+    p = Popen(['weblogo', '-F', 'png', '-s', 'LARGE', '-c',
                'classic', '--errorbars', 'YES'],
               stdout=PIPE, stdin=PIPE, stderr=PIPE, close_fds=True)
     stdout_data, stderr_data = p.communicate(input=al)
