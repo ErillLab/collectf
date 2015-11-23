@@ -16,4 +16,4 @@ DEBUG = False
 ALLOWED_HOSTS = ['.collectf-v2.umbc.edu']
 
 # Gather static files here.
-STATIC_ROOT = '/var/www/collectf_static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'collectstatic')
