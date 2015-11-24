@@ -64,7 +64,18 @@ class MotifReport(MotifReportBase):
         return self.meta_sites[0].delegate.site_instance.genome.organism
 
     @property
+    def short_species_name(self):
+        """Returns the species name in short format.
+
+        For example, returns 'Y.pestis' for the species Yersinia pestis
+        KIM10+.
+        """
+        genus, species = self.species_name.split()[:2]
+        return genus[0] + '.' + species
+
+    @property
     def genome_accession(self):
+
         """Returns the genome accession of the sites in the motif report."""
         return self.meta_sites[0].delegate.genome_accession
 
