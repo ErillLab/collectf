@@ -3,6 +3,7 @@
 from base64 import b64encode
 from subprocess import PIPE
 from subprocess import Popen
+from django.conf import settings
 
 from Bio import motifs
 from Bio import SeqUtils
@@ -35,10 +36,9 @@ def weblogo(sequences):
     Uses weblogo program that is locally installed.
     """
     al = to_fasta(sequences)
-    p = Popen(['weblogo', '-F', 'png', '-s', 'LARGE', '-c',
+    p = Popen([settings.WEBLOGO_BIN, '-F', 'png', '-s', 'LARGE', '-c',
                'classic', '--errorbars', 'YES'],
-              stdout=PIPE, stdin=PIPE, stderr=PIPE, close_fds=True,
-              shell=True)
+              stdout=PIPE, stdin=PIPE, stderr=PIPE, close_fds=True)
     stdout_data, stderr_data = p.communicate(input=al)
     return stdout_data
 
