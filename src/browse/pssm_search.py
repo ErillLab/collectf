@@ -6,13 +6,13 @@ from core import bioutils
 
 from .forms.pssm_search import BindingSiteSearchForm
 
+
 def pssm_search_from_report_page(request):
     """Gets the list of sites and renders the PSSM search form with populated
     sites field."""
     sites = request.POST['sites'].split()
-    form = BindingSiteSearchForm({
-        'sites': '\n'.join(sites)})
-                                  
+    form = BindingSiteSearchForm({'sites': '\n'.join(sites)})
+
     return render(request, 'pssm_search.html', {'form': form})
 
 
@@ -20,7 +20,7 @@ def pssm_search(request):
     """Scans the genome with the given motif."""
     if request.method == 'POST':
         form = BindingSiteSearchForm(request.POST)
-        if form.is_valid():            
+        if form.is_valid():
             genome = form.cleaned_data['genome']
             motif = bioutils.build_motif(form.cleaned_data['sites'])
             # Find a threshold
@@ -49,4 +49,3 @@ def pssm_search(request):
         form = BindingSiteSearchForm()
 
     return render(request, 'pssm_search.html', {'form': form})
-

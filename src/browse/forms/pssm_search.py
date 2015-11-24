@@ -3,6 +3,7 @@ from django import forms
 from core import bioutils
 from core import entrez_utils
 
+
 class BindingSiteSearchForm(forms.Form):
     sites = forms.CharField(
         label="Sites",
