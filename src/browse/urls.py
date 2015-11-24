@@ -15,6 +15,9 @@ from . import pssm_search
 
 urlpatterns = [
     url(r'^test_view$', test_view.test_view),
+    url(r'^404/$', test_view.view_404),
+    url(r'^500/$', test_view.view_500),
+
     # Homepage view
     url(r'^home/$', homepage_views.home, name='homepage_home'),
 
