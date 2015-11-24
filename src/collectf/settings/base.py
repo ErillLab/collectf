@@ -27,6 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+ADMINS = [('Sefa Kilic', 'sefa1@umbc.edu')]
 
 # Application definition
 
