@@ -2,33 +2,51 @@
 
 {% block homepage_content %}
 
-  <h1>Acknowledgements</h1>
-  <p>
-    CollecTF is supported by the US National Science Foundation through grant MCB-1158056
-    and by the UMBC Office of Research through a Special Research
-    Assistantship/Initiative Support (SRAIS) award.
-  </p>
+<h3>Acknowledgements</h3>
+<p>
+CollecTF is supported by the US National Science Foundation through grant MCB-1158056
+and by the UMBC Office of Research through a Special Research
+Assistantship/Initiative Support (SRAIS) award.
+</p>
 
-  <p>
-    CollecTF is based on the collective effort of a fantastic and highly motivated team
-    of dedicated curators without whom the database would be just… well, empty. Check the
-    <a href="{% url 'curator_roster' %}">curator roster</a> for kudos!
-  </p>
+<p>
+CollecTF is based on the collective effort of a fantastic and highly motivated team
+of dedicated curators without whom the database would be just… well, empty. Check the
+<a href="{% url 'curator_roster' %}">curator roster</a> for kudos!
+</p>
 
-  <p>
-    Integration with the <a href="http://www.ncbi.nlm.nih.gov/refseq/">NCBI RefSeq</a>
-    database is possible thanks to the dedicated effort and infinite patience of Stacy
-    Ciufo, Tatiana Tatusova and the RefSeq team at
-    the <a href="http://www.ncbi.nlm.nih.gov/">NCBI</a>. Thanks for allowing us to put in
-    our two cents!
-  </p>
+<p>
+  Integration with the <a href="http://www.ncbi.nlm.nih.gov/refseq/">NCBI RefSeq</a>
+database is possible thanks to the dedicated effort and infinite patience of Stacy
+Ciufo, Tatiana Tatusova and the RefSeq team at
+the <a href="http://www.ncbi.nlm.nih.gov/">NCBI</a>.
+</p>
 
-  <p>
-    CollecTF integrates data from and out-links to many outstanding resources, like the
-    <a href="http://www.ncbi.nlm.nih.gov/gene">NCBI Gene database</a>
-    and <a href="http://en.wikipedia.org/">Wikipedia</a>. Thanks all for their hard work.
-  </p>
+<p>
+  Integration with the <a href="http://www.uniprot.org">UniProt Knowledgebase</a>
+ is possible thanks to the dedicated effort of Benoit Bely, Maria Martin and the
+UniProt development team at the <a href="http://http://www.ebi.ac.uk/">EMBL-EBI</a>.
+</p>
 
+<p>
+  Submission of annotations to the <a href="http://geneontology.org/">Gene Ontology</a> is made
+  possible by the dedicated effort of Tony Sawford, Melanie Courtot, Claire O'Donovan and the
+  UniProt content team at the
+  <a href="http://http://www.ebi.ac.uk/">EMBL-EBI</a>. 
+</p>
+
+<p>
+  CollecTF uses GO-compliant evidence codes for its curation process, through adoption of the
+  <a href="http://www.evidenceontology.org/">Evidence Ontology (ECO)</a>. Integration with ECO is
+  made possible by the dedicated effort of Shoshannah Wolfish, Suvarna Nadendla, Marcus Chibucos and
+  the ECO team at the
+  <a href="http://www.igs.umaryland.edu/">Institute for Genome Sciences</a>. 
+</p>
+
+<p>
+  CollecTF integrates data from and out-links to many outstanding resources, like the
+  <a href="http://www.ncbi.nlm.nih.gov/gene">NCBI Gene database</a>
+  and <a href="http://en.wikipedia.org/">Wikipedia</a>. Thanks all for their hard work.
+</p>
 
 {% endblock %}
-
