@@ -160,6 +160,7 @@ def is_ncbi_ready(wiz):
         return False
     return True
 
+
 def create_curation(wiz, genome_dict, techniques_dict, curation_review_dict):
     """Creates curation object and save it to the database."""
     # Find the curator

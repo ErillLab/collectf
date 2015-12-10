@@ -14,7 +14,6 @@ from .motif_report import build_motif_reports
 from .motif_report import build_ensemble_report
 
 
-
 def render_motif_report(request, curation_site_instances):
     """Renders the motif report page."""
     motif_reports = build_motif_reports(curation_site_instances)

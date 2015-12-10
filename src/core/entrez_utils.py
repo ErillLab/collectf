@@ -37,12 +37,13 @@ def get_organism_taxon(genome_record):
     """Finds organism taxonomy ID of a given record using Elink utility."""
     try:
         gi = genome_record.annotations['gi']
-        record = Entrez.read(Entrez.elink(
-            db='taxonomy', dbfrom='nuccore', id=gi, linkname='nuccore_taxonomy'))
+        record = Entrez.read(Entrez.elink(db='taxonomy', dbfrom='nuccore',
+                                          id=gi, linkname='nuccore_taxonomy'))
         tax_id = record[0]['LinkSetDb'][0]['Link'][0]['Id']
         return tax_id
     except:
         raise EntrezException
+
 
 def get_taxonomy(genome_record):
     """Retrieves the taxonomy record from NCBI."""
@@ -97,7 +98,7 @@ def get_genes(genome_record):
         gene_id = feature.qualifiers['db_xref'][i][7:]
         return gene_id
 
-    genes = [] # list of genes
+    genes = []                  # list of genes
     gene_features = [f for f in genome_record.features if f.type == 'gene']
     gids = [get_gene_id(f) for f in gene_features]
     recs = []

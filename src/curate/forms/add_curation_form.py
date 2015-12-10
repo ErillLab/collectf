@@ -150,8 +150,9 @@ class GenomeForm(forms.Form):
         """
         genome_accession = genome_accession.strip()
         if '.' not in genome_accession:
-            raise forms.ValidationError(
-                "Please enter RefSeq accession number with the version number.")
+            raise forms.ValidationError("""
+                Please enter RefSeq accession number with the version
+                number.""")
         if not genome_accession.startswith('NC_'):
             raise forms.ValidationError(
                 "RefSeq genome accession number should start with 'NC_'")
@@ -557,7 +558,6 @@ class SiteEntryForm(forms.Form):
             if sites_cd.startswith('>'):
                 site_entry.parse_fasta(sites_cd)
             else:
-                lines = [line.split() for line in sites_cd.split('\n')]
                 site_entry.parse_seq(sites_cd)
         except:
             raise forms.ValidationError("Ambiguous DNA sequence.")
@@ -579,11 +579,9 @@ class SiteEntryForm(forms.Form):
     def verify_only_sites_and_values(self, sites_cd):
         """Verifies entries with a sequence and quantitative value per site."""
         lines = [line.split() for line in sites_cd.split('\n')]
-        if (all(len(line) == 2 for line in lines) and
-            all(nuc in 'ACTG' for line in lines for nuc in line[0]) and
-            all(self.verify_float(line[1]) for line in lines)):
-            pass
-        else:
+        if not (all(len(line) == 2 for line in lines) and
+                all(nuc in 'ACTG' for line in lines for nuc in line[0]) and
+                all(self.verify_float(line[1]) for line in lines)):
             raise forms.ValidationError("Invalid format")
 
         return sites_cd
@@ -591,11 +589,10 @@ class SiteEntryForm(forms.Form):
     def verify_only_coordinates_and_values(self, sites_cd):
         """Verifies site entries with coordinates and quantitative values."""
         lines = [line.split() for line in sites_cd.split('\n')]
-        if (all(len(line) == 3 for line in lines) and
-            all(self.verify_coordinates(line[0], line[1]) for line in lines) and
-            all(self.verify_float(line[2]) for line in lines)):
-            pass
-        else:
+        if not (all(len(line) == 3 for line in lines) and
+                all(self.verify_coordinates(line[0], line[1])
+                    for line in lines) and
+                all(self.verify_float(line[2]) for line in lines)):
             raise forms.ValidationError("Invalid input format.")
         return sites_cd
 
@@ -603,8 +600,8 @@ class SiteEntryForm(forms.Form):
         """Checks if the quantitative-data-format is filled."""
         if not qval_data_format:
             msg = """
-            The reported sites have associated quantitative values. Please enter
-            the quantitative data format."""
+            The reported sites have associated quantitative values. Please
+            enter the quantitative data format."""
             self._errors["__all__"] = self.error_class([msg])
 
     def clean_sites(self):

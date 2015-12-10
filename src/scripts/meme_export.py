@@ -16,9 +16,9 @@ def generate_motif_file():
     with open(export_file, 'w') as f:
         for TF_instance in models.TFInstance.objects.all():
             print TF_instance
-            curation_site_instances = models.Curation_SiteInstance.objects.filter(
-                curation__TF_instances=TF_instance)
-            reports = motif_report.build_motif_reports(curation_site_instances)
+            reports = motif_report.build_motif_reports(
+                models.Curation_SiteInstance.objects.filter(
+                    curation__TF_instances=TF_instance))
             if reports:
                 sites = reports[0].aligned_sites
                 if len(sites) < 10:

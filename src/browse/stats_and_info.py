@@ -1,6 +1,4 @@
 """View functions about CollecTF stats and info."""
-from collections import defaultdict
-
 from django.shortcuts import render
 from django.db.models import Count
 
@@ -31,6 +29,7 @@ def curation_counts():
         'site_instance__genome__organism',
         'curation__TF_instances__TF__name').annotate(n=Count('curation'))
 
+
 def site_instance_stats():
     """Returns the number of site instances by TF and species."""
     return models.Curation_SiteInstance.objects.all().values(
@@ -52,4 +51,3 @@ def stats(request):
          'publication_complete_ratio': publication_complete_ratio(),
          'TFs': all_TFs,
          'species': all_species})
-            

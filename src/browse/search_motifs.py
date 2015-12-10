@@ -196,7 +196,7 @@ def search_terms(request):
 
     # If nothing is filtered, don't return the entire database content.
     if (taxonomy.count() == models.Taxonomy.objects.count() and
-        TF_instances.count() == models.TFInstance.objects.count()):
+            TF_instances.count() == models.TFInstance.objects.count()):
         messages.add_message(request, messages.INFO, fail_msg)
         return redirect('homepage_home')
 

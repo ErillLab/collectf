@@ -3,6 +3,7 @@ from django import forms
 from core import models
 from core import entrez_utils
 
+
 class PubMedPublicationForm(forms.Form):
     pmid = forms.CharField(
         label="PMID",
@@ -31,16 +32,15 @@ class PubMedPublicationForm(forms.Form):
         label="The manuscript contains expression information",
         help_text="""The paper provides experimental support for TF-mediated
         regulation of genes.""")
-    
+
     submission_notes = forms.CharField(
         label="Submission notes",
-        required=False, 
+        required=False,
         help_text="""Include any additional details about the submission. For
         instance, you might indicate the approximate number of sites reported,
         whether high-throughput techniques are used or any other factor that
         might help prioritize curation.""",
         widget=forms.Textarea)
-
 
     def clean_pmid(self):
         """Cleans PubMed ID field."""
@@ -58,19 +58,19 @@ class PubMedPublicationForm(forms.Form):
 
 class NonPubMedPublicationForm(forms.Form):
     authors = forms.CharField(label="Authors (Name Initials,)")
-    
+
     title = forms.CharField(label="Title")
-    
+
     journal = forms.CharField(label="Journal")
-    
+
     publication_date = forms.CharField(label="Publication date")
-    
+
     volume = forms.CharField(label="Volume")
-    
+
     issue = forms.CharField(label="Issue")
-    
+
     pages = forms.CharField(label="Pages (xxx-yyy)")
-    
+
     URL = forms.URLField(label="URL",
                          required=False)
 
@@ -96,10 +96,10 @@ class NonPubMedPublicationForm(forms.Form):
         label="The manuscript contains expression information",
         help_text="""The paper provides experimental support for TF-mediated
         regulation of genes.""")
-    
+
     submission_notes = forms.CharField(
         label="Submission notes",
-        required=False, 
+        required=False,
         help_text="""Include any additional details about the submission. For
         instance, you might indicate the approximate number of sites reported,
         whether high-throughput techniques are used or any other factor that

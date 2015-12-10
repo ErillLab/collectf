@@ -32,4 +32,4 @@ DEBUG_TOOLBAR_PANELS = [
 
 SITE_ID = 1
 
-WEBLOGO_BIN = '/home/sefa/.virtualenvs/collectf_env/bin/weblogo'
+WEBLOGO_BIN = '/Users/sefa/.virtualenvs/collectf_env/bin/weblogo'

@@ -28,7 +28,8 @@ def site_exact_match_context_data(wiz):
     sites = session_utils.get(wiz.request.session, 'sites')
     site_type = session_utils.get(wiz.request.session, 'site_type')
     d = {}
-    if (site_type not in ['non_motif_associated', 'var_motif_associated'] and (len(sites)>1)):
+    if (site_type not in ['non_motif_associated', 'var_motif_associated'] and
+            (len(sites) > 1)):
         d['weblogo_img'] = bioutils.weblogo_uri([site.seq for site in sites])
     return d
 

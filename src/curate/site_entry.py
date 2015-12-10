@@ -3,7 +3,8 @@ text entered on site-entry step.
 
 First, the text is parsed to find out whether it is sequence-based or
 coordinate-based. In addition, the text will be checked to see if it contains
-any quantitative information. All fields must be separated by space or tab.  """
+any quantitative information. All fields must be separated by space or tab.
+"""
 
 from django.utils.safestring import mark_safe
 
@@ -156,14 +157,18 @@ class Match:
         s = []
         s.append('<span class="sequence">')
         s.append("%s<br/>" % seqa)
-        s.append(''.join('|' if seqa[i]==seqb[i] else '&nbsp;' for i in range(len(seqa))) + '<br/>')
-        s.append('%s %s[%d,%d] (%s)</br>' % (seqb, '+' if self.strand==1 else '-',
-                                             self.start, self.end, self.genome.genome_accession))
+        s.append(''.join('|' if seqa[i] == seqb[i]
+                         else '&nbsp;' for i in range(len(seqa))) +
+                 '<br/>')
+        s.append('%s %s[%d,%d] (%s)</br>' %
+                 (seqb, '+' if self.strand == 1 else '-',
+                  self.start, self.end, self.genome.genome_accession))
         s.append('</span>')
-        return mark_safe( ''.join(s))
+        return mark_safe(''.join(s))
 
     def __repr__(self):
-        return "%s %s (exact? %s)" % (self.seq, self.reported_seq, self.is_exact())
+        return "%s %s (exact? %s)" % (
+            self.seq, self.reported_seq, self.is_exact())
 
 
 class Site:
@@ -256,16 +261,17 @@ class Site:
 
         match = self.get_match()
         for peak in peaks:
-            if hasattr(peak, 'start'): # coordinate-based peaks
+            if hasattr(peak, 'start'):  # coordinate-based peaks
                 if (min(peak.start, peak.end) <= match.start and
-                    max(peak.start, peak.end) >= match.end):
+                        max(peak.start, peak.end) >= match.end):
                     self.qval = peak.qval
                     break
-            else: # sequence-based peaks
+            else:  # sequence-based peaks
                 if (match.seq in peak.seq or
-                    bioutils.reverse_complement(match.seq) in peak.seq):
+                        bioutils.reverse_complement(match.seq) in peak.seq):
                     self.qval = peak.qval
                     break
+
 
 class SequenceSite(Site):
     """Class definition for sites that are initialized with the sequence"""
@@ -303,7 +309,8 @@ class SequenceSite(Site):
 
     def _locate_seq_strand(self, genome, strand):
         """Search the site sequence only in one strand of the genome."""
-        search_seq = self.seq if strand==1 else bioutils.reverse_complement(self.seq)
+        search_seq = (self.seq if strand == 1
+                      else bioutils.reverse_complement(self.seq))
         matches = []
         i = genome.sequence.find(search_seq)
         while i >= 0:
@@ -335,17 +342,18 @@ class SequenceSite(Site):
         <mismatch_th> away from the reported sequence."""
         # First, find all sequences on the genome that are similar enough
         genome_sequence = genome.sequence
-        search_seq = self.seq if strand == 1 else bioutils.reverse_complement(self.seq)
+        search_seq = (self.seq if strand == 1
+                      else bioutils.reverse_complement(self.seq))
         pattern = regex.compile('(%s){1<=s<=%d}' % (search_seq, mismatch_th))
         matches = []
         for m in regex.finditer(pattern, genome_sequence, overlapped=True):
-            matched_seq = m.group() if strand==1 else bioutils.reverse_complement(m.group())
-            match = Match(genome, matched_seq, self.seq, m.span()[0], m.span()[1]-1, strand)
+            matched_seq = (m.group() if strand == 1
+                           else bioutils.reverse_complement(m.group()))
+            match = Match(genome, matched_seq, self.seq,
+                          m.span()[0], m.span()[1]-1, strand)
             matches.append(match)
         return matches
 
-    def __repr__(self):
-        return "%s" % self.seq
 
 class CoordinateSite(Site):
     """Class definition for sites that are initialized using coordinates."""
@@ -373,34 +381,42 @@ class CoordinateSite(Site):
             if self.start <= self.end:
                 # there is only one match
                 self.seq = genome_sequence[start:end+1]
-                self.exact_matches = [Match(genome, self.seq, self.seq, start, end, 1)]
+                self.exact_matches = [
+                    Match(genome, self.seq, self.seq, start, end, 1)]
             else:
-                self.seq = bioutils.reverse_complement(genome_sequence[end:start+1])
-                self.exact_matches = [Match(genome, self.seq, self.seq, end, start, -1)]
+                self.seq = bioutils.reverse_complement(
+                    genome_sequence[end:start+1])
+                self.exact_matches = [
+                    Match(genome, self.seq, self.seq, end, start, -1)]
 
         # For all matches, get nearby genes
         self.set_nearby_genes_for_all_matches()
+
 
 def parse_fasta(text):
     """Parse fasta file and return list of sites"""
     l = SeqIO.parse(StringIO.StringIO(text), 'fasta')
     seqs = [item.seq.tostring() for item in l]
-    return [SequenceSite(i,seq) for i,seq in enumerate(seqs)]
+    return [SequenceSite(i, seq) for i, seq in enumerate(seqs)]
+
 
 def parse_seq(text):
     """Parse text that contains a list of sequences, one per line"""
     seqs = [l.strip() for l in text.split('\n') if l]
-    return [SequenceSite(i,seq) for i,seq in enumerate(seqs)]
+    return [SequenceSite(i, seq) for i, seq in enumerate(seqs)]
+
 
 def parse_seq_with_qval(text):
     """Parse text that contains a list of sequences and associated quantitative
-    values. There should be one pair of site and quantitative value on each line
-    of text."""
+    values. There should be one pair of site and quantitative value on each
+    line of text."""
     lines = re.split('[\r\n]+', text)
     seqs = [line.split()[0] for line in lines]
     quantitative_values = map(float, [line.split()[1] for line in lines])
     assert len(seqs) == len(quantitative_values)
-    return [SequenceSite(i, seq, qval) for i,(seq,qval) in enumerate(zip(seqs, quantitative_values))]
+    return [SequenceSite(i, seq, qval)
+            for i, (seq, qval) in enumerate(zip(seqs, quantitative_values))]
+
 
 def parse_coords(text):
     """Parse text that contains list of coordinates, one per line. Each line
@@ -411,13 +427,16 @@ def parse_coords(text):
     return [CoordinateSite(i, int(coord[0])-1, int(coord[1])-1)
             for i, coord in enumerate(coordinates)]
 
+
 def parse_coords_with_qval(text):
     """Parse text that contains list of coordinates, one per line. Additionally,
     each line has a quantitative value associated with the coordinates"""
     coordinates = [re.split('[\t ]+', line)
                    for line in re.split('[\r\n]+', text)]
-    return [CoordinateSite(i, int(coord[0])-1, int(coord[1])-1, float(coord[2]))
+    return [CoordinateSite(i, int(coord[0])-1,
+                           int(coord[1])-1, float(coord[2]))
             for i, coord in enumerate(coordinates)]
+
 
 def parse_input(text):
     """Parse text of reported sites.
@@ -425,16 +444,16 @@ def parse_input(text):
     values.
     """
     sites = None
-    if text.strip().startswith('>'): # fasta format
+    if text.strip().startswith('>'):  # fasta format
         sites = parse_fasta(text)
-    else: # it can be in sequences/coordinates (and quantitative values)
+    else:  # it can be in sequences/coordinates (and quantitative values)
         site_lines = re.split('[\r\n]+', text)
-        if len(site_lines[0].split()) == 3: # should be coordinates with q values
+        if len(site_lines[0].split()) == 3:  # Should be coordinates with qval.
             sites = parse_coords_with_qval(text)
         elif len(site_lines[0].split()) == 2:
             # Can be either sequence with q values or
             # coordinates without q values
-            a,b = site_lines[0].split()
+            a, b = site_lines[0].split()
             if a.isalpha() and misc.is_float(b):
                 sites = parse_seq_with_qval(text)
             elif a.isdigit() and b.isdigit():
@@ -443,6 +462,7 @@ def parse_input(text):
             # it should be only sequences
             sites = parse_seq(text)
     return sites
+
 
 def dist(a, b):
     """Given two genes (or gene and match), return distance"""
