@@ -15,6 +15,7 @@
 import sys
 import os
 import django
+from mock import Mock as MagicMock
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -294,3 +295,14 @@ texinfo_documents = [
 
 # If true, todo and todolist produce output
 todo_include_todos = True
+
+
+# http://read-the-docs.readthedocs.org/en/latest/faq.html#i-get-import-errors-on-libraries-that-depend-on-c-modules
+# Workaround for matplotlib dependencies
+class Mock(MagicMock):
+    @classmethod
+    def __getattr__(cls, name):
+            return Mock()
+
+MOCK_MODULES = ['matplotlib']
+sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
