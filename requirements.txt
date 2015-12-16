@@ -8,7 +8,6 @@ django-bootstrap-form==3.2
 django-debug-toolbar==1.4
 django-extensions==1.5.9
 django-formtools==1.0
-matplotlib==1.5.0
 numpy==1.10.1
 pyparsing==2.0.5
 python-dateutil==2.4.2
