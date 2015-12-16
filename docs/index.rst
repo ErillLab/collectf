@@ -22,8 +22,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   development/index
    curation/index
+   development/index
 
 
 
