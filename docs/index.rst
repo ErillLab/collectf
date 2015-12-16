@@ -23,7 +23,6 @@ Contents:
    :maxdepth: 2
 
    curation/index
-   development/index
 
 
 
