@@ -8,5 +8,3 @@ defined.
 
 .. todo:: Add database schema figure.
 
-.. automodule:: core.models
-   :members:
