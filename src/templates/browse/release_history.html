@@ -1,9 +1,13 @@
-{% extends "base.html" %}
+{% extends "homepage.html" %}
+{% load staticfiles %}
 
-{% block content %}
+{% block homepage_content %}
 
-<div class="box">
-<h1>CollecTF release history</h1>
-<hr>
+<div>
+  <h2>Release history</h2>
+  <p>
+    Download latest CollecTF release (generated on December 17, 2015)
+    <a href="{% static 'collectf_export.tsv' %}">here</a>.
+  </p>
 </div>
 {% endblock %}
