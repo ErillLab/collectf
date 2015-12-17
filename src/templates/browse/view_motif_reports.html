@@ -160,7 +160,7 @@
 
                   <td class="regulation_col">
                     {% for regulation in meta_site.regulations %}
-                    <a href="http://www.ncbi.nlm.nih.gov/gene/{{ reg.gene.gene_accession }}" target="_blank">
+                    <a href="http://www.ncbi.nlm.nih.gov/gene/{{ regulation.gene.gene_accession }}" target="_blank">
 		              <span class="fixed-width">
                         {% with gene_name=regulation.gene.name locus_tag=regulation.gene.locus_tag %}
 			            {{ gene_name }} {% if gene_name != locus_tag %} ({{locus_tag }}) {% endif %}
