@@ -7,8 +7,8 @@ CollecTF
 .. image:: https://coveralls.io/repos/ErillLab/collectf/badge.svg?branch=develop&service=github
    :target: https://coveralls.io/github/ErillLab/collectf?branch=develop
 .. image:: https://readthedocs.org/projects/collectf/badge/?version=develop
-   :target: http://collectf.readthedocs.org/en/django-1.9/?badge=develop
-   :alt: Documentation Status
+   :target: http://collectf.readthedocs.org/?badge=develop
+   :alt: Documentation Status      
 
 
 `CollecTF`_ is a database of transcription factor binding sites in the Bacteria
