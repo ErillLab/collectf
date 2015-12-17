@@ -22,7 +22,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   curation/index
+   curation/curation_submission_guide
+   curation/high_throughput_submission_guide
 
 
 
