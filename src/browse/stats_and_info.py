@@ -49,5 +49,6 @@ def stats(request):
          'sites_count': models.SiteInstance.objects.count(),
          'publication_count': models.Publication.objects.count(),
          'publication_complete_ratio': publication_complete_ratio(),
+         'TF_instance_count': models.TFInstance.objects.count(),
          'TFs': all_TFs,
          'species': all_species})
