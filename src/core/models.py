@@ -95,6 +95,12 @@ class Curation(models.Model):
         """Returns the TF associated with the curation."""
         return self.TF_instances.all()[0].TF
 
+    @property
+    def TF_instance_accessions(self):
+        """Returns the list of TF-instance UniProt accession numbers."""
+        return [TF_instance.uniprot_accession
+                for TF_instance in self.TF_instances.all()]
+
     def TF_function_verbose(self):
         return dict(self.TF_FUNCTION)[self.TF_function]
 

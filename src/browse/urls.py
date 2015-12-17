@@ -4,6 +4,7 @@ from . import browse_by_TF
 from . import browse_by_taxonomy
 from . import browse_by_technique
 from . import compare_motifs
+from . import export
 from . import homepage_views
 from . import list_all
 from . import search_motifs
@@ -12,6 +13,7 @@ from . import test_view
 from . import view_curation
 from . import view_motif_reports
 from . import pssm_search
+
 
 urlpatterns = [
     url(r'^test_view$', test_view.test_view),
@@ -111,6 +113,9 @@ urlpatterns = [
     url(r'^view_motif_reports_by_curation_site_instance_ids/$',
         view_motif_reports.view_reports_by_curation_site_instance_ids,
         name='view_reports_by_id'),
+
+    # Export
+    url(r'^export/$', export.export_sites, name='export_sites'),
 
     # Search
     url(r'^search_motifs/$', search_motifs.search, name='motif_search'),
