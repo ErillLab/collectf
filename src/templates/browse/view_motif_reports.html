@@ -47,7 +47,6 @@
           <br/>
           <div class="tab-pane" id="{{ motif_report.id }}_sites">
             <p>Sites are listed as curated.</p>
-
             <div class="sequence box shaded-background">
               {% for meta_site in motif_report.meta_sites %}
               {{ meta_site.delegate_sequence }}<br/>
@@ -101,27 +100,34 @@
 
           <div class="tab-pane" id="{{ motif_report.id }}_detail">
             <p>For the selected transcription factor and species, the list of curated binding sites
-	          in the database are displayed below. The binding site is displayed as red bar. Genes
-	          that are reported to be regulated by TF are colored with green.
-            </p>
+	          in the database are displayed below. Gene regulation diagrams show <span class="label
+	          label-black">binding sites</span>, <span class="label
+	          label-green">positively-regulated genes</span>,
+              <span class="label label-red">negatively-regulated genes</span>,
+              <span class="label label-orange"> both positively and negatively regulated
+              genes</span>, <span class="label label-blue"> genes with unspecified type of
+              regulation</span>.
 
             <ul id="hiddenCols"></ul>
             <table class="table table-bordered table-striped">
 	          <thead>
                 <tr>
 		          <th class="genome_col">
-                    Genome [<a href="#" class="" onclick="hideCol('genome_col');">x</a>]
+                    Genome [<a href="#" class="" onclick="hideCol('genome_col'); return false;">x</a>]
                   </th>
 		          <th class="TF_col">
-                    TF [<a href="#" class="" onclick="hideCol('TF_col');">x</a>]
+                    TF [<a href="#" class="" onclick="hideCol('TF_col'); return false;">x</a>]
+                  </th>
+                  <th class="TF_conformation_col">
+                    TF conformation [<a href="#" class="#" onclick="hideCol('TF_conformation_col'); return false;">x</a>]
                   </th>
 		          <th>Site sequence</th>
 		          <th class="techniques_col">
-                    Experimental techniques [<a href="#" onclick="hideCol('techniques_col');">x</a>]
+                    Experimental techniques [<a href="#" onclick="hideCol('techniques_col'); return false;">x</a>]
                   </th>
 		          <th class="regulation_col">
                     Gene regulation [<a href="" id="regulation_diagram_switch"><small>Toggle
-                    diagrams</small></a>][<a href="#" onclick="hideCol('regulation_col');">x</a>]</th>
+                    diagrams</small></a>][<a href="#" onclick="hideCol('regulation_col'); return false;">x</a>]</th>
 		          <th>Curations</th>
 		        </tr>
 	          </thead>
@@ -146,6 +152,10 @@
                     {% endfor %}
                   </td>
                   {% endwith %}
+
+                  <td class="TF_conformation_col">
+                    {{ meta_site.delegate.get_TF_type_display }}
+                  </td>
 
                   <td>
                     <span class="sequence">{{ meta_site.delegate_sequence }}</span>

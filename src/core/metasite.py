@@ -91,12 +91,18 @@ class MetaSite:
         gdd = GenomeDiagram.Diagram('Regulation Diagram')
         gdt_features = gdd.new_track(1, greytrack=False)
         gds_features = gdt_features.new_set()
+        reg_colors = {'ACT': colors.HexColor("#4CAF50"),  # green
+                      'REP': colors.HexColor("#F44336"),  # red
+                      'DUAL': colors.HexColor("#FFEB3B"), # yellow
+                      'N/A': colors.HexColor("#2196F3")}  # blue
+        
         regulations = self.regulations
         # Draw genes.
         for regulation in regulations:
             feature = SeqFeature(
                 FeatureLocation(regulation.gene.start, regulation.gene.end),
                 strand=regulation.gene.strand)
+            
             gds_features.add_feature(
                 feature,
                 name=regulation.gene.name,
@@ -106,9 +112,10 @@ class MetaSite:
                 label_position='middle',
                 sigil="ARROW",
                 arrowshaft_height=1.0,
-                color=(colors.green
-                       if regulation.evidence_type == 'exp_verified'
-                       else colors.grey))
+                color=(
+                    reg_colors[regulation.curation_site_instance.TF_function]
+                    if regulation.evidence_type == 'exp_verified'
+                    else colors.HexColor("#9E9E9E")))  # grey
 
         # Draw binding site
         site_instance = regulations[0].curation_site_instance.site_instance
@@ -116,7 +123,7 @@ class MetaSite:
             FeatureLocation(site_instance.start, site_instance.end),
             strand=site_instance.strand)
         gds_features.add_feature(feature,
-                                 color=colors.red,
+                                 color=colors.HexColor("#000000"),  # black
                                  name='site',
                                  label=False,
                                  label_size=12)

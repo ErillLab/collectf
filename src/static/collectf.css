@@ -47,3 +47,27 @@ img {
 .error-template {padding: 40px 15px;text-align: center;}
 .error-actions {margin-top:15px;margin-bottom:15px;}
 .error-actions .btn { margin-right:10px; }
+
+.label-black {
+    background-color: #000000;
+}
+
+.label-orange {
+    background-color: #f39c12;
+}
+
+.label-green {
+    background-color: #4CAF50;
+}
+
+.label-red {
+    background-color: #e74c3c;
+}
+
+.label-grey {
+    background-color: #95a5a6;
+}
+
+.label-blue {
+    background-color: #2196F3;
+}

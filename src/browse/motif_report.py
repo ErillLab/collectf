@@ -75,7 +75,6 @@ class MotifReport(MotifReportBase):
 
     @property
     def genome_accession(self):
-
         """Returns the genome accession of the sites in the motif report."""
         return self.meta_sites[0].delegate.genome_accession
 

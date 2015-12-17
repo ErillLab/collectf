@@ -8,7 +8,7 @@ function hideCol(colClass) {
     var li = ('<li id="' + colClass +
               '"><a href="javascript:;" onclick="showCol(\'' +
 	          colClass + '\');">Show ' +
-              colClass.substr(0, colClass.length-4) +
+              colClass.substr(0, colClass.length-4).replace('_', ' ') +
               ' column</a></li>');
     $('ul#hiddenCols').append(li);
 }
@@ -31,6 +31,7 @@ $(document).ready(function() {
     // Hide 'genome' and 'TF' columns in the table
     hideCol('genome_col');
     hideCol('TF_col');
+    hideCol('TF_conformation_col');
 
     // Initialize clipboard
     new Clipboard('.btn');
