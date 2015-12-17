@@ -3,10 +3,11 @@
 High-throughput submission guide
 ================================
 
-This section is intended as a short annex to the main curation guide, providing
-specific details regarding the submission of high‐throughput data. For further
-reference on the different aspects of the curation process, please see the
-`curation submission guide`_.
+This document is intended as a short annex to the main curation guide,
+providing specific details regarding the submission of high‐throughput
+data. For further reference on the different aspects of the curation process,
+please see the CollecTF :ref:`curation submission guide`.
+
 
 Why?
 -----
@@ -62,7 +63,7 @@ The process
 
 Most steps in the CollecTF high‐throughput submission process are equivalent to
 those of normal submissions and the reader is referred to the standard
-`curation submission guide`_ for details.
+:ref:`curation submission guide` for details.
 
 Entering sites
 ~~~~~~~~~~~~~~
@@ -119,6 +120,6 @@ sequence elements (sites) can and must be defined in Step 7 (Site annotation).
 
 And that is all. The rest of the high‐throughput submission pipeline is
 equivalent to the standard submission process, and the reader is referred to
-the general `curation submission guide`_ for further details.
+the general :ref:`curation submission guide` for further details.
 
 
