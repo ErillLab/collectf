@@ -13,7 +13,9 @@ DATABASES = {
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['.collectf-v2.umbc.edu', '.collectf.org']
+ALLOWED_HOSTS = ['.collectf-v2.umbc.edu',
+                 '.collectf.org',
+                 '.collectf.umbc.edu']
 
 # Gather static files here.
 STATIC_ROOT = os.path.join(BASE_DIR, 'collectstatic')
