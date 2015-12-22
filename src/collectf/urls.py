@@ -42,6 +42,10 @@ urlpatterns = [
     url(r'^uniprotkbmap$',
         RedirectView.as_view(url=static('uniprot_dbxref.txt'))),
 
+    # GO annotations
+    url(r'^go_annotations$',
+        RedirectView.as_view(url=static('collectf.gpad'))),
+
     # user account management
     url(r'^accounts/', include('registration.backends.default.urls')),
 ]
