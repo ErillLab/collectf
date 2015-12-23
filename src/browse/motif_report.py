@@ -78,6 +78,67 @@ class MotifReport(MotifReportBase):
         """Returns the genome accession of the sites in the motif report."""
         return self.meta_sites[0].delegate.genome_accession
 
+    @property
+    def regulation_stats(self):
+        """Returns the percentages of each regulation type."""
+        stats = {}
+        for tf_function in models.Curation_SiteInstance.TF_FUNCTION:
+            sites = [meta_site for meta_site in self.meta_sites
+                     if any(csi.TF_function == tf_function[0]
+                            for csi in meta_site.curation_site_instances)]
+            stats[tf_function[1]] = 100 * len(sites) / len(self.meta_sites)
+        return stats
+
+    @property
+    def TF_conformation_stats(self):
+        """Returns the percentages of TF-conformation."""
+        stats = {}
+        for tf_type in models.Curation_SiteInstance.TF_TYPE:
+            sites = [meta_site for meta_site in self.meta_sites
+                     if any(csi.TF_type == tf_type[0]
+                            for csi in meta_site.curation_site_instances)]
+            stats[tf_type[1]] = 100 * len(sites) / len(self.meta_sites)
+        return stats
+
+    @property
+    def site_stats(self):
+        """Returns the percentages of site types."""
+        stats = {}
+        for site_type in models.Curation_SiteInstance.SITE_TYPE:
+            sites = [meta_site for meta_site in self.meta_sites
+                     if any(csi.site_type == site_type[0]
+                            for csi in meta_site.curation_site_instances)]
+            stats[site_type[1]] = len(sites)
+        return stats
+
+    @property
+    def number_of_motif_associated_sites(self):
+        """Returns the number of motif-associated sites."""
+        return len([meta_site for meta_site in self.meta_sites
+                    if meta_site.is_motif_associated])
+
+    @property
+    def number_of_non_motif_associated_sites(self):
+        """Returns the number of non-motif-associated sites."""
+        return len([meta_site for meta_site in self.meta_sites
+                    if meta_site.is_non_motif_associated])
+
+    @property
+    def number_of_variable_motif_associated_sites(self):
+        """Returns the number of variable-motif-associated sites."""
+        return len([meta_site for meta_site in self.meta_sites
+                    if meta_site.is_variable_motif_associated])
+
+    @property
+    def GC_content(self):
+        gc = sum(site.count('G') + site.count('C')
+                 for meta_site in self.meta_sites
+                 for site in meta_site.delegate_sequence)
+        total = sum(len(site)
+                    for meta_site in self.meta_sites
+                    for site in meta_site.delegate_sequence)
+        return float(gc) / total
+
 
 class EnsembleMotifReport(MotifReportBase):
     """Collection of meta-sites that are requested to be viewed together."""

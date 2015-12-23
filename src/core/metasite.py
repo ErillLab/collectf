@@ -86,6 +86,24 @@ class MetaSite:
         return meta_site_regulations
 
     @property
+    def is_motif_associated(self):
+        """Checks if the meta-site contains a motif-associated site."""
+        return any(curation_site_instance.site_type == 'motif_associated'
+                   for curation_site_instance in self.curation_site_instances)
+
+    @property
+    def is_non_motif_associated(self):
+        """Checks if the meta-site contains a non-motif-associated site."""
+        return any(curation_site_instance.site_type == 'non_motif_associated'
+                   for curation_site_instance in self.curation_site_instances)
+
+    @property
+    def is_variable_motif_associated(self):
+        """Checks if the meta-site contains a var-motif-associated site."""
+        return any(curation_site_instance.site_type == 'var_motif_associated'
+                   for curation_site_instance in self.curation_site_instances)
+
+    @property
     def regulation_diagram(self):
         """Draws the regulation diagram of the given regulation."""
         gdd = GenomeDiagram.Diagram('Regulation Diagram')
@@ -95,14 +113,14 @@ class MetaSite:
                       'REP': colors.HexColor("#F44336"),  # red
                       'DUAL': colors.HexColor("#FFEB3B"), # yellow
                       'N/A': colors.HexColor("#2196F3")}  # blue
-        
+
         regulations = self.regulations
         # Draw genes.
         for regulation in regulations:
             feature = SeqFeature(
                 FeatureLocation(regulation.gene.start, regulation.gene.end),
                 strand=regulation.gene.strand)
-            
+
             gds_features.add_feature(
                 feature,
                 name=regulation.gene.name,
