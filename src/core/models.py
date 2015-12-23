@@ -602,6 +602,17 @@ class Regulation(models.Model):
             self.curation_site_instance.site_instance.site_id,
             self.evidence_type)
 
+    @property
+    def binding_experimental_techniques(self):
+        """Gets experimental techniques showing binding."""
+        return self.curation_site_instance.experimental_techniques.filter(
+            preset_function='binding')
+
+    @property
+    def ref_pmid(self):
+        """Returns the PubMed ID of the curation."""
+        return self.curation_site_instance.curation.publication.pmid
+
 
 class NotAnnotatedSiteInstance(models.Model):
     """The table for not annotated site instances.
