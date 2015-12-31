@@ -112,24 +112,6 @@ class MotifReport(MotifReportBase):
         return stats
 
     @property
-    def number_of_motif_associated_sites(self):
-        """Returns the number of motif-associated sites."""
-        return len([meta_site for meta_site in self.meta_sites
-                    if meta_site.is_motif_associated])
-
-    @property
-    def number_of_non_motif_associated_sites(self):
-        """Returns the number of non-motif-associated sites."""
-        return len([meta_site for meta_site in self.meta_sites
-                    if meta_site.is_non_motif_associated])
-
-    @property
-    def number_of_variable_motif_associated_sites(self):
-        """Returns the number of variable-motif-associated sites."""
-        return len([meta_site for meta_site in self.meta_sites
-                    if meta_site.is_variable_motif_associated])
-
-    @property
     def GC_content(self):
         gc = sum(site.count('G') + site.count('C')
                  for meta_site in self.meta_sites
@@ -158,6 +140,7 @@ def group_curation_site_instances(curation_site_instances):
             'site_instance__genome__organism').values_list(
                 'site_instance__genome__organism',
                 'curation__TF_instances').distinct()
+
     return [curation_site_instances.filter(
         site_instance__genome__organism=genome,
         curation__TF_instances=TF_instances)

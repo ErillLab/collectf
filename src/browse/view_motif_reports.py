@@ -17,8 +17,6 @@ from .motif_report import build_ensemble_report
 def render_motif_report(request, curation_site_instances):
     """Renders the motif report page."""
     motif_reports = build_motif_reports(curation_site_instances)
-    for motif_report in motif_reports:
-        motif_report.meta_sites[0].curation_site_instances
     ensemble_motif_report = build_ensemble_report(curation_site_instances)
     return render(request, 'view_motif_reports.html',
                   {'motif_reports': motif_reports,
@@ -31,8 +29,7 @@ def view_reports_by_TF_and_species(request, TF_id, species_id):
     TF = get_object_or_404(models.TF, TF_id=TF_id)
     curation_site_instances = models.Curation_SiteInstance.objects.filter(
         site_instance__genome__taxonomy=org,
-        curation__TF_instances__TF=TF,
-        site_type='motif_associated')
+        curation__TF_instances__TF=TF)
     return render_motif_report(request, curation_site_instances)
 
 
