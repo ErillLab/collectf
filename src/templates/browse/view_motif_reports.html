@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load staticfiles %}
+{% load utiltags %}
 
 {% block content %}
 
@@ -94,49 +95,66 @@
 
             <img src="{{ motif_report.weblogo }}">
 
+            <table class="table table-bordered table-striped">
+              <tbody>
 
-            <dl class="dl-horizontal">
-              <dt>Regulation</dt>
+                <tr>
+                  <th>Motif structure</th>
+                  <td>{{ motif_report.structure }}</td>
+                </tr>
+                
+                <tr>
+                  <th>GC-content</th>
+                  <td>{{ motif_report.GC_content|floatformat:2 }}%</td>
+                </tr>
+                
+                <tr>
+                  <th rowspan="2">Regulatory mode</th>
+                  <td><i>Activation</i></td >
+                  <td><i>Repression</i></td>
+                  <td><i>Dual</i></td>
+                  <td><i>Not specified</i></td>
+                </tr>
+                <tr>
+                  <td>{{ motif_report.regulation_stats.activator }}%</td>
+                  <td>{{ motif_report.regulation_stats.repressor }}%</td>
+                  <td>{{ motif_report.regulation_stats.dual }}%</td>
+                  <td>{{ motif_report.regulation_stats|get_item:"not specified" }}%</td>
+                </tr>
 
-              <dd>
-                {% for type, percentage in motif_report.regulation_stats.items %}
-                {% if percentage > 0 %}
-                {{ percentage }}% {{ type }}.
-                {% endif %}
-                {% endfor %}
-              </dd>
+                <tr>
+                  <th rowspan="2">TF conformation</th>
+                  <td><i>Monomer</i></td>
+                  <td><i>Dimer</i></td>
+                  <td><i>Tetramer</i></td>
+                  <td><i>Other</i></td>
+                  <td><i>Not specified</i></td>
+                </tr>
+                <tr>
+                  <td>{{ motif_report.TF_conformation_stats.monomer }}%</td>
+                  <td>{{ motif_report.TF_conformation_stats.dimer }}%</td>
+                  <td>{{ motif_report.TF_conformation_stats.tetramer }}%</td>
+                  <td>{{ motif_report.TF_conformation_stats.other }}%</td>
+                  <td>{{ motif_report.TF_conformation_stats|get_item:"not specified" }}%</td>
+                </tr>
 
-              <dt>TF conformation</dt>
-              <dd>
-                {% for type, percentage in motif_report.TF_conformation_stats.items %}
-                {% if percentage > 0 %}
-                {{ percentage }}% {{ type }}.
-                {% endif %}
-                {% endfor %}
-              </dd>
-
-              <dt> # Binding sites </dt>
-
-              <dd>
-                {% for type, cnt in motif_report.site_stats.items %}
-                {% if cnt > 0 %}
-                {{ cnt }} {{ type }}.
-                {% endif %}
-                {% endfor %}
-              </dd>
+                <tr>
+                  <th rowspan="2">Binding site type</th>
+                  <td><i>Motif-associated</i></td>
+                  <td><i>Variable-motif-associated</i></td>
+                  <td><i>Non-motif-associated</i></td>
+                </tr>
+                <tr>
+                  <td>{{ motif_report.site_stats|get_item:"motif associated" }}</td>
+                  <td>{{ motif_report.site_stats|get_item:"variable motif associated" }}</td>
+                  <td>{{ motif_report.site_stats|get_item:"non-motif associated" }}</td>
+                </tr>
 
 
-              <dt> Motif pattern</dt>
-              <dd>
-                Coming soon.
-              </dd>
+              </tbody>
+            </table>
 
-              <dt>GC-content</dt>
-              <dd>{{ motif_report.GC_content|floatformat:2 }}</dd>
-            </dl>
           </div>
-
-
 
           <div class="tab-pane" id="{{ motif_report.id }}_detail">
             <p>For the selected transcription factor and species, the list of curated binding sites

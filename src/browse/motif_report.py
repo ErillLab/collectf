@@ -7,10 +7,10 @@ import random
 from django.utils.functional import cached_property
 
 from core import bioutils
-from core import metasite
 from core import lasagna
+from core import metasite
 from core import models
-
+from core import motif_structure
 
 class MotifReportBase:
     """Base class for MotifReport and EnsembleMotifReport."""
@@ -137,8 +137,13 @@ class MotifReport(MotifReportBase):
         total = sum(len(site)
                     for meta_site in self.meta_sites
                     for site in meta_site.delegate_sequence)
-        return float(gc) / total
+        return float(gc) / total * 100
 
+    @property
+    def structure(self):
+        """Returns the motif structure."""
+        return motif_structure.find_pattern(self.aligned_sites)
+    
 
 class EnsembleMotifReport(MotifReportBase):
     """Collection of meta-sites that are requested to be viewed together."""
