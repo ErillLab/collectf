@@ -104,19 +104,23 @@
   <div class="tab-content">
     <br/>
     <div class="tab-pane" id="reported">
-      {% for curation_site_instance in curation.curation_siteinstance_set.all %}
-      {% if not curation_site_instance.is_high_throughput %}
-      <span class="sequence">{{ curation_site_instance.annotated_seq }}</span><br/>
-      {% endif %}
-      {% endfor %}
+      <div class="box shaded-background">
+        {% for curation_site_instance in curation.curation_siteinstance_set.all %}
+        {% if not curation_site_instance.is_high_throughput %}
+        <span class="sequence">{{ curation_site_instance.annotated_seq }}</span><br/>
+        {% endif %}
+        {% endfor %}
+      </div>
     </div>
 
     <div class="tab-pane active" id="curated">
+      <div class="box shaded-background">
       {% for curation_site_instance in curation.curation_siteinstance_set.all %}
       {% if not curation_site_instance.is_high_throughput %}
       <span class="sequence">{{ curation_site_instance.site_instance.sequence }}</span><br/>
       {% endif %}
       {% endfor %}
+      </div>
     </div>
 
     {% if curation.quantitative_data_format %}
