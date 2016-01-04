@@ -22,4 +22,4 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'collectstatic')
 
 SITE_ID = 1
 
-WEBLOGO_BIN = '/home/erilllab/.virtualenvs/collectf_env/bin/weblogo'
+WEBLOGO_BIN = '/usr/bin/weblogo'
