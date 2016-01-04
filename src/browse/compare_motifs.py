@@ -3,6 +3,8 @@
 from base64 import b64encode
 import StringIO
 import math
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import random
 
@@ -19,6 +21,7 @@ from .search_motifs import get_all_techniques
 from .search_motifs import search_post_helper
 from .motif_report import build_motif_reports
 from .motif_report import build_ensemble_report
+
 
 
 def motif_comparison_get(request, step):
