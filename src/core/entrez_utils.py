@@ -63,61 +63,36 @@ def get_taxonomy(genome_record):
 
 def get_genes(genome_record):
     """Gets the list of all genes, given a genome record object."""
-
-    def get_gene_annotation(id_list):
-        """Gets gene annotations.
-
-        Uses Bio.Entrez epost to submit the data to NCBI, and esummary to
-        retrieve the information. Returns a list gene summary objects.
-        """
-        epost_result = Entrez.read(Entrez.epost('gene', id=','.join(id_list)))
-
-        # NCBI may refuse to return all gene summaries due to some sort of
-        # query limit. Query summaries for 1000 genes at a time.
-
-        runtime_error = 0  # error couunt  during Entrez esummary
-        while runtime_error < 10:
-            try:
-                request = Entrez.esummary(db="gene",
-                                          webenv=epost_result["WebEnv"],
-                                          query_key=epost_result["QueryKey"])
-                records = Entrez.read(request)
-            except RuntimeError,  e:
-                print "Error occurred during epost+esummary:", e
-                print "Trying again."
-                runtime_error += 1
-            else:
-                break
-        return records['DocumentSummarySet']['DocumentSummary']
-
-    def get_gene_id(feature):
-        """Extracts the gene id, given a Biopython SeqFeature object."""
-        i = 0
-        while not feature.qualifiers['db_xref'][i].startswith('GeneID:'):
-            i += 1
-        gene_id = feature.qualifiers['db_xref'][i][7:]
-        return gene_id
-
     genes = []                  # list of genes
-    gene_features = [f for f in genome_record.features if f.type == 'gene']
-    gids = [get_gene_id(f) for f in gene_features]
-    recs = []
-    chunk_size = 1000
-    for start in xrange(0, len(gids), chunk_size):
-        end = min(len(gids), start+chunk_size)
-        recs = recs + get_gene_annotation(gids[start:end])
-
-    # two sources of gene data: Entrez epost and gene features from genome
-    # record
-    for gid, feat, rec in zip(gids, gene_features, recs):
-        assert rec.attributes['uid'] == gid
-        genes.append({'gene_accession': gid,
-                      'name': rec['Name'],
-                      'description': rec['Description'],
-                      'start': feat.location.start.position,
-                      'end': feat.location.end.position,
-                      'strand': feat.strand,
-                      'locus_tag': ','.join(feat.qualifiers['locus_tag'])})
+    feature_index = 0
+    features = genome_record.features
+    while feature_index < len(features):
+        if features[feature_index].type == 'gene':
+            gene_feature = features[feature_index]
+            gene_rec = features[feature_index].qualifiers
+            locus_tag = gene_rec['locus_tag']
+            # Check if there is a product (CDS, tRNA, etc. ) entry for the gene
+            # and get the description, if possible.
+            gene_type = ""
+            description = ""  
+            if feature_index+1 < len(features):
+                next_feature = features[feature_index]
+                next_rec = features[feature_index+1].qualifiers
+                feature_index += 1
+                if next_rec['locus_tag'] == locus_tag:
+                    description = ', '.join(next_rec.get('product', []))
+                    gene_type = next_feature.type
+                else:
+                    print "No product for", gene_rec
+            
+            genes.append({'name': ', '.join(gene_rec.get('gene', locus_tag)),
+                          'description': description,
+                          'start': gene_feature.location.start.position,
+                          'end': gene_feature.location.end.position,
+                          'strand': gene_feature.strand,
+                          'locus_tag': ', '.join(locus_tag),
+                          'gene_type': gene_type})
+        feature_index += 1
     return genes
 
 

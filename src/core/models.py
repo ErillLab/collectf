@@ -226,7 +226,7 @@ class Gene(models.Model):
     gene_id = models.AutoField(primary_key=True)
 
     # The NCBI accession number of the gene.
-    gene_accession = models.CharField(max_length=30, null=True, blank=True)
+    #gene_accession = models.CharField(max_length=30, null=True, blank=True)
 
     # The genome of the gene.
     genome = models.ForeignKey('Genome')
@@ -249,6 +249,9 @@ class Gene(models.Model):
 
     # The locus tag of the gene.
     locus_tag = models.CharField(max_length=20)
+
+    # Type of the gene (e.g. CDS, tRNA, ncRNA, rRNA)
+    gene_type = models.CharField(max_length=20)
 
     def __unicode__(self):
         """Returns the unicode representation of the gene."""

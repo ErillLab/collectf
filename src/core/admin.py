@@ -32,7 +32,7 @@ class PublicationAdmin(admin.ModelAdmin):
 
 
 class GeneAdmin(admin.ModelAdmin):
-    list_display = ('gene_accession', 'name')
+    list_display = ('name', 'locus_tag')
     list_filter = ('genome__genome_accession',)
 
 
