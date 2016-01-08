@@ -1,12 +1,14 @@
 """Module for scanning a given genome with a motif."""
 
 from django.shortcuts import render
+from django.views.decorators.http import require_POST
 
 from core import bioutils
 
 from .forms.pssm_search import BindingSiteSearchForm
 
 
+@require_POST
 def pssm_search_from_report_page(request):
     """Gets the list of sites and renders the PSSM search form with populated
     sites field."""
