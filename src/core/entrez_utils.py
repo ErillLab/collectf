@@ -76,7 +76,7 @@ def get_genes(genome_record):
             gene_type = ""
             description = ""  
             if feature_index+1 < len(features):
-                next_feature = features[feature_index]
+                next_feature = features[feature_index+1]
                 next_rec = features[feature_index+1].qualifiers
                 feature_index += 1
                 if next_rec['locus_tag'] == locus_tag:
