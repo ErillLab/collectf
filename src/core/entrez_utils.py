@@ -74,17 +74,17 @@ def get_genes(genome_record):
             # Check if there is a product (CDS, tRNA, etc. ) entry for the gene
             # and get the description, if possible.
             gene_type = ""
-            description = ""  
+            description = ""
             if feature_index+1 < len(features):
                 next_feature = features[feature_index+1]
                 next_rec = features[feature_index+1].qualifiers
                 feature_index += 1
-                if next_rec['locus_tag'] == locus_tag:
+                if next_rec.get('locus_tag') == locus_tag:
                     description = ', '.join(next_rec.get('product', []))
                     gene_type = next_feature.type
                 else:
                     print "No product for", gene_rec
-            
+
             genes.append({'name': ', '.join(gene_rec.get('gene', locus_tag)),
                           'description': description,
                           'start': gene_feature.location.start.position,
