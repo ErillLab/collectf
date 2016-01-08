@@ -374,7 +374,14 @@ def new_genome(genome_record, genes, species_taxon):
         taxonomy=species_taxon)
     # Create genes
     for gene in genes:
-        Gene.objects.create(genome=genome, **gene)
+        Gene.objects.create(genome=genome,
+                            name=gene['name'],
+                            description=gene['description'],
+                            start=gene['start'],
+                            end=gene['end'],
+                            strand=gene['strand'],
+                            locus_tag=gene['locus_tag'],
+                            gene_type=gene['gene_type'])
     return genome
 
 

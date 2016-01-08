@@ -60,6 +60,11 @@ class TFInstanceAdmin(admin.ModelAdmin):
     ordering = ('uniprot_accession', )
 
 
+class GeneOntologyTermAdmin(admin.ModelAdmin):
+    list_display = ('GO_term_id', 'GO_term_name')
+    ordering = ('GO_term_id', )
+
+
 class SiteInstanceAdmin(admin.ModelAdmin):
     list_display = ('site_id',)
     ordering = ('-site_id', )
@@ -104,6 +109,7 @@ admin.site.register(models.Taxonomy, TaxonomyAdmin)
 admin.site.register(models.TF, TFAdmin)
 admin.site.register(models.TFFamily, TFFamilyAdmin)
 admin.site.register(models.TFInstance, TFInstanceAdmin)
+admin.site.register(models.GeneOntologyTerm, GeneOntologyTermAdmin)
 admin.site.register(models.SiteInstance, SiteInstanceAdmin)
 admin.site.register(models.Curation_SiteInstance, Curation_SiteInstanceAdmin)
 admin.site.register(models.NotAnnotatedSiteInstance,

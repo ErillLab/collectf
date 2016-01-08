@@ -75,12 +75,14 @@ def get_genes(genome_record):
             # and get the description, if possible.
             gene_type = ""
             description = ""
+            protein_id = None
             if feature_index+1 < len(features):
                 next_feature = features[feature_index+1]
                 next_rec = features[feature_index+1].qualifiers
                 if next_rec.get('locus_tag') == locus_tag:
                     description = ', '.join(next_rec.get('product', []))
                     gene_type = next_feature.type
+                    protein_id = next_rec.get('protein_id')
                     feature_index += 1
                 else:
                     print "No product for", gene_rec
@@ -91,7 +93,11 @@ def get_genes(genome_record):
                           'end': gene_feature.location.end.position,
                           'strand': gene_feature.strand,
                           'locus_tag': ', '.join(locus_tag),
-                          'gene_type': gene_type})
+                          'gene_type': gene_type,
+                          # Additional stuff
+                          'protein_id': protein_id,
+                          'old_locus_tag': gene_rec.get('old_locus_tag', [])})
+
         feature_index += 1
     return genes
 
