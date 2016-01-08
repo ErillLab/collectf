@@ -440,6 +440,9 @@ class TFInstance(models.Model):
     # The notes -- mostly about RefSeq to UniProt migration.
     notes = models.TextField()
 
+    # GO term associated with the TF instance
+    GO_term = models.ForeignKey('GeneOntologyTerm', null=True)
+
     def __unicode__(self):
         """Returns the unicode representation of the TF instance."""
         return u'%s (%s): %s' % (
@@ -609,12 +612,23 @@ class Regulation(models.Model):
     def binding_experimental_techniques(self):
         """Gets experimental techniques showing binding."""
         return self.curation_site_instance.experimental_techniques.filter(
-            preset_function='binding')
+            preset_function='binding', EO_term__isnull=False)
+
+    @property
+    def expression_experimental_techniques(self):
+        """Gets experimental techniques showing expression."""
+        return self.curation_site_instance.experimental_techniques.filter(
+            preset_function='expression', EO_term__isnull=False)
 
     @property
     def ref_pmid(self):
         """Returns the PubMed ID of the curation."""
         return self.curation_site_instance.curation.publication.pmid
+
+    @property
+    def mode(self):
+        """Returns the regulatory mode (ACT, REP, DUAL, N/A)."""
+        return self.curation_site_instance.TF_function
 
 
 class NotAnnotatedSiteInstance(models.Model):
@@ -814,3 +828,13 @@ class NCBISubmission(models.Model):
 
     class Meta:
         verbose_name = 'NCBI Submission'
+
+
+class GeneOntologyTerm(models.Model):
+    """GO terms for transcription factor instances."""
+    GO_term_id = models.CharField(max_length=50)
+    GO_term_name = models.CharField(max_length=250)
+
+    def __unicode__(self):
+        """Returns the unicode representation of the GO term."""
+        return u'%s (%s)' % (self.GO_term_id, self.GO_term_name)
