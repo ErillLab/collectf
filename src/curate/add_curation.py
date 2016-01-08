@@ -139,7 +139,7 @@ class CurationWizard(SessionWizardView):
 def curation(request):
     """Entry point for the curation."""
 
-    session_utils.remove(request.session, 'old_curation')
+    session_utils.remove(request.session, 'previous_curation')
 
     # This is not high-throughput submission.
     session_utils.put(request.session, 'high_throughput_curation', False)
@@ -155,8 +155,6 @@ def curation(request):
          GeneRegulationForm,
          CurationReviewForm],
         condition_dict={'5': inexact_match_form_condition})
-
-    session_utils.session_print(request.session)
 
     return view(request)
 

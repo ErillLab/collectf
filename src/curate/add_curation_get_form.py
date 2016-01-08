@@ -37,7 +37,7 @@ def publication_get_form(wiz, form):
 
 def genome_get_form(wiz, form):
     """Constructs the form for genome and TF selection step."""
-    prev_curation = wiz.request.session.get('previous_curation')
+    prev_curation = session_utils.get(wiz.request.session, 'previous_curation')
     # If selected publication is the one most recently curated, the related
     # curation should be in object prev_curation. Otherwise, it is None.  If
     # so, populate 'Genome' and 'TF information' form fields from the
@@ -52,9 +52,12 @@ def genome_get_form(wiz, form):
                 form.initial['genome_accession_%d' % i] = genome
 
         TF_instances = prev_curation.TF_instances.all()
-        form.initial['TF_accession'] = TF_instances[0].protein_accession
+        form.initial['TF_accession'] = TF_instances[0].uniprot_accession
+        form.initial['TF_refseq_accession'] = TF_instances[0].refseq_accession
         for i, TF_instance in enumerate(TF_instances[1:], start=1):
-            form.initial['TF_accession_%d' % i] = TF_instance.protein_accession
+            form.initial['TF_accession_%d' % i] = TF_instance.uniprot_accession
+            form.initial['TF_refseq_accession_%d' % i] = (
+                TF_instance.refseq_accession)
 
         form.initial["TF_species"] = prev_curation.TF_species
         form.initial["site_species"] = prev_curation.site_species
