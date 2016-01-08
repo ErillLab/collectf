@@ -10,7 +10,6 @@ from .browse_by_utils import curation_site_instances_values_list
 def browse_TF(request):
     """Returns the TF treeview for browsing by TF and family."""
     context = {'TF_families': models.TFFamily.objects.all().order_by('name')}
-    print context
     return render(request, 'browse_by_TF.html', context)
 
 
