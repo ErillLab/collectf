@@ -78,10 +78,10 @@ def get_genes(genome_record):
             if feature_index+1 < len(features):
                 next_feature = features[feature_index+1]
                 next_rec = features[feature_index+1].qualifiers
-                feature_index += 1
                 if next_rec.get('locus_tag') == locus_tag:
                     description = ', '.join(next_rec.get('product', []))
                     gene_type = next_feature.type
+                    feature_index += 1
                 else:
                     print "No product for", gene_rec
 
