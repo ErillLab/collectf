@@ -7,6 +7,7 @@ properly.
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.shortcuts import redirect
+from django.views.decorators.http import require_POST
 
 from core import models
 from core import dbxref
@@ -82,6 +83,7 @@ def view_reports_by_taxonomy(request, object_id):
     return render_motif_report(request, curation_site_instances)
 
 
+@require_POST
 def view_reports_by_curation_site_instance_ids(request):
     """Returns motif reports from given Curation_SiteInstance object IDs."""
     curation_site_instance_ids = [
