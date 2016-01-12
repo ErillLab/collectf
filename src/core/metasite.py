@@ -175,6 +175,12 @@ class MetaSite:
         return [curation_site_instance.curation.curation_id
                 for curation_site_instance in self.curation_site_instances]
 
+    @property
+    def pubmed_ids(self):
+        """Returns publications reporting this meta-site."""
+        return set(curation_site_instance.curation.publication.pmid
+                   for curation_site_instance in self.curation_site_instances)
+
     def add(self, curation_site_instance):
         """Adds the given Curation_SiteInstance object to the meta-site."""
         self.curation_site_instances.append(curation_site_instance)

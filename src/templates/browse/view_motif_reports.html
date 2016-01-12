@@ -193,6 +193,9 @@
                     Gene regulation <a href="" id="regulation_diagram_switch"><i class="fa fa-toggle-on"></i></a>
                     <a href="#" class="pull-right" onclick="hideCol('regulation_col'); return false;"><i class="fa fa-close"></i></a></th>
 		          <th>Curations</th>
+                  <th class="pubmed_col">
+                    PMIDs <a href="#" class="pull-right" onclick="hideCol('pubmed_col'); return false;"><i class="fa fa-close"></i></a>
+                  </th>
 		        </tr>
 	          </thead>
 
@@ -263,6 +266,13 @@
                       </a>{% if not forloop.last %}, {% endif %}
 		            </span>
 		            {% endfor %}
+                  </td>
+
+                  <td class="pubmed_col">
+                    {% for pubmed_id in meta_site.pubmed_ids %}
+                    <a href="http://www.ncbi.nlm.nih.gov/pubmed/{{ pubmed_id }}">{{ pubmed_id }}
+                    </a>{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
                   </td>
 
                   {% endfor %} {# for meta_site in motif_report.meta_sites #}

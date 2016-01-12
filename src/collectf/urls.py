@@ -38,7 +38,8 @@ urlpatterns = [
     url(r'^(expreg|EXPREG)_(?P<uniprot_dbxref>\w+)$',
         view_motif_reports.view_reports_by_uniprot_dbxref),
     url(r'^uniprot/(?P<uniprot_accession>\w+)$',
-        view_motif_reports.view_reports_by_uniprot_accession),
+        view_motif_reports.view_reports_by_uniprot_accession,
+        name='view_motif_report_by_uniprot_accession'),
     url(r'^uniprotkbmap$',
         RedirectView.as_view(url=static('uniprot_dbxref.txt'))),
 
