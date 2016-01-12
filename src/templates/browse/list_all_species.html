@@ -3,32 +3,49 @@
 {% block content %}
 
 <div class="box">
-  <h1>CollecTF taxonomy</h1>
+  <h2>CollecTF taxonomy</h2>
   <hr/>
   <ul>
     {% for phylum in phyla %}
     <li>
-      {{ phylum.name }} (phylum)
+      <a href="http://www.ncbi.nlm.nih.gov/taxonomy/{{ phylum.taxonomy_id }}/" target="blank_">
+        {{ phylum.name }}
+      </a> (phylum)
       <ul>
         {% for class in phylum.children.all %}
         <li>
-          {{ class.name }} (class)
+          <a href="http://www.ncbi.nlm.nih.gov/taxonomy/{{ class.taxonomy_id }}/" target="blank_">
+            {{ class.name }}
+          </a> (class)
           <ul>
             {% for order in class.children.all %}
             <li>
-              {{ order.name }} (order)
+              <a href="http://www.ncbi.nlm.nih.gov/taxonomy/{{ order.taxonomy_id }}/" target="blank_">
+                {{ order.name }}
+              </a> (order)
               <ul>
                 {% for family in order.children.all %}
                 <li>
-                  {{ family.name }} (family)
+                  <a href="http://www.ncbi.nlm.nih.gov/taxonomy/{{ family.taxonomy_id }}/" target="blank_">
+                    {{ family.name }}
+                  </a> (family)
                   <ul>
                     {% for genus in family.children.all %}
                     <li>
-                      {{ genus.name }} (genus)
+                      <a href="http://www.ncbi.nlm.nih.gov/taxonomy/{{ genus.taxonomy_id }}/" target="blank_">
+                        <i>{{ genus.name }}</i>
+                      </a> (genus)
                       <ul>
                         {% for species in genus.children.all %}
                         <li>
-                          {{ species.name }} (species)
+                          <a href="http://www.ncbi.nlm.nih.gov/taxonomy/{{ species.taxonomy_id }}/" target="blank_">
+                            <i>{{ species.name }}</i>
+                          </a> (species) -
+                          {% with genome_acc=species.genome.all.0.genome_accession %}
+                          <a href="http://www.ncbi.nlm.nih.gov/nuccore/{{ genome_acc }}" target="blank_">
+                            {{ genome_acc }}
+                          </a>
+                          {% endwith %}
                         </li>
                         {% endfor %}
                       </ul>

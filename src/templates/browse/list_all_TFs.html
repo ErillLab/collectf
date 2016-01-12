@@ -1,24 +1,38 @@
 {% extends "base.html" %}
-
+{% load utiltags %}
+{% load staticfiles %}
 {% block content %}
 
-
-
 <div class="box">
-  <h1>List of transcription factors in CollecTF</h1>
+  <h2>Transcription factors in CollecTF</h2>
   <hr/>
-  <ul>
-    {% for TF_family in  TF_families %}
-    <li>
-      {{ TF_family.name }}
-      <ul>
-        {% for TF in TF_family.TFs.all %}
-        <li>{{ TF.name }}</li>
-        {% endfor %}
-      </ul>
-    </li>
-    {% endfor %}
-  </ul>
+  <table id="tf-list-table" class="table table-striped">
+    <thead>
+      <tr>
+        <th>TF</th>
+        <th>TF family</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for TF_family in TF_families %}
+      {% for TF in TF_family.TFs.all %}
+      <tr>
+        <td>{{ TF.name }}</td>
+        <td>{{ TF_family.name }}</td>
+        <td>{{ TF.description|HTMLify }}</td>
+      </tr>
+      {% endfor %}
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+<script src="https://cdn.datatables.net/1.10.10/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.10/css/jquery.dataTables.min.css">
+<script src="{% static 'list_all_TFs.js' %}"></script>
 {% endblock %}

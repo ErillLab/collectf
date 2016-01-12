@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 
 {% block content %}
 
@@ -13,8 +14,8 @@
     waiting to be curated (hopefully) soon. The <span class="label label-danger">red</span> ones are
     not assigned to anyone yet.
   </p>
-  
-  <table class="table table-condensed table-hover table-bordered">
+
+  <table id="publication-table" class="table table-condensed table-hover table-bordered">
     <thead>
       <tr>
         <th>PMID</th>
@@ -23,7 +24,7 @@
         <th>Species</th>
       </tr>
     </thead>
-    
+
     <tbody data-provides="rowlink">
       {% for publication in publications %}
       <tr class="{% if publication.curation_complete %}
@@ -47,7 +48,14 @@
       {% endfor %}
     </tbody>
   </table>
-  
+
 </div>
 
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+<script src="https://cdn.datatables.net/1.10.10/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.10/css/jquery.dataTables.min.css">
+<script src="{% static 'list_all_publications.js' %}"></script>
 {% endblock %}
