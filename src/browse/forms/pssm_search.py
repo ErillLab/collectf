@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.safestring import mark_safe
 
 from core import entrez_utils
 
@@ -11,9 +12,11 @@ class BindingSiteSearchForm(forms.Form):
     genome = forms.CharField(
         label='NCBI RefSeq accession number',
         max_length=20,
-        help_text="""
+        help_text=mark_safe("""
         Enter the RefSeq accession number of the sequence to be scanned for
-        binding sites.""")
+        binding sites, ex: <code>NC_000913</code>. <a
+        href='http://www.ncbi.nlm.nih.gov/genome/browse/' target='blank_'> Find
+        a genome to search.</a>"""))
 
     def clean_sites(self):
         input_field = self.cleaned_data['sites'].upper().strip()
