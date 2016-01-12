@@ -36,6 +36,16 @@
 
     <dt>Curation notes</dt>
     <dd>{{ curation.notes|default:"-" }}</dd>
+
+    {% with external_databases=curation.external_databases %}
+    {% if external_databases %}
+    <dt>External databases</dt>
+    <dd>{% for external_database in external_databases %}
+      {{ external_database.external_database }} ({{ external_database.accession_number }}) <a href="{{ external_database.url }}">{{ external_database.url }}</a>.
+      {% endfor %}
+    </dd>
+    {% endif %}
+    {% endwith %}
   </dl>
 </div>
 

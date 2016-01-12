@@ -100,6 +100,13 @@ class ExternalDatabaseAdmin(admin.ModelAdmin):
                     'ext_database_descripton')
 
 
+class CurationExternalDatabaseAdmin(admin.ModelAdmin):
+    list_display = ('curation_ID', 'external_database', 'accession_number',)
+
+    def curation_ID(self, obj):
+        return obj.curation.curation_id
+
+
 admin.site.register(models.Curation, CurationAdmin)
 admin.site.register(models.Curator, CuratorAdmin)
 admin.site.register(models.Publication, PublicationAdmin)
@@ -119,3 +126,5 @@ admin.site.register(models.ExperimentalTechniqueCategory,
                     ExperimentalTechniqueCategoryAdmin)
 admin.site.register(models.ChipInfo, ChipInfoAdmin)
 admin.site.register(models.ExternalDatabase, ExternalDatabaseAdmin)
+admin.site.register(models.Curation_ExternalDatabase,
+                    CurationExternalDatabaseAdmin)

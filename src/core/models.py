@@ -111,6 +111,10 @@ class Curation(models.Model):
         """Returns the Pubmed ID of the paper for the curation."""
         return self.publication.pmid
 
+    def external_databases(self):
+        """Returns associated Curation_ExternalDatabase objects."""
+        return Curation_ExternalDatabase.objects.filter(curation=self)
+
 
 class Curator(models.Model):
     """Curator table.
@@ -807,6 +811,12 @@ class Curation_ExternalDatabase(models.Model):
                 (self.curation.curation_id,
                  self.external_database.ext_database_name,
                  self.accession_number))
+
+    @property
+    def url(self):
+        """Returns the URL to the external database."""
+        return (self.external_database.ext_database_url_format %
+                self.accession_number)
 
 
 class NCBISubmission(models.Model):
