@@ -25,6 +25,7 @@ $(document).ready(function() {
     // Regulation diagram hide/show
     $("#regulation_diagram_switch").on('click', function() {
         $(".regulation_diagram").toggle();
+        $(this).find('i').toggleClass('fa-toggle-off fa-toggle-on');
         return false;
     });
 
@@ -32,10 +33,9 @@ $(document).ready(function() {
     hideCol('genome_col');
     hideCol('TF_col');
     hideCol('TF_conformation_col');
+    hideCol('site_location_col');
 
     // Initialize clipboard
     new Clipboard('.btn');
-    
-});
-    
 
+});

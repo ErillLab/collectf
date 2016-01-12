@@ -102,12 +102,12 @@
                   <th>Motif structure</th>
                   <td>{{ motif_report.structure }}</td>
                 </tr>
-                
+
                 <tr>
                   <th>GC-content</th>
                   <td>{{ motif_report.GC_content|floatformat:2 }}%</td>
                 </tr>
-                
+
                 <tr>
                   <th rowspan="2">Regulatory mode</th>
                   <td><i>Activation</i></td >
@@ -171,21 +171,27 @@
 	          <thead>
                 <tr>
 		          <th class="genome_col">
-                    Genome [<a href="#" class="" onclick="hideCol('genome_col'); return false;">x</a>]
+                    Genome <a href="#" class="pull-right" onclick="hideCol('genome_col');
+                    return false;"><i class="fa fa-close"></i></a>
                   </th>
 		          <th class="TF_col">
-                    TF [<a href="#" class="" onclick="hideCol('TF_col'); return false;">x</a>]
+                    TF <a href="#" class="pull-right" onclick="hideCol('TF_col'); return false;">
+                      <i class="fa fa-close"></i></a>
                   </th>
                   <th class="TF_conformation_col">
-                    TF conformation [<a href="#" class="#" onclick="hideCol('TF_conformation_col'); return false;">x</a>]
+                    TF conformation <a href="#" class="pull-right" onclick="hideCol('TF_conformation_col'); return false;"><i class="fa fa-close"></i></a>
                   </th>
 		          <th>Site sequence</th>
+                  <th>Site location
+                    <a href="#" class="pull-right" onclick="hideCol('site_location_col'); return false;">
+                      <i class="fa fa-close"></i></a>
+                  </th>
 		          <th class="techniques_col">
-                    Experimental techniques [<a href="#" onclick="hideCol('techniques_col'); return false;">x</a>]
+                    Experimental techniques <a href="#" class="pull-right" onclick="hideCol('techniques_col'); return false;"><i class="fa fa-close"></i></a>
                   </th>
 		          <th class="regulation_col">
-                    Gene regulation [<a href="" id="regulation_diagram_switch"><small>Toggle
-                    diagrams</small></a>][<a href="#" onclick="hideCol('regulation_col'); return false;">x</a>]</th>
+                    Gene regulation <a href="" id="regulation_diagram_switch"><i class="fa fa-toggle-on"></i></a>
+                    <a href="#" class="pull-right" onclick="hideCol('regulation_col'); return false;"><i class="fa fa-close"></i></a></th>
 		          <th>Curations</th>
 		        </tr>
 	          </thead>
@@ -217,6 +223,14 @@
 
                   <td>
                     <span class="sequence">{{ meta_site.delegate_sequence }}</span>
+                  </td>
+
+                  <td class="site_location_col">
+                    {% with site=meta_site.delegate_site_instance %}
+                    <span class="sequence">
+                      {% if site.strand == 1 %}+{% else %}-{% endif %}[{{ site.start }}:{{ site.end }}]
+                    </span>
+                    {% endwith %}
                   </td>
 
                   <td class="techniques_col">
