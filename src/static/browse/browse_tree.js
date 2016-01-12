@@ -121,7 +121,7 @@ $(document).ready(function () {
     "use strict";
     var expandIcon = "fa fa-angle-right";
     var collapseIcon = "fa fa-angle-down";
-    
+
     $('.node > a').on('click', function () {
         $(this).parent().next().toggle(200);
         if ($(this).parent().hasClass('expandable')) {
@@ -133,7 +133,7 @@ $(document).ready(function () {
         if ($(this).hasClass('expandable')) {
             $(this).next().hide();
             $(this).children('i').addClass(expandIcon);
-            
+
         }
         $(this).children('i').css('width', '1em');
         $(this).children('i').css('display', 'inline-block');
@@ -148,5 +148,7 @@ $(document).ready(function () {
                 $(this).children('i').toggleClass(expandIcon);
             }
         });
+        // Switch toggle-icon, if present.
+        $(this).find('i').toggleClass('fa-toggle-off fa-toggle-on');
     });
 });

@@ -5,8 +5,8 @@
 
 <div class="row">
   <div class="col-md-4">
-    <div class="panel panel-default">
-      <div class="panel-body">
+    <div class="box">
+    <div class="pull-right"><a href="#" id="toggle_all"><i class="fa fa-toggle-off"></i></a></div>
         <ul class="list-unstyled">
           {% for phylum in taxonomy.phyla %}
           <li>
@@ -40,14 +40,14 @@
 		                  <li>
 			                <div class="node expandable">
 			                  <i></i>
-			                  <a href="#" onclick="getMotifReportsByTaxonomy({{ genus.pk }}); return false;">{{ genus.name }}</a>
+			                  <a href="#" onclick="getMotifReportsByTaxonomy({{ genus.pk }}); return false;"><i>{{ genus.name }}</i></a>
 			                </div>
 			                <ul class="list-unstyled">
 			                  {% for species in genus.children.all %}
 			                  <li>
 			                    <div class="node">
 			                      <i></i>
-			                      <a href="#" onclick="getMotifReportsByTaxonomy({{ species.pk }}); return false;">{{ species.name }}</a>
+			                      <a href="#" onclick="getMotifReportsByTaxonomy({{ species.pk }}); return false;"><i>{{ species.name }}</i></a>
 			                    </div>
 			                  </li>
 			                  {% endfor %}
@@ -67,21 +67,18 @@
           </li>
           {% endfor %}
         </ul>
-      </div>
     </div>
-  </div> <!-- /.col-md-3 -->
+  </div> <!-- /.col-md-4 -->
 
 
-  <div class="col-md-8">
-    <div class="panel panel-default">
-      <div class="panel-body" id="browse">
+  <div class="col-md-7">
+    <div class="box" id="browse">
         <h2>Browse CollecTF by taxonomy</h2>
         <p>
           Browse the database using up-to-date NCBI taxonomy. Just click on each
           taxonomical unit to expand it and see its associated information, and
           link out to species-specific reports.
         </p>
-      </div>
     </div>
   </div>
 
