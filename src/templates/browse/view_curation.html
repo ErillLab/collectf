@@ -3,7 +3,7 @@
 {% block content %}
 
 <div class="box">
-  <h1>Curation Information</h1>
+  <h2>Curation Information</h2>
 
   <dl class="dl-horizontal">
     <dt>Publication</dt>
@@ -12,17 +12,15 @@
       {{ pub.title }};{{ pub.authors }};{{ pub.journal }} {{pub.publication_date}};
       {{pub.volume}}({{pub.issue}}):{{pub.pages}}
       {% endwith %}
-      <a href="http://www.ncbi.nlm.nih.gov/pubmed/?term={{ curation.publication.pmid }}" target="_blank">
-        [{{ curation.publication.pmid }}]
-      </a>
+      [<a href="http://www.ncbi.nlm.nih.gov/pubmed/?term={{ curation.publication.pmid }}" target="_blank">{{ curation.publication.pmid }}</a>]
     </dd>
 
     <dt>TF</dt>
     <dd>
       {{ curation.TF.name }}
       {% for TF_instance in curation.TF_instances.all %}
-      <a href="http://uniprot.org/uniprot/{{ TF_instance.uniprot_accession }}" target="_blank">
-        [{{ TF_instance.uniprot_accession }}]</a>{% if not forloop.last %}, {% endif %}{% endfor %}
+      [<a href="http://uniprot.org/uniprot/{{ TF_instance.uniprot_accession }}" target="_blank">{{ TF_instance.uniprot_accession }}</a>]
+      [<a href="{% url 'view_motif_report_by_uniprot_accession' TF_instance.uniprot_accession %}">view regulon</a>]{% if not forloop.last %}, {% endif %}{% endfor %}
     </dd>
 
     <dt>Reported TF sp.</dt>
