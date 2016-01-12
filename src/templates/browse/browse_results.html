@@ -1,6 +1,8 @@
+{% load utiltags %}
+
 <div id="result_info">
   <h2 id="result_info_name">{{ title }}</h2>
-  <p id="result_info_description">{{ description }}</p>
+  <p id="result_info_description">{{ description|HTMLify }}</p>
 </div>
 
 <hr>
