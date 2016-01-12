@@ -380,7 +380,7 @@ class TF(models.Model):
     TF_id = models.AutoField(primary_key=True)
 
     # The name of the TF.
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, unique=True)
 
     # The TF family.
     family = models.ForeignKey('TFFamily', related_name='TFs')
@@ -404,7 +404,7 @@ class TFFamily(models.Model):
     TF_family_id = models.AutoField(primary_key=True)
 
     # The name of the TF family.
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, unique=True)
 
     # The description of the TF family.
     description = models.TextField()
