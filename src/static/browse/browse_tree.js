@@ -149,6 +149,6 @@ $(document).ready(function () {
             }
         });
         // Switch toggle-icon, if present.
-        $(this).find('i').toggleClass('fa-toggle-off fa-toggle-on');
+        $(this).find('i').toggleClass('fa-toggle-on fa-toggle-off');
     });
 });
