@@ -1,5 +1,6 @@
 """The view functions for browsing by TF and TF family."""
 
+from django.core.urlresolvers import reverse
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 
@@ -39,7 +40,10 @@ def get_results_by_technique_function(request, function):
     return render(request, 'browse_results.html',
                   {'title': title_lookup[function],
                    'description': '',
-                   'TF_species_pairs': TF_species_pairs})
+                   'TF_species_pairs': TF_species_pairs,
+                   'ensemble_report_url': reverse(
+                       'view_motif_reports_by_technique_function',
+                       args=(function,))})
 
 
 def get_results_by_technique_category(request, category_function, object_id):
@@ -55,7 +59,10 @@ def get_results_by_technique_category(request, category_function, object_id):
     return render(request, 'browse_results.html',
                   {'title': category.name,
                    'description': category.description,
-                   'TF_species_pairs': TF_species_pairs})
+                   'TF_species_pairs': TF_species_pairs,
+                   'ensemble_report_url': reverse(
+                       'view_motif_reports_by_technique_category',
+                       args=(category_function, object_id))})
 
 
 def get_results_by_technique(request, object_id):
@@ -68,4 +75,6 @@ def get_results_by_technique(request, object_id):
     return render(request, 'browse_results.html',
                   {'title': technique.name,
                    'description': technique.description,
-                   'TF_species_pairs': TF_species_pairs})
+                   'TF_species_pairs': TF_species_pairs,
+                   'ensemble_report_url': reverse(
+                       'view_motif_reports_by_technique', args=(object_id,))})

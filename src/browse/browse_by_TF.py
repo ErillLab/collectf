@@ -2,6 +2,7 @@
 
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
+from django.core.urlresolvers import reverse
 
 from core import models
 from .browse_by_utils import curation_site_instances_values_list
@@ -22,7 +23,10 @@ def get_results_by_TF_family(request, object_id):
     return render(request, 'browse_results.html',
                   {'title': TF_family.name,
                    'description': TF_family.description,
-                   'TF_species_pairs': TF_species_pairs})
+                   'TF_species_pairs': TF_species_pairs,
+                   'ensemble_report_url': reverse(
+                       'view_reports_by_TF_family',
+                       args=(TF_family.TF_family_id,))})
 
 
 def get_results_by_TF(request, object_id):
@@ -34,4 +38,6 @@ def get_results_by_TF(request, object_id):
     return render(request, 'browse_results.html',
                   {'title': TF.name,
                    'description': TF.description,
-                   'TF_species_pairs': TF_species_pairs})
+                   'TF_species_pairs': TF_species_pairs,
+                   'ensemble_report_url': reverse(
+                       'view_reports_by_TF', args=(TF.TF_id,))})

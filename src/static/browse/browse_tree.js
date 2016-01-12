@@ -71,7 +71,7 @@ function getMotifReportsByTaxonomy(objectId) {
         url: '/browse/get_results_by_taxonomy/' + objectId,
         success: function (data) {
             $("#browse").html(data);
-            getWiki($("#browse h1").text());
+            getWiki($("#browse h2").text());
         }
     });
 }

@@ -1,5 +1,5 @@
 <div id="result_info">
-  <h1 id="result_info_name">{{ title }}</h1>
+  <h2 id="result_info_name">{{ title }}</h2>
   <p id="result_info_description">{{ description }}</p>
 </div>
 
@@ -13,6 +13,7 @@
     <th>Motif report</th>
   </thead>
   <tbody>
+    <a href="{{ ensemble_report_url }}">View combined motif report</a>
     {% for TF_species_pair in TF_species_pairs %}
     <tr>
       <td>{{ TF_species_pair.1 }}</td>

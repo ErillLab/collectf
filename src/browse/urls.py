@@ -87,27 +87,32 @@ urlpatterns = [
 
     # View motif reports by TF family
     url(r'^view_motif_reports_by_TF_family/(\d+)/$',
-        view_motif_reports.view_reports_by_TF_family),
+        view_motif_reports.view_reports_by_TF_family,
+        name='view_reports_by_TF_family'),
 
     # View motif reports by TF
     url(r'^view_motif_reports_by_TF/(\d+)/$',
-        view_motif_reports.view_reports_by_TF),
+        view_motif_reports.view_reports_by_TF, name='view_reports_by_TF'),
 
     # View motif reports by technique function
     url(r'^view_motif_reports_by_technique_function/(binding|expression)/$',
-        view_motif_reports.view_reports_by_technique_function),
+        view_motif_reports.view_reports_by_technique_function,
+        name='view_motif_reports_by_technique_function'),
 
     # View motif reports by technique category
     url(r'^view_motif_reports_by_technique_category/(binding|expression)/(\d+)/$',  # noqa
-        view_motif_reports.view_reports_by_technique_category),
+        view_motif_reports.view_reports_by_technique_category,
+        name='view_motif_reports_by_technique_category'),
 
     # View motif reports by technique
     url(r'^view_motif_reports_by_technique/(\d+)/$',
-        view_motif_reports.view_reports_by_technique),
+        view_motif_reports.view_reports_by_technique,
+        name='view_motif_reports_by_technique'),
 
     # View motif reports by taxonomy
     url(r'^view_motif_reports_by_taxonomy/(\d+)/$',
-        view_motif_reports.view_reports_by_taxonomy),
+        view_motif_reports.view_reports_by_taxonomy,
+        name='view_motif_reports_by_taxonomy'),
 
     # View customized motif reports by list of Curation_SiteInstance IDs.
     url(r'^view_motif_reports_by_curation_site_instance_ids/$',

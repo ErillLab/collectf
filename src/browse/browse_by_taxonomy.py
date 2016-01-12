@@ -1,5 +1,6 @@
 """The view functions for browsing by taxonomy."""
 
+from django.core.urlresolvers import reverse
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 
@@ -22,4 +23,6 @@ def get_results_by_taxonomy(request, object_id):
     return render(request, 'browse_results.html',
                   {'title': taxon.name,
                    'description': '',  # Will be populated from Wikipedia.
-                   'TF_species_pairs': TF_species_pairs})
+                   'TF_species_pairs': TF_species_pairs,
+                   'ensemble_report_url': reverse(
+                       'view_motif_reports_by_taxonomy', args=(taxon.pk,))})
