@@ -12,7 +12,7 @@ from django.contrib import messages
 from django.shortcuts import render
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
 
 from core import bioutils
 from .search_motifs import get_all_TF_families
@@ -82,8 +82,7 @@ def motif_comparison_post(request, step):
     request.session.modified = True
 
     if step == 1:
-        return HttpResponseRedirect(reverse(
-            motif_comparison_search_second_motif))
+        return redirect(motif_comparison_search_second_motif)
     else:
         # Step 2
         # Render results
