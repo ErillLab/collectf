@@ -188,7 +188,7 @@
         <td>
 	      {% for regulation in meta_site.regulations %}
 	      {% if regulation.evidence_type == "exp_verified" %}
-	      <a href="http://www.ncbi.nlm.nih.gov/gene/{{ regulation.gene.gene_accession }}" target="_blank">{{ regulation.gene.name }}</a>{% if not forloop.last %},{% endif %}{% endif %}
+	      <a href="http://www.ncbi.nlm.nih.gov/gene/?term={{ regulation.gene.locus_tag }}" target="_blank">{{ regulation.gene.name }}</a>{% if not forloop.last %},{% endif %}{% endif %}
 	      {% endfor %}
         </td>
         <td><div>{{ meta_site.regulation_diagram }}</div></td>
