@@ -607,6 +607,7 @@ class Regulation(models.Model):
     def __unicode__(self):
         """Returns the unicode representation of the Regulation."""
         return 'curation_id: %s gene: %s, site_id: %s, type: %s' % (
+
             self.curation_site_instance.curation.curation_id,
             self.gene.name,
             self.curation_site_instance.site_instance.site_id,
@@ -616,13 +617,13 @@ class Regulation(models.Model):
     def binding_experimental_techniques(self):
         """Gets experimental techniques showing binding."""
         return self.curation_site_instance.experimental_techniques.filter(
-            preset_function='binding', EO_term__isnull=False)
+            preset_function='binding').exclude(EO_term='')
 
     @property
     def expression_experimental_techniques(self):
         """Gets experimental techniques showing expression."""
         return self.curation_site_instance.experimental_techniques.filter(
-            preset_function='expression', EO_term__isnull=False)
+            preset_function='expression').exclude(EO_term='')
 
     @property
     def ref_pmid(self):

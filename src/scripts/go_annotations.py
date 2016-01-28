@@ -62,6 +62,8 @@ import time
 
 from django.conf import settings
 
+import uniprot
+
 from core import models
 from core import entrez_utils
 
@@ -86,13 +88,13 @@ def new_TF_centric_gpad_entry(uniprot_id, go_id, db_ref,
                 annotation_properties='')
 
 
-def new_gene_centric_gpad_entry(refseq_acc, go_id, db_ref, evidence_code):
+def new_gene_centric_gpad_entry(uniprot_id, go_id, db_ref, evidence_code):
     """Returns a dictionary for a gene-centric GO annotation.
 
     See http://geneontology.org/page/gene-product-association-data-gpad-format
     """
-    return dict(db='RefSeq',
-                db_object_id=refseq_acc,
+    return dict(db='UniProtKB',
+                db_object_id=uniprot_id,
                 relationship='involved_in',
                 go_id=go_id,
                 db_ref=('PMID:' + db_ref),
@@ -207,6 +209,18 @@ def batch_refseq_accession(genome_accession):
     return gene_dict
 
 
+def refseq_to_uniprot(refseq_accession, genome_accession):
+    """Maps the given RefSeq accession to a UniProt accession."""
+    # Remove version suffix from the genome accession
+    genome_accession = genome_accession.split('.')[0]
+    mapping = uniprot.map(refseq_accession, f='P_REFSEQ_AC', t='ACC')
+    for uniprot_acc in mapping.get(refseq_accession, []):
+        rec = uniprot.retrieve(uniprot_acc)
+        if genome_accession in rec:
+            return uniprot_acc
+    return None
+
+
 def gene_centric_annotations(TF_instance):
     if not TF_instance.GO_term:
         return []
@@ -220,13 +234,17 @@ def gene_centric_annotations(TF_instance):
         refseq_accs = batch_refseq_accession(genome.genome_accession)
         for reg in regulations_in_genome:
             locus_tag = reg.gene.locus_tag
-            print locus_tag
+            # print locus_tag
             for tech in reg.expression_experimental_techniques:
-                if refseq_accs.get(locus_tag):
-                    go_annotations.append(new_gene_centric_gpad_entry(
-                        refseq_accs[locus_tag], TF_instance.GO_term.GO_term_id,
-                        reg.ref_pmid, tech.EO_term))
-    print len(go_annotations)
+                refseq_acc = refseq_accs.get(locus_tag)
+                if refseq_acc:
+                    uniprot_id = refseq_to_uniprot(
+                        refseq_acc, genome.genome_accession)
+                    print refseq_acc, genome.genome_accession, uniprot_id
+                    if uniprot_id:
+                        go_annotations.append(new_gene_centric_gpad_entry(
+                            uniprot_id, TF_instance.GO_term.GO_term_id,
+                            reg.ref_pmid, tech.EO_term))
     return set(map(gpad_entry_to_str, go_annotations))
 
 
