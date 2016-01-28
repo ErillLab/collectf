@@ -699,7 +699,7 @@ class ExperimentalTechnique(models.Model):
     categories = models.ManyToManyField("ExperimentalTechniqueCategory")
 
     # Evidence ontology term for the technique.
-    EO_term = models.CharField(max_length=50, null=True, blank=True)
+    EO_term = models.CharField(max_length=50, null=False, blank=True)
 
     def __unicode__(self):
         """Returns the unicode representation of the experimental technique."""
