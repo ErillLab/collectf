@@ -19,8 +19,8 @@
     <dd>
       {{ curation.TF.name }}
       {% for TF_instance in curation.TF_instances.all %}
-      [<a href="http://uniprot.org/uniprot/{{ TF_instance.uniprot_accession }}" target="_blank">{{ TF_instance.uniprot_accession }}</a>]
-      [<a href="{% url 'view_motif_report_by_uniprot_accession' TF_instance.uniprot_accession %}">view regulon</a>]{% if not forloop.last %}, {% endif %}{% endfor %}
+      [<a href="http://uniprot.org/uniprot/{{ TF_instance.uniprot_accession }}" target="_blank">{{TF_instance.uniprot_accession }}</a>, 
+      <a href="{% url 'view_motif_report_by_uniprot_accession' TF_instance.uniprot_accession %}">view regulon</a>]{% if not forloop.last %}, {% endif %}{% endfor %}
     </dd>
 
     <dt>Reported TF sp.</dt>

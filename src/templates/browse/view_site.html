@@ -3,7 +3,7 @@
 {% block content %}
 
 <section class="box">
-  <h1>Transcription Factor Binding Site Information</h1>
+  <h2>Transcription Factor Binding Site Information</h2>
   <dl class="dl-horizontal">
     <dt>dbxref</dt>
     <dd>CollecTF:EXPSITE_{{ dbxref }}</dd>
@@ -17,18 +17,17 @@
     </dd>
     <dt>TF</dt>
     <dd>
-      {{ meta_site.delegate.curation.TF.name }} -
-      <a href="http://uniprot.org/uniprot/{{meta_site.delegate.curation.TF_instances.all.0.uniprot_accession }}"
-         target="_blank">
-        UniProtKB:{{ meta_site.delegate.curation.TF_instances.all.0.uniprot_accession }}
-      </a>
-
+      {{ meta_site.delegate.curation.TF.name }}
+      {% for TF_instance in meta_site.delegate.curation.TF_instances.all %}
+      [<a href="http://uniprot.org/uniprot/{{TF_instance.uniprot_accession }}"
+      target="_blank">UniProtKB:{{ TF_instance.uniprot_accession }}</a>, 
+      <a href="{% url 'view_motif_report_by_uniprot_accession' TF_instance.uniprot_accession %}">view regulon</a>]{% if not forloop.last %}, {% endif %}{% endfor %}
     </dd>
   </dl>
 </section>
 
 <section class="box">
-  <h1>Supporting Evidence</h1>
+  <h2>Supporting Evidence</h2>
   <table class="table table-striped table-condensed">
     <thead>
       <tr>
@@ -69,7 +68,7 @@
 
 
 <section class="box">
-  <h1>Regulated genes</h1>
+  <h2>Regulated genes</h2>
 
   <p>
     Regulated genes for each binding site are displayed below. Gene regulation diagrams
