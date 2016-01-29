@@ -225,7 +225,7 @@
                   </td>
 
                   <td>
-                    <span class="sequence">{{ meta_site.delegate_sequence }}</span>
+                    <a href="{% url 'view_site' dbxref_id=meta_site.delegate.dbxref %}"><span class="sequence">{{ meta_site.delegate_sequence }}</span></a>
                   </td>
 
                   <td class="site_location_col">

@@ -32,7 +32,8 @@ urlpatterns = [
     url(r'^curate/', include(curate_urls)),
 
     # dbxref links from NCBI don't have browse/ prefix, being served from here.
-    url(r'^(expsite|EXPSITE)_(?P<dbxref_id>\w+)$', view_site.view_site),
+    url(r'^expsite_(?P<dbxref_id>\w+)$', view_site.view_site),
+    url(r'^EXPSITE_(?P<dbxref_id>\w+)$', view_site.view_site, name='view_site'),
 
     # UniProt dbxref
     url(r'^(expreg|EXPREG)_(?P<uniprot_dbxref>\w+)$',

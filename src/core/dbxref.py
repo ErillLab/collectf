@@ -13,7 +13,7 @@ def from_uniprot_dbxref(dbxref_id):
 
 def to_ncbi_dbxref(site_id):
     """Converts curation_site_instance_id to dbxref."""
-    return 'CollecTF:EXPSITE_' + '00' + hex(int(site_id))[2:].zfill(5) + '0'
+    return '00' + hex(int(site_id))[2:].zfill(5) + '0'
 
 
 def from_ncbi_dbxref(dbxref_id):

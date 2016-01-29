@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.core.cache import cache
 
 from bioutils import reverse_complement
+from . import dbxref
 
 
 class Curation(models.Model):
@@ -579,6 +580,11 @@ class Curation_SiteInstance(models.Model):
     def genome_accession(self):
         """Returns the genome accession of the site instance."""
         return self.site_instance.genome.genome_accession
+
+    @property
+    def dbxref(self):
+        """Returns the dbxref identifier of the object."""
+        return dbxref.to_ncbi_dbxref(self.pk)
 
 
 class Regulation(models.Model):

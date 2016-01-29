@@ -19,8 +19,7 @@
     <dd>
       {{ meta_site.delegate.curation.TF.name }}
       {% for TF_instance in meta_site.delegate.curation.TF_instances.all %}
-      [<a href="http://uniprot.org/uniprot/{{TF_instance.uniprot_accession }}"
-      target="_blank">UniProtKB:{{ TF_instance.uniprot_accession }}</a>, 
+      [<a href="http://uniprot.org/uniprot/{{TF_instance.uniprot_accession }}" target="_blank">UniProtKB:{{ TF_instance.uniprot_accession }}</a>, 
       <a href="{% url 'view_motif_report_by_uniprot_accession' TF_instance.uniprot_accession %}">view regulon</a>]{% if not forloop.last %}, {% endif %}{% endfor %}
     </dd>
   </dl>
