@@ -59,7 +59,7 @@
             <span class="icon-bar"></span>
           </button>
           <a class="navbar-brand" href="{% url 'homepage_home' %}">
-            CollecTF
+            <img src="{% static 'collectf_logo_reversed.png' %}"/> 
           </a>
         </div>
 
@@ -86,7 +86,7 @@
           </ul>
           {% endif %}
 
-          <div class="col-md-3 col-sm-3">
+          <div class="col-md-3 col-sm-3 pull-right">
           <form class="navbar-form" role="search" action="{% url 'term_search' %}">
               <div class="input-group">
                 <input type="text" class="form-control" placeholder="Quick search" name="search-term" id="search-term">
@@ -128,7 +128,10 @@
     <footer class="footer">
       <div class="container">
         <div class="row">
-          <div class="col-md-9">
+          <div class="col-md-2 col-sm-2 col-xs-2">
+            <img src="{% static 'collectf_logo.png' %}" alt="collectf_logo" class="img-responsive"/>
+          </div>
+          <div class="col-md-7 col-sm-7 col-xs-7">
             <small>
             <p>Please send comments to <a href="mailto:collectfdb@umbc.edu">collectfdb@umbc.edu</a>.
             For feedback or bug/errors, you can use the form
@@ -144,7 +147,7 @@
             </small>
           </div>
 
-          <div class="col-md-3">
+          <div class="col-md-3 col-sm-3 col-xs-3">
             <a href="http://compbio.umbc.edu">
               <img src="{% static 'erilllab_logo.png' %}" alt="erilllab_logo" class="img-responsive"/>
             </a>
