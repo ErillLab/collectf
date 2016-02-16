@@ -226,6 +226,9 @@ class Publication(models.Model):
                 (self.publication_id, self.pmid, self.reported_TF,
                  self.reported_species, self.assigned_to))
 
+    class Meta:
+        verbose_name = "Publication"
+
 
 class Gene(models.Model):
     """Gene table.
