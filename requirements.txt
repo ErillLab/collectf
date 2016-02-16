@@ -5,7 +5,7 @@ cycler==0.9.0
 Django==1.9
 django-bootstrap-form==3.2
 django-debug-toolbar==1.4
-django-extensions==1.5.9
+django-extensions==1.6.1
 django-formtools==1.0
 docutils==0.12
 Jinja2==2.8

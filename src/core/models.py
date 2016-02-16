@@ -116,6 +116,9 @@ class Curation(models.Model):
         """Returns associated Curation_ExternalDatabase objects."""
         return Curation_ExternalDatabase.objects.filter(curation=self)
 
+    class Meta:
+        verbose_name = "Curation"
+
 
 class Curator(models.Model):
     """Curator table.
@@ -151,6 +154,9 @@ class Curator(models.Model):
     def name(self):
         """Returns the curator's first name and last name."""
         return self.user.first_name + ' ' + self.user.last_name
+
+    class Meta:
+        verbose_name = "Curator"
 
 
 class Publication(models.Model):
@@ -263,6 +269,9 @@ class Gene(models.Model):
         return '%s (%s-%s)' % (self.gene_id, self.name,
                                self.genome.genome_accession)
 
+    class Meta:
+        verbose_name = "Gene"
+
 
 class Genome(models.Model):
     """Genome table."""
@@ -315,6 +324,9 @@ class Genome(models.Model):
         ret = cache.get(key)
         return ret
 
+    class Meta:
+        verbose_name = "Genome"
+
 
 class GenomeSequence(models.Model):
     """Genome sequence table.
@@ -330,6 +342,9 @@ class GenomeSequence(models.Model):
     def __unicode__(self):
         """Unicode representation of the genome sequence."""
         return '%s' % self.genome
+
+    class Meta:
+        verbose_name = "Genome sequence"
 
 
 class Taxonomy(models.Model):
@@ -374,7 +389,8 @@ class Taxonomy(models.Model):
         return all_species
 
     class Meta:
-        verbose_name_plural = 'taxonomies'
+        verbose_name = "Taxonomy"
+        verbose_name_plural = "Taxonomies"
         ordering = ['name']
 
 
@@ -398,6 +414,7 @@ class TF(models.Model):
         return u'%s (%s family)' % (self.name, self.family.name)
 
     class Meta:
+        verbose_name = "TF"
         verbose_name_plural = "TFs"
         ordering = ['name']
 
@@ -455,7 +472,7 @@ class TFInstance(models.Model):
 
     class Meta:
         ordering = ['uniprot_accession']
-        verbose_name = "TF instance"
+        verbose_name = "TF-instance"
 
 
 class SiteInstance(models.Model):
@@ -493,6 +510,10 @@ class SiteInstance(models.Model):
         """Extends the SiteInstance sequence by n bases both sides."""
         seq = self.genome.sequence[self.start-n: self.end+n+1]
         return seq if self.strand == 1 else reverse_complement(seq)
+
+    class Meta:
+        verbose_name = "Site instance"
+        
 
 
 class Curation_SiteInstance(models.Model):
@@ -586,6 +607,9 @@ class Curation_SiteInstance(models.Model):
         """Returns the dbxref identifier of the object."""
         return dbxref.to_ncbi_dbxref(self.pk)
 
+    class Meta:
+        verbose_name = "Curation-Site instance"
+
 
 class Regulation(models.Model):
     """Gene regulation table.
@@ -641,6 +665,9 @@ class Regulation(models.Model):
         """Returns the regulatory mode (ACT, REP, DUAL, N/A)."""
         return self.curation_site_instance.TF_function
 
+    class Meta:
+        verbose_name = "Regulation"
+
 
 class NotAnnotatedSiteInstance(models.Model):
     """The table for not annotated site instances.
@@ -681,6 +708,9 @@ class NotAnnotatedSiteInstance(models.Model):
         """Returns the unicode representation of the object."""
         return u'%s [%s]' % (self.id, self.sequence)
 
+    class Meta:
+        verbose_name = "Not-annotated site-instance"
+
 
 class ExperimentalTechnique(models.Model):
     """The table of experimental techniques.
@@ -713,6 +743,7 @@ class ExperimentalTechnique(models.Model):
         return u'%s' % self.name
 
     class Meta:
+        verbose_name = "Experimental technique"
         ordering = ['name']
 
 
@@ -744,7 +775,8 @@ class ExperimentalTechniqueCategory(models.Model):
 
     class Meta:
         ordering = ['name']
-        verbose_name_plural = "experimental technique categories"
+        verbose_name = "Experimental technique category"
+        verbose_name_plural = "Experimental technique categories"
 
 
 class ChipInfo(models.Model):
@@ -769,6 +801,9 @@ class ChipInfo(models.Model):
     def __unicode__(self):
         """Returns the unicode representation of the object."""
         return u'[%d] %s' % (self.chip_info_id, self.assay_conditions[:20])
+
+    class Meta:
+        verbose_name = "ChIP experiment information"
 
 
 class ExternalDatabase(models.Model):
@@ -799,6 +834,9 @@ class ExternalDatabase(models.Model):
         """Returns the unicode representation of the external database."""
         return u'%s' % self.ext_database_name
 
+    class Meta:
+        verbose_name = "External database"
+
 
 class Curation_ExternalDatabase(models.Model):
     """'Through' table between Curation and ExternalDatabase tables."""
@@ -824,6 +862,9 @@ class Curation_ExternalDatabase(models.Model):
         """Returns the URL to the external database."""
         return (self.external_database.ext_database_url_format %
                 self.accession_number)
+
+    class Meta:
+        verbose_name = "Curation-External database"
 
 
 class NCBISubmission(models.Model):
@@ -855,3 +896,8 @@ class GeneOntologyTerm(models.Model):
     def __unicode__(self):
         """Returns the unicode representation of the GO term."""
         return u'%s (%s)' % (self.GO_term_id, self.GO_term_name)
+
+    class Meta:
+        verbose_name = "GO term"
+
+    

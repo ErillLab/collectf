@@ -191,7 +191,7 @@ def search_terms(request):
         models.TFInstance.objects.filter(reduce(operator.or_, TF_qs)) or
         models.TFInstance.objects.all())
 
-    fail_msg = ("Your search (%s) did not match any motifs." %
+    fail_msg = ("Your search \"%s\" did not match any motifs." %
                 request.GET.get('search-term'))
 
     # If nothing is filtered, don't return the entire database content.
