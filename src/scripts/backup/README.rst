@@ -29,7 +29,7 @@ Create public and private keys on local-host
     Generating public/private rsa key pair.
     Enter file in which to save the key (/home/sefa/.ssh/id_rsa):[Enter key]
     Enter passphrase (empty for no passphrase): [Press enter key]
-    Enter same passphrase again: [Pess enter key]
+    Enter same passphrase again: [Press enter key]
     Your identification has been saved in /home/sefa/.ssh/id_rsa.
     Your public key has been saved in /home/sefa/.ssh/id_rsa.pub.
     The key fingerprint is:

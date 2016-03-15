@@ -1,7 +1,7 @@
 #!/bin/bash
 # Shell script to copy CollecTF backup to the lab server.
 
-ERRORFILE="/local/backups/backup.err"
+ERRORFILE="/home/erilllab/backups/backup.err"
 
 MOST_RECENT_SQL=$(ls -Art /local/backups/*.sql.gz | tail -n -1)
 
@@ -9,7 +9,7 @@ scp $MOST_RECENT_SQL erilllab@erilllab.biosci.umbc.edu:./collectf_backups/collec
 
 if [ $? -eq 0 ]
 then
-    msg="[$(date)] mysqldump copied succesfully." 
+    msg="[$(date)] mysqldump copied succesfully."
 else
     msg="[$(date)] mysqldump copied error. See $ERRORFILE."
 fi
