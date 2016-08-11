@@ -15,7 +15,7 @@ GZIP="$(which gzip)"
 FIND="$(which find)"
 
 # Backup Dest directory, change this if you have someother location
-DEST="/local/backups"
+DEST="/home/erilllab/backups"
 
 # Main directory where backup will be stored
 MBD="$DEST/"
