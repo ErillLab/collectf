@@ -30,3 +30,4 @@ uniprot-tools==0.4.1
 weblogo==3.4
 wheel==0.24.0
 pandas==0.18.1
+tqdm-4.8.3
