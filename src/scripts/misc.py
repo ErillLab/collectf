@@ -36,6 +36,22 @@ def batch_assign_GO_terms_to_TF_instances(TF_name, GO_term_id):
         TF_instance.save()
 
 
+def check_curations_with_external_db():
+    """Checks which curations have links to external databases."""
+    curations = models.Curation.objects.exclude(curation_externaldatabase__isnull=True)
+    print curations
+
+
+def clear_spaces_on_pmids():
+    """Removes trailing whitespaces on PMIDs."""
+    for pub in models.Publication.objects.all():
+        if pub.pmid:
+            pub.pmid = pub.pmid.replace(' ', '')
+            pub.save()
+
+
 def run():
-    batch_assign_GO_terms_to_TF_instances('LexA', 'GO:0006974')
-    batch_assign_GO_terms_to_TF_instances('Fur', 'GO:0071281')
+    #batch_assign_GO_terms_to_TF_instances('LexA', 'GO:0006974')
+    #batch_assign_GO_terms_to_TF_instances('Fur', 'GO:0071281')
+    #check_curations_with_external_db()
+    clear_spaces_on_pmids()
