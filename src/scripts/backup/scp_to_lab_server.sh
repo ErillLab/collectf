@@ -9,7 +9,7 @@ scp $MOST_RECENT_SQL erilllab@erilllab.biosci.umbc.edu:./collectf_backups/collec
 
 if [ $? -eq 0 ]
 then
-    msg="[$(date)] mysqldump copied succesfully." 
+    msg="[$(date)] mysqldump copied succesfully."
 else
     msg="[$(date)] mysqldump copied error. See $ERRORFILE."
 fi

@@ -36,10 +36,12 @@ def get_genome(accession):
 def get_organism_taxon(genome_record):
     """Finds organism taxonomy ID of a given record using Elink utility."""
     try:
-        gi = genome_record.annotations['gi']
-        record = Entrez.read(Entrez.elink(db='taxonomy', dbfrom='nuccore',
-                                          id=gi, linkname='nuccore_taxonomy'))
-        tax_id = record[0]['LinkSetDb'][0]['Link'][0]['Id']
+        src_feature = genome_record.features[0]
+        db_xrefs = src_feature.qualifiers['db_xref']
+        taxon_db_xref, = [db_xref for db_xref in db_xrefs
+                          if db_xref.startswith('taxon:')]
+        tax_id = taxon_db_xref.replace('taxon:', '')
+        print tax_id
         return tax_id
     except:
         raise EntrezException

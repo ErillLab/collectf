@@ -2,7 +2,7 @@
 # Shell script to backup CollecTF MySQL database.
 
 MyUSER=""                   # USERNAME
-MyPASS=""               # PASSWORD 
+MyPASS=""               # PASSWORD
 MyHOST="localhost"              # Hostname
 DB="collectfdb"
 
@@ -21,14 +21,14 @@ DEST="/home/erilllab/backups"
 MBD="$DEST/"
 
 # Get data in dd-mm-yyyy format
-NOW="$(date +"%d-%m-%Y-%H-%M-%S")"
+NOW="$(date +"%m-%d-%Y-%H-%M-%S")"
 
 # Backup here
 FILE="$MBD/collectfdb.$NOW.sql.gz"
 LOGFILE="$MBD/backup.log"
 ERRORFILE="$MBD/backup.err"
 
-$MYSQLDUMP $DB 2>>$ERRORFILE | $GZIP -1 >$FILE 
+$MYSQLDUMP $DB 2>>$ERRORFILE | $GZIP -1 >$FILE
 
 if [ ${PIPESTATUS[0]} -eq 0 ]
 then
@@ -41,4 +41,3 @@ fi
 
 # remove files older than 7 days
 $FIND $MBD/*.sql.gz -type f -mtime +7 | xargs rm -f
-
