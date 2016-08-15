@@ -3,7 +3,7 @@
 
 ERRORFILE="/home/erilllab/backups/backup.err"
 
-MOST_RECENT_SQL=$(ls -Art /local/backups/*.sql.gz | tail -n -1)
+MOST_RECENT_SQL=$(ls -Art /home/erilllab/backups/*.sql.gz | tail -n -1)
 
 scp $MOST_RECENT_SQL erilllab@erilllab.biosci.umbc.edu:./collectf_backups/collectf_backup.sql.gz 2>>$ERRORFILE
 
