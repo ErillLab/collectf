@@ -39,6 +39,15 @@ def list_all_publications(request):
                   {"publications": publications})
 
 
+""" Function to return rendered list_all_curations page
+    Function will be called by Django after user types/links to collectf.org/browse/list_all_curations
+    This will first prompt Django to disambiguate the call, looking at src/browse/urls.py (the URL mapper for the browse app),
+    and point it to the browse.list_all.list_all_curations function (within the browse app, in the list_all module).
+    The function then performs a SQL query on the database (models is a module of the core app), and stores into curations variable
+    the result of the query.
+    It then returns with a request to render the 'list_all_curations.html' template (in src/templates/browse), passing it the
+    curation object containing the list of curations retrieved from the database.
+"""
 def list_all_curations(request):
     """View function to see all curations."""
     curations = models.Curation.objects.all().order_by('-curation_id')
