@@ -50,8 +50,23 @@ def clear_spaces_on_pmids():
             pub.save()
 
 
+def batch_validate_curations():
+    """Validates any curations by superusers"""
+    curations = models.Curation.objects.filter(
+        curator__user__username__in=['ivanerill', 'dinara'])
+    sefa = models.Curator.objects.get(user__username='sefa1')
+    for curation in curations:
+        if not curation.validated_by:
+            print curation
+        curation.NCBI_submission_ready = True
+        curation.validated_by = sefa
+        curation.save()
+
+
+
 def run():
     #batch_assign_GO_terms_to_TF_instances('LexA', 'GO:0006974')
     #batch_assign_GO_terms_to_TF_instances('Fur', 'GO:0071281')
     #check_curations_with_external_db()
-    clear_spaces_on_pmids()
+    #clear_spaces_on_pmids()
+    batch_validate_curations()
