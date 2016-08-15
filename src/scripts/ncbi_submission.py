@@ -112,6 +112,6 @@ def run():
     genome_list = list_of_genomes()
     for genome in tqdm(genome_list):
         gff = get_site_instances(genome)
-        export_file = os.path.join(settings.STATICFILES_DIRS[0], 'ncbi', genome+'.txt')
+        export_file = os.path.join(settings.STATICFILES_DIRS[0], 'ncbi', genome+'.gff')
         with open(export_file, 'w') as f:
             f.write(gff)
