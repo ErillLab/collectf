@@ -1,6 +1,10 @@
+{# base.html is the main template, with header, bottom, etc. this command makes the current page a "daughter" of base.html #}
 {% extends "base.html" %}
+
+{# allows to call ("import") static files in the template without specifying absolute paths #}
 {% load staticfiles %}
 
+{# identifies the insert point for the content in the parent base.html file #}
 {% block content %}
 
 <div class="box">
@@ -8,6 +12,7 @@
   <h1>List of curations</h1>
   <hr>
 
+  {# defines the table headers #}
   <table id="curation-table" class="table table-hover">
     <thead>
       <tr>
@@ -19,14 +24,21 @@
         <th></th>
     </thead>
 
+    {# defines the table body #}
     <tbody data-provides="rowlink">
+      {# does a for loop over provided curations object to create and fill up table rows #}
       {% for curation in curations %}
+      {# new table row #}
       <tr>
+        {# define 6 table cells #}
+        {# variables are accessed through two "{{" #}
         <td>{{ curation.curation_id }}</td>
         <td>{{ curation.TF.name }}</td>
         <td>{{ curation.site_species }}</td>
+        
+        {# access publication object within curation object and assign it to publication variable #}
         {% with publication=curation.publication %}
-        <td><span title="{% with pub=publication %}{{ pub.title }}, {{ pub.authors }} {% endwith %}">
+        <td><span title="{{ publication.title }}, {{ publication.authors }}">
             <a href="http://www.ncbi.nlm.nih.gov/pubmed/?term={{ publication.pmid }}">
               {{ publication.pmid }}
             </a>
@@ -40,11 +52,16 @@
   </table>
 </div>
 
+{# ends block to be inserted in base.html #}
 {% endblock %}
 
+{# block to be inserted into base.html's js block #}
 {% block js %}
+{# 'super' indicates that this block should be appended to, not replace, the js block in base.html #}
 {{ block.super }}
 <script src="https://cdn.datatables.net/1.10.10/js/jquery.dataTables.min.js"></script>
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.10/css/jquery.dataTables.min.css">
+
+{# invokes the main JS functionality for this page, which is stored in a separate js file #}
 <script src="{% static 'list_all_curations.js' %}"></script>
 {% endblock %}
