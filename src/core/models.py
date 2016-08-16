@@ -45,7 +45,9 @@ class Curation(models.Model):
     # If true, the curation is ready for NCBI submission.
     NCBI_submission_ready = models.BooleanField()
 
-    # Reason for the revision of the curation.
+    # Reason for the revision of the curation
+    # The first element of the tuple is the text stored in the text field on DB, the second one is the one used for display (descriptor)
+    # used with the "choices" keyword, to define a text field that can take on (through Django) a limited set of values
     REVISION_REASONS = (
         ('genome_not_available', "No comparable genome in NCBI"),
         ('in_progress', "Matching genome still in progress"),
