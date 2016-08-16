@@ -25,13 +25,17 @@ from browse import view_site
 from browse import view_motif_reports
 from curate import urls as curate_urls
 
+# indicates where the urls should be looked up (which app contains the urls.py)
+# and how to handle the base urls
 urlpatterns = [
     url(r'^$', RedirectView.as_view(url=reverse_lazy('homepage_home'))),
     url(r'^admin/', admin.site.urls),
     url(r'^browse/', include(browse_urls)),
     url(r'^curate/', include(curate_urls)),
 
-    # dbxref links from NCBI don't have browse/ prefix, being served from here.
+    # dbxref links from NCBI don't have browse/ prefix, being served from here
+    # the url call has two main fields: a static "expsite_" followed by the db_xref identifier
+    # the identifier is stored in dbxref_id and passed on to the handler function view_site (in view_site module)
     url(r'^expsite_(?P<dbxref_id>\w+)$', view_site.view_site),
     url(r'^EXPSITE_(?P<dbxref_id>\w+)$', view_site.view_site, name='view_site'),
 
