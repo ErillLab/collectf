@@ -11,7 +11,12 @@ from django.utils.safestring import mark_safe
 from django.template import Library
 register = Library()
 
-
+"""
+    creates a new Django directive (for use in Jinja; Django's HTML)
+    in this case, this allows getting an item from a dictionary, given the key
+    e.g. <td>{{ motif_report.regulation_stats|get_item:"not specified" }}%</td> in view_motif_reports.html
+         the format here is equivalent to get_item(regulation_stats, "not specified")
+"""
 @register.filter
 def get_item(dictionary, key):
     """Get the dictionary element having the specified key. Lets use
