@@ -12,6 +12,7 @@
         <th>TF</th>
         <th>TF family</th>
         <th>Description</th>
+        <th>TF instances</th>
       </tr>
     </thead>
     <tbody>
@@ -21,6 +22,12 @@
         <td>{{ TF.name }}</td>
         <td>{{ TF_family.name }}</td>
         <td>{{ TF.description|HTMLify }}</td>
+        
+        <td>
+        {% for TF_instance in TF.TF_instance_accessions}
+          {{TF_instance}},
+        {% endfor %}
+        </td>
       </tr>
       {% endfor %}
       {% endfor %}
