@@ -24,8 +24,8 @@
         <td>{{ TF.description|HTMLify }}</td>
         
         <td>
-        "boo"
         {% for TF_instance in TF.TF_instances.all %}
+          "boo",
           {{TF_instance}},
         {% endfor %}
         </td>
