@@ -25,8 +25,7 @@
         
         <td>
         {% for TF_instance in TF.TF_instances.all %}
-          "boo",
-          {{TF_instance}},
+          {{TF_instance.uniprot_accession}},
         {% endfor %}
         </td>
       </tr>
