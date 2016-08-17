@@ -25,7 +25,9 @@
         
         <td>
         {% for TF_instance in TF.TF_instances.all %}
-          {{TF_instance.uniprot_accession}},
+          {{TF_instance.uniprot_accession}}
+          {% if not forloop.last %} ,
+          {% endif %}
         {% endfor %}
         </td>
       </tr>
