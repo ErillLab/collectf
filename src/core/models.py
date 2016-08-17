@@ -462,7 +462,9 @@ class TFInstance(models.Model):
     description = models.TextField()
 
     # Transcription factor that the protein is.
-    TF = models.ForeignKey('TF', null=False)
+    # the related_name (TF_instances) defines a method to retrieve the TF instances mapping to the TF
+    # from the TF object, even though the link is established (through the foreign key) in TF_instance
+    TF = models.ForeignKey('TF', null=False, related_name='TF_instances')
 
     # The notes -- mostly about RefSeq to UniProt migration.
     notes = models.TextField()
