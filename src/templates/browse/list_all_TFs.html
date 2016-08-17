@@ -25,7 +25,7 @@
         
         <td>
         {% for TF_instance in TF.TF_instances.all %}
-          {{TF_instance.uniprot_accession}}
+          <a href="{% url 'view_motif_report_by_uniprot_accession' TF_instance.uniprot_accession %}">{{TF_instance.uniprot_accession}}</a> 
           {% if not forloop.last %} ,
           {% endif %}
         {% endfor %}
