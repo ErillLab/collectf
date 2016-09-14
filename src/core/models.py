@@ -520,7 +520,7 @@ class SiteInstance(models.Model):
 
     class Meta:
         verbose_name = "Site instance"
-        
+
 
 
 class Curation_SiteInstance(models.Model):
@@ -753,6 +753,10 @@ class ExperimentalTechnique(models.Model):
         verbose_name = "Experimental technique"
         ordering = ['name']
 
+    def ECO_term_link(self):
+        """Returns the URL for the ECO term."""
+        return "http://purl.obolibrary.org/obo/" + self.EO_term.replace(':', '_')
+
 
 class ExperimentalTechniqueCategory(models.Model):
     """Experimental technique category table.
@@ -906,5 +910,3 @@ class GeneOntologyTerm(models.Model):
 
     class Meta:
         verbose_name = "GO term"
-
-    
