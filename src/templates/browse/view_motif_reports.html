@@ -2,6 +2,28 @@
 {% load staticfiles %}
 {% load utiltags %}
 
+{% block title %}
+<meta name="description" content="CollecTF regulon and TF-binding site reports for selected transcription factors. Provides details on TF-binding motif structure, experimental evidence and regulated genes.">
+<title>
+{% if motif_reports %}
+{% for motif_report in motif_reports %}
+{{ motif_report.TF_name }}
+{% if not forloop.last %}
+,
+{% endif %}
+{% endfor %}
+{% endif %} 
+regulon and binding site collection in 
+{% for motif_report in motif_reports %}
+{{ motif_report.species_name }}
+{% if not forloop.last %}
+,
+{% endif %}
+{% endfor %}
+</title>
+
+{% endblock %}
+
 {% block content %}
 
 {% if motif_reports %}

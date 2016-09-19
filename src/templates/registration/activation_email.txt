@@ -1,3 +1,10 @@
+{% block title %}
+<meta name="description" content="Validate registration to activate account.">
+<title>
+Activate CollecTF account
+</title>
+{% endblock %}
+
 {% load i18n %}
 {% blocktrans with site_name=CollecTF %}
 

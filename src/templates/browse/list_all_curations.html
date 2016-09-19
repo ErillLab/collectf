@@ -4,6 +4,14 @@
 {# allows to call ("import") static files in the template without specifying absolute paths #}
 {% load staticfiles %}
 
+
+{% block title %}
+<meta name="description" content="List of all CollecTF curations. Can be sorted by date, TF, organism or PubMed ID.">
+<title>
+Curation list
+</title>
+{% endblock %}
+
 {# identifies the insert point for the content in the parent base.html file #}
 {% block content %}
 

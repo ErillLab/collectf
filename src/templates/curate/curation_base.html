@@ -1,6 +1,13 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 
+{% block title %}
+<meta name="description" content="CollecTF curation wizard. A step-by-step annotation system to report TF-binding sites.">
+<title>
+Curation wizard
+</title>
+{% endblock %}
+
 {% block content %}
 
 {% if wizard.steps.step1 == 1 %}

@@ -7,8 +7,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'collectfdb_devel',
-        'USER': 'sefa',
-        'PASSWORD': '46544654',
+        'USER': 'collecTF',
+        'PASSWORD': 'dummy',
         'HOST': 'localhost',
         'PORT': ''
     }
@@ -33,4 +33,4 @@ DEBUG_TOOLBAR_PANELS = [
 
 SITE_ID = 1
 
-WEBLOGO_BIN = '/Users/sefa/.virtualenvs/collectf_env/bin/weblogo'
+WEBLOGO_BIN = '/home/k7n7vi/miniconda2/envs/collecTF/bin/weblogo'

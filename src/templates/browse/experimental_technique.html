@@ -4,6 +4,14 @@ Used for displaying a technique and more information about it when clicked on it
 
 {% endcomment %}
 
+
+{% block title %}
+<meta name="description" content="Experimental technique details">
+<title>
+Experimental technique details
+</title>
+{% endblock %}
+
 <a data-toggle="modal" data-target="#modal{{ technique.technique_id }}">
   {{ technique.name }}
   {% if technique.EO_term %}

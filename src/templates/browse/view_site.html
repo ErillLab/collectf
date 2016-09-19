@@ -1,5 +1,13 @@
 {% extends "base.html" %}
 
+{% block title %}
+<meta name="description" content="Site information summary. Provides details on all evidence sources used to report the site.">
+<title>
+Site information for: {{ meta_site.delegate.curation.TF.name }}
+in species {{ meta_site.delegate_site_instance.genome.taxonomy.name }}; 
+genome accession: {{ meta_site.delegate_site_instance.genome.genome_accession }}
+</title>
+
 {% block content %}
 
 <section class="box">
