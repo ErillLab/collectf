@@ -274,7 +274,7 @@ def generate_gpad_file():
     for TF_instance in models.TFInstance.objects.all():
         content.extend(TF_centric_binding_annotations(TF_instance))
         content.extend(TF_centric_regulation_annotations(TF_instance))
-        content.extend(gene_centric_annotations(TF_instance))
+        #content.extend(gene_centric_annotations(TF_instance))
     export_file = os.path.join(settings.STATICFILES_DIRS[0], 'collectf.gpad')
     with open(export_file, 'w') as f:
         f.write('\n'.join(header + content))
