@@ -238,43 +238,6 @@ def batch_refseq_accession(genome_accession):
                 gene_dict[old_locus_tag] = protein_id
     return gene_dict
 
-def retrieve_genome(genome_accession):
-    """Retrieves the genome, returns it as a list of genes"""
-    print "Downloading", genome_accession
-    genome_rec = entrez_utils.get_genome(genome_accession)
-    genes = entrez_utils.get_genes(genome_rec)
-    return genes
-    
-def get_refseq_acc(locus_tag,gene_list):
-    """Gets a locus tag and a genome gene-list, and returns a dictionary
-     {locus_tag: RefSeq_acc}, where RefSeq_acc is the product NP/YP/WP 
-     accession numbers for the protein product associated with that locus tag"""
-    gene_dict = {}
-    print locus_tag
-    print "-->"
-    for gene in gene_list:
-        if (gene['locus_tag']==locus_tag) | (gene['old_locus_tag']==locus_tag):
-            print gene['locus_tag']
-            if gene['protein_id'] and len(gene['protein_id']) == 1:
-                protein_id = gene['protein_id'][0].split('.')[0]
-                gene_dict[gene['locus_tag']] = protein_id
-                for old_locus_tag in gene['old_locus_tag']:
-                    gene_dict[old_locus_tag] = protein_id
-    return gene_dict     
-
-def refseq_to_uniprot(refseq_accession, genome_accession):
-    """Maps the given RefSeq accession to a UniProt accession."""
-    # Remove version suffix from the genome accession
-    genome_accession = genome_accession.split('.')[0]
-    mapping = uniprot.map(refseq_accession, f='P_REFSEQ_AC', t='ACC')
-    for uniprot_acc in mapping.get(refseq_accession, []):
-        rec = uniprot.retrieve(uniprot_acc)
-        if genome_accession in rec:
-            print "Found UNIPROT acc!"
-            print uniprot_acc
-            return uniprot_acc
-    return None
-
 def uniprot_to_refseq(genome_acc):
     """Gets a genome accession. Queries uniprot to get all UniProt accessions
        associated with genome. Downloads genome from NCBI and gets all refseq 
