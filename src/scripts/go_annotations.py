@@ -252,6 +252,8 @@ def uniprot_to_refseq(genome_acc):
     
     if len(u_accs)>0:
         uniprot_accs = list(u_accs.get(genome_acc,[]))
+    else:
+        uniprot_accs = []
     
     #download genome and get refseq protein accessions
     #the result is something like: {'CCNA_00250': 'YP_002515625', 'CCNA_02456': 'YP_002517829'}
