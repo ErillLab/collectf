@@ -248,7 +248,10 @@ def uniprot_to_refseq(genome_acc):
     
     #make uniprot query to get all uniprot IDs for a given NCBI genome accession
     #the result is something like: [u'A0A0H3IFM0', u'B8H3X3', u'A0A0H3IXV8']
-    uniprot_accs = list(uniprot.map(genome_acc, f='REFSEQ_NT_ID' , t='ACC').get(genome_acc,[]))
+    u_accs=uniprot.map(genome_acc, f='REFSEQ_NT_ID' , t='ACC')
+    
+    if len(u_accs)>0:
+        uniprot_accs = list(u_accs.get(genome_acc,[]))
     
     #download genome and get refseq protein accessions
     #the result is something like: {'CCNA_00250': 'YP_002515625', 'CCNA_02456': 'YP_002517829'}
