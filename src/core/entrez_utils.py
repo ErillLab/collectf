@@ -4,7 +4,7 @@ import uniprot
 
 from Bio import Entrez
 from Bio import SeqIO
-Entrez.email = 'sefa1@umbc.edu'
+Entrez.email = 'erill@umbc.edu'
 
 
 class EntrezException(Exception):
@@ -25,7 +25,7 @@ def get_genome(accession):
     """Retrieves the genome from RefSeq database."""
     try:
         handle = Entrez.efetch(db='nuccore', id=accession,
-                               retmode='gbwithparts', rettype='text')
+                               rettype='gbwithparts', retmode='text')
         record = SeqIO.read(handle, 'gb')
         handle.close()
         return record

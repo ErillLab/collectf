@@ -69,7 +69,7 @@ from core import entrez_utils
 
 
 def new_TF_centric_gpad_entry(uniprot_id, go_id, db_ref,
-                              evidence_code, relationship):
+                              evidence_code, relationship, with_field):
     """Returns a dictionary for a TF-centric GO annotation.
 
     See http://geneontology.org/page/gene-product-association-data-gpad-format
@@ -80,7 +80,7 @@ def new_TF_centric_gpad_entry(uniprot_id, go_id, db_ref,
                 go_id=go_id,
                 db_ref=('PMID:' + db_ref),
                 evidence_code=evidence_code,
-                with_from='',
+                with_from=with_field,
                 interacting_taxon_id='',
                 date=time.strftime('%Y%m%d'),
                 assigned_by='CollecTF',
@@ -120,6 +120,12 @@ def get_inferred_regulations(TF_instance):
         evidence_type='inferred',
         curation_site_instance__curation__TF_instances=TF_instance)
 
+def get_ECO_IPI_terms():
+    """Returns list of ECO terms belonging to IPI, which require
+       WITH field (with genome ID) in the GO annotation"""
+    return ['ECO:0005618', 'ECO:0005621', 'ECO:0005626', 'ECO:0005630', \
+            'ECO:0005631', 'ECO:0005635', 'ECO:0005643', 'ECO:0005647', \
+            'ECO:0005656', 'ECO:0005665']
 
 def TF_centric_binding_annotations(TF_instance):
     """Generates list of binding GO annotations for the given TF instance."""
@@ -135,14 +141,18 @@ def TF_centric_binding_annotations(TF_instance):
     for reg in (r for r in exp_regulations if r.mode in ['ACT', 'REP']):
         pmid = reg.ref_pmid
         for tech in reg.binding_experimental_techniques:
+            with_field=''
+            if tech.EO_term in get_ECO_IPI_terms():
+                with_field='RefSeq:'+reg.curation_site_instance.site_instance.genome.genome_accession
+#            print reg.curation_site_instance.site_instance.genome.genome_accession
             if reg.mode == 'ACT':
                 go_annotations.append(new_TF_centric_gpad_entry(
-                    uniprot_id, 'GO:0001216', pmid, tech.EO_term, 'enables'))
+                    uniprot_id, 'GO:0001216', pmid, tech.EO_term, 'enables',with_field))
             else:  # reg.mode = 'REP'
                 go_annotations.append(new_TF_centric_gpad_entry(
-                    uniprot_id, 'GO:0001217', pmid, tech.EO_term, 'enables'))
+                    uniprot_id, 'GO:0001217', pmid, tech.EO_term, 'enables',with_field))
             go_annotations.append(new_TF_centric_gpad_entry(
-                uniprot_id, 'GO:0000976', pmid, tech.EO_term, 'enables'))
+                uniprot_id, 'GO:0000976', pmid, tech.EO_term, 'enables',with_field))
         annotated_pmids.add(pmid)
 
     # If there is evidence of TF-mediated regulation for at least one gene,
@@ -152,10 +162,13 @@ def TF_centric_binding_annotations(TF_instance):
         pmid = reg.ref_pmid
         if pmid not in annotated_pmids:
             for tech in reg.binding_experimental_techniques:
+                with_field=''
+                if tech.EO_term in get_ECO_IPI_terms():
+                    with_field='RefSeq:'+reg.curation_site_instance.site_instance.genome.genome_accession            
                 go_annotations.append(new_TF_centric_gpad_entry(
-                    uniprot_id, 'GO:0001130', pmid, tech.EO_term, 'enables'))
+                    uniprot_id, 'GO:0001130', pmid, tech.EO_term, 'enables',with_field))
                 go_annotations.append(new_TF_centric_gpad_entry(
-                    uniprot_id, 'GO:0000976', pmid, tech.EO_term, 'enables'))
+                    uniprot_id, 'GO:0000976', pmid, tech.EO_term, 'enables',with_field))
                 annotated_pmids.add(pmid)
 
     # If there is no regulation evidence, simply report binding
@@ -163,8 +176,11 @@ def TF_centric_binding_annotations(TF_instance):
         pmid = reg.ref_pmid
         if pmid not in annotated_pmids:
             for tech in reg.binding_experimental_techniques:
+                with_field=''
+                if tech.EO_term in get_ECO_IPI_terms():
+                    with_field='RefSeq:'+reg.curation_site_instance.site_instance.genome.genome_accession                
                 go_annotations.append(new_TF_centric_gpad_entry(
-                    uniprot_id, 'GO:0043565', pmid, tech.EO_term, 'enables'))
+                    uniprot_id, 'GO:0043565', pmid, tech.EO_term, 'enables',with_field))
                 annotated_pmids.add(pmid)
 
     return set(map(gpad_entry_to_str, go_annotations))
@@ -176,18 +192,21 @@ def TF_centric_regulation_annotations(TF_instance):
     go_annotations = []
     for reg in get_exp_regulations(TF_instance):
         for tech in reg.expression_experimental_techniques:
+            with_field=''
+            if tech.EO_term in get_ECO_IPI_terms():
+                with_field='RefSeq:'+reg.curation_site_instance.site_instance.genome.genome_accession            
             if reg.mode == 'ACT':
                 go_annotations.append(new_TF_centric_gpad_entry(
                     uniprot_id, 'GO:0045893', reg.ref_pmid, tech.EO_term,
-                    'involved_in'))
+                    'involved_in',with_field))
             elif reg.mode == 'REP':
                 go_annotations.append(new_TF_centric_gpad_entry(
                     uniprot_id, 'GO:0045892', reg.ref_pmid, tech.EO_term,
-                    'involved_in'))
+                    'involved_in',with_field))
             else:
                 go_annotations.append(new_TF_centric_gpad_entry(
                     uniprot_id, 'GO:0006355', reg.ref_pmid, tech.EO_term,
-                    'involved_in'))
+                    'involved_in',with_field))
     return set(map(gpad_entry_to_str, go_annotations))
 
 
