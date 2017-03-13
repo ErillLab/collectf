@@ -131,7 +131,7 @@ def get_ECO_IPI_terms():
        WITH field (with genome ID) in the GO annotation"""
     return ['ECO:0005618', 'ECO:0005621', 'ECO:0005626', 'ECO:0005630', \
             'ECO:0005631', 'ECO:0005635', 'ECO:0005643', 'ECO:0005647', \
-            'ECO:0005656', 'ECO:0005665']
+            'ECO:0005656', 'ECO:0005665', 'ECO:0005634']
 
 def TF_centric_binding_annotations(TF_instance):
     """Generates list of binding GO annotations for the given TF instance."""
