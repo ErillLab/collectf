@@ -58,6 +58,7 @@ class TFFamilyAdmin(admin.ModelAdmin):
 class TFInstanceAdmin(admin.ModelAdmin):
     list_display = ('uniprot_accession', 'TF', 'description')
     ordering = ('uniprot_accession', )
+    blank=True
 
 
 class GeneOntologyTermAdmin(admin.ModelAdmin):
