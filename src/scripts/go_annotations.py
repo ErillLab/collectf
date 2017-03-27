@@ -246,6 +246,7 @@ def uniprot_to_refseq(genome_acc):
        If so, it returns a dictionary with the complete mapping.
     """
     
+    print "Querying UniProt for genome: ", genome_acc
     #make uniprot query to get all uniprot IDs for a given NCBI genome accession
     #the result is something like: [u'A0A0H3IFM0', u'B8H3X3', u'A0A0H3IXV8']
     u_accs=uniprot.map(genome_acc, f='REFSEQ_NT_ID' , t='ACC')
@@ -265,6 +266,7 @@ def uniprot_to_refseq(genome_acc):
     #{u'A0A0H3IFM0': {u'WP_024265740.1', u'YP_008877611.1'},
     # u'A0A0H3IXV8': {u'WP_024265959.1', u'YP_009020565.1'}}
     if len(uniprot_accs)>0:
+        print "Querying UniProt for UniProt accessions starting with: ", uniprot_accs[0]
         uni_refseqs=uniprot.map(uniprot_accs, f='ACC', t='P_REFSEQ_AC')
             
         #for each gene with mapped refseq protein record
@@ -290,7 +292,7 @@ def gene_centric_annotations(TF_instance):
                             if reg.expression_experimental_techniques)
     
     for genome in regulated_genomes:
-
+        
         #get the mapping between genes in genome and uniprot accessions
         #this looks like:
         #{'CCNA_03751': {'refseq': 'YP_002519124.2', 'uniprot': u'A0A0H3CFU0'},
@@ -354,7 +356,7 @@ def generate_gpad_file():
     for TF_instance in models.TFInstance.objects.all():
         content.extend(TF_centric_binding_annotations(TF_instance))
         content.extend(TF_centric_regulation_annotations(TF_instance))
-        #content.extend(gene_centric_annotations(TF_instance))
+        content.extend(gene_centric_annotations(TF_instance))
     export_file = os.path.join(settings.STATICFILES_DIRS[0], 'collectf.gpad')
     with open(export_file, 'w') as f:
         f.write('\n'.join(header + content))
