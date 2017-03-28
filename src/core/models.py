@@ -449,13 +449,6 @@ class TFFamily(models.Model):
 class TFInstance(models.Model):
     """TF instance (protein) table."""
 
-    my_nullable_string = models.CharField(max_length=15, null=True, blank=True)
-
-    def save(self, *args, **kwargs):
-         if not self.my_nullable_string:
-              self.my_nullable_string = None
-         super(MyModel, self).save(*args, **kwargs)
-        
     # The TF instance identifier.
     TF_instance_id = models.AutoField(primary_key=True)
 
