@@ -3,7 +3,7 @@ from django.contrib import admin
 import models
 
 def set_TF_GOterm_null(modeladmin, request, queryset):
-    queryset.update(GO_term=null)
+    queryset.update(GO_term=None)
 set_TF_GOterm_null.short_description = "Set selected TF instance GO term to null"
 
 class CurationAdmin(admin.ModelAdmin):
